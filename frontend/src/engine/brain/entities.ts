@@ -1,0 +1,29 @@
+// Entity shapes for the brain. Single source of truth for entity types.
+// INDUSTRY-FREE: "supplier"/"competitor"/"target" are generic business
+// relationships; capability tags are generic strings. Which concrete company is
+// "self", which city it sits in, and what "AS9100" means all live in the data.
+
+/** How an entity relates to the client whose world this brain models. */
+export type Relationship = "self" | "customer" | "supplier" | "competitor" | "target";
+
+export interface Location {
+  city: string;
+  lat: number;
+  lon: number;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  relationship: Relationship;
+  location: Location;
+  /** Capability tags this company needs from a supplier — matched for fit. */
+  needs: string[];
+}
+
+export interface Contact {
+  id: string;
+  company_id: string;
+  name: string;
+  title: string;
+}

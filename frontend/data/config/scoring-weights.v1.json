@@ -1,0 +1,48 @@
+{
+  "version": "1",
+  "min_confidence": 0.7,
+  "dimension_cap": 100,
+  "repeat_decay": 0.6,
+  "weights": {
+    "supplier_delay":            { "risk": 25, "capacityRisk": 15 },
+    "quality_escape":            { "risk": 20, "competitivePressure": 10 },
+    "capacity_constraint":       { "risk": 30, "capacityRisk": 35 },
+    "pricing_pressure":          { "risk": 15, "competitivePressure": 10 },
+    "regulatory_change":         { "risk": 15 },
+    "government_contract_award": { "opportunity": 20 },
+    "contract_win":              { "opportunity": 30 },
+    "contract_loss":             { "risk": 20, "competitivePressure": 15 },
+    "demand_spike":              { "opportunity": 25, "capacityRisk": 10 },
+    "competitor_expansion":      { "competitivePressure": 20 },
+    "hiring_surge":              { "opportunity": 10 },
+    "competitor_won_deal":       { "risk": 15, "competitivePressure": 30 }
+  },
+  "alert_thresholds": {
+    "risk": 60,
+    "capacityRisk": 50,
+    "competitivePressure": 30,
+    "opportunity": 30
+  },
+  "categories": {
+    "supplier_delay": "supply chain",
+    "quality_escape": "supply chain",
+    "regulatory_change": "supply chain",
+    "capacity_constraint": "capacity",
+    "demand_spike": "capacity",
+    "government_contract_award": "pipeline",
+    "contract_win": "pipeline",
+    "contract_loss": "pipeline",
+    "hiring_surge": "growth",
+    "competitor_expansion": "competition",
+    "competitor_won_deal": "competition",
+    "pricing_pressure": "competition"
+  },
+  "lens_rules": [
+    { "relationship": "competitor", "source": "opportunity",        "target": "competitivePressure", "factor": 0.5 },
+    { "relationship": "competitor", "source": "competitivePressure", "target": "competitivePressure", "factor": 0.4 },
+    { "relationship": "supplier",   "source": "risk",               "target": "capacityRisk",        "factor": 0.5 },
+    { "relationship": "supplier",   "source": "capacityRisk",       "target": "capacityRisk",        "factor": 0.5 },
+    { "relationship": "customer",   "source": "opportunity",        "target": "opportunity",         "factor": 0.4 },
+    { "relationship": "target",     "source": "opportunity",        "target": "opportunity",         "factor": 0.4 }
+  ]
+}

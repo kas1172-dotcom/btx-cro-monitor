@@ -19,10 +19,22 @@ dependencies = [
 dev = [
     "pytest>=8.0",
 ]
+# Integration platform backend (Engine #1). Kept optional so the static
+# monitor_engine install stays lean; install with `pip install -e ".[platform]"`.
+platform = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "pydantic-settings>=2.0",
+    "celery>=5.3",            # background workers (Phase 2)
+    "redis>=5.0",             # broker/result backend (Phase 2)
+    "httpx>=0.27",            # outbound forwarder + TestClient
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["monitor_engine*"]
+include = ["monitor_engine*", "btx_platform*"]
 
 [tool.setuptools.package-data]
 monitor_engine = [

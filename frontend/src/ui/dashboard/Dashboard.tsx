@@ -1,0 +1,75 @@
+// Portfolio dashboard: aggregates the engine output across the whole world (not
+// city-scoped). Pure rendering — every row is derived from scores/alerts/signals.
+// Clicking any row sets activeCompanyId, opening the dossier (cross-surface link
+// falls out of the shared store, no special glue).
+
+import type { World } from "../../app/useWorld.ts";
+import type { ScoreDimension } from "../../engine/signals/contract.ts";
+import { rankBy } from "../../engine/decision/portfolio.ts";
+import { setState } from "../../store/store.ts";
+
+function RankList({ world, dimension, title }: { world: World; dimension: ScoreDimension; title: string }) {
+  const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
+  const rows = rankBy(world.analysis.scores, dimension)
+    .filter((s) => s.dimensions[dimension].score > 0)
+    .slice(0, 6);
+  const color = dimension === "opportunity" ? "var(--good)" : "var(--bad)";
+  return (
+    <div className="dash-card">
+      <h3>{title}</h3>
+      {rows.length === 0 && <p className="muted">none</p>}
+      {rows.map((s) => {
+        const v = s.dimensions[dimension].score;
+        return (
+          <button key={s.subject_id} className="rank-row" onClick={() => setState({ activeCompanyId: s.subject_id })}>
+            <span className="rank-name">{nameOf(s.subject_id)}</span>
+            <span className="rank-bar"><span style={{ width: `${v}%`, background: color }} /></span>
+            <span className="rank-val">{v}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function Dashboard({ world }: { world: World }) {
+  const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
+  const alerts = world.analysis.alerts.slice(0, 8);
+  const recent = [...world.analysis.valid]
+    .sort((a, b) => b.detected_at.localeCompare(a.detected_at))
+    .slice(0, 8);
+
+  return (
+    <div className="dashboard">
+      <div className="dash-head">
+        Portfolio intelligence · {world.companies.length} entities · {world.analysis.valid.length} validated signals
+      </div>
+
+      <div className="dash-grid">
+        <RankList world={world} dimension="risk" title="Top risk" />
+        <RankList world={world} dimension="opportunity" title="Top opportunity" />
+      </div>
+
+      <div className="dash-card">
+        <h3>Alerts ({alerts.length})</h3>
+        {alerts.map((a, i) => (
+          <button key={i} className="alert-row" onClick={() => setState({ activeCompanyId: a.subject_id })}>
+            <span className={`sev sev-${a.severity}`}>{a.severity}</span>
+            <span className="alert-main">{nameOf(a.subject_id)} — {a.dimension} {a.score}</span>
+            <span className="muted">{a.reason}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="dash-card">
+        <h3>Recent signals</h3>
+        {recent.map((s) => (
+          <button key={s.id} className="feed-row" onClick={() => setState({ activeCompanyId: s.subject_id })}>
+            <span className="feed-ev">{s.event_type}</span>
+            <span className="feed-q">{nameOf(s.subject_id)}: {s.source_quote}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

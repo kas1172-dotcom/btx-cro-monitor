@@ -1,0 +1,14 @@
+{
+  "client_id": "btx-precision",
+  "name": "BTX Precision",
+  "home_city": "Dallas",
+  "capabilities": [
+    "5-axis CNC",
+    "precision machining",
+    "build-to-print",
+    "AS9100",
+    "ITAR",
+    "titanium",
+    "aluminum"
+  ]
+}
