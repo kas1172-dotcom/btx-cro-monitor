@@ -37,10 +37,25 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Assemble _site/ from each clients/*/artifacts dashboard plus a root
-      # landing page linking to them. stdlib only — no install step needed.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Build the Enterprise Brain demo (Vite → frontend/dist).
+      - name: Build Enterprise Brain demo
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      # Assemble _site/: the demo at the root URL, the Python cockpit dashboards
+      # under /cockpit/. build_pages is stdlib only — no install step needed.
       - name: Assemble site
-        run: python -m tooling.build_pages --clients-dir clients --out _site
+        run: |
+          rm -rf _site && mkdir -p _site
+          cp -r frontend/dist/. _site/
+          python -m tooling.build_pages --clients-dir clients --out _site/cockpit
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
