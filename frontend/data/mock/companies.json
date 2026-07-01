@@ -5,241 +5,116 @@
     "relationship": "self",
     "location": {
       "city": "Dallas",
-      "lat": 32.8685,
-      "lon": -96.8355
+      "lat": 32.709,
+      "lon": -96.8206
     },
     "needs": [
-      "AS9100",
-      "precision machining",
-      "titanium"
+      "ITAR",
+      "build-to-print",
+      "precision machining"
     ]
   },
   {
-    "id": "titan-castings",
-    "name": "Titan Castings Co",
+    "id": "anvil-manufacturing",
+    "name": "Anvil Manufacturing",
+    "relationship": "customer",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.4793,
+      "lon": -112.1646
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "build-to-print",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "meridian-technologies",
+    "name": "Meridian Technologies",
     "relationship": "supplier",
     "location": {
       "city": "Huntsville",
-      "lat": 34.6613,
-      "lon": -86.6841
-    },
-    "needs": [
-      "AS9100",
-      "NADCAP",
-      "aluminum"
-    ]
-  },
-  {
-    "id": "meridian-forgings",
-    "name": "Meridian Forgings",
-    "relationship": "supplier",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.6196,
-      "lon": -97.2595
+      "lat": 34.668,
+      "lon": -86.6238
     },
     "needs": [
       "5-axis CNC",
-      "assembly",
+      "AS9100",
       "build-to-print",
       "precision machining",
-      "titanium"
+      "sheet metal"
     ]
   },
   {
-    "id": "cobalt-alloys",
-    "name": "Cobalt Alloys",
+    "id": "falcon-fabrication",
+    "name": "Falcon Fabrication",
     "relationship": "supplier",
     "location": {
-      "city": "Phoenix",
-      "lat": 33.3934,
-      "lon": -112.1239
+      "city": "Greenville",
+      "lat": 34.7769,
+      "lon": -82.4405
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "monarch-technologies",
+    "name": "Monarch Technologies",
+    "relationship": "customer",
+    "location": {
+      "city": "Greenville",
+      "lat": 34.7945,
+      "lon": -82.4699
     },
     "needs": [
       "ITAR",
       "NADCAP",
-      "aluminum"
+      "aluminum",
+      "assembly",
+      "sheet metal"
     ]
   },
   {
-    "id": "granite-tooling",
-    "name": "Granite Tooling",
+    "id": "strata-turbine",
+    "name": "Strata Turbine",
+    "relationship": "target",
+    "location": {
+      "city": "Austin",
+      "lat": 30.2248,
+      "lon": -97.7885
+    },
+    "needs": [
+      "sheet metal",
+      "titanium"
+    ]
+  },
+  {
+    "id": "anvil-systems",
+    "name": "Anvil Systems",
     "relationship": "supplier",
     "location": {
       "city": "Austin",
-      "lat": 30.1968,
-      "lon": -97.8256
+      "lat": 30.2197,
+      "lon": -97.6664
     },
     "needs": [
       "aluminum",
-      "assembly",
-      "sheet metal"
+      "assembly"
     ]
   },
   {
-    "id": "apex-machining",
-    "name": "Apex Machining",
-    "relationship": "competitor",
-    "location": {
-      "city": "Dallas",
-      "lat": 32.7979,
-      "lon": -96.7346
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "NADCAP",
-      "aluminum",
-      "titanium"
-    ]
-  },
-  {
-    "id": "vanguard-aero",
-    "name": "Vanguard Aerospace",
-    "relationship": "competitor",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.6089,
-      "lon": -97.3531
-    },
-    "needs": [
-      "ITAR",
-      "build-to-print",
-      "sheet metal",
-      "titanium"
-    ]
-  },
-  {
-    "id": "ironclad-comp",
-    "name": "Ironclad Components",
-    "relationship": "competitor",
-    "location": {
-      "city": "Hartford",
-      "lat": 41.803,
-      "lon": -72.685
-    },
-    "needs": [
-      "precision machining",
-      "sheet metal",
-      "titanium"
-    ]
-  },
-  {
-    "id": "strata-mfg",
-    "name": "Strata Manufacturing",
-    "relationship": "competitor",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.5374,
-      "lon": -112.0332
-    },
-    "needs": [
-      "aluminum",
-      "build-to-print",
-      "sheet metal"
-    ]
-  },
-  {
-    "id": "harbor-aero",
-    "name": "Harbor Aerosystems",
+    "id": "sentinel-alloys",
+    "name": "Sentinel Alloys",
     "relationship": "customer",
     "location": {
-      "city": "Hartford",
-      "lat": 41.824,
-      "lon": -72.7329
-    },
-    "needs": [
-      "AS9100",
-      "aluminum",
-      "sheet metal"
-    ]
-  },
-  {
-    "id": "continental-def",
-    "name": "Continental Defense",
-    "relationship": "customer",
-    "location": {
-      "city": "Dallas",
-      "lat": 32.8498,
-      "lon": -96.7539
-    },
-    "needs": [
-      "5-axis CNC",
-      "aluminum",
-      "build-to-print",
-      "precision machining",
-      "titanium"
-    ]
-  },
-  {
-    "id": "northwind-sys",
-    "name": "Northwind Systems",
-    "relationship": "customer",
-    "location": {
-      "city": "Austin",
-      "lat": 30.351,
-      "lon": -97.7197
-    },
-    "needs": [
-      "NADCAP",
-      "assembly",
-      "sheet metal"
-    ]
-  },
-  {
-    "id": "beacon-aviation",
-    "name": "Beacon Aviation",
-    "relationship": "target",
-    "location": {
-      "city": "Austin",
-      "lat": 30.202,
-      "lon": -97.6678
-    },
-    "needs": [
-      "sheet metal",
-      "titanium"
-    ]
-  },
-  {
-    "id": "summit-turbine",
-    "name": "Summit Turbine",
-    "relationship": "target",
-    "location": {
-      "city": "Austin",
-      "lat": 30.2323,
-      "lon": -97.7705
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "titanium"
-    ]
-  },
-  {
-    "id": "delta-propulsion",
-    "name": "Delta Propulsion",
-    "relationship": "target",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.609,
-      "lon": -97.2863
-    },
-    "needs": [
-      "aluminum",
-      "assembly",
-      "build-to-print",
-      "precision machining",
-      "titanium"
-    ]
-  },
-  {
-    "id": "orion-defense",
-    "name": "Orion Defense",
-    "relationship": "target",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.543,
-      "lon": -112.0951
+      "city": "Cincinnati",
+      "lat": 39.1365,
+      "lon": -84.4484
     },
     "needs": [
       "5-axis CNC",
@@ -247,6 +122,659 @@
       "aluminum",
       "assembly",
       "build-to-print"
+    ]
+  },
+  {
+    "id": "cardinal-metalworks",
+    "name": "Cardinal Metalworks",
+    "relationship": "competitor",
+    "location": {
+      "city": "Tulsa",
+      "lat": 36.2253,
+      "lon": -96.0807
+    },
+    "needs": [
+      "NADCAP",
+      "assembly",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "monarch-alloys",
+    "name": "Monarch Alloys",
+    "relationship": "target",
+    "location": {
+      "city": "Huntsville",
+      "lat": 34.7288,
+      "lon": -86.6339
+    },
+    "needs": [
+      "5-axis CNC",
+      "ITAR"
+    ]
+  },
+  {
+    "id": "sentinel-aerospace",
+    "name": "Sentinel Aerospace",
+    "relationship": "target",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.7661,
+      "lon": -117.1251
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "build-to-print"
+    ]
+  },
+  {
+    "id": "beacon-alloys",
+    "name": "Beacon Alloys",
+    "relationship": "supplier",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.3912,
+      "lon": -112.0518
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "ITAR",
+      "assembly",
+      "titanium"
+    ]
+  },
+  {
+    "id": "halcyon-components",
+    "name": "Halcyon Components",
+    "relationship": "target",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.8011,
+      "lon": -117.1735
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "ITAR",
+      "assembly",
+      "titanium"
+    ]
+  },
+  {
+    "id": "vanguard-systems",
+    "name": "Vanguard Systems",
+    "relationship": "target",
+    "location": {
+      "city": "Hartford",
+      "lat": 41.7643,
+      "lon": -72.6653
+    },
+    "needs": [
+      "5-axis CNC",
+      "ITAR",
+      "build-to-print",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "nimbus-technologies",
+    "name": "Nimbus Technologies",
+    "relationship": "supplier",
+    "location": {
+      "city": "Tulsa",
+      "lat": 36.247,
+      "lon": -95.9631
+    },
+    "needs": [
+      "aluminum",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "falcon-tooling",
+    "name": "Falcon Tooling",
+    "relationship": "competitor",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.3594,
+      "lon": -111.9949
+    },
+    "needs": [
+      "ITAR",
+      "build-to-print",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "titan-precision",
+    "name": "Titan Precision",
+    "relationship": "competitor",
+    "location": {
+      "city": "Wichita",
+      "lat": 37.695,
+      "lon": -97.3854
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "build-to-print",
+      "precision machining",
+      "titanium"
+    ]
+  },
+  {
+    "id": "titan-components",
+    "name": "Titan Components",
+    "relationship": "supplier",
+    "location": {
+      "city": "Huntsville",
+      "lat": 34.827,
+      "lon": -86.608
+    },
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "NADCAP"
+    ]
+  },
+  {
+    "id": "cardinal-components",
+    "name": "Cardinal Components",
+    "relationship": "target",
+    "location": {
+      "city": "Cincinnati",
+      "lat": 39.1579,
+      "lon": -84.5233
+    },
+    "needs": [
+      "AS9100",
+      "NADCAP",
+      "assembly",
+      "build-to-print",
+      "titanium"
+    ]
+  },
+  {
+    "id": "pinnacle-forgings",
+    "name": "Pinnacle Forgings",
+    "relationship": "customer",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.7829,
+      "lon": -117.1732
+    },
+    "needs": [
+      "AS9100",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "bastion-tooling",
+    "name": "Bastion Tooling",
+    "relationship": "competitor",
+    "location": {
+      "city": "Tulsa",
+      "lat": 36.0736,
+      "lon": -95.942
+    },
+    "needs": [
+      "AS9100",
+      "aluminum",
+      "build-to-print",
+      "titanium"
+    ]
+  },
+  {
+    "id": "meridian-systems",
+    "name": "Meridian Systems",
+    "relationship": "supplier",
+    "location": {
+      "city": "Cincinnati",
+      "lat": 39.1704,
+      "lon": -84.4926
+    },
+    "needs": [
+      "5-axis CNC",
+      "assembly",
+      "build-to-print"
+    ]
+  },
+  {
+    "id": "granite-components",
+    "name": "Granite Components",
+    "relationship": "target",
+    "location": {
+      "city": "Hartford",
+      "lat": 41.705,
+      "lon": -72.6588
+    },
+    "needs": [
+      "AS9100",
+      "ITAR",
+      "precision machining",
+      "titanium"
+    ]
+  },
+  {
+    "id": "nimbus-components",
+    "name": "Nimbus Components",
+    "relationship": "target",
+    "location": {
+      "city": "Wichita",
+      "lat": 37.6182,
+      "lon": -97.2729
+    },
+    "needs": [
+      "ITAR",
+      "assembly"
+    ]
+  },
+  {
+    "id": "delta-precision",
+    "name": "Delta Precision",
+    "relationship": "target",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.4544,
+      "lon": -111.9784
+    },
+    "needs": [
+      "AS9100",
+      "NADCAP",
+      "assembly"
+    ]
+  },
+  {
+    "id": "aegis-components",
+    "name": "Aegis Components",
+    "relationship": "competitor",
+    "location": {
+      "city": "Wichita",
+      "lat": 37.7129,
+      "lon": -97.3098
+    },
+    "needs": [
+      "AS9100",
+      "aluminum",
+      "assembly"
+    ]
+  },
+  {
+    "id": "meridian-aerospace",
+    "name": "Meridian Aerospace",
+    "relationship": "supplier",
+    "location": {
+      "city": "Greenville",
+      "lat": 34.7571,
+      "lon": -82.2946
+    },
+    "needs": [
+      "AS9100",
+      "ITAR",
+      "aluminum",
+      "precision machining",
+      "titanium"
+    ]
+  },
+  {
+    "id": "axiom-components",
+    "name": "Axiom Components",
+    "relationship": "customer",
+    "location": {
+      "city": "Tulsa",
+      "lat": 36.1009,
+      "lon": -96.0339
+    },
+    "needs": [
+      "5-axis CNC",
+      "NADCAP",
+      "assembly",
+      "build-to-print"
+    ]
+  },
+  {
+    "id": "meridian-precision",
+    "name": "Meridian Precision",
+    "relationship": "target",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.4427,
+      "lon": -112.1283
+    },
+    "needs": [
+      "ITAR",
+      "aluminum",
+      "sheet metal",
+      "titanium"
+    ]
+  },
+  {
+    "id": "sterling-turbine",
+    "name": "Sterling Turbine",
+    "relationship": "competitor",
+    "location": {
+      "city": "Huntsville",
+      "lat": 34.777,
+      "lon": -86.6342
+    },
+    "needs": [
+      "ITAR",
+      "NADCAP",
+      "assembly",
+      "build-to-print",
+      "titanium"
+    ]
+  },
+  {
+    "id": "ironclad-defense",
+    "name": "Ironclad Defense",
+    "relationship": "target",
+    "location": {
+      "city": "Tulsa",
+      "lat": 36.2355,
+      "lon": -95.9511
+    },
+    "needs": [
+      "assembly",
+      "build-to-print",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "vertex-alloys",
+    "name": "Vertex Alloys",
+    "relationship": "target",
+    "location": {
+      "city": "Austin",
+      "lat": 30.242,
+      "lon": -97.8304
+    },
+    "needs": [
+      "ITAR",
+      "NADCAP",
+      "build-to-print"
+    ]
+  },
+  {
+    "id": "foundry-precision",
+    "name": "Foundry Precision",
+    "relationship": "supplier",
+    "location": {
+      "city": "Austin",
+      "lat": 30.2031,
+      "lon": -97.6661
+    },
+    "needs": [
+      "5-axis CNC",
+      "ITAR",
+      "titanium"
+    ]
+  },
+  {
+    "id": "monarch-forgings",
+    "name": "Monarch Forgings",
+    "relationship": "target",
+    "location": {
+      "city": "Cincinnati",
+      "lat": 39.1955,
+      "lon": -84.5445
+    },
+    "needs": [
+      "5-axis CNC",
+      "titanium"
+    ]
+  },
+  {
+    "id": "halcyon-manufacturing",
+    "name": "Halcyon Manufacturing",
+    "relationship": "target",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.4115,
+      "lon": -111.9933
+    },
+    "needs": [
+      "ITAR",
+      "assembly",
+      "build-to-print",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "continental-components",
+    "name": "Continental Components",
+    "relationship": "target",
+    "location": {
+      "city": "Dallas",
+      "lat": 32.8566,
+      "lon": -96.7064
+    },
+    "needs": [
+      "AS9100",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "ironclad-dynamics",
+    "name": "Ironclad Dynamics",
+    "relationship": "supplier",
+    "location": {
+      "city": "Cincinnati",
+      "lat": 39.0279,
+      "lon": -84.6057
+    },
+    "needs": [
+      "AS9100",
+      "NADCAP",
+      "titanium"
+    ]
+  },
+  {
+    "id": "aegis-machining",
+    "name": "Aegis Machining",
+    "relationship": "supplier",
+    "location": {
+      "city": "Wichita",
+      "lat": 37.6444,
+      "lon": -97.2765
+    },
+    "needs": [
+      "NADCAP",
+      "aluminum",
+      "assembly",
+      "build-to-print",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "halcyon-castings",
+    "name": "Halcyon Castings",
+    "relationship": "target",
+    "location": {
+      "city": "Huntsville",
+      "lat": 34.6405,
+      "lon": -86.6861
+    },
+    "needs": [
+      "5-axis CNC",
+      "ITAR",
+      "aluminum",
+      "build-to-print",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "falcon-turbine",
+    "name": "Falcon Turbine",
+    "relationship": "supplier",
+    "location": {
+      "city": "Austin",
+      "lat": 30.367,
+      "lon": -97.6465
+    },
+    "needs": [
+      "ITAR",
+      "build-to-print",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "halcyon-dynamics",
+    "name": "Halcyon Dynamics",
+    "relationship": "competitor",
+    "location": {
+      "city": "Huntsville",
+      "lat": 34.633,
+      "lon": -86.6572
+    },
+    "needs": [
+      "5-axis CNC",
+      "aluminum",
+      "build-to-print",
+      "precision machining",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "northwind-controls",
+    "name": "Northwind Controls",
+    "relationship": "supplier",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.7782,
+      "lon": -117.2169
+    },
+    "needs": [
+      "AS9100",
+      "NADCAP",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "vanguard-machining",
+    "name": "Vanguard Machining",
+    "relationship": "target",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.635,
+      "lon": -117.209
+    },
+    "needs": [
+      "ITAR",
+      "build-to-print"
+    ]
+  },
+  {
+    "id": "harbor-components",
+    "name": "Harbor Components",
+    "relationship": "supplier",
+    "location": {
+      "city": "Tulsa",
+      "lat": 36.2447,
+      "lon": -96.0131
+    },
+    "needs": [
+      "5-axis CNC",
+      "build-to-print",
+      "precision machining"
+    ]
+  },
+  {
+    "id": "foundry-turbine",
+    "name": "Foundry Turbine",
+    "relationship": "supplier",
+    "location": {
+      "city": "Phoenix",
+      "lat": 33.4434,
+      "lon": -112.068
+    },
+    "needs": [
+      "AS9100",
+      "ITAR",
+      "build-to-print",
+      "sheet metal",
+      "titanium"
+    ]
+  },
+  {
+    "id": "continental-castings",
+    "name": "Continental Castings",
+    "relationship": "competitor",
+    "location": {
+      "city": "Cincinnati",
+      "lat": 39.0286,
+      "lon": -84.4231
+    },
+    "needs": [
+      "AS9100",
+      "ITAR",
+      "build-to-print",
+      "titanium"
+    ]
+  },
+  {
+    "id": "strata-defense",
+    "name": "Strata Defense",
+    "relationship": "supplier",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.6763,
+      "lon": -117.0785
+    },
+    "needs": [
+      "AS9100",
+      "ITAR",
+      "NADCAP",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "titan-fabrication",
+    "name": "Titan Fabrication",
+    "relationship": "supplier",
+    "location": {
+      "city": "Greenville",
+      "lat": 34.7659,
+      "lon": -82.3775
+    },
+    "needs": [
+      "5-axis CNC",
+      "ITAR",
+      "assembly",
+      "sheet metal",
+      "titanium"
+    ]
+  },
+  {
+    "id": "falcon-defense",
+    "name": "Falcon Defense",
+    "relationship": "target",
+    "location": {
+      "city": "San Diego",
+      "lat": 32.8149,
+      "lon": -117.1678
+    },
+    "needs": [
+      "5-axis CNC",
+      "sheet metal"
+    ]
+  },
+  {
+    "id": "torque-turbine",
+    "name": "Torque Turbine",
+    "relationship": "supplier",
+    "location": {
+      "city": "Greenville",
+      "lat": 34.9119,
+      "lon": -82.4867
+    },
+    "needs": [
+      "5-axis CNC",
+      "NADCAP",
+      "precision machining",
+      "sheet metal"
     ]
   }
 ]

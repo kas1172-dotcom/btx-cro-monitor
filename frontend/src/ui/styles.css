@@ -100,6 +100,42 @@ body {
 .contacts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .contacts li { padding: 6px 0; }
 
+.inspector-back { display: none; }
+
+/* ── Mobile ─────────────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "top" "stage";
+  }
+  .topbar { flex-wrap: wrap; height: auto; padding: 10px 12px; gap: 8px; }
+  .controls { flex-wrap: wrap; gap: 8px; width: 100%; justify-content: space-between; }
+  .brand-sub { display: none; }
+  .city-picker { flex: 0 0 auto; }
+  .tabs { flex-wrap: wrap; }
+  .tab { padding: 6px 10px; }
+
+  /* Inspector becomes a full-screen slide-in, shown only when a company is picked. */
+  .inspector {
+    position: fixed; inset: 0; width: auto; z-index: 40;
+    transform: translateX(100%); transition: transform .22s ease;
+  }
+  .inspector.open { transform: none; }
+  .inspector-back {
+    display: block; margin: -18px -18px 14px; width: calc(100% + 36px);
+    text-align: left; background: var(--panel-2); border: 0;
+    border-bottom: 1px solid var(--line); color: var(--text);
+    padding: 12px 14px; font-size: 15px; cursor: pointer;
+  }
+
+  .dash-grid { grid-template-columns: 1fr; }
+  .rank-name, .rec-name, .feed-ev { flex-basis: auto; }
+
+  .copilot { width: calc(100vw - 24px); right: 12px; bottom: 12px; max-height: 80%; }
+  .copilot-fab { right: 12px; bottom: 12px; }
+}
+
 /* Dashboard */
 .dashboard { position: absolute; inset: 0; overflow-y: auto; padding: 18px; }
 .dash-head { color: var(--muted); margin-bottom: 14px; font-size: 13px; }

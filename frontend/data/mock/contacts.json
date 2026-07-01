@@ -2,193 +2,2899 @@
   {
     "id": "con-0001",
     "company_id": "btx-precision",
-    "name": "Michael Cole",
-    "title": "Chief Engineer"
+    "name": "Marcus Nguyen",
+    "title": "Director of Operations"
   },
   {
     "id": "con-0002",
     "company_id": "btx-precision",
-    "name": "Nancy Diaz",
+    "name": "Omar Sharpe",
     "title": "Commodity Manager"
   },
   {
     "id": "con-0003",
     "company_id": "btx-precision",
-    "name": "Robert Hayes",
-    "title": "Director of Operations"
+    "name": "Kevin Sharpe",
+    "title": "Sourcing Lead"
   },
   {
     "id": "con-0004",
-    "company_id": "titan-castings",
-    "name": "Karen Vargas",
+    "company_id": "btx-precision",
+    "name": "Karen Knox",
     "title": "Commodity Manager"
   },
   {
     "id": "con-0005",
-    "company_id": "titan-castings",
-    "name": "Linda Reed",
-    "title": "Director of Procurement"
+    "company_id": "btx-precision",
+    "name": "Marcus Reed",
+    "title": "Chief Engineer"
   },
   {
     "id": "con-0006",
-    "company_id": "titan-castings",
-    "name": "Karen Patel",
-    "title": "VP Supply Chain"
+    "company_id": "btx-precision",
+    "name": "Paul Cole",
+    "title": "Director of Operations"
   },
   {
     "id": "con-0007",
-    "company_id": "meridian-forgings",
-    "name": "James Patel",
-    "title": "Director of Procurement"
+    "company_id": "anvil-manufacturing",
+    "name": "Lisa Sharpe",
+    "title": "VP Manufacturing"
   },
   {
     "id": "con-0008",
-    "company_id": "cobalt-alloys",
-    "name": "Robert Flores",
-    "title": "Director of Procurement"
+    "company_id": "anvil-manufacturing",
+    "name": "Priya Vargas",
+    "title": "Program Manager"
   },
   {
     "id": "con-0009",
-    "company_id": "cobalt-alloys",
-    "name": "Nancy Hayes",
-    "title": "Commodity Manager"
+    "company_id": "anvil-manufacturing",
+    "name": "Wei Knox",
+    "title": "Chief Engineer"
   },
   {
     "id": "con-0010",
-    "company_id": "granite-tooling",
-    "name": "James Knox",
+    "company_id": "anvil-manufacturing",
+    "name": "Linda Foster",
     "title": "Director of Procurement"
   },
   {
     "id": "con-0011",
-    "company_id": "granite-tooling",
-    "name": "Nancy Cole",
-    "title": "Director of Procurement"
+    "company_id": "anvil-manufacturing",
+    "name": "Lisa Vargas",
+    "title": "Quality Director"
   },
   {
     "id": "con-0012",
-    "company_id": "apex-machining",
-    "name": "Lisa Diaz",
-    "title": "Program Manager"
+    "company_id": "anvil-manufacturing",
+    "name": "Maria Diaz",
+    "title": "Quality Director"
   },
   {
     "id": "con-0013",
-    "company_id": "apex-machining",
-    "name": "Susan Nguyen",
-    "title": "Program Manager"
+    "company_id": "anvil-manufacturing",
+    "name": "Elena Flores",
+    "title": "Sr. Buyer"
   },
   {
     "id": "con-0014",
-    "company_id": "vanguard-aero",
-    "name": "Karen Carter",
-    "title": "Chief Engineer"
+    "company_id": "meridian-technologies",
+    "name": "Lisa Bauer",
+    "title": "Sr. Buyer"
   },
   {
     "id": "con-0015",
-    "company_id": "vanguard-aero",
-    "name": "Daniel Vargas",
-    "title": "VP Supply Chain"
+    "company_id": "meridian-technologies",
+    "name": "Linda Chen",
+    "title": "Sr. Buyer"
   },
   {
     "id": "con-0016",
-    "company_id": "ironclad-comp",
-    "name": "Lisa Carter",
-    "title": "Program Manager"
+    "company_id": "meridian-technologies",
+    "name": "Susan Bauer",
+    "title": "Director of Operations"
   },
   {
     "id": "con-0017",
-    "company_id": "strata-mfg",
-    "name": "Nancy Carter",
-    "title": "Director of Procurement"
-  },
-  {
-    "id": "con-0018",
-    "company_id": "harbor-aero",
-    "name": "Lisa Brooks",
-    "title": "VP Supply Chain"
-  },
-  {
-    "id": "con-0019",
-    "company_id": "continental-def",
-    "name": "Paul Diaz",
+    "company_id": "meridian-technologies",
+    "name": "Nancy Flores",
     "title": "Program Manager"
   },
   {
-    "id": "con-0020",
-    "company_id": "northwind-sys",
-    "name": "Maria Brooks",
-    "title": "Director of Procurement"
-  },
-  {
-    "id": "con-0021",
-    "company_id": "northwind-sys",
-    "name": "Michael Reed",
-    "title": "Director of Procurement"
-  },
-  {
-    "id": "con-0022",
-    "company_id": "northwind-sys",
-    "name": "Maria Sharpe",
+    "id": "con-0018",
+    "company_id": "meridian-technologies",
+    "name": "Wei Patel",
     "title": "Commodity Manager"
   },
   {
+    "id": "con-0019",
+    "company_id": "meridian-technologies",
+    "name": "Wei Diaz",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0020",
+    "company_id": "meridian-technologies",
+    "name": "Elena Nguyen",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0021",
+    "company_id": "meridian-technologies",
+    "name": "James Malik",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0022",
+    "company_id": "meridian-technologies",
+    "name": "Karen Brooks",
+    "title": "Sr. Buyer"
+  },
+  {
     "id": "con-0023",
-    "company_id": "beacon-aviation",
-    "name": "Susan Knox",
-    "title": "Chief Engineer"
+    "company_id": "meridian-technologies",
+    "name": "Sofia Brooks",
+    "title": "Program Manager"
   },
   {
     "id": "con-0024",
-    "company_id": "beacon-aviation",
+    "company_id": "meridian-technologies",
+    "name": "Michael Santos",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0025",
+    "company_id": "meridian-technologies",
+    "name": "Susan Malik",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0026",
+    "company_id": "meridian-technologies",
+    "name": "Maria Chen",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0027",
+    "company_id": "falcon-fabrication",
+    "name": "Linda Diaz",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0028",
+    "company_id": "falcon-fabrication",
+    "name": "Daniel Okafor",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0029",
+    "company_id": "falcon-fabrication",
+    "name": "James Santos",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0030",
+    "company_id": "falcon-fabrication",
+    "name": "Michael Flores",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0031",
+    "company_id": "falcon-fabrication",
+    "name": "Paul Chen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0032",
+    "company_id": "falcon-fabrication",
+    "name": "Grace Brooks",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0033",
+    "company_id": "falcon-fabrication",
+    "name": "Maria Nguyen",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0034",
+    "company_id": "falcon-fabrication",
+    "name": "Michael Chen",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0035",
+    "company_id": "falcon-fabrication",
+    "name": "Priya Diaz",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0036",
+    "company_id": "falcon-fabrication",
+    "name": "Michael Malik",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0037",
+    "company_id": "falcon-fabrication",
+    "name": "Nancy Reed",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0038",
+    "company_id": "falcon-fabrication",
+    "name": "Elena Bauer",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0039",
+    "company_id": "falcon-fabrication",
+    "name": "Nancy Malik",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0040",
+    "company_id": "monarch-technologies",
+    "name": "Paul Nguyen",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0041",
+    "company_id": "monarch-technologies",
+    "name": "Daniel Flores",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0042",
+    "company_id": "monarch-technologies",
+    "name": "Paul Chen",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0043",
+    "company_id": "monarch-technologies",
+    "name": "Paul Nguyen",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0044",
+    "company_id": "monarch-technologies",
+    "name": "Michael Carter",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0045",
+    "company_id": "monarch-technologies",
+    "name": "Karen Diaz",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0046",
+    "company_id": "monarch-technologies",
+    "name": "Michael Diaz",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0047",
+    "company_id": "monarch-technologies",
+    "name": "David Bauer",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0048",
+    "company_id": "monarch-technologies",
+    "name": "Susan Diaz",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0049",
+    "company_id": "monarch-technologies",
+    "name": "Daniel Bauer",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0050",
+    "company_id": "monarch-technologies",
+    "name": "Linda Chen",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0051",
+    "company_id": "monarch-technologies",
+    "name": "Sofia Weber",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0052",
+    "company_id": "monarch-technologies",
+    "name": "Nancy Malik",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0053",
+    "company_id": "monarch-technologies",
+    "name": "Sofia Nguyen",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0054",
+    "company_id": "strata-turbine",
+    "name": "Michael Cole",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0055",
+    "company_id": "strata-turbine",
+    "name": "Michael Reed",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0056",
+    "company_id": "strata-turbine",
+    "name": "Wei Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0057",
+    "company_id": "strata-turbine",
+    "name": "Nancy Nguyen",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0058",
+    "company_id": "strata-turbine",
+    "name": "James Okafor",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0059",
+    "company_id": "strata-turbine",
+    "name": "Maria Chen",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0060",
+    "company_id": "anvil-systems",
+    "name": "Robert Foster",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0061",
+    "company_id": "anvil-systems",
+    "name": "Marcus Patel",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0062",
+    "company_id": "anvil-systems",
+    "name": "Wei Chen",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0063",
+    "company_id": "anvil-systems",
+    "name": "Sofia Patel",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0064",
+    "company_id": "anvil-systems",
+    "name": "Linda Knox",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0065",
+    "company_id": "anvil-systems",
+    "name": "Susan Malik",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0066",
+    "company_id": "sentinel-alloys",
+    "name": "Karen Weber",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0067",
+    "company_id": "sentinel-alloys",
+    "name": "Marcus Carter",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0068",
+    "company_id": "sentinel-alloys",
+    "name": "Paul Reed",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0069",
+    "company_id": "sentinel-alloys",
+    "name": "James Rivera",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0070",
+    "company_id": "sentinel-alloys",
+    "name": "Wei Bauer",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0071",
+    "company_id": "sentinel-alloys",
+    "name": "Sofia Bauer",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0072",
+    "company_id": "sentinel-alloys",
     "name": "Nancy Reed",
     "title": "Director of Operations"
   },
   {
-    "id": "con-0025",
-    "company_id": "summit-turbine",
-    "name": "Nancy Carter",
-    "title": "Chief Engineer"
+    "id": "con-0073",
+    "company_id": "sentinel-alloys",
+    "name": "Maria Carter",
+    "title": "Sr. Buyer"
   },
   {
-    "id": "con-0026",
-    "company_id": "summit-turbine",
-    "name": "James Cole",
-    "title": "VP Supply Chain"
-  },
-  {
-    "id": "con-0027",
-    "company_id": "summit-turbine",
-    "name": "Karen Vargas",
-    "title": "VP Supply Chain"
-  },
-  {
-    "id": "con-0028",
-    "company_id": "delta-propulsion",
-    "name": "Lisa Patel",
+    "id": "con-0074",
+    "company_id": "sentinel-alloys",
+    "name": "Susan Bauer",
     "title": "Director of Operations"
   },
   {
-    "id": "con-0029",
-    "company_id": "delta-propulsion",
-    "name": "Maria Hayes",
+    "id": "con-0075",
+    "company_id": "sentinel-alloys",
+    "name": "Nancy Hayes",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0076",
+    "company_id": "sentinel-alloys",
+    "name": "Daniel Chen",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0077",
+    "company_id": "sentinel-alloys",
+    "name": "Sofia Santos",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0078",
+    "company_id": "cardinal-metalworks",
+    "name": "Grace Malik",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0079",
+    "company_id": "cardinal-metalworks",
+    "name": "Kevin Rivera",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0080",
+    "company_id": "cardinal-metalworks",
+    "name": "Susan Rivera",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0081",
+    "company_id": "cardinal-metalworks",
+    "name": "Karen Hayes",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0082",
+    "company_id": "cardinal-metalworks",
+    "name": "Sofia Foster",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0083",
+    "company_id": "cardinal-metalworks",
+    "name": "Grace Reed",
     "title": "Director of Operations"
   },
   {
-    "id": "con-0030",
-    "company_id": "orion-defense",
-    "name": "Lisa Vargas",
+    "id": "con-0084",
+    "company_id": "cardinal-metalworks",
+    "name": "Daniel Sharpe",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0085",
+    "company_id": "cardinal-metalworks",
+    "name": "Kevin Rivera",
     "title": "Commodity Manager"
   },
   {
-    "id": "con-0031",
-    "company_id": "orion-defense",
+    "id": "con-0086",
+    "company_id": "cardinal-metalworks",
+    "name": "Lisa Okafor",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0087",
+    "company_id": "monarch-alloys",
+    "name": "Susan Reed",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0088",
+    "company_id": "monarch-alloys",
+    "name": "Marcus Santos",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0089",
+    "company_id": "monarch-alloys",
+    "name": "Karen Patel",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0090",
+    "company_id": "monarch-alloys",
+    "name": "Kevin Knox",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0091",
+    "company_id": "monarch-alloys",
+    "name": "Daniel Okafor",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0092",
+    "company_id": "monarch-alloys",
+    "name": "Linda Santos",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0093",
+    "company_id": "monarch-alloys",
+    "name": "Wei Hayes",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0094",
+    "company_id": "monarch-alloys",
+    "name": "Michael Reed",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0095",
+    "company_id": "monarch-alloys",
+    "name": "Robert Vargas",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0096",
+    "company_id": "monarch-alloys",
+    "name": "Omar Reed",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0097",
+    "company_id": "monarch-alloys",
+    "name": "Robert Cole",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0098",
+    "company_id": "monarch-alloys",
+    "name": "Maria Patel",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0099",
+    "company_id": "sentinel-aerospace",
+    "name": "Grace Cole",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0100",
+    "company_id": "sentinel-aerospace",
+    "name": "Paul Cole",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0101",
+    "company_id": "sentinel-aerospace",
+    "name": "Marcus Rivera",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0102",
+    "company_id": "sentinel-aerospace",
+    "name": "James Rivera",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0103",
+    "company_id": "sentinel-aerospace",
+    "name": "Omar Sharpe",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0104",
+    "company_id": "sentinel-aerospace",
+    "name": "Michael Diaz",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0105",
+    "company_id": "beacon-alloys",
+    "name": "Karen Foster",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0106",
+    "company_id": "beacon-alloys",
+    "name": "Karen Brooks",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0107",
+    "company_id": "beacon-alloys",
+    "name": "Wei Diaz",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0108",
+    "company_id": "beacon-alloys",
+    "name": "Linda Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0109",
+    "company_id": "beacon-alloys",
+    "name": "Robert Carter",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0110",
+    "company_id": "beacon-alloys",
+    "name": "Michael Foster",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0111",
+    "company_id": "beacon-alloys",
+    "name": "Karen Rivera",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0112",
+    "company_id": "beacon-alloys",
+    "name": "Elena Foster",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0113",
+    "company_id": "halcyon-components",
+    "name": "Kevin Diaz",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0114",
+    "company_id": "halcyon-components",
+    "name": "Elena Hayes",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0115",
+    "company_id": "halcyon-components",
+    "name": "Lisa Weber",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0116",
+    "company_id": "halcyon-components",
+    "name": "Michael Weber",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0117",
+    "company_id": "halcyon-components",
+    "name": "Robert Nguyen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0118",
+    "company_id": "halcyon-components",
+    "name": "Michael Sharpe",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0119",
+    "company_id": "halcyon-components",
+    "name": "Omar Rivera",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0120",
+    "company_id": "vanguard-systems",
+    "name": "Susan Knox",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0121",
+    "company_id": "vanguard-systems",
+    "name": "Priya Brooks",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0122",
+    "company_id": "vanguard-systems",
+    "name": "Nancy Hayes",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0123",
+    "company_id": "vanguard-systems",
+    "name": "Susan Okafor",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0124",
+    "company_id": "vanguard-systems",
+    "name": "Marcus Nguyen",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0125",
+    "company_id": "vanguard-systems",
+    "name": "Lisa Weber",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0126",
+    "company_id": "vanguard-systems",
+    "name": "Susan Bauer",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0127",
+    "company_id": "vanguard-systems",
+    "name": "David Bauer",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0128",
+    "company_id": "vanguard-systems",
+    "name": "Kevin Malik",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0129",
+    "company_id": "vanguard-systems",
+    "name": "Susan Malik",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0130",
+    "company_id": "vanguard-systems",
+    "name": "Kevin Reed",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0131",
+    "company_id": "vanguard-systems",
+    "name": "Kevin Santos",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0132",
+    "company_id": "nimbus-technologies",
+    "name": "Sofia Vargas",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0133",
+    "company_id": "nimbus-technologies",
+    "name": "Wei Hayes",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0134",
+    "company_id": "nimbus-technologies",
+    "name": "Elena Malik",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0135",
+    "company_id": "nimbus-technologies",
+    "name": "Nancy Cole",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0136",
+    "company_id": "nimbus-technologies",
+    "name": "Karen Diaz",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0137",
+    "company_id": "nimbus-technologies",
+    "name": "Linda Bauer",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0138",
+    "company_id": "falcon-tooling",
+    "name": "Paul Rivera",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0139",
+    "company_id": "falcon-tooling",
+    "name": "Robert Hayes",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0140",
+    "company_id": "falcon-tooling",
+    "name": "Paul Okafor",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0141",
+    "company_id": "falcon-tooling",
+    "name": "Nancy Reed",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0142",
+    "company_id": "falcon-tooling",
+    "name": "Nancy Reed",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0143",
+    "company_id": "falcon-tooling",
+    "name": "Omar Nguyen",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0144",
+    "company_id": "falcon-tooling",
+    "name": "Robert Cole",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0145",
+    "company_id": "titan-precision",
+    "name": "Paul Flores",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0146",
+    "company_id": "titan-precision",
+    "name": "Maria Foster",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0147",
+    "company_id": "titan-precision",
+    "name": "James Weber",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0148",
+    "company_id": "titan-precision",
+    "name": "David Rivera",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0149",
+    "company_id": "titan-precision",
+    "name": "Marcus Cole",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0150",
+    "company_id": "titan-precision",
+    "name": "Daniel Nguyen",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0151",
+    "company_id": "titan-precision",
+    "name": "Grace Cole",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0152",
+    "company_id": "titan-precision",
+    "name": "Nancy Santos",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0153",
+    "company_id": "titan-precision",
+    "name": "Sofia Cole",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0154",
+    "company_id": "titan-precision",
+    "name": "James Sharpe",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0155",
+    "company_id": "titan-precision",
+    "name": "Marcus Patel",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0156",
+    "company_id": "titan-precision",
+    "name": "Susan Sharpe",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0157",
+    "company_id": "titan-precision",
+    "name": "Kevin Patel",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0158",
+    "company_id": "titan-precision",
+    "name": "Sofia Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0159",
+    "company_id": "titan-components",
+    "name": "Linda Hayes",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0160",
+    "company_id": "titan-components",
+    "name": "Nancy Hayes",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0161",
+    "company_id": "titan-components",
+    "name": "Karen Vargas",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0162",
+    "company_id": "titan-components",
+    "name": "Wei Flores",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0163",
+    "company_id": "titan-components",
+    "name": "Robert Carter",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0164",
+    "company_id": "titan-components",
+    "name": "Omar Chen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0165",
+    "company_id": "titan-components",
+    "name": "Nancy Bauer",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0166",
+    "company_id": "cardinal-components",
+    "name": "Sofia Diaz",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0167",
+    "company_id": "cardinal-components",
+    "name": "Elena Foster",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0168",
+    "company_id": "cardinal-components",
+    "name": "Susan Vargas",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0169",
+    "company_id": "cardinal-components",
+    "name": "Lisa Brooks",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0170",
+    "company_id": "cardinal-components",
+    "name": "Kevin Knox",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0171",
+    "company_id": "cardinal-components",
+    "name": "Wei Patel",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0172",
+    "company_id": "cardinal-components",
+    "name": "Susan Cole",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0173",
+    "company_id": "cardinal-components",
+    "name": "Lisa Rivera",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0174",
+    "company_id": "cardinal-components",
+    "name": "Linda Knox",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0175",
+    "company_id": "cardinal-components",
+    "name": "Kevin Foster",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0176",
+    "company_id": "pinnacle-forgings",
+    "name": "Susan Cole",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0177",
+    "company_id": "pinnacle-forgings",
+    "name": "Kevin Reed",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0178",
+    "company_id": "pinnacle-forgings",
+    "name": "Elena Sharpe",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0179",
+    "company_id": "pinnacle-forgings",
+    "name": "Daniel Flores",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0180",
+    "company_id": "pinnacle-forgings",
+    "name": "Kevin Vargas",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0181",
+    "company_id": "pinnacle-forgings",
+    "name": "Linda Reed",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0182",
+    "company_id": "pinnacle-forgings",
+    "name": "Michael Okafor",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0183",
+    "company_id": "pinnacle-forgings",
+    "name": "Robert Hayes",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0184",
+    "company_id": "pinnacle-forgings",
+    "name": "Linda Brooks",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0185",
+    "company_id": "pinnacle-forgings",
+    "name": "Paul Rivera",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0186",
+    "company_id": "pinnacle-forgings",
+    "name": "Wei Reed",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0187",
+    "company_id": "bastion-tooling",
+    "name": "Nancy Sharpe",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0188",
+    "company_id": "bastion-tooling",
+    "name": "Michael Diaz",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0189",
+    "company_id": "bastion-tooling",
+    "name": "Sofia Bauer",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0190",
+    "company_id": "bastion-tooling",
+    "name": "Kevin Reed",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0191",
+    "company_id": "bastion-tooling",
+    "name": "Michael Reed",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0192",
+    "company_id": "bastion-tooling",
+    "name": "Linda Weber",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0193",
+    "company_id": "bastion-tooling",
+    "name": "Paul Nguyen",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0194",
+    "company_id": "bastion-tooling",
+    "name": "Maria Knox",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0195",
+    "company_id": "bastion-tooling",
+    "name": "Karen Foster",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0196",
+    "company_id": "bastion-tooling",
+    "name": "Kevin Chen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0197",
+    "company_id": "meridian-systems",
+    "name": "Susan Hayes",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0198",
+    "company_id": "meridian-systems",
+    "name": "Karen Patel",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0199",
+    "company_id": "meridian-systems",
+    "name": "Wei Weber",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0200",
+    "company_id": "meridian-systems",
+    "name": "Sofia Cole",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0201",
+    "company_id": "meridian-systems",
     "name": "Robert Vargas",
     "title": "Commodity Manager"
   },
   {
-    "id": "con-0032",
-    "company_id": "orion-defense",
-    "name": "Nancy Nguyen",
+    "id": "con-0202",
+    "company_id": "meridian-systems",
+    "name": "Michael Patel",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0203",
+    "company_id": "meridian-systems",
+    "name": "Karen Flores",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0204",
+    "company_id": "meridian-systems",
+    "name": "Wei Flores",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0205",
+    "company_id": "granite-components",
+    "name": "Sofia Nguyen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0206",
+    "company_id": "granite-components",
+    "name": "Michael Vargas",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0207",
+    "company_id": "granite-components",
+    "name": "Marcus Brooks",
     "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0208",
+    "company_id": "granite-components",
+    "name": "Robert Carter",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0209",
+    "company_id": "granite-components",
+    "name": "Paul Diaz",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0210",
+    "company_id": "granite-components",
+    "name": "Omar Cole",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0211",
+    "company_id": "granite-components",
+    "name": "Maria Okafor",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0212",
+    "company_id": "granite-components",
+    "name": "Karen Knox",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0213",
+    "company_id": "nimbus-components",
+    "name": "Priya Diaz",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0214",
+    "company_id": "nimbus-components",
+    "name": "Michael Carter",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0215",
+    "company_id": "nimbus-components",
+    "name": "Wei Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0216",
+    "company_id": "nimbus-components",
+    "name": "Daniel Okafor",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0217",
+    "company_id": "nimbus-components",
+    "name": "Maria Knox",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0218",
+    "company_id": "nimbus-components",
+    "name": "Daniel Sharpe",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0219",
+    "company_id": "nimbus-components",
+    "name": "Priya Santos",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0220",
+    "company_id": "nimbus-components",
+    "name": "Elena Rivera",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0221",
+    "company_id": "nimbus-components",
+    "name": "Daniel Hayes",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0222",
+    "company_id": "nimbus-components",
+    "name": "Elena Santos",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0223",
+    "company_id": "nimbus-components",
+    "name": "Susan Foster",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0224",
+    "company_id": "nimbus-components",
+    "name": "Karen Carter",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0225",
+    "company_id": "nimbus-components",
+    "name": "Paul Carter",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0226",
+    "company_id": "delta-precision",
+    "name": "Grace Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0227",
+    "company_id": "delta-precision",
+    "name": "Wei Foster",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0228",
+    "company_id": "delta-precision",
+    "name": "Marcus Diaz",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0229",
+    "company_id": "delta-precision",
+    "name": "Lisa Santos",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0230",
+    "company_id": "delta-precision",
+    "name": "Priya Sharpe",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0231",
+    "company_id": "delta-precision",
+    "name": "Michael Flores",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0232",
+    "company_id": "delta-precision",
+    "name": "Maria Brooks",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0233",
+    "company_id": "delta-precision",
+    "name": "Grace Bauer",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0234",
+    "company_id": "delta-precision",
+    "name": "James Foster",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0235",
+    "company_id": "delta-precision",
+    "name": "Omar Reed",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0236",
+    "company_id": "aegis-components",
+    "name": "Linda Bauer",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0237",
+    "company_id": "aegis-components",
+    "name": "Wei Bauer",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0238",
+    "company_id": "aegis-components",
+    "name": "Maria Brooks",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0239",
+    "company_id": "aegis-components",
+    "name": "Marcus Brooks",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0240",
+    "company_id": "aegis-components",
+    "name": "Nancy Weber",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0241",
+    "company_id": "aegis-components",
+    "name": "Michael Cole",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0242",
+    "company_id": "aegis-components",
+    "name": "Karen Foster",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0243",
+    "company_id": "aegis-components",
+    "name": "Lisa Cole",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0244",
+    "company_id": "meridian-aerospace",
+    "name": "Nancy Hayes",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0245",
+    "company_id": "meridian-aerospace",
+    "name": "Sofia Foster",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0246",
+    "company_id": "meridian-aerospace",
+    "name": "Wei Sharpe",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0247",
+    "company_id": "meridian-aerospace",
+    "name": "David Cole",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0248",
+    "company_id": "meridian-aerospace",
+    "name": "Maria Patel",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0249",
+    "company_id": "meridian-aerospace",
+    "name": "James Malik",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0250",
+    "company_id": "meridian-aerospace",
+    "name": "David Malik",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0251",
+    "company_id": "meridian-aerospace",
+    "name": "Lisa Brooks",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0252",
+    "company_id": "axiom-components",
+    "name": "Karen Reed",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0253",
+    "company_id": "axiom-components",
+    "name": "Robert Reed",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0254",
+    "company_id": "axiom-components",
+    "name": "Grace Diaz",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0255",
+    "company_id": "axiom-components",
+    "name": "Sofia Cole",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0256",
+    "company_id": "axiom-components",
+    "name": "Priya Carter",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0257",
+    "company_id": "axiom-components",
+    "name": "David Rivera",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0258",
+    "company_id": "axiom-components",
+    "name": "Karen Bauer",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0259",
+    "company_id": "axiom-components",
+    "name": "Priya Hayes",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0260",
+    "company_id": "axiom-components",
+    "name": "David Knox",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0261",
+    "company_id": "axiom-components",
+    "name": "Elena Malik",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0262",
+    "company_id": "axiom-components",
+    "name": "James Santos",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0263",
+    "company_id": "axiom-components",
+    "name": "Paul Cole",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0264",
+    "company_id": "axiom-components",
+    "name": "Kevin Foster",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0265",
+    "company_id": "meridian-precision",
+    "name": "Maria Sharpe",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0266",
+    "company_id": "meridian-precision",
+    "name": "Kevin Vargas",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0267",
+    "company_id": "meridian-precision",
+    "name": "Marcus Malik",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0268",
+    "company_id": "meridian-precision",
+    "name": "Sofia Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0269",
+    "company_id": "meridian-precision",
+    "name": "Daniel Vargas",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0270",
+    "company_id": "meridian-precision",
+    "name": "Robert Carter",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0271",
+    "company_id": "meridian-precision",
+    "name": "Linda Santos",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0272",
+    "company_id": "meridian-precision",
+    "name": "Kevin Chen",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0273",
+    "company_id": "meridian-precision",
+    "name": "Maria Weber",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0274",
+    "company_id": "meridian-precision",
+    "name": "Grace Brooks",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0275",
+    "company_id": "sterling-turbine",
+    "name": "Grace Weber",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0276",
+    "company_id": "sterling-turbine",
+    "name": "Paul Santos",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0277",
+    "company_id": "sterling-turbine",
+    "name": "Karen Santos",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0278",
+    "company_id": "sterling-turbine",
+    "name": "Nancy Knox",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0279",
+    "company_id": "sterling-turbine",
+    "name": "Sofia Malik",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0280",
+    "company_id": "sterling-turbine",
+    "name": "Linda Brooks",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0281",
+    "company_id": "sterling-turbine",
+    "name": "Elena Cole",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0282",
+    "company_id": "ironclad-defense",
+    "name": "Sofia Chen",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0283",
+    "company_id": "ironclad-defense",
+    "name": "Sofia Patel",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0284",
+    "company_id": "ironclad-defense",
+    "name": "Nancy Knox",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0285",
+    "company_id": "ironclad-defense",
+    "name": "Maria Hayes",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0286",
+    "company_id": "ironclad-defense",
+    "name": "Nancy Patel",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0287",
+    "company_id": "ironclad-defense",
+    "name": "Marcus Carter",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0288",
+    "company_id": "ironclad-defense",
+    "name": "Susan Hayes",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0289",
+    "company_id": "ironclad-defense",
+    "name": "Linda Chen",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0290",
+    "company_id": "ironclad-defense",
+    "name": "David Bauer",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0291",
+    "company_id": "ironclad-defense",
+    "name": "Linda Sharpe",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0292",
+    "company_id": "ironclad-defense",
+    "name": "Michael Carter",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0293",
+    "company_id": "ironclad-defense",
+    "name": "Wei Chen",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0294",
+    "company_id": "ironclad-defense",
+    "name": "Grace Weber",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0295",
+    "company_id": "vertex-alloys",
+    "name": "Sofia Carter",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0296",
+    "company_id": "vertex-alloys",
+    "name": "Sofia Nguyen",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0297",
+    "company_id": "vertex-alloys",
+    "name": "Omar Bauer",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0298",
+    "company_id": "vertex-alloys",
+    "name": "James Nguyen",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0299",
+    "company_id": "vertex-alloys",
+    "name": "Grace Hayes",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0300",
+    "company_id": "vertex-alloys",
+    "name": "Priya Rivera",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0301",
+    "company_id": "vertex-alloys",
+    "name": "Wei Okafor",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0302",
+    "company_id": "foundry-precision",
+    "name": "Grace Patel",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0303",
+    "company_id": "foundry-precision",
+    "name": "Michael Brooks",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0304",
+    "company_id": "foundry-precision",
+    "name": "David Foster",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0305",
+    "company_id": "foundry-precision",
+    "name": "Kevin Hayes",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0306",
+    "company_id": "foundry-precision",
+    "name": "Nancy Knox",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0307",
+    "company_id": "foundry-precision",
+    "name": "Susan Weber",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0308",
+    "company_id": "foundry-precision",
+    "name": "Lisa Diaz",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0309",
+    "company_id": "foundry-precision",
+    "name": "Paul Knox",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0310",
+    "company_id": "foundry-precision",
+    "name": "Marcus Hayes",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0311",
+    "company_id": "foundry-precision",
+    "name": "Kevin Vargas",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0312",
+    "company_id": "foundry-precision",
+    "name": "James Rivera",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0313",
+    "company_id": "foundry-precision",
+    "name": "Michael Malik",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0314",
+    "company_id": "monarch-forgings",
+    "name": "Susan Brooks",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0315",
+    "company_id": "monarch-forgings",
+    "name": "Sofia Rivera",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0316",
+    "company_id": "monarch-forgings",
+    "name": "Marcus Foster",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0317",
+    "company_id": "monarch-forgings",
+    "name": "Daniel Bauer",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0318",
+    "company_id": "monarch-forgings",
+    "name": "Paul Diaz",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0319",
+    "company_id": "monarch-forgings",
+    "name": "Priya Flores",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0320",
+    "company_id": "monarch-forgings",
+    "name": "James Sharpe",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0321",
+    "company_id": "monarch-forgings",
+    "name": "Grace Knox",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0322",
+    "company_id": "monarch-forgings",
+    "name": "Karen Foster",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0323",
+    "company_id": "monarch-forgings",
+    "name": "Lisa Reed",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0324",
+    "company_id": "monarch-forgings",
+    "name": "Priya Knox",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0325",
+    "company_id": "monarch-forgings",
+    "name": "Wei Reed",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0326",
+    "company_id": "monarch-forgings",
+    "name": "James Patel",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0327",
+    "company_id": "monarch-forgings",
+    "name": "Omar Santos",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0328",
+    "company_id": "halcyon-manufacturing",
+    "name": "Robert Cole",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0329",
+    "company_id": "halcyon-manufacturing",
+    "name": "Omar Rivera",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0330",
+    "company_id": "halcyon-manufacturing",
+    "name": "Kevin Patel",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0331",
+    "company_id": "halcyon-manufacturing",
+    "name": "James Carter",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0332",
+    "company_id": "halcyon-manufacturing",
+    "name": "Karen Bauer",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0333",
+    "company_id": "halcyon-manufacturing",
+    "name": "James Vargas",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0334",
+    "company_id": "halcyon-manufacturing",
+    "name": "Omar Diaz",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0335",
+    "company_id": "halcyon-manufacturing",
+    "name": "James Vargas",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0336",
+    "company_id": "halcyon-manufacturing",
+    "name": "James Brooks",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0337",
+    "company_id": "halcyon-manufacturing",
+    "name": "Robert Foster",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0338",
+    "company_id": "halcyon-manufacturing",
+    "name": "Karen Sharpe",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0339",
+    "company_id": "halcyon-manufacturing",
+    "name": "Michael Chen",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0340",
+    "company_id": "halcyon-manufacturing",
+    "name": "Sofia Reed",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0341",
+    "company_id": "halcyon-manufacturing",
+    "name": "Marcus Chen",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0342",
+    "company_id": "continental-components",
+    "name": "Daniel Malik",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0343",
+    "company_id": "continental-components",
+    "name": "Linda Knox",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0344",
+    "company_id": "continental-components",
+    "name": "Grace Cole",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0345",
+    "company_id": "continental-components",
+    "name": "Omar Flores",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0346",
+    "company_id": "continental-components",
+    "name": "Karen Foster",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0347",
+    "company_id": "continental-components",
+    "name": "Elena Cole",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0348",
+    "company_id": "continental-components",
+    "name": "Daniel Flores",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0349",
+    "company_id": "continental-components",
+    "name": "Elena Patel",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0350",
+    "company_id": "ironclad-dynamics",
+    "name": "Elena Rivera",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0351",
+    "company_id": "ironclad-dynamics",
+    "name": "Priya Weber",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0352",
+    "company_id": "ironclad-dynamics",
+    "name": "Karen Bauer",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0353",
+    "company_id": "ironclad-dynamics",
+    "name": "Michael Carter",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0354",
+    "company_id": "ironclad-dynamics",
+    "name": "Robert Vargas",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0355",
+    "company_id": "ironclad-dynamics",
+    "name": "Susan Carter",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0356",
+    "company_id": "ironclad-dynamics",
+    "name": "Grace Malik",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0357",
+    "company_id": "aegis-machining",
+    "name": "Nancy Malik",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0358",
+    "company_id": "aegis-machining",
+    "name": "Maria Nguyen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0359",
+    "company_id": "aegis-machining",
+    "name": "Susan Malik",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0360",
+    "company_id": "aegis-machining",
+    "name": "Paul Brooks",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0361",
+    "company_id": "aegis-machining",
+    "name": "James Brooks",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0362",
+    "company_id": "aegis-machining",
+    "name": "Michael Sharpe",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0363",
+    "company_id": "aegis-machining",
+    "name": "David Foster",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0364",
+    "company_id": "aegis-machining",
+    "name": "Linda Vargas",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0365",
+    "company_id": "aegis-machining",
+    "name": "Marcus Rivera",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0366",
+    "company_id": "halcyon-castings",
+    "name": "Nancy Malik",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0367",
+    "company_id": "halcyon-castings",
+    "name": "Maria Brooks",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0368",
+    "company_id": "halcyon-castings",
+    "name": "Robert Foster",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0369",
+    "company_id": "halcyon-castings",
+    "name": "Kevin Foster",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0370",
+    "company_id": "halcyon-castings",
+    "name": "Marcus Vargas",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0371",
+    "company_id": "halcyon-castings",
+    "name": "James Malik",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0372",
+    "company_id": "halcyon-castings",
+    "name": "Michael Weber",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0373",
+    "company_id": "halcyon-castings",
+    "name": "Priya Hayes",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0374",
+    "company_id": "halcyon-castings",
+    "name": "Marcus Foster",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0375",
+    "company_id": "halcyon-castings",
+    "name": "Grace Reed",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0376",
+    "company_id": "halcyon-castings",
+    "name": "Linda Hayes",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0377",
+    "company_id": "halcyon-castings",
+    "name": "Michael Knox",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0378",
+    "company_id": "halcyon-castings",
+    "name": "Sofia Weber",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0379",
+    "company_id": "halcyon-castings",
+    "name": "Robert Chen",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0380",
+    "company_id": "falcon-turbine",
+    "name": "Marcus Flores",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0381",
+    "company_id": "falcon-turbine",
+    "name": "Linda Vargas",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0382",
+    "company_id": "falcon-turbine",
+    "name": "Sofia Hayes",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0383",
+    "company_id": "falcon-turbine",
+    "name": "Priya Vargas",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0384",
+    "company_id": "falcon-turbine",
+    "name": "Wei Patel",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0385",
+    "company_id": "falcon-turbine",
+    "name": "David Malik",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0386",
+    "company_id": "falcon-turbine",
+    "name": "Lisa Carter",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0387",
+    "company_id": "falcon-turbine",
+    "name": "Robert Santos",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0388",
+    "company_id": "falcon-turbine",
+    "name": "Kevin Hayes",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0389",
+    "company_id": "falcon-turbine",
+    "name": "Michael Weber",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0390",
+    "company_id": "falcon-turbine",
+    "name": "Sofia Flores",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0391",
+    "company_id": "halcyon-dynamics",
+    "name": "Michael Bauer",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0392",
+    "company_id": "halcyon-dynamics",
+    "name": "Robert Malik",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0393",
+    "company_id": "halcyon-dynamics",
+    "name": "Nancy Brooks",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0394",
+    "company_id": "halcyon-dynamics",
+    "name": "James Malik",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0395",
+    "company_id": "halcyon-dynamics",
+    "name": "Paul Knox",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0396",
+    "company_id": "halcyon-dynamics",
+    "name": "Omar Foster",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0397",
+    "company_id": "halcyon-dynamics",
+    "name": "Priya Bauer",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0398",
+    "company_id": "halcyon-dynamics",
+    "name": "Karen Reed",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0399",
+    "company_id": "halcyon-dynamics",
+    "name": "Susan Knox",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0400",
+    "company_id": "halcyon-dynamics",
+    "name": "Susan Foster",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0401",
+    "company_id": "halcyon-dynamics",
+    "name": "Nancy Chen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0402",
+    "company_id": "halcyon-dynamics",
+    "name": "Nancy Patel",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0403",
+    "company_id": "northwind-controls",
+    "name": "Nancy Patel",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0404",
+    "company_id": "northwind-controls",
+    "name": "Paul Patel",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0405",
+    "company_id": "northwind-controls",
+    "name": "Wei Flores",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0406",
+    "company_id": "northwind-controls",
+    "name": "Nancy Carter",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0407",
+    "company_id": "northwind-controls",
+    "name": "Marcus Sharpe",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0408",
+    "company_id": "northwind-controls",
+    "name": "Karen Flores",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0409",
+    "company_id": "northwind-controls",
+    "name": "Grace Sharpe",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0410",
+    "company_id": "northwind-controls",
+    "name": "Michael Diaz",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0411",
+    "company_id": "vanguard-machining",
+    "name": "Wei Vargas",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0412",
+    "company_id": "vanguard-machining",
+    "name": "Wei Brooks",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0413",
+    "company_id": "vanguard-machining",
+    "name": "Daniel Flores",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0414",
+    "company_id": "vanguard-machining",
+    "name": "Robert Patel",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0415",
+    "company_id": "vanguard-machining",
+    "name": "Wei Cole",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0416",
+    "company_id": "vanguard-machining",
+    "name": "Grace Reed",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0417",
+    "company_id": "harbor-components",
+    "name": "Omar Flores",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0418",
+    "company_id": "harbor-components",
+    "name": "Robert Nguyen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0419",
+    "company_id": "harbor-components",
+    "name": "Nancy Reed",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0420",
+    "company_id": "harbor-components",
+    "name": "Lisa Malik",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0421",
+    "company_id": "harbor-components",
+    "name": "Marcus Rivera",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0422",
+    "company_id": "harbor-components",
+    "name": "Maria Bauer",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0423",
+    "company_id": "harbor-components",
+    "name": "James Santos",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0424",
+    "company_id": "harbor-components",
+    "name": "Paul Okafor",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0425",
+    "company_id": "harbor-components",
+    "name": "Kevin Bauer",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0426",
+    "company_id": "harbor-components",
+    "name": "Marcus Carter",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0427",
+    "company_id": "harbor-components",
+    "name": "Priya Brooks",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0428",
+    "company_id": "harbor-components",
+    "name": "Nancy Malik",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0429",
+    "company_id": "harbor-components",
+    "name": "Grace Hayes",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0430",
+    "company_id": "harbor-components",
+    "name": "Susan Brooks",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0431",
+    "company_id": "foundry-turbine",
+    "name": "Michael Cole",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0432",
+    "company_id": "foundry-turbine",
+    "name": "Linda Rivera",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0433",
+    "company_id": "foundry-turbine",
+    "name": "Priya Carter",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0434",
+    "company_id": "foundry-turbine",
+    "name": "Susan Rivera",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0435",
+    "company_id": "foundry-turbine",
+    "name": "Linda Malik",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0436",
+    "company_id": "foundry-turbine",
+    "name": "Elena Brooks",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0437",
+    "company_id": "foundry-turbine",
+    "name": "Lisa Rivera",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0438",
+    "company_id": "foundry-turbine",
+    "name": "Paul Vargas",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0439",
+    "company_id": "continental-castings",
+    "name": "Linda Knox",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0440",
+    "company_id": "continental-castings",
+    "name": "Wei Rivera",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0441",
+    "company_id": "continental-castings",
+    "name": "Paul Foster",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0442",
+    "company_id": "continental-castings",
+    "name": "Karen Hayes",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0443",
+    "company_id": "continental-castings",
+    "name": "Elena Cole",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0444",
+    "company_id": "continental-castings",
+    "name": "David Weber",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0445",
+    "company_id": "continental-castings",
+    "name": "Grace Flores",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0446",
+    "company_id": "continental-castings",
+    "name": "Omar Bauer",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0447",
+    "company_id": "strata-defense",
+    "name": "Kevin Chen",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0448",
+    "company_id": "strata-defense",
+    "name": "Grace Vargas",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0449",
+    "company_id": "strata-defense",
+    "name": "James Chen",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0450",
+    "company_id": "strata-defense",
+    "name": "Daniel Chen",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0451",
+    "company_id": "strata-defense",
+    "name": "Wei Weber",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0452",
+    "company_id": "strata-defense",
+    "name": "Elena Bauer",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0453",
+    "company_id": "strata-defense",
+    "name": "Marcus Rivera",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0454",
+    "company_id": "strata-defense",
+    "name": "Priya Knox",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0455",
+    "company_id": "strata-defense",
+    "name": "Nancy Brooks",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0456",
+    "company_id": "titan-fabrication",
+    "name": "Wei Foster",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0457",
+    "company_id": "titan-fabrication",
+    "name": "Michael Cole",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0458",
+    "company_id": "titan-fabrication",
+    "name": "Kevin Knox",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0459",
+    "company_id": "titan-fabrication",
+    "name": "Kevin Diaz",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0460",
+    "company_id": "titan-fabrication",
+    "name": "David Rivera",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0461",
+    "company_id": "titan-fabrication",
+    "name": "Linda Vargas",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0462",
+    "company_id": "titan-fabrication",
+    "name": "Paul Malik",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0463",
+    "company_id": "titan-fabrication",
+    "name": "Robert Chen",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0464",
+    "company_id": "titan-fabrication",
+    "name": "Grace Carter",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0465",
+    "company_id": "titan-fabrication",
+    "name": "James Rivera",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0466",
+    "company_id": "falcon-defense",
+    "name": "Lisa Chen",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0467",
+    "company_id": "falcon-defense",
+    "name": "Marcus Rivera",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0468",
+    "company_id": "falcon-defense",
+    "name": "Maria Knox",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0469",
+    "company_id": "falcon-defense",
+    "name": "Robert Diaz",
+    "title": "Program Manager"
+  },
+  {
+    "id": "con-0470",
+    "company_id": "falcon-defense",
+    "name": "Sofia Reed",
+    "title": "Director of Operations"
+  },
+  {
+    "id": "con-0471",
+    "company_id": "falcon-defense",
+    "name": "Wei Vargas",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0472",
+    "company_id": "torque-turbine",
+    "name": "David Nguyen",
+    "title": "Sr. Buyer"
+  },
+  {
+    "id": "con-0473",
+    "company_id": "torque-turbine",
+    "name": "Elena Nguyen",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0474",
+    "company_id": "torque-turbine",
+    "name": "Elena Hayes",
+    "title": "Commodity Manager"
+  },
+  {
+    "id": "con-0475",
+    "company_id": "torque-turbine",
+    "name": "Linda Patel",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0476",
+    "company_id": "torque-turbine",
+    "name": "Maria Flores",
+    "title": "Quality Director"
+  },
+  {
+    "id": "con-0477",
+    "company_id": "torque-turbine",
+    "name": "Nancy Foster",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0478",
+    "company_id": "torque-turbine",
+    "name": "Nancy Sharpe",
+    "title": "Sourcing Lead"
+  },
+  {
+    "id": "con-0479",
+    "company_id": "torque-turbine",
+    "name": "Lisa Chen",
+    "title": "VP Supply Chain"
+  },
+  {
+    "id": "con-0480",
+    "company_id": "torque-turbine",
+    "name": "Michael Sharpe",
+    "title": "Director of Procurement"
+  },
+  {
+    "id": "con-0481",
+    "company_id": "torque-turbine",
+    "name": "Elena Chen",
+    "title": "Chief Engineer"
+  },
+  {
+    "id": "con-0482",
+    "company_id": "torque-turbine",
+    "name": "Omar Flores",
+    "title": "VP Manufacturing"
+  },
+  {
+    "id": "con-0483",
+    "company_id": "torque-turbine",
+    "name": "Grace Cole",
+    "title": "Director of Procurement"
   }
 ]

@@ -46,8 +46,16 @@ function nodeStyle(rel: string, isSelf: boolean): React.CSSProperties {
 export function RelationshipGraph({ world }: { world: World }) {
   const { nodes, edges } = useMemo(() => {
     const self = world.companies.find((c) => c.relationship === "self");
+    // At ~50 companies a full star is a hairball — show self + the most active
+    // accounts (highest score in any dimension), then lay them out by relationship.
+    const relevance = (id: string) => {
+      const d = world.analysis.byId.get(id)?.dimensions;
+      return d ? Math.max(d.risk.score, d.opportunity.score, d.capacityRisk.score, d.competitivePressure.score) : 0;
+    };
     const others = world.companies
       .filter((c) => c.relationship !== "self")
+      .sort((a, b) => relevance(b.id) - relevance(a.id) || a.id.localeCompare(b.id))
+      .slice(0, 22)
       .sort(
         (a, b) =>
           REL_ORDER.indexOf(a.relationship) - REL_ORDER.indexOf(b.relationship) ||

@@ -1,893 +1,2066 @@
 [
   {
     "id": "sig-0001",
-    "event_type": "quality_escape",
-    "entities": [
-      "BTX Precision"
-    ],
-    "subject_id": "btx-precision",
-    "confidence": 0.76,
-    "source_quote": "A quality escape at BTX Precision triggered a customer source-inspection hold.",
-    "detected_at": "2026-06-25T01:00:00.000Z"
-  },
-  {
-    "id": "sig-0002",
-    "event_type": "competitor_won_deal",
-    "entities": [
-      "BTX Precision",
-      "Ironclad Components"
-    ],
-    "subject_id": "btx-precision",
-    "confidence": 0.7,
-    "source_quote": "Ironclad Components won a deal BTX Precision had been pursuing.",
-    "detected_at": "2026-06-13T06:00:00.000Z"
-  },
-  {
-    "id": "sig-0003",
-    "event_type": "pricing_pressure",
-    "entities": [
-      "BTX Precision"
-    ],
-    "subject_id": "btx-precision",
-    "confidence": 0.89,
-    "source_quote": "BTX Precision raised quoted prices, citing material and labor cost inflation.",
-    "detected_at": "2026-06-04T06:00:00.000Z"
-  },
-  {
-    "id": "sig-0004",
-    "event_type": "pricing_pressure",
-    "entities": [
-      "BTX Precision"
-    ],
-    "subject_id": "btx-precision",
-    "confidence": 0.91,
-    "source_quote": "BTX Precision raised quoted prices, citing material and labor cost inflation.",
-    "detected_at": "2026-06-25T12:00:00.000Z"
-  },
-  {
-    "id": "sig-0005",
     "event_type": "government_contract_award",
     "entities": [
       "BTX Precision"
     ],
     "subject_id": "btx-precision",
-    "value": 5600000,
-    "confidence": 0.85,
-    "source_quote": "BTX Precision was awarded a $5.6M government contract.",
-    "detected_at": "2026-06-22T06:00:00.000Z"
+    "value": 1700000,
+    "confidence": 0.91,
+    "source_quote": "BTX Precision was awarded a $1.7M government contract.",
+    "detected_at": "2026-06-17T11:00:00.000Z"
+  },
+  {
+    "id": "sig-0002",
+    "event_type": "government_contract_award",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "value": 8000000,
+    "confidence": 0.84,
+    "source_quote": "BTX Precision was awarded a $8.0M government contract.",
+    "detected_at": "2026-06-17T08:00:00.000Z"
+  },
+  {
+    "id": "sig-0003",
+    "event_type": "quality_escape",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.79,
+    "source_quote": "A quality escape at BTX Precision triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-10T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0004",
+    "event_type": "demand_spike",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.89,
+    "source_quote": "Demand for BTX Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-26T06:00:00.000Z"
+  },
+  {
+    "id": "sig-0005",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.96,
+    "source_quote": "BTX Precision is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-12T06:00:00.000Z"
   },
   {
     "id": "sig-0006",
+    "event_type": "quality_escape",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.83,
+    "source_quote": "A quality escape at BTX Precision triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-30T00:00:00.000Z"
+  },
+  {
+    "id": "sig-0007",
     "event_type": "contract_loss",
     "entities": [
       "BTX Precision"
     ],
     "subject_id": "btx-precision",
-    "value": 16700000,
-    "confidence": 0.7,
-    "source_quote": "BTX Precision lost a $16.7M recompete it had held for years.",
-    "detected_at": "2026-06-24T08:00:00.000Z"
-  },
-  {
-    "id": "sig-0007",
-    "event_type": "regulatory_change",
-    "entities": [
-      "Titan Castings Co"
-    ],
-    "subject_id": "titan-castings",
-    "confidence": 0.84,
-    "source_quote": "New compliance requirements affect Titan Castings Co's certified processes.",
-    "detected_at": "2026-06-08T21:00:00.000Z"
+    "value": 6000000,
+    "confidence": 0.87,
+    "source_quote": "BTX Precision lost a $6.0M recompete it had held for years.",
+    "detected_at": "2026-06-15T23:00:00.000Z"
   },
   {
     "id": "sig-0008",
-    "event_type": "regulatory_change",
+    "event_type": "contract_loss",
     "entities": [
-      "Titan Castings Co"
+      "BTX Precision"
     ],
-    "subject_id": "titan-castings",
-    "confidence": 0.81,
-    "source_quote": "New compliance requirements affect Titan Castings Co's certified processes.",
-    "detected_at": "2026-06-09T12:00:00.000Z"
+    "subject_id": "btx-precision",
+    "value": 3300000,
+    "confidence": 0.76,
+    "source_quote": "BTX Precision lost a $3.3M recompete it had held for years.",
+    "detected_at": "2026-06-05T21:00:00.000Z"
   },
   {
     "id": "sig-0009",
-    "event_type": "regulatory_change",
+    "event_type": "government_contract_award",
     "entities": [
-      "Titan Castings Co"
+      "Anvil Manufacturing"
     ],
-    "subject_id": "titan-castings",
-    "confidence": 0.89,
-    "source_quote": "New compliance requirements affect Titan Castings Co's certified processes.",
-    "detected_at": "2026-06-09T07:00:00.000Z"
+    "subject_id": "anvil-manufacturing",
+    "value": 4800000,
+    "confidence": 0.84,
+    "source_quote": "Anvil Manufacturing was awarded a $4.8M government contract.",
+    "detected_at": "2026-06-19T08:00:00.000Z"
   },
   {
     "id": "sig-0010",
-    "event_type": "capacity_constraint",
+    "event_type": "demand_spike",
     "entities": [
-      "Meridian Forgings"
+      "Anvil Manufacturing"
     ],
-    "subject_id": "meridian-forgings",
-    "confidence": 0.75,
-    "source_quote": "Meridian Forgings is quoting extended lead times, indicating its floor is near capacity.",
-    "detected_at": "2026-06-10T22:00:00.000Z"
+    "subject_id": "anvil-manufacturing",
+    "confidence": 0.94,
+    "source_quote": "Demand for Anvil Manufacturing's products spiked on new program starts.",
+    "detected_at": "2026-06-04T05:00:00.000Z"
   },
   {
     "id": "sig-0011",
-    "event_type": "quality_escape",
+    "event_type": "hiring_surge",
     "entities": [
-      "Meridian Forgings"
+      "Anvil Manufacturing"
     ],
-    "subject_id": "meridian-forgings",
-    "confidence": 0.98,
-    "source_quote": "A quality escape at Meridian Forgings triggered a customer source-inspection hold.",
-    "detected_at": "2026-06-28T03:00:00.000Z"
+    "subject_id": "anvil-manufacturing",
+    "confidence": 0.86,
+    "source_quote": "Anvil Manufacturing posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-06T02:00:00.000Z"
   },
   {
     "id": "sig-0012",
-    "event_type": "capacity_constraint",
+    "event_type": "government_contract_award",
     "entities": [
-      "Meridian Forgings"
+      "Anvil Manufacturing"
     ],
-    "subject_id": "meridian-forgings",
-    "confidence": 0.68,
-    "source_quote": "Meridian Forgings is quoting extended lead times, indicating its floor is near capacity.",
-    "detected_at": "2026-06-17T08:00:00.000Z"
+    "subject_id": "anvil-manufacturing",
+    "value": 13000000,
+    "confidence": 0.74,
+    "source_quote": "Anvil Manufacturing was awarded a $13.0M government contract.",
+    "detected_at": "2026-06-10T00:00:00.000Z"
   },
   {
     "id": "sig-0013",
-    "event_type": "supplier_delay",
+    "event_type": "quality_escape",
     "entities": [
-      "Cobalt Alloys"
+      "Meridian Technologies"
     ],
-    "subject_id": "cobalt-alloys",
-    "confidence": 0.9,
-    "source_quote": "Cobalt Alloys notified customers of a multi-week slip on shipments.",
-    "detected_at": "2026-06-23T02:00:00.000Z"
+    "subject_id": "meridian-technologies",
+    "confidence": 0.77,
+    "source_quote": "A quality escape at Meridian Technologies triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-27T20:00:00.000Z"
   },
   {
     "id": "sig-0014",
-    "event_type": "pricing_pressure",
+    "event_type": "supplier_delay",
     "entities": [
-      "Cobalt Alloys"
+      "Meridian Technologies"
     ],
-    "subject_id": "cobalt-alloys",
-    "confidence": 0.87,
-    "source_quote": "Cobalt Alloys raised quoted prices, citing material and labor cost inflation.",
-    "detected_at": "2026-06-17T03:00:00.000Z"
+    "subject_id": "meridian-technologies",
+    "confidence": 0.69,
+    "source_quote": "Meridian Technologies notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-01T05:00:00.000Z"
   },
   {
     "id": "sig-0015",
     "event_type": "quality_escape",
     "entities": [
-      "Cobalt Alloys"
+      "Falcon Fabrication"
     ],
-    "subject_id": "cobalt-alloys",
-    "confidence": 0.76,
-    "source_quote": "A quality escape at Cobalt Alloys triggered a customer source-inspection hold.",
-    "detected_at": "2026-06-19T19:00:00.000Z"
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.88,
+    "source_quote": "A quality escape at Falcon Fabrication triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-25T01:00:00.000Z"
   },
   {
     "id": "sig-0016",
     "event_type": "pricing_pressure",
     "entities": [
-      "Granite Tooling"
+      "Falcon Fabrication"
     ],
-    "subject_id": "granite-tooling",
-    "confidence": 0.82,
-    "source_quote": "Granite Tooling raised quoted prices, citing material and labor cost inflation.",
-    "detected_at": "2026-06-05T20:00:00.000Z"
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.68,
+    "source_quote": "Falcon Fabrication raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-10T08:00:00.000Z"
   },
   {
     "id": "sig-0017",
     "event_type": "regulatory_change",
     "entities": [
-      "Granite Tooling"
+      "Falcon Fabrication"
     ],
-    "subject_id": "granite-tooling",
-    "confidence": 0.92,
-    "source_quote": "New compliance requirements affect Granite Tooling's certified processes.",
-    "detected_at": "2026-06-12T19:00:00.000Z"
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.89,
+    "source_quote": "New compliance requirements affect Falcon Fabrication's certified processes.",
+    "detected_at": "2026-06-28T02:00:00.000Z"
   },
   {
     "id": "sig-0018",
-    "event_type": "regulatory_change",
+    "event_type": "quality_escape",
     "entities": [
-      "Granite Tooling"
+      "Falcon Fabrication"
     ],
-    "subject_id": "granite-tooling",
-    "confidence": 0.87,
-    "source_quote": "New compliance requirements affect Granite Tooling's certified processes.",
-    "detected_at": "2026-06-29T22:00:00.000Z"
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.97,
+    "source_quote": "A quality escape at Falcon Fabrication triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-03T02:00:00.000Z"
   },
   {
     "id": "sig-0019",
-    "event_type": "pricing_pressure",
+    "event_type": "supplier_delay",
     "entities": [
-      "Granite Tooling"
+      "Falcon Fabrication"
     ],
-    "subject_id": "granite-tooling",
-    "confidence": 0.71,
-    "source_quote": "Granite Tooling raised quoted prices, citing material and labor cost inflation.",
-    "detected_at": "2026-06-26T02:00:00.000Z"
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.78,
+    "source_quote": "Falcon Fabrication notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-24T12:00:00.000Z"
   },
   {
     "id": "sig-0020",
-    "event_type": "pricing_pressure",
+    "event_type": "demand_spike",
     "entities": [
-      "Granite Tooling"
+      "Monarch Technologies"
     ],
-    "subject_id": "granite-tooling",
-    "confidence": 0.82,
-    "source_quote": "Granite Tooling raised quoted prices, citing material and labor cost inflation.",
-    "detected_at": "2026-05-31T16:00:00.000Z"
+    "subject_id": "monarch-technologies",
+    "confidence": 0.86,
+    "source_quote": "Demand for Monarch Technologies's products spiked on new program starts.",
+    "detected_at": "2026-06-13T17:00:00.000Z"
   },
   {
     "id": "sig-0021",
-    "event_type": "competitor_expansion",
+    "event_type": "hiring_surge",
     "entities": [
-      "Apex Machining"
+      "Monarch Technologies"
     ],
-    "subject_id": "apex-machining",
-    "confidence": 0.94,
-    "source_quote": "Apex Machining announced a facility expansion to add machining capacity.",
-    "detected_at": "2026-06-02T21:00:00.000Z"
+    "subject_id": "monarch-technologies",
+    "confidence": 0.7,
+    "source_quote": "Monarch Technologies posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-22T15:00:00.000Z"
   },
   {
     "id": "sig-0022",
-    "event_type": "contract_win",
+    "event_type": "government_contract_award",
     "entities": [
-      "Apex Machining"
+      "Monarch Technologies"
     ],
-    "subject_id": "apex-machining",
-    "value": 6000000,
-    "confidence": 0.77,
-    "source_quote": "Apex Machining booked a $6.0M multi-year production contract.",
-    "detected_at": "2026-06-23T00:00:00.000Z"
+    "subject_id": "monarch-technologies",
+    "value": 14700000,
+    "confidence": 0.7,
+    "source_quote": "Monarch Technologies was awarded a $14.7M government contract.",
+    "detected_at": "2026-06-19T15:00:00.000Z"
   },
   {
     "id": "sig-0023",
-    "event_type": "government_contract_award",
+    "event_type": "demand_spike",
     "entities": [
-      "Apex Machining"
+      "Monarch Technologies"
     ],
-    "subject_id": "apex-machining",
-    "value": 10600000,
-    "confidence": 0.85,
-    "source_quote": "Apex Machining was awarded a $10.6M government contract.",
-    "detected_at": "2026-06-16T13:00:00.000Z"
+    "subject_id": "monarch-technologies",
+    "confidence": 0.95,
+    "source_quote": "Demand for Monarch Technologies's products spiked on new program starts.",
+    "detected_at": "2026-05-31T19:00:00.000Z"
   },
   {
     "id": "sig-0024",
-    "event_type": "contract_win",
+    "event_type": "demand_spike",
     "entities": [
-      "Apex Machining"
+      "Strata Turbine"
     ],
-    "subject_id": "apex-machining",
-    "value": 18700000,
-    "confidence": 0.77,
-    "source_quote": "Apex Machining booked a $18.7M multi-year production contract.",
-    "detected_at": "2026-06-12T14:00:00.000Z"
+    "subject_id": "strata-turbine",
+    "confidence": 0.74,
+    "source_quote": "Demand for Strata Turbine's products spiked on new program starts.",
+    "detected_at": "2026-06-21T11:00:00.000Z"
   },
   {
     "id": "sig-0025",
-    "event_type": "government_contract_award",
+    "event_type": "demand_spike",
     "entities": [
-      "Apex Machining"
+      "Strata Turbine"
     ],
-    "subject_id": "apex-machining",
-    "value": 6100000,
-    "confidence": 0.83,
-    "source_quote": "Apex Machining was awarded a $6.1M government contract.",
-    "detected_at": "2026-06-19T10:00:00.000Z"
+    "subject_id": "strata-turbine",
+    "confidence": 0.9,
+    "source_quote": "Demand for Strata Turbine's products spiked on new program starts.",
+    "detected_at": "2026-06-03T17:00:00.000Z"
   },
   {
     "id": "sig-0026",
-    "event_type": "government_contract_award",
+    "event_type": "hiring_surge",
     "entities": [
-      "Apex Machining"
+      "Strata Turbine"
     ],
-    "subject_id": "apex-machining",
-    "value": 1700000,
-    "confidence": 0.91,
-    "source_quote": "Apex Machining was awarded a $1.7M government contract.",
-    "detected_at": "2026-06-17T11:00:00.000Z"
+    "subject_id": "strata-turbine",
+    "confidence": 0.78,
+    "source_quote": "Strata Turbine posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-05-31T22:00:00.000Z"
   },
   {
     "id": "sig-0027",
-    "event_type": "competitor_expansion",
+    "event_type": "government_contract_award",
     "entities": [
-      "Vanguard Aerospace"
+      "Strata Turbine"
     ],
-    "subject_id": "vanguard-aero",
-    "confidence": 0.78,
-    "source_quote": "Vanguard Aerospace announced a facility expansion to add machining capacity.",
-    "detected_at": "2026-06-01T11:00:00.000Z"
+    "subject_id": "strata-turbine",
+    "value": 1100000,
+    "confidence": 0.95,
+    "source_quote": "Strata Turbine was awarded a $1.1M government contract.",
+    "detected_at": "2026-06-02T08:00:00.000Z"
   },
   {
     "id": "sig-0028",
-    "event_type": "contract_win",
+    "event_type": "regulatory_change",
     "entities": [
-      "Vanguard Aerospace"
+      "Anvil Systems"
     ],
-    "subject_id": "vanguard-aero",
-    "value": 12200000,
-    "confidence": 0.83,
-    "source_quote": "Vanguard Aerospace booked a $12.2M multi-year production contract.",
-    "detected_at": "2026-06-30T00:00:00.000Z"
+    "subject_id": "anvil-systems",
+    "confidence": 0.69,
+    "source_quote": "New compliance requirements affect Anvil Systems's certified processes.",
+    "detected_at": "2026-06-28T23:00:00.000Z"
   },
   {
     "id": "sig-0029",
-    "event_type": "contract_win",
+    "event_type": "capacity_constraint",
     "entities": [
-      "Vanguard Aerospace"
+      "Anvil Systems"
     ],
-    "subject_id": "vanguard-aero",
-    "value": 6000000,
-    "confidence": 0.87,
-    "source_quote": "Vanguard Aerospace booked a $6.0M multi-year production contract.",
-    "detected_at": "2026-06-15T23:00:00.000Z"
+    "subject_id": "anvil-systems",
+    "confidence": 0.97,
+    "source_quote": "Anvil Systems is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-28T02:00:00.000Z"
   },
   {
     "id": "sig-0030",
-    "event_type": "contract_win",
+    "event_type": "capacity_constraint",
     "entities": [
-      "Vanguard Aerospace"
+      "Anvil Systems"
     ],
-    "subject_id": "vanguard-aero",
-    "value": 3300000,
-    "confidence": 0.76,
-    "source_quote": "Vanguard Aerospace booked a $3.3M multi-year production contract.",
-    "detected_at": "2026-06-05T21:00:00.000Z"
+    "subject_id": "anvil-systems",
+    "confidence": 0.72,
+    "source_quote": "Anvil Systems is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-13T12:00:00.000Z"
   },
   {
     "id": "sig-0031",
-    "event_type": "competitor_expansion",
+    "event_type": "supplier_delay",
     "entities": [
-      "Vanguard Aerospace"
+      "Anvil Systems"
     ],
-    "subject_id": "vanguard-aero",
-    "confidence": 0.67,
-    "source_quote": "Vanguard Aerospace announced a facility expansion to add machining capacity.",
-    "detected_at": "2026-06-10T21:00:00.000Z"
+    "subject_id": "anvil-systems",
+    "confidence": 0.68,
+    "source_quote": "Anvil Systems notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-05-31T15:00:00.000Z"
   },
   {
     "id": "sig-0032",
-    "event_type": "government_contract_award",
+    "event_type": "contract_win",
     "entities": [
-      "Vanguard Aerospace"
+      "Sentinel Alloys"
     ],
-    "subject_id": "vanguard-aero",
-    "value": 2200000,
-    "confidence": 0.7,
-    "source_quote": "Vanguard Aerospace was awarded a $2.2M government contract.",
-    "detected_at": "2026-06-12T13:00:00.000Z"
+    "subject_id": "sentinel-alloys",
+    "value": 500000,
+    "confidence": 0.75,
+    "source_quote": "Sentinel Alloys booked a $0.5M multi-year production contract.",
+    "detected_at": "2026-06-09T08:00:00.000Z"
   },
   {
     "id": "sig-0033",
-    "event_type": "hiring_surge",
+    "event_type": "government_contract_award",
     "entities": [
-      "Ironclad Components"
+      "Sentinel Alloys"
     ],
-    "subject_id": "ironclad-comp",
-    "confidence": 0.67,
-    "source_quote": "Ironclad Components posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-14T04:00:00.000Z"
+    "subject_id": "sentinel-alloys",
+    "value": 11800000,
+    "confidence": 0.97,
+    "source_quote": "Sentinel Alloys was awarded a $11.8M government contract.",
+    "detected_at": "2026-06-21T16:00:00.000Z"
   },
   {
     "id": "sig-0034",
     "event_type": "contract_win",
     "entities": [
-      "Ironclad Components"
+      "Sentinel Alloys"
     ],
-    "subject_id": "ironclad-comp",
+    "subject_id": "sentinel-alloys",
     "value": 12400000,
-    "confidence": 0.82,
-    "source_quote": "Ironclad Components booked a $12.4M multi-year production contract.",
-    "detected_at": "2026-06-20T19:00:00.000Z"
+    "confidence": 0.83,
+    "source_quote": "Sentinel Alloys booked a $12.4M multi-year production contract.",
+    "detected_at": "2026-06-07T14:00:00.000Z"
   },
   {
     "id": "sig-0035",
     "event_type": "contract_win",
     "entities": [
-      "Ironclad Components"
+      "Sentinel Alloys"
     ],
-    "subject_id": "ironclad-comp",
-    "value": 14200000,
-    "confidence": 0.91,
-    "source_quote": "Ironclad Components booked a $14.2M multi-year production contract.",
-    "detected_at": "2026-06-23T03:00:00.000Z"
+    "subject_id": "sentinel-alloys",
+    "value": 1900000,
+    "confidence": 0.7,
+    "source_quote": "Sentinel Alloys booked a $1.9M multi-year production contract.",
+    "detected_at": "2026-06-20T10:00:00.000Z"
   },
   {
     "id": "sig-0036",
     "event_type": "hiring_surge",
     "entities": [
-      "Ironclad Components"
+      "Cardinal Metalworks"
     ],
-    "subject_id": "ironclad-comp",
-    "confidence": 0.85,
-    "source_quote": "Ironclad Components posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-05T09:00:00.000Z"
+    "subject_id": "cardinal-metalworks",
+    "confidence": 0.9,
+    "source_quote": "Cardinal Metalworks posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-01T12:00:00.000Z"
   },
   {
     "id": "sig-0037",
-    "event_type": "contract_win",
+    "event_type": "competitor_expansion",
     "entities": [
-      "Strata Manufacturing"
+      "Cardinal Metalworks"
     ],
-    "subject_id": "strata-mfg",
-    "value": 6000000,
-    "confidence": 0.73,
-    "source_quote": "Strata Manufacturing booked a $6.0M multi-year production contract.",
-    "detected_at": "2026-06-28T10:00:00.000Z"
+    "subject_id": "cardinal-metalworks",
+    "confidence": 0.81,
+    "source_quote": "Cardinal Metalworks announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-05T06:00:00.000Z"
   },
   {
     "id": "sig-0038",
-    "event_type": "competitor_expansion",
+    "event_type": "government_contract_award",
     "entities": [
-      "Strata Manufacturing"
+      "Cardinal Metalworks"
     ],
-    "subject_id": "strata-mfg",
-    "confidence": 0.91,
-    "source_quote": "Strata Manufacturing announced a facility expansion to add machining capacity.",
-    "detected_at": "2026-06-10T20:00:00.000Z"
+    "subject_id": "cardinal-metalworks",
+    "value": 17300000,
+    "confidence": 0.94,
+    "source_quote": "Cardinal Metalworks was awarded a $17.3M government contract.",
+    "detected_at": "2026-06-28T12:00:00.000Z"
   },
   {
     "id": "sig-0039",
-    "event_type": "competitor_expansion",
+    "event_type": "demand_spike",
     "entities": [
-      "Strata Manufacturing"
+      "Monarch Alloys"
     ],
-    "subject_id": "strata-mfg",
-    "confidence": 0.74,
-    "source_quote": "Strata Manufacturing announced a facility expansion to add machining capacity.",
-    "detected_at": "2026-06-07T11:00:00.000Z"
+    "subject_id": "monarch-alloys",
+    "confidence": 0.89,
+    "source_quote": "Demand for Monarch Alloys's products spiked on new program starts.",
+    "detected_at": "2026-06-05T14:00:00.000Z"
   },
   {
     "id": "sig-0040",
-    "event_type": "contract_win",
+    "event_type": "hiring_surge",
     "entities": [
-      "Strata Manufacturing"
+      "Monarch Alloys"
     ],
-    "subject_id": "strata-mfg",
-    "value": 7500000,
-    "confidence": 0.89,
-    "source_quote": "Strata Manufacturing booked a $7.5M multi-year production contract.",
-    "detected_at": "2026-06-24T14:00:00.000Z"
+    "subject_id": "monarch-alloys",
+    "confidence": 0.79,
+    "source_quote": "Monarch Alloys posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-03T01:00:00.000Z"
   },
   {
     "id": "sig-0041",
-    "event_type": "competitor_expansion",
+    "event_type": "demand_spike",
     "entities": [
-      "Strata Manufacturing"
+      "Monarch Alloys"
     ],
-    "subject_id": "strata-mfg",
-    "confidence": 0.94,
-    "source_quote": "Strata Manufacturing announced a facility expansion to add machining capacity.",
-    "detected_at": "2026-06-03T22:00:00.000Z"
+    "subject_id": "monarch-alloys",
+    "confidence": 0.79,
+    "source_quote": "Demand for Monarch Alloys's products spiked on new program starts.",
+    "detected_at": "2026-06-24T06:00:00.000Z"
   },
   {
     "id": "sig-0042",
-    "event_type": "government_contract_award",
+    "event_type": "contract_win",
     "entities": [
-      "Strata Manufacturing"
+      "Monarch Alloys"
     ],
-    "subject_id": "strata-mfg",
-    "value": 19100000,
-    "confidence": 0.83,
-    "source_quote": "Strata Manufacturing was awarded a $19.1M government contract.",
-    "detected_at": "2026-06-19T20:00:00.000Z"
+    "subject_id": "monarch-alloys",
+    "value": 3900000,
+    "confidence": 0.8,
+    "source_quote": "Monarch Alloys booked a $3.9M multi-year production contract.",
+    "detected_at": "2026-06-15T14:00:00.000Z"
   },
   {
     "id": "sig-0043",
-    "event_type": "hiring_surge",
+    "event_type": "contract_win",
     "entities": [
-      "Harbor Aerosystems"
+      "Sentinel Aerospace"
     ],
-    "subject_id": "harbor-aero",
-    "confidence": 0.73,
-    "source_quote": "Harbor Aerosystems posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-20T16:00:00.000Z"
+    "subject_id": "sentinel-aerospace",
+    "value": 3000000,
+    "confidence": 0.94,
+    "source_quote": "Sentinel Aerospace booked a $3.0M multi-year production contract.",
+    "detected_at": "2026-06-18T02:00:00.000Z"
   },
   {
     "id": "sig-0044",
-    "event_type": "demand_spike",
-    "entities": [
-      "Harbor Aerosystems"
-    ],
-    "subject_id": "harbor-aero",
-    "confidence": 0.96,
-    "source_quote": "Demand for Harbor Aerosystems's products spiked on new program starts.",
-    "detected_at": "2026-06-29T21:00:00.000Z"
-  },
-  {
-    "id": "sig-0045",
-    "event_type": "hiring_surge",
-    "entities": [
-      "Harbor Aerosystems"
-    ],
-    "subject_id": "harbor-aero",
-    "confidence": 0.71,
-    "source_quote": "Harbor Aerosystems posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-26T18:00:00.000Z"
-  },
-  {
-    "id": "sig-0046",
-    "event_type": "demand_spike",
-    "entities": [
-      "Harbor Aerosystems"
-    ],
-    "subject_id": "harbor-aero",
-    "confidence": 0.89,
-    "source_quote": "Demand for Harbor Aerosystems's products spiked on new program starts.",
-    "detected_at": "2026-06-22T03:00:00.000Z"
-  },
-  {
-    "id": "sig-0047",
     "event_type": "contract_win",
     "entities": [
-      "Harbor Aerosystems"
+      "Sentinel Aerospace"
     ],
-    "subject_id": "harbor-aero",
-    "value": 4100000,
+    "subject_id": "sentinel-aerospace",
+    "value": 11400000,
     "confidence": 0.8,
-    "source_quote": "Harbor Aerosystems booked a $4.1M multi-year production contract.",
-    "detected_at": "2026-06-11T20:00:00.000Z"
-  },
-  {
-    "id": "sig-0048",
-    "event_type": "contract_win",
-    "entities": [
-      "Harbor Aerosystems"
-    ],
-    "subject_id": "harbor-aero",
-    "value": 19300000,
-    "confidence": 0.75,
-    "source_quote": "Harbor Aerosystems booked a $19.3M multi-year production contract.",
-    "detected_at": "2026-06-21T06:00:00.000Z"
-  },
-  {
-    "id": "sig-0049",
-    "event_type": "hiring_surge",
-    "entities": [
-      "Continental Defense"
-    ],
-    "subject_id": "continental-def",
-    "confidence": 0.76,
-    "source_quote": "Continental Defense posted a surge of openings, signaling a growth push.",
+    "source_quote": "Sentinel Aerospace booked a $11.4M multi-year production contract.",
     "detected_at": "2026-06-01T22:00:00.000Z"
   },
   {
-    "id": "sig-0050",
-    "event_type": "demand_spike",
+    "id": "sig-0045",
+    "event_type": "pricing_pressure",
     "entities": [
-      "Continental Defense"
+      "Beacon Alloys"
     ],
-    "subject_id": "continental-def",
-    "confidence": 0.8,
-    "source_quote": "Demand for Continental Defense's products spiked on new program starts.",
-    "detected_at": "2026-06-03T06:00:00.000Z"
+    "subject_id": "beacon-alloys",
+    "confidence": 0.89,
+    "source_quote": "Beacon Alloys raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-26T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0046",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Beacon Alloys"
+    ],
+    "subject_id": "beacon-alloys",
+    "confidence": 0.87,
+    "source_quote": "Beacon Alloys raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-29T07:00:00.000Z"
+  },
+  {
+    "id": "sig-0047",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Beacon Alloys"
+    ],
+    "subject_id": "beacon-alloys",
+    "confidence": 0.66,
+    "source_quote": "Beacon Alloys raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-28T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0048",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Beacon Alloys"
+    ],
+    "subject_id": "beacon-alloys",
+    "confidence": 0.69,
+    "source_quote": "Beacon Alloys notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-05-31T03:00:00.000Z"
+  },
+  {
+    "id": "sig-0049",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "value": 12400000,
+    "confidence": 0.67,
+    "source_quote": "Halcyon Components was awarded a $12.4M government contract.",
+    "detected_at": "2026-06-20T02:00:00.000Z"
+  },
+  {
+    "id": "sig-0050",
+    "event_type": "contract_win",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "value": 15900000,
+    "confidence": 0.79,
+    "source_quote": "Halcyon Components booked a $15.9M multi-year production contract.",
+    "detected_at": "2026-06-08T11:00:00.000Z"
   },
   {
     "id": "sig-0051",
-    "event_type": "government_contract_award",
+    "event_type": "demand_spike",
     "entities": [
-      "Continental Defense"
+      "Vanguard Systems"
     ],
-    "subject_id": "continental-def",
-    "value": 19300000,
-    "confidence": 0.92,
-    "source_quote": "Continental Defense was awarded a $19.3M government contract.",
-    "detected_at": "2026-06-06T15:00:00.000Z"
+    "subject_id": "vanguard-systems",
+    "confidence": 0.96,
+    "source_quote": "Demand for Vanguard Systems's products spiked on new program starts.",
+    "detected_at": "2026-06-24T01:00:00.000Z"
   },
   {
     "id": "sig-0052",
-    "event_type": "demand_spike",
+    "event_type": "contract_win",
     "entities": [
-      "Continental Defense"
+      "Vanguard Systems"
     ],
-    "subject_id": "continental-def",
-    "confidence": 0.97,
-    "source_quote": "Demand for Continental Defense's products spiked on new program starts.",
-    "detected_at": "2026-06-20T09:00:00.000Z"
+    "subject_id": "vanguard-systems",
+    "value": 4900000,
+    "confidence": 0.71,
+    "source_quote": "Vanguard Systems booked a $4.9M multi-year production contract.",
+    "detected_at": "2026-06-22T02:00:00.000Z"
   },
   {
     "id": "sig-0053",
-    "event_type": "contract_win",
+    "event_type": "government_contract_award",
     "entities": [
-      "Continental Defense"
+      "Vanguard Systems"
     ],
-    "subject_id": "continental-def",
-    "value": 14000000,
-    "confidence": 0.94,
-    "source_quote": "Continental Defense booked a $14.0M multi-year production contract.",
-    "detected_at": "2026-06-02T07:00:00.000Z"
+    "subject_id": "vanguard-systems",
+    "value": 13000000,
+    "confidence": 0.84,
+    "source_quote": "Vanguard Systems was awarded a $13.0M government contract.",
+    "detected_at": "2026-06-26T16:00:00.000Z"
   },
   {
     "id": "sig-0054",
-    "event_type": "hiring_surge",
+    "event_type": "government_contract_award",
     "entities": [
-      "Northwind Systems"
+      "Vanguard Systems"
     ],
-    "subject_id": "northwind-sys",
-    "confidence": 0.95,
-    "source_quote": "Northwind Systems posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-05T01:00:00.000Z"
+    "subject_id": "vanguard-systems",
+    "value": 15500000,
+    "confidence": 0.89,
+    "source_quote": "Vanguard Systems was awarded a $15.5M government contract.",
+    "detected_at": "2026-06-15T00:00:00.000Z"
   },
   {
     "id": "sig-0055",
-    "event_type": "demand_spike",
+    "event_type": "hiring_surge",
     "entities": [
-      "Northwind Systems"
+      "Vanguard Systems"
     ],
-    "subject_id": "northwind-sys",
-    "confidence": 0.92,
-    "source_quote": "Demand for Northwind Systems's products spiked on new program starts.",
-    "detected_at": "2026-06-17T17:00:00.000Z"
+    "subject_id": "vanguard-systems",
+    "confidence": 0.67,
+    "source_quote": "Vanguard Systems posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-10T03:00:00.000Z"
   },
   {
     "id": "sig-0056",
-    "event_type": "contract_win",
+    "event_type": "supplier_delay",
     "entities": [
-      "Northwind Systems"
+      "Nimbus Technologies"
     ],
-    "subject_id": "northwind-sys",
-    "value": 17400000,
-    "confidence": 0.71,
-    "source_quote": "Northwind Systems booked a $17.4M multi-year production contract.",
-    "detected_at": "2026-06-14T23:00:00.000Z"
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.84,
+    "source_quote": "Nimbus Technologies notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-27T20:00:00.000Z"
   },
   {
     "id": "sig-0057",
-    "event_type": "government_contract_award",
+    "event_type": "pricing_pressure",
     "entities": [
-      "Northwind Systems"
+      "Nimbus Technologies"
     ],
-    "subject_id": "northwind-sys",
-    "value": 2700000,
-    "confidence": 0.73,
-    "source_quote": "Northwind Systems was awarded a $2.7M government contract.",
-    "detected_at": "2026-06-18T12:00:00.000Z"
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.72,
+    "source_quote": "Nimbus Technologies raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-02T07:00:00.000Z"
   },
   {
     "id": "sig-0058",
-    "event_type": "government_contract_award",
+    "event_type": "regulatory_change",
     "entities": [
-      "Northwind Systems"
+      "Nimbus Technologies"
     ],
-    "subject_id": "northwind-sys",
-    "value": 11100000,
-    "confidence": 0.84,
-    "source_quote": "Northwind Systems was awarded a $11.1M government contract.",
-    "detected_at": "2026-06-25T06:00:00.000Z"
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.97,
+    "source_quote": "New compliance requirements affect Nimbus Technologies's certified processes.",
+    "detected_at": "2026-06-13T09:00:00.000Z"
   },
   {
     "id": "sig-0059",
-    "event_type": "government_contract_award",
+    "event_type": "supplier_delay",
     "entities": [
-      "Northwind Systems"
+      "Nimbus Technologies"
     ],
-    "subject_id": "northwind-sys",
-    "value": 10900000,
-    "confidence": 0.77,
-    "source_quote": "Northwind Systems was awarded a $10.9M government contract.",
-    "detected_at": "2026-06-16T06:00:00.000Z"
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.88,
+    "source_quote": "Nimbus Technologies notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-17T21:00:00.000Z"
   },
   {
     "id": "sig-0060",
-    "event_type": "demand_spike",
+    "event_type": "competitor_expansion",
     "entities": [
-      "Beacon Aviation"
+      "Falcon Tooling"
     ],
-    "subject_id": "beacon-aviation",
-    "confidence": 0.86,
-    "source_quote": "Demand for Beacon Aviation's products spiked on new program starts.",
-    "detected_at": "2026-06-13T17:00:00.000Z"
+    "subject_id": "falcon-tooling",
+    "confidence": 0.69,
+    "source_quote": "Falcon Tooling announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-21T20:00:00.000Z"
   },
   {
     "id": "sig-0061",
-    "event_type": "contract_win",
+    "event_type": "competitor_expansion",
     "entities": [
-      "Beacon Aviation"
+      "Falcon Tooling"
     ],
-    "subject_id": "beacon-aviation",
-    "value": 3700000,
-    "confidence": 0.74,
-    "source_quote": "Beacon Aviation booked a $3.7M multi-year production contract.",
-    "detected_at": "2026-06-17T04:00:00.000Z"
+    "subject_id": "falcon-tooling",
+    "confidence": 0.71,
+    "source_quote": "Falcon Tooling announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-06T16:00:00.000Z"
   },
   {
     "id": "sig-0062",
-    "event_type": "hiring_surge",
+    "event_type": "government_contract_award",
     "entities": [
-      "Beacon Aviation"
+      "Falcon Tooling"
     ],
-    "subject_id": "beacon-aviation",
-    "confidence": 0.7,
-    "source_quote": "Beacon Aviation posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-19T15:00:00.000Z"
+    "subject_id": "falcon-tooling",
+    "value": 7200000,
+    "confidence": 0.72,
+    "source_quote": "Falcon Tooling was awarded a $7.2M government contract.",
+    "detected_at": "2026-06-17T16:00:00.000Z"
   },
   {
     "id": "sig-0063",
-    "event_type": "demand_spike",
+    "event_type": "competitor_expansion",
     "entities": [
-      "Beacon Aviation"
+      "Falcon Tooling"
     ],
-    "subject_id": "beacon-aviation",
-    "confidence": 0.95,
-    "source_quote": "Demand for Beacon Aviation's products spiked on new program starts.",
-    "detected_at": "2026-05-31T19:00:00.000Z"
+    "subject_id": "falcon-tooling",
+    "confidence": 0.98,
+    "source_quote": "Falcon Tooling announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-03T00:00:00.000Z"
   },
   {
     "id": "sig-0064",
-    "event_type": "government_contract_award",
+    "event_type": "contract_win",
     "entities": [
-      "Beacon Aviation"
+      "Titan Precision"
     ],
-    "subject_id": "beacon-aviation",
-    "value": 5800000,
-    "confidence": 0.73,
-    "source_quote": "Beacon Aviation was awarded a $5.8M government contract.",
-    "detected_at": "2026-06-12T07:00:00.000Z"
+    "subject_id": "titan-precision",
+    "value": 4900000,
+    "confidence": 0.72,
+    "source_quote": "Titan Precision booked a $4.9M multi-year production contract.",
+    "detected_at": "2026-06-12T22:00:00.000Z"
   },
   {
     "id": "sig-0065",
     "event_type": "government_contract_award",
     "entities": [
-      "Summit Turbine"
+      "Titan Precision"
     ],
-    "subject_id": "summit-turbine",
-    "value": 12500000,
-    "confidence": 0.66,
-    "source_quote": "Summit Turbine was awarded a $12.5M government contract.",
-    "detected_at": "2026-06-21T18:00:00.000Z"
+    "subject_id": "titan-precision",
+    "value": 11800000,
+    "confidence": 0.78,
+    "source_quote": "Titan Precision was awarded a $11.8M government contract.",
+    "detected_at": "2026-06-11T22:00:00.000Z"
   },
   {
     "id": "sig-0066",
-    "event_type": "government_contract_award",
+    "event_type": "competitor_expansion",
     "entities": [
-      "Summit Turbine"
+      "Titan Precision"
     ],
-    "subject_id": "summit-turbine",
-    "value": 4400000,
-    "confidence": 0.9,
-    "source_quote": "Summit Turbine was awarded a $4.4M government contract.",
-    "detected_at": "2026-06-03T17:00:00.000Z"
+    "subject_id": "titan-precision",
+    "confidence": 0.89,
+    "source_quote": "Titan Precision announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-16T04:00:00.000Z"
   },
   {
     "id": "sig-0067",
-    "event_type": "hiring_surge",
+    "event_type": "competitor_expansion",
     "entities": [
-      "Summit Turbine"
+      "Titan Precision"
     ],
-    "subject_id": "summit-turbine",
-    "confidence": 0.78,
-    "source_quote": "Summit Turbine posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-05-31T22:00:00.000Z"
+    "subject_id": "titan-precision",
+    "confidence": 0.85,
+    "source_quote": "Titan Precision announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-21T01:00:00.000Z"
   },
   {
     "id": "sig-0068",
-    "event_type": "government_contract_award",
+    "event_type": "quality_escape",
     "entities": [
-      "Summit Turbine"
+      "Titan Components"
     ],
-    "subject_id": "summit-turbine",
-    "value": 1100000,
-    "confidence": 0.95,
-    "source_quote": "Summit Turbine was awarded a $1.1M government contract.",
-    "detected_at": "2026-06-02T08:00:00.000Z"
+    "subject_id": "titan-components",
+    "confidence": 0.98,
+    "source_quote": "A quality escape at Titan Components triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-27T06:00:00.000Z"
   },
   {
     "id": "sig-0069",
-    "event_type": "government_contract_award",
+    "event_type": "pricing_pressure",
     "entities": [
-      "Summit Turbine"
+      "Titan Components"
     ],
-    "subject_id": "summit-turbine",
-    "value": 17800000,
-    "confidence": 0.68,
-    "source_quote": "Summit Turbine was awarded a $17.8M government contract.",
-    "detected_at": "2026-06-04T08:00:00.000Z"
+    "subject_id": "titan-components",
+    "confidence": 0.76,
+    "source_quote": "Titan Components raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-02T23:00:00.000Z"
   },
   {
     "id": "sig-0070",
-    "event_type": "demand_spike",
+    "event_type": "regulatory_change",
     "entities": [
-      "Summit Turbine"
+      "Titan Components"
     ],
-    "subject_id": "summit-turbine",
-    "confidence": 0.95,
-    "source_quote": "Demand for Summit Turbine's products spiked on new program starts.",
-    "detected_at": "2026-06-05T05:00:00.000Z"
+    "subject_id": "titan-components",
+    "confidence": 0.8,
+    "source_quote": "New compliance requirements affect Titan Components's certified processes.",
+    "detected_at": "2026-06-19T07:00:00.000Z"
   },
   {
     "id": "sig-0071",
-    "event_type": "demand_spike",
+    "event_type": "regulatory_change",
     "entities": [
-      "Delta Propulsion"
+      "Titan Components"
     ],
-    "subject_id": "delta-propulsion",
-    "confidence": 0.67,
-    "source_quote": "Demand for Delta Propulsion's products spiked on new program starts.",
-    "detected_at": "2026-06-24T11:00:00.000Z"
+    "subject_id": "titan-components",
+    "confidence": 0.85,
+    "source_quote": "New compliance requirements affect Titan Components's certified processes.",
+    "detected_at": "2026-06-10T00:00:00.000Z"
   },
   {
     "id": "sig-0072",
-    "event_type": "demand_spike",
+    "event_type": "supplier_delay",
     "entities": [
-      "Delta Propulsion"
+      "Titan Components"
     ],
-    "subject_id": "delta-propulsion",
-    "confidence": 0.96,
-    "source_quote": "Demand for Delta Propulsion's products spiked on new program starts.",
-    "detected_at": "2026-06-26T14:00:00.000Z"
+    "subject_id": "titan-components",
+    "confidence": 0.72,
+    "source_quote": "Titan Components notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-06T02:00:00.000Z"
   },
   {
     "id": "sig-0073",
-    "event_type": "hiring_surge",
+    "event_type": "demand_spike",
     "entities": [
-      "Delta Propulsion"
+      "Cardinal Components"
     ],
-    "subject_id": "delta-propulsion",
-    "confidence": 0.83,
-    "source_quote": "Delta Propulsion posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-02T21:00:00.000Z"
+    "subject_id": "cardinal-components",
+    "confidence": 0.92,
+    "source_quote": "Demand for Cardinal Components's products spiked on new program starts.",
+    "detected_at": "2026-06-13T11:00:00.000Z"
   },
   {
     "id": "sig-0074",
-    "event_type": "demand_spike",
+    "event_type": "contract_win",
     "entities": [
-      "Orion Defense"
+      "Cardinal Components"
     ],
-    "subject_id": "orion-defense",
-    "confidence": 0.73,
-    "source_quote": "Demand for Orion Defense's products spiked on new program starts.",
-    "detected_at": "2026-06-29T05:00:00.000Z"
+    "subject_id": "cardinal-components",
+    "value": 15200000,
+    "confidence": 0.94,
+    "source_quote": "Cardinal Components booked a $15.2M multi-year production contract.",
+    "detected_at": "2026-06-01T06:00:00.000Z"
   },
   {
     "id": "sig-0075",
     "event_type": "hiring_surge",
     "entities": [
-      "Orion Defense"
+      "Cardinal Components"
     ],
-    "subject_id": "orion-defense",
+    "subject_id": "cardinal-components",
     "confidence": 0.91,
-    "source_quote": "Orion Defense posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-05T06:00:00.000Z"
+    "source_quote": "Cardinal Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-15T00:00:00.000Z"
   },
   {
     "id": "sig-0076",
     "event_type": "contract_win",
     "entities": [
-      "Orion Defense"
+      "Pinnacle Forgings"
     ],
-    "subject_id": "orion-defense",
-    "value": 9700000,
-    "confidence": 0.65,
-    "source_quote": "Orion Defense booked a $9.7M multi-year production contract.",
-    "detected_at": "2026-06-12T23:00:00.000Z"
+    "subject_id": "pinnacle-forgings",
+    "value": 3900000,
+    "confidence": 0.82,
+    "source_quote": "Pinnacle Forgings booked a $3.9M multi-year production contract.",
+    "detected_at": "2026-06-18T16:00:00.000Z"
   },
   {
     "id": "sig-0077",
-    "event_type": "hiring_surge",
+    "event_type": "contract_win",
     "entities": [
-      "Orion Defense"
+      "Pinnacle Forgings"
     ],
-    "subject_id": "orion-defense",
-    "confidence": 0.75,
-    "source_quote": "Orion Defense posted a surge of openings, signaling a growth push.",
-    "detected_at": "2026-06-06T11:00:00.000Z"
+    "subject_id": "pinnacle-forgings",
+    "value": 10400000,
+    "confidence": 0.81,
+    "source_quote": "Pinnacle Forgings booked a $10.4M multi-year production contract.",
+    "detected_at": "2026-06-02T11:00:00.000Z"
   },
   {
     "id": "sig-0078",
     "event_type": "government_contract_award",
     "entities": [
-      "Orion Defense"
+      "Pinnacle Forgings"
     ],
-    "subject_id": "orion-defense",
-    "value": 4100000,
+    "subject_id": "pinnacle-forgings",
+    "value": 1600000,
+    "confidence": 0.73,
+    "source_quote": "Pinnacle Forgings was awarded a $1.6M government contract.",
+    "detected_at": "2026-06-16T07:00:00.000Z"
+  },
+  {
+    "id": "sig-0079",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Pinnacle Forgings"
+    ],
+    "subject_id": "pinnacle-forgings",
+    "confidence": 0.68,
+    "source_quote": "Pinnacle Forgings posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-05-31T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0080",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Bastion Tooling"
+    ],
+    "subject_id": "bastion-tooling",
+    "value": 12400000,
+    "confidence": 0.98,
+    "source_quote": "Bastion Tooling was awarded a $12.4M government contract.",
+    "detected_at": "2026-06-25T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0081",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Bastion Tooling"
+    ],
+    "subject_id": "bastion-tooling",
+    "confidence": 0.68,
+    "source_quote": "Bastion Tooling posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-10T19:00:00.000Z"
+  },
+  {
+    "id": "sig-0082",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.94,
+    "source_quote": "Meridian Systems notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-29T01:00:00.000Z"
+  },
+  {
+    "id": "sig-0083",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.88,
+    "source_quote": "Meridian Systems raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-17T22:00:00.000Z"
+  },
+  {
+    "id": "sig-0084",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.86,
+    "source_quote": "Meridian Systems is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-14T22:00:00.000Z"
+  },
+  {
+    "id": "sig-0085",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.75,
+    "source_quote": "Meridian Systems is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-05T23:00:00.000Z"
+  },
+  {
+    "id": "sig-0086",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.84,
+    "source_quote": "New compliance requirements affect Meridian Systems's certified processes.",
+    "detected_at": "2026-06-15T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0087",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Granite Components"
+    ],
+    "subject_id": "granite-components",
+    "value": 19000000,
     "confidence": 0.79,
-    "source_quote": "Orion Defense was awarded a $4.1M government contract.",
-    "detected_at": "2026-06-04T04:00:00.000Z"
+    "source_quote": "Granite Components was awarded a $19.0M government contract.",
+    "detected_at": "2026-06-04T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0088",
+    "event_type": "demand_spike",
+    "entities": [
+      "Granite Components"
+    ],
+    "subject_id": "granite-components",
+    "confidence": 0.95,
+    "source_quote": "Demand for Granite Components's products spiked on new program starts.",
+    "detected_at": "2026-06-29T14:00:00.000Z"
+  },
+  {
+    "id": "sig-0089",
+    "event_type": "contract_win",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "value": 11600000,
+    "confidence": 0.81,
+    "source_quote": "Nimbus Components booked a $11.6M multi-year production contract.",
+    "detected_at": "2026-06-01T08:00:00.000Z"
+  },
+  {
+    "id": "sig-0090",
+    "event_type": "contract_win",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "value": 12500000,
+    "confidence": 0.97,
+    "source_quote": "Nimbus Components booked a $12.5M multi-year production contract.",
+    "detected_at": "2026-06-12T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0091",
+    "event_type": "demand_spike",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "confidence": 0.95,
+    "source_quote": "Demand for Nimbus Components's products spiked on new program starts.",
+    "detected_at": "2026-06-11T00:00:00.000Z"
+  },
+  {
+    "id": "sig-0092",
+    "event_type": "contract_win",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "value": 8000000,
+    "confidence": 0.75,
+    "source_quote": "Nimbus Components booked a $8.0M multi-year production contract.",
+    "detected_at": "2026-06-21T03:00:00.000Z"
+  },
+  {
+    "id": "sig-0093",
+    "event_type": "contract_win",
+    "entities": [
+      "Delta Precision"
+    ],
+    "subject_id": "delta-precision",
+    "value": 16900000,
+    "confidence": 0.89,
+    "source_quote": "Delta Precision booked a $16.9M multi-year production contract.",
+    "detected_at": "2026-06-14T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0094",
+    "event_type": "demand_spike",
+    "entities": [
+      "Delta Precision"
+    ],
+    "subject_id": "delta-precision",
+    "confidence": 0.79,
+    "source_quote": "Demand for Delta Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-10T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0095",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Aegis Components"
+    ],
+    "subject_id": "aegis-components",
+    "confidence": 0.96,
+    "source_quote": "Aegis Components announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-20T06:00:00.000Z"
+  },
+  {
+    "id": "sig-0096",
+    "event_type": "contract_win",
+    "entities": [
+      "Aegis Components"
+    ],
+    "subject_id": "aegis-components",
+    "value": 5300000,
+    "confidence": 0.89,
+    "source_quote": "Aegis Components booked a $5.3M multi-year production contract.",
+    "detected_at": "2026-06-03T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0097",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.86,
+    "source_quote": "Meridian Aerospace is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-07T03:00:00.000Z"
+  },
+  {
+    "id": "sig-0098",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.75,
+    "source_quote": "Meridian Aerospace raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-29T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0099",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.77,
+    "source_quote": "Meridian Aerospace raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-22T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0100",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.87,
+    "source_quote": "New compliance requirements affect Meridian Aerospace's certified processes.",
+    "detected_at": "2026-06-26T19:00:00.000Z"
+  },
+  {
+    "id": "sig-0101",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.76,
+    "source_quote": "Meridian Aerospace raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-02T15:00:00.000Z"
+  },
+  {
+    "id": "sig-0102",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "confidence": 0.68,
+    "source_quote": "Axiom Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-05T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0103",
+    "event_type": "demand_spike",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "confidence": 0.86,
+    "source_quote": "Demand for Axiom Components's products spiked on new program starts.",
+    "detected_at": "2026-06-20T08:00:00.000Z"
+  },
+  {
+    "id": "sig-0104",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "value": 1500000,
+    "confidence": 0.92,
+    "source_quote": "Axiom Components was awarded a $1.5M government contract.",
+    "detected_at": "2026-06-23T01:00:00.000Z"
+  },
+  {
+    "id": "sig-0105",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "confidence": 0.96,
+    "source_quote": "Axiom Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-25T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0106",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "confidence": 0.9,
+    "source_quote": "Meridian Precision posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-24T15:00:00.000Z"
+  },
+  {
+    "id": "sig-0107",
+    "event_type": "demand_spike",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "confidence": 0.76,
+    "source_quote": "Demand for Meridian Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-14T18:00:00.000Z"
+  },
+  {
+    "id": "sig-0108",
+    "event_type": "demand_spike",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "confidence": 0.89,
+    "source_quote": "Demand for Meridian Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-05T00:00:00.000Z"
+  },
+  {
+    "id": "sig-0109",
+    "event_type": "demand_spike",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "confidence": 0.75,
+    "source_quote": "Demand for Meridian Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-29T23:00:00.000Z"
+  },
+  {
+    "id": "sig-0110",
+    "event_type": "demand_spike",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "confidence": 0.82,
+    "source_quote": "Demand for Meridian Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-03T10:00:00.000Z"
+  },
+  {
+    "id": "sig-0111",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "value": 11900000,
+    "confidence": 0.8,
+    "source_quote": "Sterling Turbine was awarded a $11.9M government contract.",
+    "detected_at": "2026-06-25T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0112",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "value": 4100000,
+    "confidence": 0.7,
+    "source_quote": "Sterling Turbine was awarded a $4.1M government contract.",
+    "detected_at": "2026-06-23T02:00:00.000Z"
+  },
+  {
+    "id": "sig-0113",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "confidence": 0.66,
+    "source_quote": "Sterling Turbine announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-25T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0114",
+    "event_type": "contract_win",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "value": 18100000,
+    "confidence": 0.86,
+    "source_quote": "Sterling Turbine booked a $18.1M multi-year production contract.",
+    "detected_at": "2026-06-08T14:00:00.000Z"
+  },
+  {
+    "id": "sig-0115",
+    "event_type": "demand_spike",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "confidence": 0.86,
+    "source_quote": "Demand for Ironclad Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-28T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0116",
+    "event_type": "demand_spike",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "confidence": 0.89,
+    "source_quote": "Demand for Ironclad Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-25T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0117",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "value": 12500000,
+    "confidence": 0.75,
+    "source_quote": "Vertex Alloys was awarded a $12.5M government contract.",
+    "detected_at": "2026-06-11T03:00:00.000Z"
+  },
+  {
+    "id": "sig-0118",
+    "event_type": "demand_spike",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "confidence": 0.69,
+    "source_quote": "Demand for Vertex Alloys's products spiked on new program starts.",
+    "detected_at": "2026-06-17T01:00:00.000Z"
+  },
+  {
+    "id": "sig-0119",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.91,
+    "source_quote": "Foundry Precision is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-22T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0120",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.65,
+    "source_quote": "Foundry Precision is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-12T21:00:00.000Z"
+  },
+  {
+    "id": "sig-0121",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.95,
+    "source_quote": "Foundry Precision notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-08T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0122",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.75,
+    "source_quote": "New compliance requirements affect Foundry Precision's certified processes.",
+    "detected_at": "2026-06-26T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0123",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Monarch Forgings"
+    ],
+    "subject_id": "monarch-forgings",
+    "value": 9100000,
+    "confidence": 0.8,
+    "source_quote": "Monarch Forgings was awarded a $9.1M government contract.",
+    "detected_at": "2026-06-26T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0124",
+    "event_type": "demand_spike",
+    "entities": [
+      "Monarch Forgings"
+    ],
+    "subject_id": "monarch-forgings",
+    "confidence": 0.95,
+    "source_quote": "Demand for Monarch Forgings's products spiked on new program starts.",
+    "detected_at": "2026-05-31T02:00:00.000Z"
+  },
+  {
+    "id": "sig-0125",
+    "event_type": "contract_win",
+    "entities": [
+      "Monarch Forgings"
+    ],
+    "subject_id": "monarch-forgings",
+    "value": 14700000,
+    "confidence": 0.82,
+    "source_quote": "Monarch Forgings booked a $14.7M multi-year production contract.",
+    "detected_at": "2026-06-20T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0126",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Halcyon Manufacturing"
+    ],
+    "subject_id": "halcyon-manufacturing",
+    "confidence": 0.71,
+    "source_quote": "Halcyon Manufacturing posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-15T08:00:00.000Z"
+  },
+  {
+    "id": "sig-0127",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Halcyon Manufacturing"
+    ],
+    "subject_id": "halcyon-manufacturing",
+    "confidence": 0.82,
+    "source_quote": "Halcyon Manufacturing posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-07T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0128",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Halcyon Manufacturing"
+    ],
+    "subject_id": "halcyon-manufacturing",
+    "confidence": 0.72,
+    "source_quote": "Halcyon Manufacturing posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-08T23:00:00.000Z"
+  },
+  {
+    "id": "sig-0129",
+    "event_type": "contract_win",
+    "entities": [
+      "Halcyon Manufacturing"
+    ],
+    "subject_id": "halcyon-manufacturing",
+    "value": 13200000,
+    "confidence": 0.84,
+    "source_quote": "Halcyon Manufacturing booked a $13.2M multi-year production contract.",
+    "detected_at": "2026-06-16T21:00:00.000Z"
+  },
+  {
+    "id": "sig-0130",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "confidence": 0.77,
+    "source_quote": "Continental Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-10T18:00:00.000Z"
+  },
+  {
+    "id": "sig-0131",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "confidence": 0.65,
+    "source_quote": "Continental Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-09T01:00:00.000Z"
+  },
+  {
+    "id": "sig-0132",
+    "event_type": "contract_win",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "value": 700000,
+    "confidence": 0.72,
+    "source_quote": "Continental Components booked a $0.7M multi-year production contract.",
+    "detected_at": "2026-06-08T02:00:00.000Z"
+  },
+  {
+    "id": "sig-0133",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "value": 15600000,
+    "confidence": 0.89,
+    "source_quote": "Continental Components was awarded a $15.6M government contract.",
+    "detected_at": "2026-06-08T04:00:00.000Z"
+  },
+  {
+    "id": "sig-0134",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.97,
+    "source_quote": "New compliance requirements affect Ironclad Dynamics's certified processes.",
+    "detected_at": "2026-06-28T18:00:00.000Z"
+  },
+  {
+    "id": "sig-0135",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.65,
+    "source_quote": "Ironclad Dynamics raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-19T09:00:00.000Z"
+  },
+  {
+    "id": "sig-0136",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.89,
+    "source_quote": "Ironclad Dynamics is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-20T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0137",
+    "event_type": "quality_escape",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.87,
+    "source_quote": "A quality escape at Ironclad Dynamics triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-04T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0138",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.71,
+    "source_quote": "Ironclad Dynamics raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-10T19:00:00.000Z"
+  },
+  {
+    "id": "sig-0139",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.74,
+    "source_quote": "Aegis Machining raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-18T13:00:00.000Z"
+  },
+  {
+    "id": "sig-0140",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.87,
+    "source_quote": "Aegis Machining raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-23T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0141",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.77,
+    "source_quote": "New compliance requirements affect Aegis Machining's certified processes.",
+    "detected_at": "2026-06-25T23:00:00.000Z"
+  },
+  {
+    "id": "sig-0142",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.79,
+    "source_quote": "New compliance requirements affect Aegis Machining's certified processes.",
+    "detected_at": "2026-06-05T19:00:00.000Z"
+  },
+  {
+    "id": "sig-0143",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Castings"
+    ],
+    "subject_id": "halcyon-castings",
+    "value": 19400000,
+    "confidence": 0.89,
+    "source_quote": "Halcyon Castings was awarded a $19.4M government contract.",
+    "detected_at": "2026-06-06T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0144",
+    "event_type": "contract_win",
+    "entities": [
+      "Halcyon Castings"
+    ],
+    "subject_id": "halcyon-castings",
+    "value": 10200000,
+    "confidence": 0.78,
+    "source_quote": "Halcyon Castings booked a $10.2M multi-year production contract.",
+    "detected_at": "2026-06-14T15:00:00.000Z"
+  },
+  {
+    "id": "sig-0145",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Halcyon Castings"
+    ],
+    "subject_id": "halcyon-castings",
+    "confidence": 0.9,
+    "source_quote": "Halcyon Castings posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-26T03:00:00.000Z"
+  },
+  {
+    "id": "sig-0146",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.92,
+    "source_quote": "Falcon Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-04T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0147",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.89,
+    "source_quote": "Falcon Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-21T13:00:00.000Z"
+  },
+  {
+    "id": "sig-0148",
+    "event_type": "quality_escape",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.88,
+    "source_quote": "A quality escape at Falcon Turbine triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-21T15:00:00.000Z"
+  },
+  {
+    "id": "sig-0149",
+    "event_type": "quality_escape",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.89,
+    "source_quote": "A quality escape at Falcon Turbine triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-16T23:00:00.000Z"
+  },
+  {
+    "id": "sig-0150",
+    "event_type": "quality_escape",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.84,
+    "source_quote": "A quality escape at Falcon Turbine triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-19T22:00:00.000Z"
+  },
+  {
+    "id": "sig-0151",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Halcyon Dynamics"
+    ],
+    "subject_id": "halcyon-dynamics",
+    "confidence": 0.86,
+    "source_quote": "Halcyon Dynamics posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-19T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0152",
+    "event_type": "contract_win",
+    "entities": [
+      "Halcyon Dynamics"
+    ],
+    "subject_id": "halcyon-dynamics",
+    "value": 12700000,
+    "confidence": 0.79,
+    "source_quote": "Halcyon Dynamics booked a $12.7M multi-year production contract.",
+    "detected_at": "2026-06-07T20:00:00.000Z"
+  },
+  {
+    "id": "sig-0153",
+    "event_type": "quality_escape",
+    "entities": [
+      "Northwind Controls"
+    ],
+    "subject_id": "northwind-controls",
+    "confidence": 0.85,
+    "source_quote": "A quality escape at Northwind Controls triggered a customer source-inspection hold.",
+    "detected_at": "2026-05-31T22:00:00.000Z"
+  },
+  {
+    "id": "sig-0154",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Northwind Controls"
+    ],
+    "subject_id": "northwind-controls",
+    "confidence": 0.75,
+    "source_quote": "Northwind Controls notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-06T13:00:00.000Z"
+  },
+  {
+    "id": "sig-0155",
+    "event_type": "demand_spike",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "confidence": 0.92,
+    "source_quote": "Demand for Vanguard Machining's products spiked on new program starts.",
+    "detected_at": "2026-06-21T01:00:00.000Z"
+  },
+  {
+    "id": "sig-0156",
+    "event_type": "contract_win",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "value": 10100000,
+    "confidence": 0.77,
+    "source_quote": "Vanguard Machining booked a $10.1M multi-year production contract.",
+    "detected_at": "2026-06-08T19:00:00.000Z"
+  },
+  {
+    "id": "sig-0157",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "confidence": 0.67,
+    "source_quote": "Vanguard Machining posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-09T14:00:00.000Z"
+  },
+  {
+    "id": "sig-0158",
+    "event_type": "quality_escape",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.82,
+    "source_quote": "A quality escape at Harbor Components triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-21T16:00:00.000Z"
+  },
+  {
+    "id": "sig-0159",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.84,
+    "source_quote": "Harbor Components is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-09T15:00:00.000Z"
+  },
+  {
+    "id": "sig-0160",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.7,
+    "source_quote": "Harbor Components is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-26T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0161",
+    "event_type": "quality_escape",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.93,
+    "source_quote": "A quality escape at Harbor Components triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-13T04:00:00.000Z"
+  },
+  {
+    "id": "sig-0162",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.75,
+    "source_quote": "Foundry Turbine notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-06T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0163",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.69,
+    "source_quote": "Foundry Turbine is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-18T06:00:00.000Z"
+  },
+  {
+    "id": "sig-0164",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.84,
+    "source_quote": "Foundry Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-04T09:00:00.000Z"
+  },
+  {
+    "id": "sig-0165",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.91,
+    "source_quote": "Foundry Turbine is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-18T06:00:00.000Z"
+  },
+  {
+    "id": "sig-0166",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Continental Castings"
+    ],
+    "subject_id": "continental-castings",
+    "confidence": 0.83,
+    "source_quote": "Continental Castings posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-19T00:00:00.000Z"
+  },
+  {
+    "id": "sig-0167",
+    "event_type": "contract_win",
+    "entities": [
+      "Continental Castings"
+    ],
+    "subject_id": "continental-castings",
+    "value": 11000000,
+    "confidence": 0.76,
+    "source_quote": "Continental Castings booked a $11.0M multi-year production contract.",
+    "detected_at": "2026-06-06T07:00:00.000Z"
+  },
+  {
+    "id": "sig-0168",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Continental Castings"
+    ],
+    "subject_id": "continental-castings",
+    "confidence": 0.77,
+    "source_quote": "Continental Castings posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-02T22:00:00.000Z"
+  },
+  {
+    "id": "sig-0169",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Continental Castings"
+    ],
+    "subject_id": "continental-castings",
+    "confidence": 0.68,
+    "source_quote": "Continental Castings posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-07T10:00:00.000Z"
+  },
+  {
+    "id": "sig-0170",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Strata Defense"
+    ],
+    "subject_id": "strata-defense",
+    "confidence": 0.79,
+    "source_quote": "Strata Defense is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-12T09:00:00.000Z"
+  },
+  {
+    "id": "sig-0171",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Strata Defense"
+    ],
+    "subject_id": "strata-defense",
+    "confidence": 0.78,
+    "source_quote": "New compliance requirements affect Strata Defense's certified processes.",
+    "detected_at": "2026-06-14T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0172",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Strata Defense"
+    ],
+    "subject_id": "strata-defense",
+    "confidence": 0.85,
+    "source_quote": "Strata Defense raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-26T15:00:00.000Z"
+  },
+  {
+    "id": "sig-0173",
+    "event_type": "quality_escape",
+    "entities": [
+      "Titan Fabrication"
+    ],
+    "subject_id": "titan-fabrication",
+    "confidence": 0.9,
+    "source_quote": "A quality escape at Titan Fabrication triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-13T14:00:00.000Z"
+  },
+  {
+    "id": "sig-0174",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Titan Fabrication"
+    ],
+    "subject_id": "titan-fabrication",
+    "confidence": 0.93,
+    "source_quote": "Titan Fabrication notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-26T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0175",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "confidence": 0.96,
+    "source_quote": "Falcon Defense posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-28T00:00:00.000Z"
+  },
+  {
+    "id": "sig-0176",
+    "event_type": "demand_spike",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "confidence": 0.79,
+    "source_quote": "Demand for Falcon Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-02T13:00:00.000Z"
+  },
+  {
+    "id": "sig-0177",
+    "event_type": "demand_spike",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "confidence": 0.73,
+    "source_quote": "Demand for Falcon Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-04T17:00:00.000Z"
+  },
+  {
+    "id": "sig-0178",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "value": 5900000,
+    "confidence": 0.74,
+    "source_quote": "Falcon Defense was awarded a $5.9M government contract.",
+    "detected_at": "2026-06-20T00:00:00.000Z"
+  },
+  {
+    "id": "sig-0179",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "confidence": 0.96,
+    "source_quote": "Falcon Defense posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-17T12:00:00.000Z"
+  },
+  {
+    "id": "sig-0180",
+    "event_type": "quality_escape",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.7,
+    "source_quote": "A quality escape at Torque Turbine triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-02T03:00:00.000Z"
+  },
+  {
+    "id": "sig-0181",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.66,
+    "source_quote": "Torque Turbine notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-07T05:00:00.000Z"
+  },
+  {
+    "id": "sig-0182",
+    "event_type": "quality_escape",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.98,
+    "source_quote": "A quality escape at Torque Turbine triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-10T01:00:00.000Z"
+  },
+  {
+    "id": "sig-0183",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.74,
+    "source_quote": "New compliance requirements affect Torque Turbine's certified processes.",
+    "detected_at": "2026-06-01T20:00:00.000Z"
   }
 ]

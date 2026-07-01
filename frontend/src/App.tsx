@@ -59,7 +59,10 @@ export function App() {
         {world && <Copilot world={world} />}
       </main>
 
-      <aside className="inspector">
+      <aside className={activeCompanyId ? "inspector open" : "inspector"}>
+        {activeCompanyId && (
+          <button className="inspector-back" onClick={() => setState({ activeCompanyId: null })}>← Back</button>
+        )}
         {world && activeCompanyId ? (
           <Dossier world={world} companyId={activeCompanyId} />
         ) : (
