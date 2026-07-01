@@ -9,7 +9,7 @@ on:
       client:
         description: "Client directory under clients/ to validate"
         required: true
-        default: "healthcare-regulatory"
+        default: "btx"
 
 permissions:
   contents: read        # read-only: this validates, it does not commit anything
