@@ -8,6 +8,7 @@ import { groupTrace, summarizeGroups } from "../../engine/decision/explain.ts";
 import { CONFIG, PROFILE } from "../../app/config.ts";
 import { narrateOpportunity, findingMeaning } from "../../app/narrate.ts";
 import { getInsight } from "../../app/insights.ts";
+import { pipelineHealth } from "../../engine/decision/health.ts";
 
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
   const company = world.companies.find((c) => c.id === companyId);
@@ -24,6 +25,8 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const oppGroups = opp ? groupTrace(opp, CONFIG) : [];
   const insight = getInsight(companyId);
   const narrative = insight?.opportunity ?? narrateOpportunity(company, opp?.score ?? 0, fit, signals);
+  const rec = world.analysis.recById.get(companyId);
+  const health = score ? pipelineHealth(score.dimensions.opportunity.score, score.dimensions.competitivePressure.score) : 0;
 
   return (
     <div className="dossier">
@@ -33,6 +36,13 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         <div className="muted">{company.location.city}</div>
       </div>
 
+      {rec && (
+        <div className={`rec rec-${rec.action}`}>
+          <span className="rec-action">{rec.action}</span>
+          <span className="rec-reason">{rec.reason}</span>
+        </div>
+      )}
+
       <div className="metrics">
         <div className="metric">
           <div className="metric-val">{opp?.score ?? 0}</div>
@@ -41,6 +51,10 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         <div className="metric">
           <div className="metric-val">{fit.score}%</div>
           <div className="metric-lbl">fit to {PROFILE.name}</div>
+        </div>
+        <div className="metric">
+          <div className="metric-val">{health}</div>
+          <div className="metric-lbl">pipeline health</div>
         </div>
       </div>
 

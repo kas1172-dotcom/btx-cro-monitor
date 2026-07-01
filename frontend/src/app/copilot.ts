@@ -16,10 +16,10 @@ const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
 ];
 
 export const SUGGESTIONS = [
+  "What needs my attention today?",
   "Who should I call in Austin?",
   "Why is BTX Precision high risk?",
   "What's the top opportunity?",
-  "What's happening with Titan Castings?",
 ];
 
 export function answer(question: string, world: World): string {
@@ -79,6 +79,10 @@ export function answer(question: string, world: World): string {
   }
 
   // 3) portfolio-level
+  if (/(what should i do|priorit|\baction|focus|today|attention)/.test(q)) {
+    const top = world.analysis.recommendations.filter((r) => r.priority !== "low").slice(0, 5);
+    if (top.length) return "Top actions:\n" + top.map((r) => `• ${r.action} ${nameOf(r.subject_id)} — ${r.reason}`).join("\n");
+  }
   if (/\brisk\b/.test(q)) {
     const top = [...world.analysis.scores].sort((a, b) => b.dimensions.risk.score - a.dimensions.risk.score)[0];
     return top ? `Highest risk: ${nameOf(top.subject_id)} at ${top.dimensions.risk.score}.` : help();

@@ -6,6 +6,7 @@ import { validateSignals } from "../engine/validation/validate.ts";
 import { scorePortfolio, deriveAlerts } from "../engine/decision/portfolio.ts";
 import { applySelfLens } from "../engine/decision/lens.ts";
 import { scoreFit } from "../engine/decision/fit.ts";
+import { recommend, rankRecommendations } from "../engine/decision/recommend.ts";
 import { CONFIG, PROFILE } from "./config.ts";
 
 import type { Company, Contact } from "../engine/brain/entities.ts";
@@ -14,6 +15,7 @@ import type { FitResult } from "../engine/decision/fit.ts";
 import type { Signal } from "../engine/signals/contract.ts";
 import type { Alert } from "../engine/decision/portfolio.ts";
 import type { PerspectiveScore } from "../engine/decision/lens.ts";
+import type { Recommendation } from "../engine/decision/recommend.ts";
 
 export interface Analysis {
   valid: Signal[];
@@ -21,6 +23,8 @@ export interface Analysis {
   byId: Map<string, CompanyScore>;
   alerts: Alert[];
   persp: PerspectiveScore | null;
+  recommendations: Recommendation[];
+  recById: Map<string, Recommendation>;
 }
 
 export function analyze(companies: Company[], rawSignals: unknown[]): Analysis {
@@ -29,7 +33,11 @@ export function analyze(companies: Company[], rawSignals: unknown[]): Analysis {
   const byId = new Map(scores.map((s) => [s.subject_id, s]));
   const alerts = deriveAlerts(scores, CONFIG);
   const persp = applySelfLens(companies, scores, CONFIG);
-  return { valid, scores, byId, alerts, persp };
+  const recommendations = rankRecommendations(
+    companies.map((c) => recommend(c, byId.get(c.id) as CompanyScore, scoreFit(c.needs, PROFILE.capabilities))),
+  );
+  const recById = new Map(recommendations.map((r) => [r.subject_id, r]));
+  return { valid, scores, byId, alerts, persp, recommendations, recById };
 }
 
 export interface Prospect {

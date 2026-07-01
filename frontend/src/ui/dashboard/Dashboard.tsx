@@ -45,6 +45,20 @@ export function Dashboard({ world }: { world: World }) {
         Portfolio intelligence · {world.companies.length} entities · {world.analysis.valid.length} validated signals
       </div>
 
+      <div className="dash-card">
+        <h3>What to do now</h3>
+        {world.analysis.recommendations
+          .filter((r) => r.priority !== "low")
+          .slice(0, 6)
+          .map((r) => (
+            <button key={r.subject_id} className="rec-row" onClick={() => setState({ activeCompanyId: r.subject_id })}>
+              <span className={`rec-tag rec-${r.action}`}>{r.action}</span>
+              <span className="rec-name">{nameOf(r.subject_id)}</span>
+              <span className="muted">{r.reason}</span>
+            </button>
+          ))}
+      </div>
+
       <div className="dash-grid">
         <RankList world={world} dimension="risk" title="Top risk" />
         <RankList world={world} dimension="opportunity" title="Top opportunity" />
