@@ -1,11 +1,11 @@
 {
   "meta": {
-    "run_id": "20260630T152122-9422",
-    "run_at": "2026-06-30T15:21:22.423950Z",
+    "run_id": "20260701T012828-c00d",
+    "run_at": "2026-07-01T01:28:28.618207Z",
     "items_collected": 54,
     "items_after_prefilter": 43,
-    "items_analyzed": 8,
-    "estimated_cost_usd": 0.127588,
+    "items_analyzed": 5,
+    "estimated_cost_usd": 0.131923,
     "engine_version": "0.1.0"
   },
   "items": [
@@ -16,23 +16,83 @@
       "url": "https://spacenews.com/quantum-computing-is-about-to-become-a-national-security-problem-in-orbit/",
       "source_id": "SpaceNews",
       "published_at": "2026-06-29T13:00:00Z",
-      "collected_at": "2026-06-30T15:19:16.725701Z",
+      "collected_at": "2026-07-01T01:26:38.465130Z",
       "tier": 3,
       "per_edition": {
         "bd": {
-          "relevance_score": 28,
-          "so_what": "Quantum-computing threats to orbital encryption may trigger defense and space-industry security initiatives, but no specific contract, solicitation, or subcontracting work for BTX's machining capabilities is identified.",
-          "now_what": "Monitor DOD and DCMA guidance on quantum-safe encryption and satellite security; flag any RFPs or technical requirements from Lockheed Martin, RTX, or Northrop Grumman addressing orbital cybersecurity hardening.",
+          "relevance_score": 15,
+          "so_what": "Quantum-computing threat to satellite encryption may trigger future defense-satellite contract modifications and new encryption-hardening work, but no specific primes, programs, or solicitations are named.",
+          "now_what": "Monitor Defense Department and prime-contractor announcements on quantum-resistant satellite communications and encryption upgrades for F-35, B-21, and space systems; flag RFPs mentioning post-quantum cryptography.",
           "categories": [
             "Industry News"
           ]
         },
         "exec": {
-          "relevance_score": 35,
-          "so_what": "Quantum-computing threat to orbital encryption may trigger new compliance, security, and supply-chain vetting requirements for BTX's ITAR/export-control operations if defense primes accelerate satellite or space-segment security upgrades.",
-          "now_what": "Establish point of contact with RTX, Lockheed Martin, and Northrop Grumman security/compliance teams to understand quantum-safe requirements and potential impacts on BTX's ITAR registration, facility security, and personnel clearances.",
+          "relevance_score": 25,
+          "so_what": "Quantum-computing advances pose a latent national-security risk to satellite communications; if BTX's primes pursue quantum-resistant encryption retrofits, BTX may face new machining or assembly requirements for hardened components, but this is speculative at present.",
+          "now_what": "Brief leadership on emerging quantum-threat narrative in defense space; begin horizon scanning for post-quantum cryptography requirements in next-generation space system RFPs and DARPA initiatives.",
           "categories": [
-            "Export Controls / Compliance",
+            "Export Controls / Compliance"
+          ]
+        }
+      },
+      "dollar_amount": null,
+      "affected_population": null,
+      "action_deadline": null,
+      "confidence_note": "Summary is truncated and speculative; no specific programs, timelines, or contract actions named. Relevance depends on future threat assessment and procurement response.",
+      "unverified_claims": [],
+      "deep_analysis": {
+        "sections": {
+          "background": "Quantum computing development is accelerating globally, with nations pursuing machines capable of breaking current encryption standards. This advancement creates national security implications for space-based systems, which increasingly rely on encrypted communications and data security. The commercial space industry faces regulatory and technical pressures as defense and intelligence agencies prepare for quantum-resistant encryption mandates.",
+          "key_stakeholders": [
+            "Department of Defense",
+            "National Security Agency",
+            "Space Force",
+            "Commercial space operators",
+            "Satellite manufacturers",
+            "Intelligence agencies"
+          ],
+          "scenarios": [
+            "DoD/NSA issues mandatory quantum-resistant encryption standards for space-based military and classified missions within 12 months, requiring suppliers to re-qualify communication and data-handling subsystems.",
+            "Quantum computing breakthroughs accelerate timelines for cryptanalysis of legacy space-based systems, prompting emergency upgrades to operational satellite constellations and ground networks.",
+            "Defense primes (RTX, Lockheed, Northrop) begin flow-down of quantum-resistant encryption requirements to Tier 2 suppliers, creating compliance and qualification cycles for subcontractors working on space platforms."
+          ],
+          "recommended_actions": [
+            "Monitor DCMA and State Department guidance on quantum-resistant encryption standards applicable to build-to-print aerospace work; establish compliance roadmap with key primes (RTX Space, Lockheed Missiles & Fire Control, Northrop Space).",
+            "Assess BTX's current involvement in precision-machined components for space-based communication or electronic sub-systems; identify which programs (F-35 avionics interconnects, satellite bus components) may be subject to re-design or re-qualification for quantum-safe architectures.",
+            "Engage prime-contractor supply-chain security teams to understand whether quantum-resistant component certification or re-test requirements will flow down to machined-hardware suppliers; flag AS9100 audit and ITAR documentation burden."
+          ]
+        }
+      },
+      "also_covered_by": [],
+      "entities": [],
+      "enrichment": null,
+      "related": [],
+      "importance_score": 25
+    },
+    {
+      "item_id": "106a264c6bbf5e0a",
+      "title": "China establishes VLEO industry alliance as satellites demonstrate sustained…",
+      "raw_title": "China establishes VLEO industry alliance as satellites demonstrate sustained low-orbit operations",
+      "url": "https://spacenews.com/china-establishes-vleo-industry-alliance-as-satellites-demonstrate-sustained-low-orbit-operations/",
+      "source_id": "SpaceNews",
+      "published_at": "2026-06-29T08:53:12Z",
+      "collected_at": "2026-07-01T01:26:38.465130Z",
+      "tier": 3,
+      "per_edition": {
+        "bd": {
+          "relevance_score": 12,
+          "so_what": "China's very-low-Earth-orbit (VLEO) industry alliance and sustained satellite operations indicate Chinese competitive development in space; no immediate U.S. defense-prime or BTX subcontracting opportunity is named, but may signal future DOD emphasis on rapid U.S. space-system resilience.",
+          "now_what": "Monitor DOD and U.S. prime-contractor statements on counter-VLEO satellite resilience, hardening, and rapid-replacement programs; flag RFPs for flight-critical VLEO-hardened components BTX could machine.",
+          "categories": [
+            "Industry News"
+          ]
+        },
+        "exec": {
+          "relevance_score": 28,
+          "so_what": "China's VLEO capability advancement represents a strategic competitive signal that may prompt DOD to accelerate resilience requirements for U.S. satellite systems, potentially driving new precision-machining work on flight-critical components for rapid-replacement or hardened designs.",
+          "now_what": "Brief leadership on China's VLEO-alliance announcement and its likely DOD response (resilience, rapid launch, hardening); track defense-space RFPs and prime-contractor announcements for VLEO-related machining and assembly work over next 12 months.",
+          "categories": [
             "Industry News"
           ]
         }
@@ -40,32 +100,37 @@
       "dollar_amount": null,
       "affected_population": null,
       "action_deadline": null,
-      "confidence_note": "Item warns of quantum-computing threat to space-sector encryption; no specific program, timeline, or contract action stated. BTX relevance is conditional on defense primes' response.",
+      "confidence_note": "Summary names China's VLEO alliance and satellite achievements but does not specify DOD response, funding, or U.S. defense-prime procurement timelines. Relevance depends on downstream defense-space policy reaction.",
       "unverified_claims": [],
       "deep_analysis": {
         "sections": {
-          "background": "Quantum computing advancement is creating encryption-breaking risk for space-based systems and orbital assets. The item flags a national security concern where commercially fielded quantum machines could compromise modern cryptographic standards protecting military and dual-use space infrastructure, including communications and control systems aboard satellites and spacecraft.",
+          "background": "China has established a national very low Earth orbit (VLEO, below 300 km altitude) industry alliance, supported by demonstrated satellite operations and investment in propulsion startups. VLEO constellations offer advantages in imaging resolution, signal strength, and latency but face increased atmospheric drag and shorter orbital lifespans. This development signals sustained Chinese commitment to a capability domain historically dominated by Western and allied operators.",
           "key_stakeholders": [
-            "Department of Defense",
-            "National Security Agency",
-            "Space Force",
-            "commercial satellite operators",
-            "defense primes (Boeing, Lockheed Martin, RTX)"
+            "People's Republic of China",
+            "U.S. Space Force",
+            "U.S. Department of Defense",
+            "Commercial space operators (U.S./allied)",
+            "Satellite manufacturers (international)",
+            "Allied governments (NATO, Five Eyes)"
           ],
           "scenarios": [
-            "DoD issues new encryption or key-management standards for satellite programs, triggering retrofit or design-refresh mandates that cascade to subcontractors.",
-            "Quantum-resistant cryptography becomes a compliance gate for ITAR-controlled satellite components and build-to-print hardware, requiring BTX and peers to certify machined/electronic-interface parts against new standards.",
-            "Intelligence community accelerates classified or black programs to pre-empt quantum threat, shifting discretionary spending away from visible F-35/B-21 production toward undisclosed space initiatives."
+            "Chinese VLEO constellation reaches operational scale (1,000+ satellites) within 18–24 months, triggering U.S. military counter-surveillance and electronic-warfare response programs, which cascade requirements to Boeing, Lockheed, RTX, and their subcontractors.",
+            "U.S. Space Force accelerates its own VLEO or responsive-space programs to maintain overhead intelligence and communications dominance, increasing build-to-print machining demand for rapid-turnaround satellite bus components, reaction control system parts, and thermal-management hardware.",
+            "Allied nations (UK, Australia, Canada, Japan) initiate sovereign VLEO initiatives with U.S. technology transfer, creating new export-licensed subcontract opportunities requiring ITAR compliance and DDTC approval for component designs and manufacturing data."
           ],
           "recommended_actions": [
-            "Monitor Space Force and DCMA guidance on quantum-safe encryption and key-management architecture for satellite buses and propulsion systems; flag any build-to-print mechanical interfaces or fastener designs that interface with cryptographic subsystems.",
-            "Engage Lockheed Martin and RTX space/missiles divisions (not just defense platforms) on whether quantum-safe upgrades to fielded satellite programs (e.g., SBIRS, AEHF successors) will require re-qualification of precision-machined components or assemblies.",
-            "Review ITAR compliance posture for any exported components used in allied space systems; quantum breakthroughs could trigger re-export controls or retroactive review of past shipments to Five Eyes partners."
+            "Brief leadership on the strategic significance of VLEO for U.S. space-industrial-base demand; identify which current BTX customers (Lockheed Space, RTX Missiles & Fire Control, Northrop Innovation Systems) are investing in responsive-space or rapid-iteration satellite programs.",
+            "Develop pre-positioned technical and commercial responses for VLEO-related build-to-print RFQs: catalog BTX's 5-axis CNC capabilities for small-sat bus components, RCS (reaction control system) thruster-mount machining, and rapid-turnaround prototype work that aligns with \"responsive space\" timelines.",
+            "Engage RTX and Northrop supply-chain teams on VLEO propulsion-system manufacturing; assess whether BTX can qualify for propellant-tank fittings, manifold bodies, or other precision-machined subassemblies in hypergolic or cryogenic environments (ties to BTX's hypersonics/advanced propulsion exposure)."
           ]
         }
       },
       "also_covered_by": [],
       "entities": [
+        {
+          "name": "China",
+          "type": "place"
+        },
         {
           "name": "Department of Defense",
           "type": "agency"
@@ -82,213 +147,6 @@
           ]
         }
       ],
-      "importance_score": 35
-    },
-    {
-      "item_id": "106a264c6bbf5e0a",
-      "title": "China establishes VLEO industry alliance as satellites demonstrate sustained…",
-      "raw_title": "China establishes VLEO industry alliance as satellites demonstrate sustained low-orbit operations",
-      "url": "https://spacenews.com/china-establishes-vleo-industry-alliance-as-satellites-demonstrate-sustained-low-orbit-operations/",
-      "source_id": "SpaceNews",
-      "published_at": "2026-06-29T08:53:12Z",
-      "collected_at": "2026-06-30T15:19:16.725701Z",
-      "tier": 3,
-      "per_edition": {
-        "bd": {
-          "relevance_score": 15,
-          "so_what": "China's VLEO alliance and satellite demonstration signal competitive development in very-low-Earth-orbit systems; no stated U.S. defense prime contracts or subcontracting openings for BTX.",
-          "now_what": "Track whether Chinese VLEO developments trigger U.S. defense countermeasures (e.g., accelerated F-35 or B-21 upgrades) that could expand BTX machining scope.",
-          "categories": [
-            "Industry News"
-          ]
-        },
-        "exec": {
-          "relevance_score": 25,
-          "so_what": "China's coordinated VLEO capability and investment signal a space-systems competition escalation; could indirectly drive U.S. defense funding and urgency on strategic programs, but no direct supply-chain or compliance impact stated.",
-          "now_what": "Brief leadership on potential implications for DOD budget pressure; await specific U.S. program responses before planning supply-chain adjustments.",
-          "categories": [
-            "Industry News"
-          ]
-        }
-      },
-      "dollar_amount": null,
-      "affected_population": null,
-      "action_deadline": null,
-      "confidence_note": "Source does not detail which Chinese satellites, propulsion startups, or investment amounts; geopolitical signal only.",
-      "unverified_claims": [],
-      "deep_analysis": {
-        "sections": {
-          "background": "China has established a very low Earth orbit (VLEO, <300 km altitude) industry alliance and demonstrated sustained satellite operations at extreme altitudes. This represents a coordinated national program to dominate a emerging constellation segment with potential military applications (reconnaissance, communications, weapons targeting) and industrial implications for U.S. and allied space suppliers.",
-          "key_stakeholders": [
-            "China (MIIT, CASC, civilian space sector)",
-            "U.S. Space Force",
-            "Defense Intelligence Agency",
-            "U.S. satellite primes (Lockheed Martin, RTX, Boeing)",
-            "allied space agencies (ESA, Japan, South Korea)"
-          ],
-          "scenarios": [
-            "U.S. DoD accelerates VLEO constellation investments or counter-space programs to match Chinese capability; BTX's customers (Lockheed, RTX) pursue new contracts for VLEO-capable satellite buses or propulsion hardware.",
-            "VLEO satellites are weaponized or used for anti-satellite targeting; U.S. government restricts export of precision-machined components used in VLEO propulsion or structural systems to non-allied third parties.",
-            "Chinese VLEO satellites out-compete U.S./allied commercial and military systems, eroding market share for U.S. primes and reducing subcontract demand for precision-machining work on legacy constellation platforms."
-          ],
-          "recommended_actions": [
-            "Alert Lockheed Martin, RTX, and Northrop Grumman capture teams to competitive threats from Chinese VLEO; position BTX's 5-axis CNC and structural-component capabilities for any accelerated U.S. VLEO satellite or propulsion-system designs.",
-            "Conduct internal ITAR/export-control risk assessment: review whether any past deliveries of precision-machined components for satellite propulsion, attitude control, or structural systems could be reverse-engineered or copied by non-allied firms; flag to compliance for potential downstream export-control review.",
-            "Monitor Space Force RFIs and RFPs for VLEO constellations (e.g., classified or unclassified rapid-acquisition programs); prepare technical white-papers on BTX's ability to deliver short-lead, NADCAP-certified precision parts for agile satellite manufacturing cycles."
-          ]
-        }
-      },
-      "also_covered_by": [],
-      "entities": [
-        {
-          "name": "China",
-          "type": "place"
-        }
-      ],
-      "enrichment": null,
-      "related": [],
-      "importance_score": 25
-    },
-    {
-      "item_id": "553b66820bc218d6",
-      "title": "Starlink veterans launch startup to broaden megaconstellation ownership",
-      "raw_title": null,
-      "url": "https://spacenews.com/starlink-veterans-launch-startup-to-broaden-megaconstellation-ownership/",
-      "source_id": "SpaceNews",
-      "published_at": "2026-06-26T12:00:00Z",
-      "collected_at": "2026-06-30T15:19:16.725701Z",
-      "tier": 3,
-      "per_edition": {
-        "bd": {
-          "relevance_score": 18,
-          "so_what": "Former SpaceX engineers' startup aims to serve governments and companies with megaconstellations; potential subcontracting pathway for BTX if they land a U.S. defense or allied-government contract, but no such award or solicitation is stated.",
-          "now_what": "Identify the startup name and track for future U.S. government contracts; prepare to bid on precision-machining support if megaconstellation payloads or launch-vehicle components require flight-critical hardware.",
-          "categories": [
-            "Industry News"
-          ]
-        },
-        "exec": {
-          "relevance_score": 20,
-          "so_what": "A new megaconstellation-for-governments startup could eventually compete for U.S. defense space contracts, indirectly supporting demand for precision manufacturing; no immediate supply-chain or compliance change.",
-          "now_what": "Monitor for DoD or allied-nation partnerships; if established, assess whether constellation payloads align with BTX's 5-axis CNC and flight-critical assembly capabilities.",
-          "categories": [
-            "Industry News"
-          ]
-        }
-      },
-      "dollar_amount": null,
-      "affected_population": null,
-      "action_deadline": null,
-      "confidence_note": "Startup name and funding not disclosed in summary; unable to assess specific defense-sector positioning yet.",
-      "unverified_claims": [],
-      "deep_analysis": {
-        "sections": {
-          "background": "Former SpaceX Starlink engineers have launched a startup to offer megaconstellation services to governments and commercial entities seeking independent orbital infrastructure. This represents a new competitive entrant targeting government customers (including U.S. and allies) who have been dependent on SpaceX's Starlink for space-based comms and want domestic or allied alternatives.",
-          "key_stakeholders": [
-            "New Starlink-veteran startup",
-            "SpaceX",
-            "U.S. Space Force (Skynet, satellite-comms modernization)",
-            "defense primes (Boeing, Lockheed Martin, RTX)",
-            "allied governments seeking independent constellations"
-          ],
-          "scenarios": [
-            "Startup wins U.S. or allied government contracts for megaconstellations; primes (Lockheed, Boeing, RTX) become integrators or principal suppliers, creating new subcontract demand for spacecraft bus machining, structural components, and propulsion-system parts.",
-            "Startup develops its own spacecraft platform and manufacturing base, reducing reliance on traditional defense primes and potentially squeezing BTX's access to build-to-print work in the megaconstellation segment.",
-            "Startup partners with defense primes as prime contractors (not competitors), creating tiered subcontracting opportunities for precision-machining of satellite structures, antenna mounts, and deployment mechanisms."
-          ],
-          "recommended_actions": [
-            "Research the startup's known technical leadership and likely platform architecture (bus type, propulsion, structure); identify which BTX-capable primes (Lockheed, RTX, Boeing) are most likely to bid or partner.",
-            "Prepare targeted outreach to the startup's senior engineering or manufacturing leadership (leveraging Starlink-veteran networks) to offer BTX's AS9100/NADCAP build-to-print capabilities for rapid megaconstellation manufacturing.",
-            "Engage RTX and Lockheed Martin space-division business development on government megaconstellation programs; position BTX for structural components, fastening hardware, and precision-machined interfaces on spacecraft buses."
-          ]
-        }
-      },
-      "also_covered_by": [],
-      "entities": [
-        {
-          "name": "SpaceX",
-          "type": "organization"
-        }
-      ],
-      "enrichment": {
-        "facts": [],
-        "queried_entities": [
-          "SpaceX"
-        ]
-      },
-      "related": [],
-      "importance_score": 20
-    },
-    {
-      "item_id": "d30fcf4cb8f39385",
-      "title": "ISS repair spacewalk highlights concerns about station health",
-      "raw_title": null,
-      "url": "https://spacenews.com/iss-repair-spacewalk-highlights-concerns-about-station-health/",
-      "source_id": "SpaceNews",
-      "published_at": "2026-06-26T11:57:53Z",
-      "collected_at": "2026-06-30T15:19:16.725701Z",
-      "tier": 3,
-      "per_edition": {
-        "bd": {
-          "relevance_score": 22,
-          "so_what": "ISS spacewalk for robotic-arm repair and growing concerns about station health and spacesuit condition do not directly signal subcontracting demand for precision-machined defense prime components.",
-          "now_what": "Monitor if ISS health concerns trigger NASA or DoD decisions to accelerate alternative space-station or LEO-platform programs; such programs could create BTX machining opportunities.",
-          "categories": [
-            "Industry News"
-          ]
-        },
-        "exec": {
-          "relevance_score": 28,
-          "so_what": "ISS health concerns and aging spacesuit inventory may indirectly accelerate U.S. government investment in next-generation LEO infrastructure and EVA systems, which could expand opportunities for suppliers of precision-machined structural and mechanical assemblies.",
-          "now_what": "Brief leadership on potential legislative or budget responses to ISS aging; track for emerging NASA/commercial-LEO platform RFPs that may require BTX's AS9100/ITAR precision-machining capabilities.",
-          "categories": [
-            "Industry News"
-          ]
-        }
-      },
-      "dollar_amount": null,
-      "affected_population": null,
-      "action_deadline": null,
-      "confidence_note": "Summary states only that advisers raise concerns; no specific funding, timeline, or program decision is disclosed.",
-      "unverified_claims": [],
-      "deep_analysis": null,
-      "also_covered_by": [],
-      "entities": [
-        {
-          "name": "NASA",
-          "type": "agency"
-        },
-        {
-          "name": "International Space Station",
-          "type": "program"
-        }
-      ],
-      "enrichment": {
-        "facts": [
-          {
-            "enricher_id": "federal-register-program",
-            "entity": "International Space Station",
-            "label": "Latest Federal Register doc",
-            "value": "Medicare Program; CY 2027 Changes to the End-Stage Renal Disease (ESRD) Prospective Payment System, Acute Kidney Injury Dialysis (AKI) Payment, and ESRD Quality Incentive Program",
-            "kind": "text",
-            "number": null,
-            "url": "https://www.federalregister.gov/documents/2026/06/26/2026-12925/medicare-program-cy-2027-changes-to-the-end-stage-renal-disease-esrd-prospective-payment-system"
-          },
-          {
-            "enricher_id": "federal-register-program",
-            "entity": "International Space Station",
-            "label": "Published",
-            "value": "2026-06-26",
-            "kind": "date",
-            "number": null,
-            "url": "https://www.federalregister.gov/documents/2026/06/26/2026-12925/medicare-program-cy-2027-changes-to-the-end-stage-renal-disease-esrd-prospective-payment-system"
-          }
-        ],
-        "queried_entities": [
-          "International Space Station"
-        ]
-      },
-      "related": [],
       "importance_score": 28
     },
     {
@@ -298,35 +156,57 @@
       "url": "https://spacenews.com/space-forces-new-muos-satellites-to-use-boeings-702mp-spacecraft-platform/",
       "source_id": "SpaceNews",
       "published_at": "2026-06-25T21:53:39Z",
-      "collected_at": "2026-06-30T15:19:16.725701Z",
-      "tier": 3,
+      "collected_at": "2026-07-01T01:26:38.465130Z",
+      "tier": 2,
       "per_edition": {
         "bd": {
-          "relevance_score": 42,
-          "so_what": "Boeing is providing its 702MP spacecraft platform for the Space Force's new MUOS (Mobile User Objective System) satellites, a military wideband communications program. This is a prime contract win by Boeing on a strategic DoD mission, signaling potential subcontracting activity in spacecraft components and assemblies.",
-          "now_what": "Contact Boeing's defense space and security division to identify subcontracting opportunities in MUOS satellite mechanical, structural, or assembly work that aligns with BTX's 5-axis CNC and AS9100-certified capabilities; request RFQ or teaming discussions for near-term supplier qualification.",
+          "relevance_score": 45,
+          "so_what": "Boeing has been selected to supply spacecraft platforms for the U.S. Space Force's new MUOS satellites; this is a prime contract award that may create subcontracting openings for precision-machined flight-critical components, potentially within BTX's 5-axis CNC and AS9100 capabilities.",
+          "now_what": "Contact Boeing Defense (Space Systems division) to identify subcontracting opportunities on MUOS platform integration, structural machining, or robotic-arm interface components; request RFQ or technical data package.",
           "categories": [
             "Contract Award",
             "Subcontracting Opportunity"
           ]
         },
         "exec": {
-          "relevance_score": 48,
-          "so_what": "Space Force MUOS satellite procurement via Boeing's 702MP platform is a material defense space-communications award; Boeing is a BTX key customer, and platform production may drive increased machining volume for precision spacecraft structures and components.",
-          "now_what": "Establish contact with Boeing Space & Security MUOS program leadership to confirm subcontracting roadmap, long-lead machining requirements, and schedule alignment for BTX's AS9100 and NADCAP capabilities in flight-critical assemblies.",
+          "relevance_score": 68,
+          "so_what": "Boeing's selection for MUOS spacecraft production demonstrates sustained military-satellite demand and validates Boeing as a key BTX customer for advanced space platforms; this supports BTX's strategic goal of deepening prime-contractor relationships and winning new build-to-print programs.",
+          "now_what": "Initiate outreach to Boeing Defense program management to understand platform specifications, production schedule, and machining/assembly subcontracting strategy; assess whether MUOS work aligns with BTX's F-35/B-21 competencies and AS9100 footprint.",
           "categories": [
             "Contract Award",
-            "Subcontracting Opportunity",
-            "Industry News"
+            "Subcontracting Opportunity"
           ]
         }
       },
       "dollar_amount": null,
       "affected_population": null,
       "action_deadline": null,
-      "confidence_note": "Item does not state contract value, performance period, or specific Boeing sourcing strategy; summary is brief and does not confirm MUOS scope of work or BTX's role.",
+      "confidence_note": "Item does not specify MUOS contract value, production timeline, or subcontracting plan; recommend follow-up with Boeing or Federal Procurement Data System (FPDS) for details.",
       "unverified_claims": [],
-      "deep_analysis": null,
+      "deep_analysis": {
+        "sections": {
+          "background": "The U.S. Space Force has selected Boeing's 702MP spacecraft bus for its next generation of MUOS (Mobile User Objective System) satellites, which provide tactical wideband communications for military forces. The 702MP is a proven platform previously used in commercial and military missions. This selection confirms Boeing's role as a prime spacecraft integrator for critical military communications infrastructure.",
+          "key_stakeholders": [
+            "Boeing Defense, Space & Security",
+            "U.S. Space Force",
+            "Space & Missile Systems Center",
+            "U.S. Department of Defense",
+            "RTX/Raytheon Technologies (potential subsystem supplier)",
+            "Lockheed Martin (potential subsystem supplier)",
+            "Northrop Grumman (potential subsystem supplier)"
+          ],
+          "scenarios": [
+            "Boeing initiates full development and production of MUOS payload integration, driving Tier 2 subcontract RFQs for precision-machined structural, thermal, and RF-interface components; BTX and peers compete for build-to-print awards in 2026–2027.",
+            "MUOS program encounters schedule pressure or technical challenges, accelerating demand for rapid-turnaround machining of prototype and qualification test articles, favoring suppliers (like BTX) with AS9100 and NADCAP certifications and proven responsiveness.",
+            "Boeing consolidates spacecraft bus production at fewer locations, requiring subcontractors to relocate production, qualify at new manufacturing sites, or accept longer lead times; BTX's ability to win first-article and follow-on production work depends on early engagement and qualified-supplier status."
+          ],
+          "recommended_actions": [
+            "Initiate direct outreach to Boeing Defense, Space & Security supply-chain (Seattle, Mesa, Huntington Beach) within this week to understand MUOS subsystem opportunities and RFQ timelines; position BTX's 5-axis CNC and assembly capabilities for structural/RF-interface components.",
+            "Monitor Space & Missile Systems Center (SMC) contract awards and engineering-change-order (ECO) traffic related to MUOS; flag any supplier-qualification or foreign-source-content (ITAR) issues that may create bottlenecks and subcontract openings.",
+            "Confirm BTX's qualification status with Boeing's supplier portal (if not already compliant); ensure NADCAP and AS9100 registrations are current and visible; prepare cost/schedule/quality submissions for competitive RFQs expected in Q3–Q4 2026."
+          ]
+        }
+      },
       "also_covered_by": [],
       "entities": [
         {
@@ -334,7 +214,7 @@
           "type": "organization"
         },
         {
-          "name": "Space Force",
+          "name": "U.S. Space Force",
           "type": "agency"
         },
         {
@@ -395,191 +275,191 @@
           "MUOS"
         ]
       },
-      "related": [
-        {
-          "item_id": "3c499c0c324c2e30",
-          "title": "House Appropriations Committee approves $55.5 billion for U.S. Space Force",
-          "url": "https://spacenews.com/house-appropriations-committee-approves-55-5-billion-for-u-s-space-force/",
-          "via": [
-            "Space Force"
-          ]
-        }
-      ],
-      "importance_score": 48
+      "related": [],
+      "importance_score": 68
     },
     {
-      "item_id": "3c499c0c324c2e30",
-      "title": "House Appropriations Committee approves $55.5 billion for U.S. Space Force",
+      "item_id": "b4577bc5f1976477",
+      "title": "Radar Data Pilot Program",
       "raw_title": null,
-      "url": "https://spacenews.com/house-appropriations-committee-approves-55-5-billion-for-u-s-space-force/",
-      "source_id": "SpaceNews",
-      "published_at": "2026-06-25T11:17:40Z",
-      "collected_at": "2026-06-30T15:19:16.725701Z",
-      "tier": 2,
-      "per_edition": {
-        "bd": {
-          "relevance_score": 52,
-          "so_what": "House Appropriations Committee approved $55.5 billion for the Space Force and directed focus on increased competition in satellite communications while criticizing sole-source reliance on reconciliation funding for the Golden Dome (likely the Next Generation ICBM ground-control system). This signals potential new competitive solicitations and supplier openings in space-comms and missile-defense ground systems.",
-          "now_what": "Monitor Federal Register for Space Force satellite-communications and ground-systems RFPs under this appropriation; request briefings from Lockheed Martin, Northrop Grumman, and RTX on competitive subcontracting opportunities in comms hardware, precision assemblies, and AS9100-certified manufacturing.",
-          "categories": [
-            "Budget & Appropriations",
-            "Solicitation / RFP"
-          ]
-        },
-        "exec": {
-          "relevance_score": 61,
-          "so_what": "House Appropriations Committee's $55.5 billion Space Force allocation includes a strategic push to increase competition in satellite communications and reduce sole-source dependence. This creates program risk for incumbent primes and opportunity for new suppliers in competitive tiers, directly affecting BTX's customer base and potential for new contract wins.",
-          "now_what": "Engage Lockheed Martin, RTX, and Northrop Grumman program managers on anticipated competitive solicitations for satellite-comms and ground-control components; prioritize fast-track supplier qualification and bid-ready capacity in machined structures and assemblies for planned FY27-28 awards.",
-          "categories": [
-            "Budget & Appropriations",
-            "Industry News"
-          ]
-        }
-      },
-      "dollar_amount": {
-        "raw_text": "$55.5 billion",
-        "value": 55500000000.0,
-        "currency": "USD"
-      },
-      "affected_population": null,
-      "action_deadline": null,
-      "confidence_note": "Dollar amount is stated for overall Space Force budget; specific satellite-comms solicitation timelines and funding amounts are not detailed in the summary.",
-      "unverified_claims": [],
-      "deep_analysis": null,
-      "also_covered_by": [],
-      "entities": [
-        {
-          "name": "House Appropriations Committee",
-          "type": "agency"
-        },
-        {
-          "name": "Space Force",
-          "type": "agency"
-        },
-        {
-          "name": "Golden Dome",
-          "type": "program"
-        }
-      ],
-      "enrichment": {
-        "facts": [
-          {
-            "enricher_id": "federal-register-program",
-            "entity": "Golden Dome",
-            "label": "Latest Federal Register doc",
-            "value": "Golden Triangle Storage, LLC; Notice of Schedule for the Preparation of an Environmental Assessment for the Spindletop Expansion Project",
-            "kind": "text",
-            "number": null,
-            "url": "https://www.federalregister.gov/documents/2025/06/04/2025-10177/golden-triangle-storage-llc-notice-of-schedule-for-the-preparation-of-an-environmental-assessment"
-          },
-          {
-            "enricher_id": "federal-register-program",
-            "entity": "Golden Dome",
-            "label": "Published",
-            "value": "2025-06-04",
-            "kind": "date",
-            "number": null,
-            "url": "https://www.federalregister.gov/documents/2025/06/04/2025-10177/golden-triangle-storage-llc-notice-of-schedule-for-the-preparation-of-an-environmental-assessment"
-          }
-        ],
-        "queried_entities": [
-          "Golden Dome"
-        ]
-      },
-      "related": [
-        {
-          "item_id": "15b1f21dc9b9b170",
-          "title": "Space Force’s new MUOS satellites to use Boeing’s 702MP spacecraft platform",
-          "url": "https://spacenews.com/space-forces-new-muos-satellites-to-use-boeings-702mp-spacecraft-platform/",
-          "via": [
-            "Space Force"
-          ]
-        }
-      ],
-      "importance_score": 61
-    },
-    {
-      "item_id": "27ace318dc5d4dbe",
-      "title": "Airworthiness Directives; The Boeing Company Airplanes",
-      "raw_title": null,
-      "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13207/airworthiness-directives-the-boeing-company-airplanes",
+      "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program",
       "source_id": "Federal Register – Dept. of the Air Force",
       "published_at": "2026-06-30T00:00:00Z",
-      "collected_at": "2026-06-30T15:19:16.854160Z",
+      "collected_at": "2026-07-01T01:26:38.583681Z",
       "tier": 3,
       "per_edition": {
         "bd": {
-          "relevance_score": 16,
-          "so_what": "FAA airworthiness directive addresses 5G C-Band interference on Boeing 747 radio altimeters in Canadian airspace; commercial aircraft fleet action with no identified precision-machining opportunity.",
-          "now_what": "Track Boeing's retrofit or mitigation strategy; if flight-control or structural modifications are mandated, assess alignment with BTX's build-to-print and assembly capabilities.",
-          "categories": []
+          "relevance_score": 22,
+          "so_what": "FAA Radar Data Pilot Program (RDPP) makes airspace and sensitive defense data feeds available to qualified users; may create new intelligence or sensor-data contracts for Tier 1 aerospace suppliers and subcontractors, but BTX's role as a precision machinist is indirect.",
+          "now_what": "Monitor for RDPP contract awards to Lockheed Martin, RTX, Northrop Grumman, or Boeing Defense; assess whether radar/sensor subsystem work implies build-to-print machining of enclosures, mounts, or flight-critical hardware BTX could support.",
+          "categories": [
+            "Industry News"
+          ]
         },
         "exec": {
-          "relevance_score": 20,
-          "so_what": "Commercial aviation regulatory response; not directly relevant to BTX's defense focus or named supply-chain and compliance risks.",
-          "now_what": "No action.",
-          "categories": []
+          "relevance_score": 24,
+          "so_what": "RDPP pilot program grants access to Sensitive and Controlled Unclassified Information to qualified users; strengthens BTX's primes' ability to win sensor/intelligence contracts, but does not alter BTX's compliance obligations or supply-chain risk profile.",
+          "now_what": "Ensure BTX's ITAR and CUI handling protocols are current; confirm primes' eligibility for RDPP data; monitor for resulting subcontracts involving machining or assembly of sensor-related hardware.",
+          "categories": [
+            "Industry News"
+          ]
         }
       },
       "dollar_amount": null,
       "affected_population": null,
       "action_deadline": null,
-      "confidence_note": "Commercial 747/747F fleet issue; minimal relevance to BTX's defense business.",
+      "confidence_note": "RDPP details are preliminary (announcement of opportunity); no contract value, timeline, or specific BTX-prime involvement is stated.",
       "unverified_claims": [],
       "deep_analysis": {
         "sections": {
-          "background": "The FAA is issuing airworthiness directives for a comprehensive range of earlier-generation Boeing 747 models (747-100 through -400F) due to radio-altimeter interference from 5G Lower C-Band operations in Canadian airspace. This mirrors concurrent ADs issued for the 747-8 and 777 families, and indicates that the 5G interference risk spans the entire legacy and modern 747 fleet, with particular concern for radio-altimeter reliability during critical flight phases (takeoff, approach, landing, go-around).",
+          "background": "The FAA, in coordination with the Department of Defense, has announced a Radar Data Pilot Program (RDPP) under the 2024 FAA Reauthorization Act to share airspace data containing Sensitive Unclassified Information (SUI) and Controlled Unclassified Information (CUI) with qualified users. This initiative aims to increase airspace transparency while protecting classified and sensitive defense information.",
           "key_stakeholders": [
-            "FAA",
-            "Boeing",
-            "Air Canada and Canadian operators",
-            "RTX (engine integration points)",
-            "Northrop Grumman (avionics/mission systems integration)",
-            "Airlines and military operators of 747 variants",
-            "Transport Canada"
+            "Federal Aviation Administration (FAA)",
+            "Department of Defense",
+            "Air Force",
+            "Qualified commercial and government airspace users",
+            "Defense contractors receiving airspace data",
+            "Allied air operators"
           ],
           "scenarios": [
-            "If FAA mandates radio-altimeter replacement or upgrade across all 747 models, BTX could see sustained demand for build-to-print machined altimeter mounting brackets, electrical connectors, shielding hardware, and structural transition pieces; lead time and certification requirements would favor early engagement.",
-            "If Canadian airspace restrictions tighten further or extend to the U.S., operators may demand expedited retrofit kits; BTX's 5-axis CNC capability and AS9100 certification position it well for fast-turnaround, flight-critical precision hardware.",
-            "If the FAA issues similar ADs for other airframe families (Airbus, older military transports), demand for retrofit-qualified precision-machined components could spike across the entire aerospace supply base, creating opportunity to backfill prime-contractor inventory and expand defense revenue.",
-            " ],",
-            " recommended_actions",
-            " : [",
-            " Immediately contact Lockheed Martin and Northrop Grumman: identify any involvement in 747-variant avionics, altimeter integration, or military-derivative (e.g., E-4B, C-32, VC-25) programs and assess whether retrofit machining work is anticipated; clarify timing and build-to-print specifications.",
-            ",",
-            "Conduct an internal review of BTX's existing 747-related subcontract base (if any): determine whether current tooling, processes, or supplier relationships are affected by 5G interference risk; assess whether any existing hardware needs re-certification or redesign.",
-            ",",
-            "Position BTX's precision-machining and assembly capability with Boeing Defense's retrofit and sustainment division: emphasize lead-time agility, AS9100 compliance, and ability to produce ITAR-compliant retrofit kits without requiring additional supplier coordination."
+            "RDPP qualification and data-access requirements impose new SUI/CUI handling and security protocols on defense contractors; BTX and prime customers must implement compliant IT infrastructure, personnel vetting, and documentation controls, creating compliance costs and timelines.",
+            "Real-time or near-real-time airspace data improves collision avoidance and dynamic flight planning for military test and training operations; programs like F-35 flight testing or hypersonic vehicle ranges may benefit, indirectly increasing operational intensity and subcontract activity for precision components.",
+            "RDPP data flows to international allied air operators, requiring U.S. export-control reviews (ITAR/DDTC) for any defense-contractor access to combined datasets; BTX may face secondary compliance burden if prime customers request BTX staff participation in airspace-data-dependent programs or supply-chain risk assessments."
           ],
           "recommended_actions": [
-            "Immediately contact Lockheed Martin and Northrop Grumman: identify any involvement in 747-variant avionics, altimeter integration, or military-derivative (e.g., E-4B, C-32, VC-25) programs and assess whether retrofit machining work is anticipated; clarify timing and build-to-print specifications.",
-            "Conduct an internal review of BTX's existing 747-related subcontract base (if any): determine whether current tooling, processes, or supplier relationships are affected by 5G interference risk; assess whether any existing hardware needs re-certification or redesign.",
-            "Position BTX's precision-machining and assembly capability with Boeing Defense's retrofit and sustainment division: emphasize lead-time agility, AS9100 compliance, and ability to produce ITAR-compliant retrofit kits without requiring additional supplier coordination."
+            "Monitor RDPP qualification criteria and SUI/CUI handling requirements (expected via FAA/DoD guidance by late 2026); assess whether BTX's current IT, personnel-security, and document-control systems meet thresholds for potential involvement in airspace-data-dependent subcontracts.",
+            "Brief BTX leadership on the RDPP's indirect relevance to F-35 and hypersonics test-range operations; confirm with key primes (Lockheed, RTX, Northrop) whether RDPP participation will be required for Tier 2 suppliers or whether information barriers will isolate BTX from classified airspace inputs.",
+            "Flag ITAR/export-control exposure: if RDPP data includes allied or multinational airspace information, confirm with DDTC and prime-contractor compliance offices whether BTX's supply-chain visibility or personnel access will trigger additional licensing or security protocols."
+          ]
+        }
+      },
+      "also_covered_by": [],
+      "entities": [
+        {
+          "name": "Federal Aviation Administration",
+          "type": "agency"
+        },
+        {
+          "name": "Department of Transportation",
+          "type": "agency"
+        },
+        {
+          "name": "Department of Defense",
+          "type": "agency"
+        }
+      ],
+      "enrichment": null,
+      "related": [
+        {
+          "item_id": "106a264c6bbf5e0a",
+          "title": "China establishes VLEO industry alliance as satellites demonstrate sustained…",
+          "url": "https://spacenews.com/china-establishes-vleo-industry-alliance-as-satellites-demonstrate-sustained-low-orbit-operations/",
+          "via": [
+            "Department of Defense"
+          ]
+        },
+        {
+          "item_id": "3e767733ed5c2ea2",
+          "title": "Airworthiness Directives; The Boeing Company Airplanes",
+          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13216/airworthiness-directives-the-boeing-company-airplanes",
+          "via": [
+            "Federal Aviation Administration"
+          ]
+        }
+      ],
+      "importance_score": 24
+    },
+    {
+      "item_id": "3e767733ed5c2ea2",
+      "title": "Airworthiness Directives; The Boeing Company Airplanes",
+      "raw_title": null,
+      "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13216/airworthiness-directives-the-boeing-company-airplanes",
+      "source_id": "Federal Register – Dept. of Defense",
+      "published_at": "2026-06-30T00:00:00Z",
+      "collected_at": "2026-07-01T01:26:38.802532Z",
+      "tier": 3,
+      "per_edition": {
+        "bd": {
+          "relevance_score": 25,
+          "so_what": "FAA airworthiness directive restricts Boeing 747-8 and 777-series aircraft operations in Canadian airspace due to 5G Lower C-Band radio altimeter interference, potentially affecting supply-chain routing and delivery schedules for any BTX-supplied components destined for these aircraft.",
+          "now_what": "Monitor FAA AD repository and customer communications to determine if any active BTX contracts include components for 747-8 or 777-series aircraft and whether the AD triggers component rework, retrofit kits, or new subcontracting for avionics-related machined hardware.",
+          "categories": [
+            "Industry News"
+          ]
+        },
+        "exec": {
+          "relevance_score": 35,
+          "so_what": "FAA adoption of multiple airworthiness directives for Boeing commercial aircraft due to 5G Lower C-Band interference signals a potential supply-chain constraint affecting Boeing's fleet operations and customer confidence; BTX's ability to deliver precision-machined components may be indirectly affected if customers defer orders or redirect sourcing due to aircraft grounding risk.",
+          "now_what": "Track FAA AD publication and Boeing customer communications to identify whether this triggers retrofit or new-build demand for radio altimeter-related flight-critical machined components; assess whether BTX's prime customers (Lockheed Martin, RTX, Northrop Grumman) face supply-chain delays that could impact their defense programs.",
+          "categories": [
+            "Supply Chain",
+            "Industry News"
+          ]
+        }
+      },
+      "dollar_amount": null,
+      "affected_population": null,
+      "action_deadline": null,
+      "confidence_note": "Source is truncated and does not specify scope of interference, mitigation steps, or retrofit requirements; relevance is contingent on whether BTX supplies components to affected Boeing platforms.",
+      "unverified_claims": [],
+      "deep_analysis": {
+        "sections": {
+          "background": "The FAA has issued a new Airworthiness Directive (AD) for Boeing 747-8 and 777 series aircraft, addressing failures in radio altimeter function caused by interference from 5G Lower C-Band (3.7–3.98 GHz) wireless broadband operations in Canadian airspace. The interference affects multiple aircraft systems reliant on radio altimeter data. This directive mandates technical or operational corrections to ensure continued safe flight.",
+          "key_stakeholders": [
+            "Federal Aviation Administration (FAA)",
+            "Transport Canada",
+            "The Boeing Company",
+            "Boeing suppliers and component manufacturers",
+            "Airlines operating affected aircraft",
+            "Wireless broadband operators (5G infrastructure)",
+            "Electronics and avionics subcontractors"
+          ],
+          "scenarios": [
+            "Boeing initiates emergency design modifications or mitigation strategies (hardware filter upgrades, altimeter re-qualification, system-logic updates) requiring subcontract RFQs for prototype and production parts; machining and assembly demand spikes for radio-altimeter mounting, shielding, and thermal-management components.",
+            "If hardware fixes are required, BTX may bid on precision-machined shielding structures, mounting brackets, or thermal conduits for radio-altimeter systems or related avionics enclosures; however, BTX's historical involvement in avionics-level precision work would need confirmation with specific primes.",
+            "Longer-term: regulatory harmonization between FAA and Transport Canada (and potentially EASA) may mandate global fleet modifications, extending subcontract demand beyond Boeing to include retrofit inventory and spare-parts production for multiple aircraft types and operators."
+          ],
+          "recommended_actions": [
+            "Establish rapid-response capability within BTX's supply-chain intelligence: subscribe to FAA and Transport Canada AD tracking and liaise with Lockheed Missiles & Fire Control and RTX Avionics to understand whether BTX is positioned as a supplier for radio-altimeter or avionics-enclosure precision-machining work.",
+            "If BTX has existing avionics-subassembly customers (e.g., RTX, Northrop, or smaller Tier 2 avionics integrators), confirm immediately whether 5G-mitigation parts (shielding, thermal management) fall within BTX's scope; prepare technical responses and lead-time estimates for prototype and production RFQs.",
+            "Monitor Boeing and FAA Engineering Change Order (ECO) announcements; assess whether the 747/777 AD will trigger cascading directives for military variants (e.g., Boeing 707-based AWACS or tanker platforms) that may increase defense-subcontract exposure for BTX's precision-machining capabilities."
           ]
         }
       },
       "also_covered_by": [
         {
-          "item_id": "1e426ac1189cbcb0",
-          "source_id": "Federal Register – Dept. of the Air Force",
-          "title": "Airworthiness Directives; The Boeing Company Airplanes",
-          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13216/airworthiness-directives-the-boeing-company-airplanes"
-        },
-        {
-          "item_id": "16b87bd3518da0c1",
+          "item_id": "e21a74f77cb20b00",
           "source_id": "Federal Register – Dept. of Defense",
           "title": "Airworthiness Directives; The Boeing Company Airplanes",
-          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13217/airworthiness-directives-the-boeing-company-airplanes"
+          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13208/airworthiness-directives-the-boeing-company-airplanes"
+        },
+        {
+          "item_id": "dbf840a20775d2d5",
+          "source_id": "Federal Register – Dept. of Defense",
+          "title": "Airworthiness Directives; The Boeing Company Airplanes",
+          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13207/airworthiness-directives-the-boeing-company-airplanes"
+        },
+        {
+          "item_id": "d6741c0bb28eaa73",
+          "source_id": "Federal Register – Dept. of Defense",
+          "title": "Airworthiness Directives; The Boeing Company Airplanes",
+          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13206/airworthiness-directives-the-boeing-company-airplanes"
+        },
+        {
+          "item_id": "48b4037614258792",
+          "source_id": "Federal Register – Dept. of Defense",
+          "title": "Airworthiness Directives; The Boeing Company Airplanes",
+          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13205/airworthiness-directives-the-boeing-company-airplanes"
         }
       ],
       "entities": [
         {
-          "name": "The Boeing Company",
-          "type": "organization"
-        },
-        {
           "name": "Federal Aviation Administration",
           "type": "agency"
+        },
+        {
+          "name": "The Boeing Company",
+          "type": "organization"
         },
         {
           "name": "Canadian airspace",
@@ -630,148 +510,30 @@
           ]
         }
       ],
-      "importance_score": 20
-    },
-    {
-      "item_id": "b4577bc5f1976477",
-      "title": "Radar Data Pilot Program",
-      "raw_title": null,
-      "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program",
-      "source_id": "Federal Register – Dept. of the Air Force",
-      "published_at": "2026-06-30T00:00:00Z",
-      "collected_at": "2026-06-30T15:19:16.854160Z",
-      "tier": 3,
-      "per_edition": {
-        "bd": {
-          "relevance_score": 22,
-          "so_what": "FAA pilot program opens access to Sensitive Unclassified Information (SUI) and Controlled Unclassified Information (CUI) airspace data; potential value for defense contractors supporting airspace modernization, but no direct contract opportunity named.",
-          "now_what": "Determine whether BTX's defense prime customers (Lockheed Martin, RTX, Northrop Grumman) are participating or bidding on RDPP-related work, and whether BTX could support resulting avionics or ground-system integration subcontracts.",
-          "categories": [
-            "Industry News"
-          ]
-        },
-        "exec": {
-          "relevance_score": 35,
-          "so_what": "FAA Reauthorization Act Section 905 pilot program creates regulated access to classified airspace data for qualified defense and aerospace companies; BTX's ITAR registration and AS9100 certification may be prerequisites for subcontracting on resulting RDPP-related prime work.",
-          "now_what": "Confirm BTX's eligibility for RDPP participation or subcontracting; coordinate with Lockheed Martin, RTX, and Northrop Grumman contacts to identify if they are RDPP pilot participants and require precision-component support.",
-          "categories": [
-            "Industry News"
-          ]
-        }
-      },
-      "dollar_amount": null,
-      "affected_population": null,
-      "action_deadline": null,
-      "confidence_note": "Program invitation published; no specific dollar values, performers, or subcontracting requirements stated. Relevance is contingent on BTX primes' participation in pilot.",
-      "unverified_claims": [],
-      "deep_analysis": {
-        "sections": {
-          "background": "The FAA, under authority granted by the FAA Reauthorization Act of 2024 (Section 905), is establishing a Radar Data Pilot Program (RDPP) to provide qualified users access to sensitive airspace data feeds marked as Sensitive Unclassified Information (SUI) and Controlled Unclassified Information (CUI). This program represents a policy shift toward controlled dissemination of radar and air-traffic data to support operational innovation and is coordinated across DoD, FAA, and other federal agencies.",
-          "key_stakeholders": [
-            "FAA",
-            "Department of Defense",
-            "Congress (Reauthorization Act sponsors)",
-            "Defense primes (Northrop Grumman, Lockheed Martin, RTX) as potential data users",
-            "Aerospace OEMs and Tier 1 suppliers",
-            "Qualified research institutions and tech vendors"
-          ],
-          "scenarios": [
-            "If BTX or its prime customers are invited to participate in RDPP, access to radar/airspace CUI could enable faster validation of precision-machined avionics integration or flight-test support; BTX should position itself to assist primes in data-handling compliance.",
-            "If RDPP data feeds are restricted to primes and large integrators, BTX may face downstream compliance burdens if asked to support prime data-processing workflows; BTX should clarify CUI/SUI handling policies and personnel clearance requirements now.",
-            "If RDPP becomes a pathway for developing advanced air-traffic and autonomous-system integration, defense primes may accelerate development of next-gen hypersonic or unmanned-platform guidance systems, creating indirect demand for precision-machined sensor mounts and structural components."
-          ],
-          "recommended_actions": [
-            "Notify Lockheed Martin, RTX, and Northrop Grumman compliance and BD leadership: understand whether they intend to apply for RDPP participation and what role, if any, BTX's supply-chain or facilities may play in handling CUI/SUI-marked data or components.",
-            "Review and document BTX's CUI/SUI handling capability: confirm that AS9100 and ITAR processes cover controlled-information handling; identify any facilities or personnel that would need to be designated CUI-aware if BTX becomes a data recipient or processor.",
-            "Establish a cross-functional BTX task force (BD, compliance, operations) to assess whether RDPP participation could unlock new avionics or sensor-integration subcontract opportunities; prepare a brief for each prime on how BTX can support RDPP-enabled workflows."
-          ]
-        }
-      },
-      "also_covered_by": [
-        {
-          "item_id": "4045fe63802d95a6",
-          "source_id": "Federal Register – Dept. of Defense",
-          "title": "Radar Data Pilot Program",
-          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program"
-        }
-      ],
-      "entities": [
-        {
-          "name": "Federal Aviation Administration",
-          "type": "agency"
-        },
-        {
-          "name": "Department of Transportation",
-          "type": "agency"
-        },
-        {
-          "name": "Department of Defense",
-          "type": "agency"
-        },
-        {
-          "name": "FAA Reauthorization Act of 2024",
-          "type": "program"
-        }
-      ],
-      "enrichment": {
-        "facts": [
-          {
-            "enricher_id": "federal-register-program",
-            "entity": "FAA Reauthorization Act of 2024",
-            "label": "Latest Federal Register doc",
-            "value": "Radar Data Pilot Program",
-            "kind": "text",
-            "number": null,
-            "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program"
-          },
-          {
-            "enricher_id": "federal-register-program",
-            "entity": "FAA Reauthorization Act of 2024",
-            "label": "Published",
-            "value": "2026-06-30",
-            "kind": "date",
-            "number": null,
-            "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program"
-          }
-        ],
-        "queried_entities": [
-          "FAA Reauthorization Act of 2024"
-        ]
-      },
-      "related": [
-        {
-          "item_id": "11027ec37db257b4",
-          "title": "Quantum computing is about to become a national security problem in orbit",
-          "url": "https://spacenews.com/quantum-computing-is-about-to-become-a-national-security-problem-in-orbit/",
-          "via": [
-            "Department of Defense"
-          ]
-        },
-        {
-          "item_id": "27ace318dc5d4dbe",
-          "title": "Airworthiness Directives; The Boeing Company Airplanes",
-          "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13207/airworthiness-directives-the-boeing-company-airplanes",
-          "via": [
-            "Federal Aviation Administration"
-          ]
-        }
-      ],
       "importance_score": 35
     }
   ],
   "whats_new": {
     "new_tier_1": [],
     "new_tier_2": [
+      "15b1f21dc9b9b170"
+    ],
+    "escalated": [
+      {
+        "item_id": "15b1f21dc9b9b170",
+        "previous_tier": 3,
+        "current_tier": 2
+      }
+    ],
+    "dropped": [
       "3c499c0c324c2e30"
     ],
-    "escalated": [],
-    "dropped": [],
     "deadline_imminent": []
   },
   "editorial": {
-    "theme_of_week": "Congress is reshaping Space Force procurement by pushing $55.5 billion toward competitive sourcing, disrupting incumbent prime positions and opening supply-chain tiers to new entrants.",
-    "editors_note": "The House Appropriations Committee's Space Force allocation is structured to reduce sole-source dependency in satellite communications — a direct signal that primes like Lockheed Martin, RTX, and Northrop Grumman will face pressure to justify their supply chains competitively. For BTX, this is a two-sided development: existing prime relationships may be subject to re-scoping, but the deliberate push for competitive tiers creates genuine openings to win new build-to-print programs where AS9100 and NADCAP credentials differentiate. The window to position with primes ahead of competitive solicitations is now, not after awards are made.",
-    "whats_new_digest": "What is concretely new this run is the specific legislative direction to increase competition in Space Force satellite communications, moving beyond general budget growth to structural procurement reform. This is not routine appropriations language — it signals that sole-source arrangements shielding incumbent suppliers are under active congressional scrutiny. For BTX's key customers, this likely means RFPs structured for tiered competition rather than direct subcontract flow-down from single primes. BTX's certifications and precision machining capabilities position it as a credible candidate in this emerging competitive tier, provided it proactively engages primes on Space Force-adjacent programs before solicitation structures are locked."
+    "theme_of_week": "Boeing's selection for MUOS military-satellite production signals sustained DoD spacecraft demand and reinforces the strategic value of BTX's build-to-print relationship with a key prime contractor.",
+    "editors_note": "This run is defined by a single but significant signal: Boeing continues to secure major military-platform awards, this time for next-generation MUOS satellites on the proven 702MP bus. For BTX, that means a key customer is accumulating new production mandates that will eventually translate into machined components and assemblies at the Tier 2 level. The priority action is to ensure BTX's AS9100 and NADCAP credentials are visible and current to Boeing Defense procurement teams before program work is allocated.",
+    "whats_new_digest": "Boeing's capture of the MUOS follow-on spacecraft contract is a concrete, new award — not a proposal or study — confirming that military-satellite production is entering an active phase rather than remaining on the horizon. This distinguishes the current moment from prior periods of satellite-program speculation and means procurement planning at Boeing is now underway. For BTX, the development opens a traceable path to build-to-print opportunities on precision structural and mechanical components tied to the 702MP platform. Because the work sits squarely within Boeing Defense's portfolio, it directly reinforces BTX's strategic goal of deepening its relationship with one of its named key customers. No other major developments appeared in this run, so this Boeing award stands as the singular item requiring immediate strategic attention."
   },
   "site_config": {
     "name": "BTX Aerospace & Defense Monitor",
@@ -862,7 +624,7 @@
       "name": "Department of Defense",
       "type": "agency",
       "item_ids": [
-        "11027ec37db257b4",
+        "106a264c6bbf5e0a",
         "b4577bc5f1976477"
       ]
     },
@@ -870,16 +632,8 @@
       "name": "Federal Aviation Administration",
       "type": "agency",
       "item_ids": [
-        "27ace318dc5d4dbe",
-        "b4577bc5f1976477"
-      ]
-    },
-    {
-      "name": "Space Force",
-      "type": "agency",
-      "item_ids": [
-        "15b1f21dc9b9b170",
-        "3c499c0c324c2e30"
+        "b4577bc5f1976477",
+        "3e767733ed5c2ea2"
       ]
     }
   ]
