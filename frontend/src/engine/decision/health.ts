@@ -1,10 +1,20 @@
-// pipelineHealth — a composite 0..100 index. Healthy pipeline = strong
-// opportunity, low competitive pressure. Derived from existing scores (not the
-// additive scorer), so it can move both up and down around a 50 baseline without
-// reworking the locked engine. Deterministic.
+// pipelineHealth — now derived from the actual Opportunity pipeline (deals),
+// not from news-signal sentiment. Healthy = lots of weighted open value in late
+// stages, few recent losses. Deterministic, no AI.
 
-export function pipelineHealth(opportunity: number, competitivePressure: number): number {
-  return Math.max(0, Math.min(100, Math.round(50 + (opportunity - competitivePressure) / 2)));
+import type { Opportunity } from "../brain/entities.ts";
+
+const STAGE_WEIGHT: Record<string, number> = { prospecting: 0.3, qualified: 0.6, proposal: 1.0 };
+
+export function pipelineHealth(opps: Opportunity[]): number {
+  const weightedOpen = opps
+    .filter((o) => o.stage in STAGE_WEIGHT)
+    .reduce((sum, o) => sum + o.value * STAGE_WEIGHT[o.stage], 0);
+  const won = opps.filter((o) => o.stage === "won").length;
+  const lost = opps.filter((o) => o.stage === "lost").length;
+  // Baseline 40; up to +35 for a strong weighted open book; wins lift, losses drag.
+  const raw = 40 + Math.min(35, weightedOpen / 700_000) + won * 3 - lost * 4;
+  return Math.max(0, Math.min(100, Math.round(raw)));
 }
 
 export function healthLabel(score: number): string {

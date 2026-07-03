@@ -26,7 +26,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const insight = getInsight(companyId);
   const narrative = insight?.opportunity ?? narrateOpportunity(company, opp?.score ?? 0, fit, signals);
   const rec = world.analysis.recById.get(companyId);
-  const health = score ? pipelineHealth(score.dimensions.opportunity.score, score.dimensions.competitivePressure.score) : 0;
+  const health = pipelineHealth(world.opportunities.filter((o) => o.company_id === companyId));
   const facilities = world.facilities.filter((f) => f.company_id === companyId);
   const openOpps = world.opportunities
     .filter((o) => o.company_id === companyId && o.stage !== "won" && o.stage !== "lost")

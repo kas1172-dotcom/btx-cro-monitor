@@ -48,3 +48,18 @@ export interface Opportunity {
   /** ISO date (YYYY-MM-DD). */
   close_date: string;
 }
+
+/** A news article + its ground-truth signal. The extraction layer re-derives the
+ *  signal from headline/body via the LLM; the embedded fields are the offline
+ *  fallback so the news→signal→score loop works without a key. */
+export interface MarketEvent {
+  id: string;
+  source: string;
+  published_date: string;
+  headline: string;
+  body: string;
+  subject_id: string;
+  event_type: string;
+  value?: number;
+  source_quote: string;
+}

@@ -22,6 +22,11 @@ jobs:
         with:
           node-version: "22"
 
+      # The tools import engine modules (validation now uses zod) — install deps.
+      - name: Install deps
+        working-directory: frontend
+        run: npm ci
+
       - name: Generate dossier insights
         working-directory: frontend
         env:

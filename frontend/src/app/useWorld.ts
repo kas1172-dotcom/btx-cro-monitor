@@ -4,10 +4,16 @@
 import { useEffect, useState } from "react";
 import { BrowserMockAdapter } from "../adapters/mock/BrowserMockAdapter.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
+import { deriveNewsSignals } from "./newsIngest.ts";
+import newsData from "../../data/mock/news.json";
+import extractedData from "../../data/mock/extracted-signals.json";
 import type { Analysis, Prospect } from "./intelligence.ts";
-import type { Company, Contact, Facility, Opportunity } from "../engine/brain/entities.ts";
+import type { ExtractedRow } from "./newsIngest.ts";
+import type { Company, Contact, Facility, Opportunity, MarketEvent } from "../engine/brain/entities.ts";
 
 const adapter = new BrowserMockAdapter();
+const NEWS = newsData as unknown as MarketEvent[];
+const EXTRACTED = extractedData as unknown as ExtractedRow[];
 
 export interface World {
   city: string | null;
@@ -33,7 +39,8 @@ export function useWorld(city: string | null): World | null {
       adapter.getOpportunities(filter),
     ]).then(([companies, signals, contacts, facilities, opportunities]) => {
       if (!alive) return;
-      const analysis = analyze(companies, signals);
+      const newsSignals = deriveNewsSignals(companies, NEWS, EXTRACTED);
+      const analysis = analyze(companies, [...(signals as unknown[]), ...newsSignals]);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
       setWorld({ city, companies, contacts, facilities, opportunities, analysis, prospects });
     });

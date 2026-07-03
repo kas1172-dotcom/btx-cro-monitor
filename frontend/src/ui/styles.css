@@ -239,4 +239,5 @@ body {
 .sig-meta { font-size: 12px; color: var(--muted); }
 .sig-entities { font-size: 12px; margin: 4px 0; }
 .sig-quote { font-size: 12px; font-style: italic; color: var(--muted); }
+.sig-effect { font-size: 12px; color: var(--good); margin-top: 6px; font-weight: 500; }
 @media (max-width: 760px) { .feed-item { grid-template-columns: 1fr; } .feed-arrow { display: none; } }

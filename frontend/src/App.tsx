@@ -56,7 +56,7 @@ export function App() {
         ) : view === "dashboard" ? (
           world ? <Dashboard world={world} /> : <div className="loading">loading…</div>
         ) : view === "feed" ? (
-          <SignalFeed />
+          world ? <SignalFeed world={world} /> : <div className="loading">loading…</div>
         ) : (
           world ? <RelationshipGraph world={world} /> : <div className="loading">loading…</div>
         )}

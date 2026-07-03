@@ -195,10 +195,53 @@ for (const c of COMPANIES) {
   }
 }
 
+// ── Market events (news) tied to REAL companies, so extraction/ingestion
+// resolves to actual accounts and moves real scores. ────────────────────────
+const SOURCES = ["Defense Daily", "AeroSupply News", "GovCon Beat", "Metalworking Wire", "Quality Digest", "Manufacturing Today", "Careers Wire", "Compliance Watch"];
+function newsHeadline(ev: string, name: string, value?: number): string {
+  const m = value ? ` ($${(value / 1e6).toFixed(1)}M)` : "";
+  const phrase: Record<string, string> = {
+    supplier_delay: "flags multi-week shipment delays",
+    quality_escape: "hit with a customer quality hold",
+    capacity_constraint: "quoting long lead times as capacity tightens",
+    pricing_pressure: "raises quoted prices on cost inflation",
+    regulatory_change: "faces new compliance requirements",
+    government_contract_award: `wins a government contract${m}`,
+    contract_win: `books a multi-year production contract${m}`,
+    contract_loss: `loses a long-held recompete${m}`,
+    demand_spike: "sees demand surge on new program starts",
+    competitor_expansion: "expands machining capacity",
+    hiring_surge: "posts a hiring surge",
+  };
+  return `${name} ${phrase[ev] ?? ev}`;
+}
+const newsCompanies = COMPANIES.filter((c) => c.relationship !== "self").slice(0, 14);
+const newsEvents: unknown[] = [];
+let nn = 0;
+for (const c of newsCompanies) {
+  nn += 1;
+  const ev = pick(REL_POOL[c.relationship]);
+  const value = VALUE_EVENTS.has(ev) ? int(5, 200) * 100000 : undefined;
+  const detectedMs = AS_OF - int(1, 20) * 86400000;
+  const q = quote(ev, c.name, value, "A rival");
+  newsEvents.push({
+    id: `news-${String(nn).padStart(2, "0")}`,
+    source: pick(SOURCES),
+    published_date: new Date(detectedMs).toISOString().slice(0, 10),
+    headline: newsHeadline(ev, c.name, value),
+    body: `${q} Industry watchers say the move could reshape supplier dynamics in the segment.`,
+    subject_id: c.id,
+    event_type: ev,
+    ...(value !== undefined ? { value } : {}),
+    source_quote: q,
+  });
+}
+
 const write = (file: string, data: unknown) => writeFileSync(join(OUT_DIR, file), JSON.stringify(data, null, 2) + "\n");
 write("companies.json", companies);
 write("signals.json", signals);
 write("contacts.json", contacts);
 write("facilities.json", facilities);
 write("opportunities.json", opportunities);
-console.log(`generated ${companies.length} companies, ${signals.length} signals, ${contacts.length} contacts, ${facilities.length} facilities, ${opportunities.length} opportunities (seed ${SEED})`);
+write("news.json", newsEvents);
+console.log(`generated ${companies.length} companies, ${signals.length} signals, ${contacts.length} contacts, ${facilities.length} facilities, ${opportunities.length} opportunities, ${newsEvents.length} news events (seed ${SEED})`);

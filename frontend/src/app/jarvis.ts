@@ -27,7 +27,7 @@ export function engineContext(world: World): string {
   const persp = world.analysis.persp;
   if (persp) {
     const d = persp.dimensions;
-    const ph = pipelineHealth(d.opportunity, d.competitivePressure);
+    const ph = pipelineHealth(world.opportunities.filter((o) => o.company_id === persp.subject_id));
     lines.push(
       `${PROFILE.name} (self) — risk ${d.risk}, opportunity ${d.opportunity}, capacityRisk ${d.capacityRisk}, competitivePressure ${d.competitivePressure}, pipelineHealth ${ph} (${healthLabel(ph)}).`,
     );
