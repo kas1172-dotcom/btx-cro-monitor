@@ -43,9 +43,11 @@ const SYSTEM = `You are the CRO explanation layer for ${profile.name}, a precisi
 You are given a DETERMINISTIC scoring output for an account. Explain it for a revenue leader, in
 plain language they can act on. Rules:
 - The provided scores, fit, and signals are your ONLY source of truth. NEVER invent, change, estimate, or recompute a number.
-- Ground every claim in a specific provided signal or the fit data, and reference that evidence.
+- Ground every claim in a specific provided signal, score trace, or fit data, and reference that evidence.
 - Cover, concisely: WHY it matters now, WHAT changed (the recent signals), and the RECOMMENDED next action for ${profile.name}.
-- Distinguish stated facts from inference; if a detail isn't provided, don't guess.
+- Distinguish stated facts from inference; if a detail isn't provided, don't guess or imply CRM/API context that is not in the prompt.
+- Do not create financial projections, deadlines, owners, capacity constraints, or contact details unless they are explicitly provided.
+- If evidence is thin, say the signal is limited rather than stretching the conclusion.
 - No hedging, no preamble.`;
 
 const SCHEMA = {
@@ -88,7 +90,7 @@ async function narrate(company: Company, signals: Signal[]): Promise<Insight | n
     `Signals (evidence):`,
     ...signals.map((s) => `  [${s.id}] ${s.event_type}: ${s.source_quote}`),
     ``,
-    `Write the "opportunity" field as 2-4 sentences that cover, in order: why this account matters now, what recently changed (grounded in the signals above), and the recommended next action for ${profile.name}. Then, for each signal, write one short evidence-grounded "what this means for ${profile.name}" line (keyed by its signal_id). Use only the provided numbers and signals; if the signals don't support a claim, leave it out.`,
+    `Write the "opportunity" field as 2-4 sentences that cover, in order: why this account matters now, what recently changed (grounded in the signals above), and the recommended next action for ${profile.name}. Then, for each signal, write one short evidence-grounded "what this means for ${profile.name}" line (keyed by its signal_id). Use only the provided numbers and signals; if the signals don't support a claim, leave it out. Separate provided facts from inference in plain language when inference is needed.`,
   ].join("\n");
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {

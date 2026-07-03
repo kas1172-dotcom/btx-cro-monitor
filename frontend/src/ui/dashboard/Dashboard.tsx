@@ -9,6 +9,7 @@ import { rankBy } from "../../engine/decision/portfolio.ts";
 import { setState } from "../../store/store.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { explainRankingPrompt, expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
+import { USER_PROMPT_RULES } from "../../app/promptContract.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
@@ -54,7 +55,9 @@ export function Dashboard({ world }: { world: World }) {
   return (
     <div className="dashboard">
       <div className="dash-head">
-        Portfolio intelligence · {world.companies.length} entities · {world.analysis.valid.length} validated signals
+        <p className="eyebrow">Executive dashboard</p>
+        <h1>What needs attention now?</h1>
+        <span>Portfolio intelligence across {world.companies.length} entities and {world.analysis.valid.length} validated signals.</span>
       </div>
 
       <div className="dash-card">
@@ -91,7 +94,7 @@ export function Dashboard({ world }: { world: World }) {
             <span className="muted">{a.reason}</span>
             <AskChatpilButton
               label="Explain"
-              prompt={`Explain this alert using only engine context. Account: ${nameOf(a.subject_id)}. Dimension: ${a.dimension}. Score: ${a.score}. Severity: ${a.severity}. Reason: ${a.reason}. Do not invent numbers.`}
+              prompt={`Explain this alert for a CRO. Account: ${nameOf(a.subject_id)}. Dimension: ${a.dimension}. Score: ${a.score}. Severity: ${a.severity}. Reason: ${a.reason}. Cover what happened, why it matters, recommended action, evidence, and missing data. ${USER_PROMPT_RULES}`}
             />
           </button>
         ))}

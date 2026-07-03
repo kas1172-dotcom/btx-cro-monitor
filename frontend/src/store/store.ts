@@ -14,9 +14,24 @@ export interface UiState {
   activeCompanyId: string | null;
   copilotPrompt: string | null;
   copilotPromptId: number;
+  demoAction: DemoActionNotice | null;
 }
 
-let state: UiState = { city: "Austin", view: "home", activeCompanyId: null, copilotPrompt: null, copilotPromptId: 0 };
+export interface DemoActionNotice {
+  title: string;
+  accountName?: string;
+  action: "crm_task" | "follow_up" | "crm_lead";
+  evidence?: string;
+}
+
+let state: UiState = {
+  city: "Austin",
+  view: "home",
+  activeCompanyId: null,
+  copilotPrompt: null,
+  copilotPromptId: 0,
+  demoAction: null,
+};
 const listeners = new Set<() => void>();
 
 export function setState(patch: Partial<UiState>): void {
@@ -26,6 +41,14 @@ export function setState(patch: Partial<UiState>): void {
 
 export function openCopilotWithPrompt(prompt: string): void {
   setState({ copilotPrompt: prompt, copilotPromptId: state.copilotPromptId + 1 });
+}
+
+export function openDemoAction(action: DemoActionNotice): void {
+  setState({ demoAction: action });
+}
+
+export function closeDemoAction(): void {
+  setState({ demoAction: null });
 }
 
 function subscribe(listener: () => void): () => void {

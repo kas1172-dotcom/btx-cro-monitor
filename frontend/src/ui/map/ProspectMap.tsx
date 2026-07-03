@@ -10,7 +10,6 @@ import { explainRankingPrompt, outreachPrompt } from "../../app/copilotPrompts.t
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { formatAddress } from "../../app/format.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
-import { RankingWhy } from "../ranking/RankingWhy.tsx";
 
 const avg = (ns: number[]): number => (ns.length ? ns.reduce((a, b) => a + b, 0) / ns.length : 0);
 
@@ -68,31 +67,32 @@ export function ProspectMap({ world }: { world: World }) {
           <span>{marketLabel}</span>
           <strong>{world.prospects.length} prospects</strong>
         </div>
-        {world.prospects.slice(0, 6).map((p, i) => (
-          <button
-            key={p.company.id}
-            className={p.company.id === activeCompanyId ? "map-prospect active" : "map-prospect"}
-            onClick={() => setState({ activeCompanyId: p.company.id })}
-          >
-            <span className="rank-badge">#{i + 1}</span>
-            <span className="map-prospect-main">
-              <strong>{p.company.name}</strong>
-              <em>Opportunity {p.opportunity} · fit {p.fit.score}%</em>
-              {formatAddress(p.company.location) && <small>{formatAddress(p.company.location)}</small>}
-              <RankingWhy explanation={rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score })} />
-              {p.topSignal && <small>{p.topSignal.event_type}: {p.topSignal.source_quote}</small>}
-              {p.contact && <small>Call {p.contact.name}, {p.contact.title}</small>}
-              <AskChatpilButton
-                label="Explain"
-                prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Opportunity ${p.opportunity}, fit ${p.fit.score}%, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
-              />
-              <AskChatpilButton
-                label="Draft outreach"
-                prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Opportunity ${p.opportunity}, fit ${p.fit.score}%, contact ${p.contact?.name ?? "not available"}.`)}
-              />
-            </span>
-          </button>
-        ))}
+        <div className="map-prospect-list">
+          {world.prospects.slice(0, 12).map((p, i) => (
+            <button
+              key={p.company.id}
+              className={p.company.id === activeCompanyId ? "map-prospect active" : "map-prospect"}
+              onClick={() => setState({ activeCompanyId: p.company.id })}
+            >
+              <span className="rank-badge">#{i + 1}</span>
+              <span className="map-prospect-main">
+                <strong>{p.company.name}</strong>
+                <em>Opp {p.opportunity} · fit {p.fit.score}% · {p.company.location.city}</em>
+                {p.topSignal && <small>{p.topSignal.event_type}: {p.topSignal.source_quote}</small>}
+                <span className="map-prospect-actions">
+                  <AskChatpilButton
+                    label="Explain"
+                    prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Opportunity ${p.opportunity}, fit ${p.fit.score}%, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
+                  />
+                  <AskChatpilButton
+                    label="Draft outreach"
+                    prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Opportunity ${p.opportunity}, fit ${p.fit.score}%, contact ${p.contact?.name ?? "not available"}.`)}
+                  />
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
         <div className="map-legend">
           <span><i className="legend-prospect" /> prospect/customer</span>
           <span><i className="legend-other" /> supplier/competitor/self</span>

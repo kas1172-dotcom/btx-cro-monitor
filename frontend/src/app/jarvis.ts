@@ -21,10 +21,13 @@ export interface Msg {
 
 const nameIn = (world: World) => (id: string) =>
   world.companies.find((c) => c.id === id)?.name ?? id;
+const companyIn = (world: World) => (id: string) =>
+  world.companies.find((c) => c.id === id);
 
 /** Compact factual snapshot — the ground truth Jarvis is allowed to use. */
 export function engineContext(world: World): string {
   const nameOf = nameIn(world);
+  const companyOf = companyIn(world);
   const lines: string[] = [];
   const persp = world.analysis.persp;
   if (persp) {
@@ -37,9 +40,10 @@ export function engineContext(world: World): string {
   lines.push("LEADERBOARD (top accounts; all four objective scores so you can explain any ranking):");
   for (const s of [...world.analysis.scores].sort((a, b) => Math.max(b.dimensions.risk.score, b.dimensions.opportunity.score) - Math.max(a.dimensions.risk.score, a.dimensions.opportunity.score)).slice(0, 12)) {
     const d = s.dimensions;
+    const company = companyOf(s.subject_id);
     const topRisk = d.risk.contributions[0]?.event_type;
     const topOpp = d.opportunity.contributions[0]?.event_type;
-    lines.push(`- ${nameOf(s.subject_id)}: risk ${d.risk.score}${topRisk ? ` (top: ${topRisk})` : ""}, opportunity ${d.opportunity.score}${topOpp ? ` (top: ${topOpp})` : ""}, capacityRisk ${d.capacityRisk.score}, competitivePressure ${d.competitivePressure.score}`);
+    lines.push(`- ${nameOf(s.subject_id)}${company?.account_status ? ` [account_status ${company.account_status}]` : ""}${company?.business_motion ? ` [business_motion ${company.business_motion}]` : ""}: risk ${d.risk.score}${topRisk ? ` (top: ${topRisk})` : ""}, opportunity ${d.opportunity.score}${topOpp ? ` (top: ${topOpp})` : ""}, capacityRisk ${d.capacityRisk.score}, competitivePressure ${d.competitivePressure.score}`);
   }
   lines.push("RECOMMENDED ACTIONS (priority order):");
   for (const r of world.analysis.recommendations.filter((r) => r.priority !== "low").slice(0, 8))
@@ -47,7 +51,7 @@ export function engineContext(world: World): string {
   lines.push("TOP PROSPECTS:");
   for (const p of world.prospects.slice(0, 8))
     lines.push(
-      `- ${p.company.name} [${p.company.location.city}] opportunity ${p.opportunity}, fit ${p.fit.score}%` +
+      `- ${p.company.name} [${p.company.location.city}]${p.company.account_status ? ` account_status ${p.company.account_status}` : ""}${p.company.business_motion ? ` business_motion ${p.company.business_motion}` : ""}, opportunity ${p.opportunity}, fit ${p.fit.score}%` +
         (p.contact ? `, contact ${p.contact.name} (${p.contact.title})` : "") +
         (p.fit.matched.length ? `, serve ${p.fit.matched.join("/")}` : ""),
     );

@@ -1,4 +1,4 @@
-import { useStore, setState } from "./store/store.ts";
+import { useStore, setState, closeDemoAction } from "./store/store.ts";
 import type { View } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES, PROFILE } from "./app/config.ts";
@@ -29,7 +29,7 @@ const VIEWS: Array<{ id: View; label: string }> = [
 const ALL_MARKETS_VALUE = "__all_markets__";
 
 export function App() {
-  const { city, view, activeCompanyId } = useStore();
+  const { city, view, activeCompanyId, demoAction } = useStore();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
   const marketLabel = city ?? "All Markets";
@@ -109,6 +109,33 @@ export function App() {
           </div>
         )}
       </aside>
+
+      {demoAction && (
+        <div className="demo-action-overlay" role="dialog" aria-modal="true" aria-labelledby="demo-action-title">
+          <div className="demo-action-modal">
+            <p className="eyebrow">Demo workflow</p>
+            <h2 id="demo-action-title">{demoAction.title}</h2>
+            {demoAction.accountName && <p className="demo-action-account">{demoAction.accountName}</p>}
+            <p>
+              In production, this would create a Salesforce task or lead, assign an owner, attach source evidence,
+              and schedule follow-up. This demo does not send email, write to a CRM, or call an external API.
+            </p>
+            {demoAction.evidence && (
+              <div className="demo-action-evidence">
+                <span>Evidence attached</span>
+                <strong>{demoAction.evidence}</strong>
+              </div>
+            )}
+            <div className="demo-action-steps">
+              <span>Create CRM task</span>
+              <span>Attach evidence</span>
+              <span>Assign owner</span>
+              <span>Schedule follow-up</span>
+            </div>
+            <button onClick={closeDemoAction}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -33,12 +33,17 @@ const news = JSON.parse(readFileSync(join(here, "../data/demo/btx/news.json"), "
   body: string;
 }>;
 
-const SYSTEM = `You extract exactly ONE structured business signal from a news article. A signal is a concrete, actionable business EVENT (a contract award, a supplier delay, a quality issue, a capacity change, a price move, a hiring surge, a regulatory change), not a vague topic, opinion, or general summary. Rules:
+const SYSTEM = `You extract exactly ONE structured business signal from a news article. A signal is a concrete, actionable business EVENT (a contract award, a supplier delay, a quality issue, a capacity change, a price move, a hiring surge, a regulatory change), not a vague topic, opinion, or general summary. The goal is to produce useful CRO evidence: what happened, who it affects, and whether the source directly supports acting on it. Rules:
 - event_type MUST be one of the provided enum values. If the text describes no clear, specific business event, use "none".
 - entities: the canonical/full company or organization name(s) the event is about (not abbreviations or partials).
 - value: include ONLY if a specific dollar amount is explicitly stated in the text; otherwise omit it. Never guess or estimate a number.
 - confidence: 0..1, how clearly the text supports the event. Firm, stated fact -> high (>=0.85). Hedged/rumored/unconfirmed ("may", "could", "reportedly", "sources say") -> low (<0.5).
 - source_quote: a VERBATIM span copied from the body that directly supports the signal — do not paraphrase.
+Extraction discipline:
+- The source_quote must prove both the event_type and at least one extracted entity.
+- If the article only gives background, marketing language, analyst opinion, or unsupported implications, return event_type "none" with low confidence.
+- Do not infer customers, competitors, revenue impact, urgency, dates, or dollar values unless explicitly stated.
+- If multiple events are present, choose the most concrete and commercially actionable event with the strongest evidence.
 Extract only what the text states. No free-text reasoning, no interpretation, no invented detail — just the structured extraction.`;
 
 const SCHEMA = {

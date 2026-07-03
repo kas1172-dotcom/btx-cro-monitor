@@ -14,6 +14,7 @@ import { explainAccountPrompt, expandSignalPrompt, nextActionPrompt } from "../.
 import { companyLinks, formatAddress } from "../../app/format.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
+import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
   const company = world.companies.find((c) => c.id === companyId);
@@ -67,6 +68,15 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           <AskChatpilButton
             label="Explain"
             prompt={nextActionPrompt(company.name, `Dossier recommendation: ${actionLabel(rec.action)}. Reason: ${rec.reason}.`)}
+          />
+          <DemoActionButton
+            label="Create CRM Task"
+            action={{
+              action: "crm_task",
+              title: "Create CRM Task",
+              accountName: company.name,
+              evidence: rec.reason,
+            }}
           />
         </div>
       )}

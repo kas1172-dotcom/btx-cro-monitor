@@ -158,8 +158,10 @@ class ResearchAgent:
             "item. Use the tools to gather concrete, verifiable detail (figures, "
             "agencies, dates, prior context). Make at most a few targeted calls, then "
             "STOP and reply with a tight factual brief of what you found — bullet "
-            "points, each grounded in a tool result. Do not speculate; if a lookup "
-            "returns nothing, say so. Do not write the final analysis, only the notes."
+            "points, each grounded in a tool result and naming the source or tool. "
+            "Keep facts separate from any analyst inference. Do not speculate, infer "
+            "missing numbers, or fill gaps from memory; if a lookup returns nothing, "
+            "say what is missing. Do not write the final analysis, only the notes."
         )
         user = (
             f"ITEM: {item.title}\n"
@@ -168,7 +170,7 @@ class ResearchAgent:
         )
         if raw and raw.summary:
             user += f"SUMMARY: {raw.summary[:600]}\n"
-        user += "\nResearch this item, then reply with your factual notes."
+        user += "\nResearch this item, then reply with factual notes focused on what changed, why it matters, evidence found, and important missing data."
 
         messages: list[dict] = [{"role": "user", "content": user}]
         steps = 0
