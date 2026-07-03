@@ -1,0 +1,24 @@
+# ★ THE ONE BUTTON ★
+# Refreshes the LLM artifacts (dossier prose + signals extracted from news),
+# then rebuilds and deploys the site. Run this whenever you want the live demo
+# fully up to date — it is the only workflow you normally need to touch.
+# (The other workflows — Monitor Pipeline, Discovery Validation — belong to the
+# old Python cockpit and are not part of the demo.)
+name: Update demo (bake + deploy)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  bake:
+    uses: ./.github/workflows/insights.yml
+    secrets: inherit
+  deploy:
+    needs: bake
+    uses: ./.github/workflows/pages.yml
+    secrets: inherit
