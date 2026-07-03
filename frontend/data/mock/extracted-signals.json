@@ -1,1 +1,144 @@
-[]
+[
+  {
+    "news_id": "news-01",
+    "headline": "Apex Machining lands $6.5M Navy IDIQ",
+    "extracted": {
+      "event_type": "government_contract_award",
+      "entities": [
+        "Apex Machining",
+        "Navy"
+      ],
+      "value": 6500000,
+      "confidence": 0.97,
+      "source_quote": "Apex Machining confirmed it was awarded a $6.5M multi-year IDIQ to produce machined actuator assemblies for a Navy program"
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-02",
+    "headline": "Furnace outage idles Titan Castings shift",
+    "extracted": {
+      "event_type": "supplier_delay",
+      "entities": [
+        "Titan Castings"
+      ],
+      "confidence": 0.92,
+      "source_quote": "told customers to expect multi-week slips on titanium billet shipments"
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-03",
+    "headline": "Beacon Aviation ramps on new program starts",
+    "extracted": {
+      "event_type": "demand_spike",
+      "entities": [
+        "Beacon Aerospace"
+      ],
+      "confidence": 0.85,
+      "source_quote": "Demand for Beacon Aerospace components is spiking as several new aircraft programs enter production"
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-04",
+    "headline": "Cobalt Alloys hit with source-inspection hold",
+    "extracted": {
+      "event_type": "quality_escape",
+      "entities": [
+        "Cobalt Alloys"
+      ],
+      "confidence": 0.9,
+      "source_quote": "A porosity escape on a Cobalt Alloys casting lot triggered a customer source-inspection hold"
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-05",
+    "headline": "Chatter: Ironclad may have taken a bracket program",
+    "extracted": {
+      "event_type": "contract_win",
+      "entities": [
+        "Ironclad Components"
+      ],
+      "confidence": 0.2,
+      "source_quote": "Unconfirmed industry chatter suggests Ironclad Components may have won a bracket program, though nothing has been announced and sources are hedging."
+    },
+    "valid": false,
+    "reason": "confidence 0.2 below 0.7"
+  },
+  {
+    "news_id": "news-06",
+    "headline": "Summit Turbine wins $1.1M Air Force award",
+    "extracted": {
+      "event_type": "government_contract_award",
+      "entities": [
+        "Summit Turbine",
+        "Air Force"
+      ],
+      "value": 1100000,
+      "confidence": 0.98,
+      "source_quote": "Summit Turbine was awarded a $1.1M Air Force contract for turbine blade machining, its first federal award in the segment."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-07",
+    "headline": "Vanguard Aerospace breaks ground on new plant",
+    "extracted": {
+      "event_type": "capacity_constraint",
+      "entities": [
+        "Vanguard Aerospace"
+      ],
+      "confidence": 0.55,
+      "source_quote": "Vanguard Aerospace announced a facility expansion to add 5-axis machining capacity"
+    },
+    "valid": false,
+    "reason": "confidence 0.55 below 0.7"
+  },
+  {
+    "news_id": "news-08",
+    "headline": "Aluminum prices climb again",
+    "extracted": {
+      "event_type": "pricing_pressure",
+      "entities": [],
+      "confidence": 0.82,
+      "source_quote": "Aluminum prices climbed for a third straight month on energy costs, pressuring margins across the machining supply base, with several shops signaling quote increases."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-09",
+    "headline": "Northwind Systems posts hiring surge",
+    "extracted": {
+      "event_type": "hiring_surge",
+      "entities": [
+        "Northwind Systems"
+      ],
+      "confidence": 0.85,
+      "source_quote": "Northwind Systems posted a surge of engineering and supply-chain openings, a signal it is staffing up for a production ramp."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-10",
+    "headline": "New AS9100 revision affects certified shops",
+    "extracted": {
+      "event_type": "regulatory_change",
+      "entities": [
+        "AS9100"
+      ],
+      "confidence": 0.85,
+      "source_quote": "A new revision to AS9100 introduces additional process-control requirements that certified aerospace suppliers will need to demonstrate at their next audit."
+    },
+    "valid": true,
+    "reason": ""
+  }
+]
