@@ -7,8 +7,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "gen": "node tools/generate-mock.ts",
-    "engine": "node demo/run.ts"
+    "gen": "tsx tools/generate-demo.ts",
+    "engine": "tsx demo/run.ts",
+    "demo:generate": "tsx tools/generate-demo.ts"
   },
   "dependencies": {
     "@xyflow/react": "^12.3.5",
