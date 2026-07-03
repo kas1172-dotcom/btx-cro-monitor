@@ -1,142 +1,200 @@
 [
   {
     "news_id": "news-01",
-    "headline": "Apex Machining lands $6.5M Navy IDIQ",
+    "headline": "Anvil Manufacturing posts a hiring surge",
     "extracted": {
-      "event_type": "government_contract_award",
+      "event_type": "hiring_surge",
       "entities": [
-        "Apex Machining",
-        "Navy"
+        "Anvil Manufacturing"
       ],
-      "value": 6500000,
-      "confidence": 0.97,
-      "source_quote": "Apex Machining confirmed it was awarded a $6.5M multi-year IDIQ to produce machined actuator assemblies for a Navy program"
+      "confidence": 0.85,
+      "source_quote": "Anvil Manufacturing posted a surge of openings, signaling a growth push."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-02",
-    "headline": "Furnace outage idles Titan Castings shift",
+    "headline": "Meridian Technologies faces new compliance requirements",
     "extracted": {
-      "event_type": "supplier_delay",
+      "event_type": "regulatory_change",
       "entities": [
-        "Titan Castings"
+        "Meridian Technologies"
       ],
-      "confidence": 0.92,
-      "source_quote": "told customers to expect multi-week slips on titanium billet shipments"
+      "confidence": 0.72,
+      "source_quote": "New compliance requirements affect Meridian Technologies's certified processes."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-03",
-    "headline": "Beacon Aviation ramps on new program starts",
+    "headline": "Falcon Fabrication hit with a customer quality hold",
     "extracted": {
-      "event_type": "demand_spike",
+      "event_type": "quality_escape",
       "entities": [
-        "Beacon Aerospace"
+        "Falcon Fabrication"
       ],
-      "confidence": 0.85,
-      "source_quote": "Demand for Beacon Aerospace components is spiking as several new aircraft programs enter production"
+      "confidence": 0.95,
+      "source_quote": "A quality escape at Falcon Fabrication triggered a customer source-inspection hold."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-04",
-    "headline": "Cobalt Alloys hit with source-inspection hold",
+    "headline": "Monarch Technologies posts a hiring surge",
     "extracted": {
-      "event_type": "quality_escape",
+      "event_type": "hiring_surge",
       "entities": [
-        "Cobalt Alloys"
+        "Monarch Technologies"
       ],
-      "confidence": 0.9,
-      "source_quote": "A porosity escape on a Cobalt Alloys casting lot triggered a customer source-inspection hold"
+      "confidence": 0.85,
+      "source_quote": "Monarch Technologies posted a surge of openings, signaling a growth push."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-05",
-    "headline": "Chatter: Ironclad may have taken a bracket program",
+    "headline": "Strata Turbine books a multi-year production contract ($17.5M)",
     "extracted": {
       "event_type": "contract_win",
       "entities": [
-        "Ironclad Components"
+        "Strata Turbine"
       ],
-      "confidence": 0.2,
-      "source_quote": "Unconfirmed industry chatter suggests Ironclad Components may have won a bracket program, though nothing has been announced and sources are hedging."
+      "value": 17500000,
+      "confidence": 0.95,
+      "source_quote": "Strata Turbine booked a $17.5M multi-year production contract."
     },
-    "valid": false,
-    "reason": "confidence 0.2 below 0.7"
+    "valid": true,
+    "reason": ""
   },
   {
     "news_id": "news-06",
-    "headline": "Summit Turbine wins $1.1M Air Force award",
+    "headline": "Anvil Systems raises quoted prices on cost inflation",
     "extracted": {
-      "event_type": "government_contract_award",
+      "event_type": "pricing_pressure",
       "entities": [
-        "Summit Turbine",
-        "Air Force"
+        "Anvil Systems"
       ],
-      "value": 1100000,
-      "confidence": 0.98,
-      "source_quote": "Summit Turbine was awarded a $1.1M Air Force contract for turbine blade machining, its first federal award in the segment."
+      "confidence": 0.9,
+      "source_quote": "Anvil Systems raised quoted prices, citing material and labor cost inflation."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-07",
-    "headline": "Vanguard Aerospace breaks ground on new plant",
+    "headline": "Sentinel Alloys posts a hiring surge",
     "extracted": {
-      "event_type": "capacity_constraint",
+      "event_type": "hiring_surge",
       "entities": [
-        "Vanguard Aerospace"
+        "Sentinel Alloys"
       ],
-      "confidence": 0.55,
-      "source_quote": "Vanguard Aerospace announced a facility expansion to add 5-axis machining capacity"
+      "confidence": 0.85,
+      "source_quote": "Sentinel Alloys posted a surge of openings, signaling a growth push."
     },
-    "valid": false,
-    "reason": "confidence 0.55 below 0.7"
+    "valid": true,
+    "reason": ""
   },
   {
     "news_id": "news-08",
-    "headline": "Aluminum prices climb again",
+    "headline": "Cardinal Metalworks expands machining capacity",
     "extracted": {
-      "event_type": "pricing_pressure",
-      "entities": [],
-      "confidence": 0.82,
-      "source_quote": "Aluminum prices climbed for a third straight month on energy costs, pressuring margins across the machining supply base, with several shops signaling quote increases."
+      "event_type": "competitor_expansion",
+      "entities": [
+        "Cardinal Metalworks"
+      ],
+      "confidence": 0.85,
+      "source_quote": "Cardinal Metalworks announced a facility expansion to add machining capacity."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-09",
-    "headline": "Northwind Systems posts hiring surge",
+    "headline": "Monarch Alloys wins a government contract ($7.5M)",
     "extracted": {
-      "event_type": "hiring_surge",
+      "event_type": "government_contract_award",
       "entities": [
-        "Northwind Systems"
+        "Monarch Alloys"
       ],
-      "confidence": 0.85,
-      "source_quote": "Northwind Systems posted a surge of engineering and supply-chain openings, a signal it is staffing up for a production ramp."
+      "value": 7500000,
+      "confidence": 0.97,
+      "source_quote": "Monarch Alloys was awarded a $7.5M government contract."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-10",
-    "headline": "New AS9100 revision affects certified shops",
+    "headline": "Sentinel Aerospace books a multi-year production contract ($16.5M)",
+    "extracted": {
+      "event_type": "contract_win",
+      "entities": [
+        "Sentinel Aerospace"
+      ],
+      "value": 16500000,
+      "confidence": 0.95,
+      "source_quote": "Sentinel Aerospace booked a $16.5M multi-year production contract."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-11",
+    "headline": "Beacon Alloys faces new compliance requirements",
     "extracted": {
       "event_type": "regulatory_change",
       "entities": [
-        "AS9100"
+        "Beacon Alloys"
       ],
       "confidence": 0.85,
-      "source_quote": "A new revision to AS9100 introduces additional process-control requirements that certified aerospace suppliers will need to demonstrate at their next audit."
+      "source_quote": "New compliance requirements affect Beacon Alloys's certified processes."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-12",
+    "headline": "Halcyon Components books a multi-year production contract ($9.6M)",
+    "extracted": {
+      "event_type": "contract_win",
+      "entities": [
+        "Halcyon Components"
+      ],
+      "value": 9600000,
+      "confidence": 0.95,
+      "source_quote": "Halcyon Components booked a $9.6M multi-year production contract."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-13",
+    "headline": "Vanguard Systems sees demand surge on new program starts",
+    "extracted": {
+      "event_type": "demand_spike",
+      "entities": [
+        "Vanguard Systems"
+      ],
+      "confidence": 0.9,
+      "source_quote": "Demand for Vanguard Systems's products spiked on new program starts."
+    },
+    "valid": true,
+    "reason": ""
+  },
+  {
+    "news_id": "news-14",
+    "headline": "Nimbus Technologies raises quoted prices on cost inflation",
+    "extracted": {
+      "event_type": "pricing_pressure",
+      "entities": [
+        "Nimbus Technologies"
+      ],
+      "confidence": 0.9,
+      "source_quote": "Nimbus Technologies raised quoted prices, citing material and labor cost inflation."
     },
     "valid": true,
     "reason": ""
