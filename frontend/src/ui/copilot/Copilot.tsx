@@ -30,7 +30,7 @@ export function Copilot({ world }: { world: World }) {
   if (!open) {
     return (
       <button className="copilot-fab" onClick={() => setOpen(true)}>
-        ✦ Jarvis
+        ✦ Chatpil
       </button>
     );
   }
@@ -39,7 +39,7 @@ export function Copilot({ world }: { world: World }) {
     <div className="copilot">
       <div className="copilot-head">
         <span>
-          ✦ Jarvis <em className={jarvisLive ? "live" : "offline"}>{jarvisLive ? "live" : "offline"}</em>
+          ✦ Chatpil <em className={jarvisLive ? "live" : "offline"}>{jarvisLive ? "live" : "offline"}</em>
         </span>
         <button onClick={() => setOpen(false)} aria-label="close">×</button>
       </div>
@@ -65,7 +65,7 @@ export function Copilot({ world }: { world: World }) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={jarvisLive ? "Ask Jarvis anything…" : "Ask (offline: rule-based)…"}
+          placeholder={jarvisLive ? "Ask Chatpil anything…" : "Ask (offline: rule-based)…"}
           disabled={busy}
         />
         <button type="submit" disabled={busy}>Ask</button>
