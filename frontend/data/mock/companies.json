@@ -20,14 +20,14 @@
     "relationship": "customer",
     "location": {
       "city": "Phoenix",
-      "lat": 33.4793,
-      "lon": -112.1646
+      "lat": 33.4669,
+      "lon": -112.0117
     },
     "needs": [
-      "5-axis CNC",
-      "AS9100",
+      "NADCAP",
       "build-to-print",
-      "precision machining"
+      "sheet metal",
+      "titanium"
     ]
   },
   {
@@ -36,14 +36,13 @@
     "relationship": "supplier",
     "location": {
       "city": "Huntsville",
-      "lat": 34.668,
-      "lon": -86.6238
+      "lat": 34.6641,
+      "lon": -86.6851
     },
     "needs": [
-      "5-axis CNC",
       "AS9100",
+      "NADCAP",
       "build-to-print",
-      "precision machining",
       "sheet metal"
     ]
   },
@@ -53,13 +52,15 @@
     "relationship": "supplier",
     "location": {
       "city": "Greenville",
-      "lat": 34.7769,
-      "lon": -82.4405
+      "lat": 34.9453,
+      "lon": -82.4057
     },
     "needs": [
       "5-axis CNC",
-      "AS9100",
-      "sheet metal"
+      "NADCAP",
+      "aluminum",
+      "build-to-print",
+      "titanium"
     ]
   },
   {
@@ -68,15 +69,12 @@
     "relationship": "customer",
     "location": {
       "city": "Greenville",
-      "lat": 34.7945,
-      "lon": -82.4699
+      "lat": 34.9496,
+      "lon": -82.4717
     },
     "needs": [
-      "ITAR",
-      "NADCAP",
-      "aluminum",
-      "assembly",
-      "sheet metal"
+      "5-axis CNC",
+      "build-to-print"
     ]
   },
   {
@@ -85,12 +83,15 @@
     "relationship": "target",
     "location": {
       "city": "Austin",
-      "lat": 30.2248,
-      "lon": -97.7885
+      "lat": 30.2639,
+      "lon": -97.7274
     },
     "needs": [
-      "sheet metal",
-      "titanium"
+      "ITAR",
+      "aluminum",
+      "build-to-print",
+      "precision machining",
+      "sheet metal"
     ]
   },
   {
@@ -99,12 +100,14 @@
     "relationship": "supplier",
     "location": {
       "city": "Austin",
-      "lat": 30.2197,
-      "lon": -97.6664
+      "lat": 30.2789,
+      "lon": -97.8348
     },
     "needs": [
-      "aluminum",
-      "assembly"
+      "AS9100",
+      "assembly",
+      "build-to-print",
+      "sheet metal"
     ]
   },
   {
@@ -113,15 +116,13 @@
     "relationship": "customer",
     "location": {
       "city": "Cincinnati",
-      "lat": 39.1365,
-      "lon": -84.4484
+      "lat": 39.2014,
+      "lon": -84.531
     },
     "needs": [
       "5-axis CNC",
-      "NADCAP",
-      "aluminum",
-      "assembly",
-      "build-to-print"
+      "ITAR",
+      "sheet metal"
     ]
   },
   {
@@ -130,13 +131,14 @@
     "relationship": "competitor",
     "location": {
       "city": "Tulsa",
-      "lat": 36.2253,
-      "lon": -96.0807
+      "lat": 36.0827,
+      "lon": -95.9364
     },
     "needs": [
+      "5-axis CNC",
       "NADCAP",
       "assembly",
-      "sheet metal"
+      "build-to-print"
     ]
   },
   {
@@ -145,12 +147,15 @@
     "relationship": "target",
     "location": {
       "city": "Huntsville",
-      "lat": 34.7288,
-      "lon": -86.6339
+      "lat": 34.7294,
+      "lon": -86.6785
     },
     "needs": [
       "5-axis CNC",
-      "ITAR"
+      "AS9100",
+      "ITAR",
+      "precision machining",
+      "sheet metal"
     ]
   },
   {
@@ -159,13 +164,13 @@
     "relationship": "target",
     "location": {
       "city": "San Diego",
-      "lat": 32.7661,
-      "lon": -117.1251
+      "lat": 32.6214,
+      "lon": -117.1458
     },
     "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "build-to-print"
+      "aluminum",
+      "assembly",
+      "precision machining"
     ]
   },
   {
@@ -174,14 +179,14 @@
     "relationship": "supplier",
     "location": {
       "city": "Phoenix",
-      "lat": 33.3912,
-      "lon": -112.0518
+      "lat": 33.4187,
+      "lon": -112.0544
     },
     "needs": [
       "5-axis CNC",
-      "AS9100",
       "ITAR",
       "assembly",
+      "build-to-print",
       "titanium"
     ]
   },
@@ -191,15 +196,15 @@
     "relationship": "target",
     "location": {
       "city": "San Diego",
-      "lat": 32.8011,
-      "lon": -117.1735
+      "lat": 32.7662,
+      "lon": -117.1669
     },
     "needs": [
       "5-axis CNC",
       "AS9100",
-      "ITAR",
       "assembly",
-      "titanium"
+      "precision machining",
+      "sheet metal"
     ]
   },
   {
@@ -208,14 +213,15 @@
     "relationship": "target",
     "location": {
       "city": "Hartford",
-      "lat": 41.7643,
-      "lon": -72.6653
+      "lat": 41.7631,
+      "lon": -72.7126
     },
     "needs": [
       "5-axis CNC",
-      "ITAR",
-      "build-to-print",
-      "sheet metal"
+      "AS9100",
+      "NADCAP",
+      "aluminum",
+      "titanium"
     ]
   },
   {
@@ -224,12 +230,15 @@
     "relationship": "supplier",
     "location": {
       "city": "Tulsa",
-      "lat": 36.247,
-      "lon": -95.9631
+      "lat": 36.1408,
+      "lon": -95.9998
     },
     "needs": [
+      "ITAR",
+      "NADCAP",
       "aluminum",
-      "precision machining"
+      "sheet metal",
+      "titanium"
     ]
   },
   {
@@ -238,13 +247,14 @@
     "relationship": "competitor",
     "location": {
       "city": "Phoenix",
-      "lat": 33.3594,
-      "lon": -111.9949
+      "lat": 33.4007,
+      "lon": -112.0483
     },
     "needs": [
-      "ITAR",
+      "AS9100",
+      "assembly",
       "build-to-print",
-      "precision machining"
+      "sheet metal"
     ]
   },
   {
@@ -253,15 +263,13 @@
     "relationship": "competitor",
     "location": {
       "city": "Wichita",
-      "lat": 37.695,
-      "lon": -97.3854
+      "lat": 37.5932,
+      "lon": -97.2306
     },
     "needs": [
       "5-axis CNC",
-      "AS9100",
-      "build-to-print",
-      "precision machining",
-      "titanium"
+      "NADCAP",
+      "precision machining"
     ]
   },
   {
@@ -270,13 +278,14 @@
     "relationship": "supplier",
     "location": {
       "city": "Huntsville",
-      "lat": 34.827,
-      "lon": -86.608
+      "lat": 34.7471,
+      "lon": -86.6706
     },
     "needs": [
-      "5-axis CNC",
       "AS9100",
-      "NADCAP"
+      "ITAR",
+      "NADCAP",
+      "sheet metal"
     ]
   },
   {
@@ -285,14 +294,11 @@
     "relationship": "target",
     "location": {
       "city": "Cincinnati",
-      "lat": 39.1579,
-      "lon": -84.5233
+      "lat": 39.0191,
+      "lon": -84.5897
     },
     "needs": [
-      "AS9100",
-      "NADCAP",
       "assembly",
-      "build-to-print",
       "titanium"
     ]
   },
@@ -302,12 +308,14 @@
     "relationship": "customer",
     "location": {
       "city": "San Diego",
-      "lat": 32.7829,
-      "lon": -117.1732
+      "lat": 32.7801,
+      "lon": -117.2356
     },
     "needs": [
       "AS9100",
-      "sheet metal"
+      "assembly",
+      "precision machining",
+      "titanium"
     ]
   },
   {
@@ -316,14 +324,15 @@
     "relationship": "competitor",
     "location": {
       "city": "Tulsa",
-      "lat": 36.0736,
-      "lon": -95.942
+      "lat": 36.1157,
+      "lon": -95.8931
     },
     "needs": [
-      "AS9100",
+      "ITAR",
       "aluminum",
+      "assembly",
       "build-to-print",
-      "titanium"
+      "precision machining"
     ]
   },
   {
@@ -332,13 +341,12 @@
     "relationship": "supplier",
     "location": {
       "city": "Cincinnati",
-      "lat": 39.1704,
-      "lon": -84.4926
+      "lat": 39.0917,
+      "lon": -84.5228
     },
     "needs": [
-      "5-axis CNC",
-      "assembly",
-      "build-to-print"
+      "NADCAP",
+      "assembly"
     ]
   },
   {
@@ -347,13 +355,13 @@
     "relationship": "target",
     "location": {
       "city": "Hartford",
-      "lat": 41.705,
-      "lon": -72.6588
+      "lat": 41.8114,
+      "lon": -72.7593
     },
     "needs": [
       "AS9100",
       "ITAR",
-      "precision machining",
+      "sheet metal",
       "titanium"
     ]
   },
@@ -363,12 +371,15 @@
     "relationship": "target",
     "location": {
       "city": "Wichita",
-      "lat": 37.6182,
-      "lon": -97.2729
+      "lat": 37.6546,
+      "lon": -97.3036
     },
     "needs": [
-      "ITAR",
-      "assembly"
+      "5-axis CNC",
+      "AS9100",
+      "build-to-print",
+      "sheet metal",
+      "titanium"
     ]
   },
   {
@@ -377,13 +388,15 @@
     "relationship": "target",
     "location": {
       "city": "Phoenix",
-      "lat": 33.4544,
-      "lon": -111.9784
+      "lat": 33.5469,
+      "lon": -112.0824
     },
     "needs": [
+      "5-axis CNC",
       "AS9100",
+      "ITAR",
       "NADCAP",
-      "assembly"
+      "build-to-print"
     ]
   },
   {
@@ -392,13 +405,12 @@
     "relationship": "competitor",
     "location": {
       "city": "Wichita",
-      "lat": 37.7129,
-      "lon": -97.3098
+      "lat": 37.6628,
+      "lon": -97.3499
     },
     "needs": [
       "AS9100",
-      "aluminum",
-      "assembly"
+      "sheet metal"
     ]
   },
   {
@@ -407,15 +419,15 @@
     "relationship": "supplier",
     "location": {
       "city": "Greenville",
-      "lat": 34.7571,
-      "lon": -82.2946
+      "lat": 34.9014,
+      "lon": -82.4537
     },
     "needs": [
-      "AS9100",
       "ITAR",
-      "aluminum",
-      "precision machining",
-      "titanium"
+      "NADCAP",
+      "assembly",
+      "build-to-print",
+      "precision machining"
     ]
   },
   {
@@ -424,14 +436,14 @@
     "relationship": "customer",
     "location": {
       "city": "Tulsa",
-      "lat": 36.1009,
-      "lon": -96.0339
+      "lat": 36.168,
+      "lon": -95.8981
     },
     "needs": [
       "5-axis CNC",
-      "NADCAP",
+      "AS9100",
       "assembly",
-      "build-to-print"
+      "sheet metal"
     ]
   },
   {
@@ -440,11 +452,10 @@
     "relationship": "target",
     "location": {
       "city": "Phoenix",
-      "lat": 33.4427,
-      "lon": -112.1283
+      "lat": 33.4675,
+      "lon": -112.1486
     },
     "needs": [
-      "ITAR",
       "aluminum",
       "sheet metal",
       "titanium"
@@ -456,13 +467,11 @@
     "relationship": "competitor",
     "location": {
       "city": "Huntsville",
-      "lat": 34.777,
-      "lon": -86.6342
+      "lat": 34.6894,
+      "lon": -86.5137
     },
     "needs": [
-      "ITAR",
-      "NADCAP",
-      "assembly",
+      "5-axis CNC",
       "build-to-print",
       "titanium"
     ]
@@ -473,13 +482,12 @@
     "relationship": "target",
     "location": {
       "city": "Tulsa",
-      "lat": 36.2355,
-      "lon": -95.9511
+      "lat": 36.197,
+      "lon": -95.949
     },
     "needs": [
-      "assembly",
-      "build-to-print",
-      "sheet metal"
+      "5-axis CNC",
+      "aluminum"
     ]
   },
   {
@@ -488,13 +496,13 @@
     "relationship": "target",
     "location": {
       "city": "Austin",
-      "lat": 30.242,
-      "lon": -97.8304
+      "lat": 30.2577,
+      "lon": -97.7673
     },
     "needs": [
-      "ITAR",
       "NADCAP",
-      "build-to-print"
+      "aluminum",
+      "titanium"
     ]
   },
   {
@@ -503,13 +511,14 @@
     "relationship": "supplier",
     "location": {
       "city": "Austin",
-      "lat": 30.2031,
-      "lon": -97.6661
+      "lat": 30.3387,
+      "lon": -97.8178
     },
     "needs": [
       "5-axis CNC",
       "ITAR",
-      "titanium"
+      "build-to-print",
+      "sheet metal"
     ]
   },
   {
@@ -518,12 +527,15 @@
     "relationship": "target",
     "location": {
       "city": "Cincinnati",
-      "lat": 39.1955,
-      "lon": -84.5445
+      "lat": 39.0093,
+      "lon": -84.5568
     },
     "needs": [
       "5-axis CNC",
-      "titanium"
+      "AS9100",
+      "NADCAP",
+      "assembly",
+      "precision machining"
     ]
   },
   {
@@ -532,14 +544,12 @@
     "relationship": "target",
     "location": {
       "city": "Phoenix",
-      "lat": 33.4115,
-      "lon": -111.9933
+      "lat": 33.4805,
+      "lon": -112.1419
     },
     "needs": [
       "ITAR",
-      "assembly",
-      "build-to-print",
-      "sheet metal"
+      "precision machining"
     ]
   },
   {
@@ -548,12 +558,15 @@
     "relationship": "target",
     "location": {
       "city": "Dallas",
-      "lat": 32.8566,
-      "lon": -96.7064
+      "lat": 32.8261,
+      "lon": -96.7503
     },
     "needs": [
-      "AS9100",
-      "sheet metal"
+      "5-axis CNC",
+      "aluminum",
+      "build-to-print",
+      "sheet metal",
+      "titanium"
     ]
   },
   {
@@ -562,13 +575,13 @@
     "relationship": "supplier",
     "location": {
       "city": "Cincinnati",
-      "lat": 39.0279,
-      "lon": -84.6057
+      "lat": 39.0882,
+      "lon": -84.4242
     },
     "needs": [
+      "5-axis CNC",
       "AS9100",
-      "NADCAP",
-      "titanium"
+      "sheet metal"
     ]
   },
   {
@@ -577,15 +590,15 @@
     "relationship": "supplier",
     "location": {
       "city": "Wichita",
-      "lat": 37.6444,
-      "lon": -97.2765
+      "lat": 37.7426,
+      "lon": -97.3334
     },
     "needs": [
+      "ITAR",
       "NADCAP",
       "aluminum",
       "assembly",
-      "build-to-print",
-      "precision machining"
+      "sheet metal"
     ]
   },
   {
@@ -594,15 +607,13 @@
     "relationship": "target",
     "location": {
       "city": "Huntsville",
-      "lat": 34.6405,
-      "lon": -86.6861
+      "lat": 34.7679,
+      "lon": -86.6746
     },
     "needs": [
-      "5-axis CNC",
-      "ITAR",
-      "aluminum",
-      "build-to-print",
-      "sheet metal"
+      "AS9100",
+      "sheet metal",
+      "titanium"
     ]
   },
   {
@@ -611,13 +622,15 @@
     "relationship": "supplier",
     "location": {
       "city": "Austin",
-      "lat": 30.367,
-      "lon": -97.6465
+      "lat": 30.3245,
+      "lon": -97.8129
     },
     "needs": [
-      "ITAR",
-      "build-to-print",
-      "precision machining"
+      "5-axis CNC",
+      "AS9100",
+      "NADCAP",
+      "aluminum",
+      "build-to-print"
     ]
   },
   {
@@ -626,15 +639,13 @@
     "relationship": "competitor",
     "location": {
       "city": "Huntsville",
-      "lat": 34.633,
-      "lon": -86.6572
+      "lat": 34.7683,
+      "lon": -86.6826
     },
     "needs": [
       "5-axis CNC",
-      "aluminum",
-      "build-to-print",
-      "precision machining",
-      "sheet metal"
+      "NADCAP",
+      "titanium"
     ]
   },
   {
@@ -643,13 +654,13 @@
     "relationship": "supplier",
     "location": {
       "city": "San Diego",
-      "lat": 32.7782,
-      "lon": -117.2169
+      "lat": 32.6327,
+      "lon": -117.1247
     },
     "needs": [
-      "AS9100",
-      "NADCAP",
-      "precision machining"
+      "build-to-print",
+      "precision machining",
+      "sheet metal"
     ]
   },
   {
@@ -658,12 +669,12 @@
     "relationship": "target",
     "location": {
       "city": "San Diego",
-      "lat": 32.635,
-      "lon": -117.209
+      "lat": 32.6648,
+      "lon": -117.2602
     },
     "needs": [
       "ITAR",
-      "build-to-print"
+      "precision machining"
     ]
   },
   {
@@ -672,13 +683,13 @@
     "relationship": "supplier",
     "location": {
       "city": "Tulsa",
-      "lat": 36.2447,
-      "lon": -96.0131
+      "lat": 36.24,
+      "lon": -95.9838
     },
     "needs": [
-      "5-axis CNC",
-      "build-to-print",
-      "precision machining"
+      "aluminum",
+      "assembly",
+      "sheet metal"
     ]
   },
   {
@@ -687,15 +698,15 @@
     "relationship": "supplier",
     "location": {
       "city": "Phoenix",
-      "lat": 33.4434,
-      "lon": -112.068
+      "lat": 33.5214,
+      "lon": -112.1513
     },
     "needs": [
       "AS9100",
       "ITAR",
+      "aluminum",
       "build-to-print",
-      "sheet metal",
-      "titanium"
+      "precision machining"
     ]
   },
   {
@@ -704,12 +715,12 @@
     "relationship": "competitor",
     "location": {
       "city": "Cincinnati",
-      "lat": 39.0286,
-      "lon": -84.4231
+      "lat": 39.0214,
+      "lon": -84.5787
     },
     "needs": [
       "AS9100",
-      "ITAR",
+      "NADCAP",
       "build-to-print",
       "titanium"
     ]
@@ -720,14 +731,15 @@
     "relationship": "supplier",
     "location": {
       "city": "San Diego",
-      "lat": 32.6763,
-      "lon": -117.0785
+      "lat": 32.6694,
+      "lon": -117.2098
     },
     "needs": [
-      "AS9100",
+      "5-axis CNC",
       "ITAR",
-      "NADCAP",
-      "sheet metal"
+      "build-to-print",
+      "precision machining",
+      "titanium"
     ]
   },
   {
@@ -736,13 +748,13 @@
     "relationship": "supplier",
     "location": {
       "city": "Greenville",
-      "lat": 34.7659,
-      "lon": -82.3775
+      "lat": 34.8992,
+      "lon": -82.3116
     },
     "needs": [
-      "5-axis CNC",
       "ITAR",
-      "assembly",
+      "aluminum",
+      "build-to-print",
       "sheet metal",
       "titanium"
     ]
@@ -753,12 +765,15 @@
     "relationship": "target",
     "location": {
       "city": "San Diego",
-      "lat": 32.8149,
-      "lon": -117.1678
+      "lat": 32.6294,
+      "lon": -117.1086
     },
     "needs": [
-      "5-axis CNC",
-      "sheet metal"
+      "AS9100",
+      "ITAR",
+      "NADCAP",
+      "sheet metal",
+      "titanium"
     ]
   },
   {
@@ -767,14 +782,13 @@
     "relationship": "supplier",
     "location": {
       "city": "Greenville",
-      "lat": 34.9119,
-      "lon": -82.4867
+      "lat": 34.8933,
+      "lon": -82.3465
     },
     "needs": [
-      "5-axis CNC",
-      "NADCAP",
-      "precision machining",
-      "sheet metal"
+      "assembly",
+      "sheet metal",
+      "titanium"
     ]
   }
 ]

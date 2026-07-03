@@ -45,6 +45,11 @@ export function engineContext(world: World): string {
   lines.push("ACTIVE ALERTS:");
   for (const a of world.analysis.alerts.slice(0, 6))
     lines.push(`- ${nameOf(a.subject_id)}: ${a.dimension} ${a.score} (${a.severity}) — ${a.reason}`);
+
+  const open = world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost");
+  const pipeline = open.reduce((s, o) => s + o.value, 0);
+  lines.push(`OPEN PIPELINE: $${(pipeline / 1e6).toFixed(1)}M across ${open.length} deals in ${world.companies.length} accounts.`);
+
   return lines.join("\n");
 }
 

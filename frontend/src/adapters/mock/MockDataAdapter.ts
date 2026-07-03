@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 import type { DataAdapter, RegionFilter } from "../../engine/brain/ports.ts";
-import type { Company, Contact } from "../../engine/brain/entities.ts";
+import type { Company, Contact, Facility, Opportunity } from "../../engine/brain/entities.ts";
 
 const MOCK_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../../data/mock");
 
@@ -39,5 +39,17 @@ export class MockDataAdapter implements DataAdapter {
     if (!filter?.city) return all;
     const inCity = new Set((await this.getCompanies(filter)).map((c) => c.id));
     return all.filter((c) => inCity.has(c.company_id));
+  }
+
+  async getFacilities(filter?: RegionFilter): Promise<Facility[]> {
+    const all = readJson<Facility[]>("facilities.json");
+    return filter?.city ? all.filter((f) => f.city === filter.city) : all;
+  }
+
+  async getOpportunities(filter?: RegionFilter): Promise<Opportunity[]> {
+    const all = readJson<Opportunity[]>("opportunities.json");
+    if (!filter?.city) return all;
+    const inCity = new Set((await this.getCompanies(filter)).map((c) => c.id));
+    return all.filter((o) => inCity.has(o.company_id));
   }
 }

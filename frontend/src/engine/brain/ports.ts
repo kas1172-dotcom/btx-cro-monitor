@@ -8,7 +8,7 @@
 // the adapter returns only that region's data and the engine scores the subset.
 // Mock filters locally; a live adapter would issue a region-scoped API query.
 
-import type { Company, Contact } from "./entities.ts";
+import type { Company, Contact, Facility, Opportunity } from "./entities.ts";
 
 export interface RegionFilter {
   /** Scope to a single city. Omitted = the whole portfolio. */
@@ -20,4 +20,6 @@ export interface DataAdapter {
   /** Raw signals — must clear the validation layer before scoring. */
   getSignals(filter?: RegionFilter): Promise<unknown[]>;
   getContacts(filter?: RegionFilter): Promise<Contact[]>;
+  getFacilities(filter?: RegionFilter): Promise<Facility[]>;
+  getOpportunities(filter?: RegionFilter): Promise<Opportunity[]>;
 }

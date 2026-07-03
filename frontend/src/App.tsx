@@ -5,6 +5,7 @@ import { CITIES, PROFILE } from "./app/config.ts";
 import { ProspectMap } from "./ui/map/ProspectMap.tsx";
 import { Dashboard } from "./ui/dashboard/Dashboard.tsx";
 import { RelationshipGraph } from "./ui/graph/RelationshipGraph.tsx";
+import { SignalFeed } from "./ui/feed/SignalFeed.tsx";
 import { Copilot } from "./ui/copilot/Copilot.tsx";
 import { Dossier } from "./ui/company/Dossier.tsx";
 
@@ -12,6 +13,7 @@ const VIEWS: Array<{ id: View; label: string }> = [
   { id: "map", label: "Prospect Map" },
   { id: "dashboard", label: "Dashboard" },
   { id: "graph", label: "Relationships" },
+  { id: "feed", label: "Signal Feed" },
 ];
 
 export function App() {
@@ -53,6 +55,8 @@ export function App() {
           cityWorld ? <ProspectMap world={cityWorld} /> : <div className="loading">running the brain for {city}…</div>
         ) : view === "dashboard" ? (
           world ? <Dashboard world={world} /> : <div className="loading">loading…</div>
+        ) : view === "feed" ? (
+          <SignalFeed />
         ) : (
           world ? <RelationshipGraph world={world} /> : <div className="loading">loading…</div>
         )}

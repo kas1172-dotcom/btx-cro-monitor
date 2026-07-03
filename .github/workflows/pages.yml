@@ -45,6 +45,10 @@ jobs:
       # Build the Enterprise Brain demo (Vite → frontend/dist).
       - name: Build Enterprise Brain demo
         working-directory: frontend
+        env:
+          # Points Jarvis at the Cloudflare Worker proxy (the key lives in the
+          # Worker's secret, never here). Public endpoint — safe to commit.
+          VITE_COPILOT_ENDPOINT: https://btx-jarvis.kas1172.workers.dev
         run: |
           npm ci
           npm run build

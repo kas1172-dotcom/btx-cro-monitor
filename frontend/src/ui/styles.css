@@ -100,6 +100,14 @@ body {
 .contacts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .contacts li { padding: 6px 0; }
 
+.opps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.opps li { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.opp-stage { flex: 0 0 auto; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.stage-proposal { color: var(--good); border-color: var(--good); }
+.stage-qualified { color: var(--accent); border-color: var(--accent); }
+.opp-name { flex: 1; }
+.opp-val { flex: 0 0 auto; color: var(--muted); }
+
 .inspector-back { display: none; }
 
 /* ── Mobile ─────────────────────────────────────────────────────────────── */
@@ -215,3 +223,20 @@ body {
 .rec-expand, .rec-tag.rec-expand { color: var(--accent); border-color: var(--accent); }
 .rec-watch, .rec-tag.rec-watch { color: var(--muted); border-color: var(--line); }
 .rec-tag { border: 1px solid; }
+
+/* Signal Feed (extraction) */
+.feed { position: absolute; inset: 0; overflow-y: auto; padding: 18px; }
+.feed-head { color: var(--muted); margin-bottom: 14px; font-size: 13px; }
+.feed-item { display: grid; grid-template-columns: 1fr auto 320px; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.feed-src { font-size: 11px; color: var(--muted); }
+.feed-headline { font-weight: 600; margin: 2px 0 4px; }
+.feed-body { font-size: 13px; color: var(--text); }
+.feed-arrow { color: var(--accent); font-size: 20px; }
+.sig-card { border: 1px solid var(--line); border-left: 2px solid var(--muted); border-radius: 8px; padding: 10px; }
+.sig-card.valid { border-left-color: var(--good); }
+.sig-card.rejected { border-left-color: var(--bad); }
+.sig-type { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); font-weight: 700; }
+.sig-meta { font-size: 12px; color: var(--muted); }
+.sig-entities { font-size: 12px; margin: 4px 0; }
+.sig-quote { font-size: 12px; font-style: italic; color: var(--muted); }
+@media (max-width: 760px) { .feed-item { grid-template-columns: 1fr; } .feed-arrow { display: none; } }

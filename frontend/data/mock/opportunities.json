@@ -1,0 +1,2378 @@
+[
+  {
+    "id": "opp-0001",
+    "company_id": "btx-precision",
+    "name": "Patriot bulkhead fitting",
+    "value": 8900000,
+    "stage": "qualified",
+    "close_date": "2026-10-02"
+  },
+  {
+    "id": "opp-0002",
+    "company_id": "btx-precision",
+    "name": "T408 turbine blade",
+    "value": 3600000,
+    "stage": "lost",
+    "close_date": "2026-04-28"
+  },
+  {
+    "id": "opp-0003",
+    "company_id": "btx-precision",
+    "name": "LEAP-1B gearbox component",
+    "value": 16700000,
+    "stage": "prospecting",
+    "close_date": "2026-07-31"
+  },
+  {
+    "id": "opp-0004",
+    "company_id": "btx-precision",
+    "name": "JASSM hydraulic block",
+    "value": 6000000,
+    "stage": "won",
+    "close_date": "2026-08-04"
+  },
+  {
+    "id": "opp-0005",
+    "company_id": "btx-precision",
+    "name": "KC-46 turbine blade",
+    "value": 11500000,
+    "stage": "qualified",
+    "close_date": "2026-09-28"
+  },
+  {
+    "id": "opp-0006",
+    "company_id": "btx-precision",
+    "name": "SM-6 turbine blade",
+    "value": 17700000,
+    "stage": "lost",
+    "close_date": "2026-11-01"
+  },
+  {
+    "id": "opp-0007",
+    "company_id": "anvil-manufacturing",
+    "name": "Gray Wolf hydraulic block",
+    "value": 3700000,
+    "stage": "prospecting",
+    "close_date": "2026-05-21"
+  },
+  {
+    "id": "opp-0008",
+    "company_id": "anvil-manufacturing",
+    "name": "KC-46 bracket assembly",
+    "value": 14800000,
+    "stage": "qualified",
+    "close_date": "2026-11-24"
+  },
+  {
+    "id": "opp-0009",
+    "company_id": "anvil-manufacturing",
+    "name": "CH-53K manifold",
+    "value": 3700000,
+    "stage": "proposal",
+    "close_date": "2026-09-04"
+  },
+  {
+    "id": "opp-0010",
+    "company_id": "meridian-technologies",
+    "name": "JASSM actuator housing",
+    "value": 10500000,
+    "stage": "prospecting",
+    "close_date": "2026-11-25"
+  },
+  {
+    "id": "opp-0011",
+    "company_id": "meridian-technologies",
+    "name": "KC-46 actuator housing",
+    "value": 4800000,
+    "stage": "qualified",
+    "close_date": "2026-08-11"
+  },
+  {
+    "id": "opp-0012",
+    "company_id": "meridian-technologies",
+    "name": "F-35 structural fitting",
+    "value": 10900000,
+    "stage": "proposal",
+    "close_date": "2026-04-14"
+  },
+  {
+    "id": "opp-0013",
+    "company_id": "meridian-technologies",
+    "name": "Patriot hydraulic block",
+    "value": 5200000,
+    "stage": "proposal",
+    "close_date": "2026-06-20"
+  },
+  {
+    "id": "opp-0014",
+    "company_id": "meridian-technologies",
+    "name": "GE9X engine mount",
+    "value": 2700000,
+    "stage": "prospecting",
+    "close_date": "2026-11-20"
+  },
+  {
+    "id": "opp-0015",
+    "company_id": "meridian-technologies",
+    "name": "F-35 engine mount",
+    "value": 13300000,
+    "stage": "proposal",
+    "close_date": "2026-07-16"
+  },
+  {
+    "id": "opp-0016",
+    "company_id": "falcon-fabrication",
+    "name": "F-35 landing-gear pin",
+    "value": 18200000,
+    "stage": "won",
+    "close_date": "2026-09-17"
+  },
+  {
+    "id": "opp-0017",
+    "company_id": "falcon-fabrication",
+    "name": "T-7A hydraulic block",
+    "value": 1900000,
+    "stage": "lost",
+    "close_date": "2026-09-20"
+  },
+  {
+    "id": "opp-0018",
+    "company_id": "falcon-fabrication",
+    "name": "F-15EX turbine blade",
+    "value": 18400000,
+    "stage": "lost",
+    "close_date": "2026-11-06"
+  },
+  {
+    "id": "opp-0019",
+    "company_id": "falcon-fabrication",
+    "name": "CH-53K actuator housing",
+    "value": 14400000,
+    "stage": "lost",
+    "close_date": "2026-10-30"
+  },
+  {
+    "id": "opp-0020",
+    "company_id": "falcon-fabrication",
+    "name": "Patriot actuator housing",
+    "value": 12200000,
+    "stage": "prospecting",
+    "close_date": "2026-08-17"
+  },
+  {
+    "id": "opp-0021",
+    "company_id": "falcon-fabrication",
+    "name": "Gray Wolf turbine blade",
+    "value": 19900000,
+    "stage": "prospecting",
+    "close_date": "2026-08-14"
+  },
+  {
+    "id": "opp-0022",
+    "company_id": "monarch-technologies",
+    "name": "Black Hawk turbine blade",
+    "value": 15600000,
+    "stage": "proposal",
+    "close_date": "2026-07-20"
+  },
+  {
+    "id": "opp-0023",
+    "company_id": "monarch-technologies",
+    "name": "KC-46 actuator housing",
+    "value": 8700000,
+    "stage": "lost",
+    "close_date": "2026-11-09"
+  },
+  {
+    "id": "opp-0024",
+    "company_id": "monarch-technologies",
+    "name": "SM-6 engine mount",
+    "value": 6700000,
+    "stage": "proposal",
+    "close_date": "2026-10-09"
+  },
+  {
+    "id": "opp-0025",
+    "company_id": "monarch-technologies",
+    "name": "F-35 structural fitting",
+    "value": 13900000,
+    "stage": "won",
+    "close_date": "2026-03-11"
+  },
+  {
+    "id": "opp-0026",
+    "company_id": "strata-turbine",
+    "name": "F-35 manifold",
+    "value": 18400000,
+    "stage": "proposal",
+    "close_date": "2026-05-19"
+  },
+  {
+    "id": "opp-0027",
+    "company_id": "strata-turbine",
+    "name": "CH-53K gearbox component",
+    "value": 700000,
+    "stage": "won",
+    "close_date": "2026-05-21"
+  },
+  {
+    "id": "opp-0028",
+    "company_id": "strata-turbine",
+    "name": "F-35 manifold",
+    "value": 16200000,
+    "stage": "won",
+    "close_date": "2026-03-04"
+  },
+  {
+    "id": "opp-0029",
+    "company_id": "strata-turbine",
+    "name": "B-21 actuator housing",
+    "value": 6300000,
+    "stage": "lost",
+    "close_date": "2026-08-25"
+  },
+  {
+    "id": "opp-0030",
+    "company_id": "strata-turbine",
+    "name": "JASSM gearbox component",
+    "value": 13000000,
+    "stage": "proposal",
+    "close_date": "2026-04-25"
+  },
+  {
+    "id": "opp-0031",
+    "company_id": "strata-turbine",
+    "name": "Black Hawk actuator housing",
+    "value": 14100000,
+    "stage": "qualified",
+    "close_date": "2026-09-16"
+  },
+  {
+    "id": "opp-0032",
+    "company_id": "strata-turbine",
+    "name": "KC-46 bracket assembly",
+    "value": 15300000,
+    "stage": "qualified",
+    "close_date": "2026-06-30"
+  },
+  {
+    "id": "opp-0033",
+    "company_id": "strata-turbine",
+    "name": "SM-6 bulkhead fitting",
+    "value": 700000,
+    "stage": "prospecting",
+    "close_date": "2026-05-11"
+  },
+  {
+    "id": "opp-0034",
+    "company_id": "strata-turbine",
+    "name": "B-21 hydraulic block",
+    "value": 2000000,
+    "stage": "prospecting",
+    "close_date": "2026-12-11"
+  },
+  {
+    "id": "opp-0035",
+    "company_id": "anvil-systems",
+    "name": "F-15EX structural fitting",
+    "value": 4600000,
+    "stage": "proposal",
+    "close_date": "2026-10-03"
+  },
+  {
+    "id": "opp-0036",
+    "company_id": "anvil-systems",
+    "name": "LEAP-1B hydraulic block",
+    "value": 3900000,
+    "stage": "won",
+    "close_date": "2026-05-15"
+  },
+  {
+    "id": "opp-0037",
+    "company_id": "anvil-systems",
+    "name": "CH-53K actuator housing",
+    "value": 8700000,
+    "stage": "qualified",
+    "close_date": "2026-11-30"
+  },
+  {
+    "id": "opp-0038",
+    "company_id": "anvil-systems",
+    "name": "F-35 structural fitting",
+    "value": 16300000,
+    "stage": "qualified",
+    "close_date": "2026-11-26"
+  },
+  {
+    "id": "opp-0039",
+    "company_id": "anvil-systems",
+    "name": "Gray Wolf engine mount",
+    "value": 10800000,
+    "stage": "won",
+    "close_date": "2026-10-06"
+  },
+  {
+    "id": "opp-0040",
+    "company_id": "anvil-systems",
+    "name": "F-15EX structural fitting",
+    "value": 9500000,
+    "stage": "won",
+    "close_date": "2026-09-22"
+  },
+  {
+    "id": "opp-0041",
+    "company_id": "anvil-systems",
+    "name": "F-35 engine mount",
+    "value": 100000,
+    "stage": "won",
+    "close_date": "2026-03-14"
+  },
+  {
+    "id": "opp-0042",
+    "company_id": "anvil-systems",
+    "name": "F-35 hydraulic block",
+    "value": 700000,
+    "stage": "prospecting",
+    "close_date": "2026-04-08"
+  },
+  {
+    "id": "opp-0043",
+    "company_id": "anvil-systems",
+    "name": "Gray Wolf landing-gear pin",
+    "value": 4000000,
+    "stage": "lost",
+    "close_date": "2026-07-11"
+  },
+  {
+    "id": "opp-0044",
+    "company_id": "sentinel-alloys",
+    "name": "LEAP-1B actuator housing",
+    "value": 14000000,
+    "stage": "qualified",
+    "close_date": "2026-05-04"
+  },
+  {
+    "id": "opp-0045",
+    "company_id": "sentinel-alloys",
+    "name": "GE9X structural fitting",
+    "value": 4900000,
+    "stage": "qualified",
+    "close_date": "2026-09-01"
+  },
+  {
+    "id": "opp-0046",
+    "company_id": "sentinel-alloys",
+    "name": "T-7A hydraulic block",
+    "value": 1900000,
+    "stage": "won",
+    "close_date": "2026-08-28"
+  },
+  {
+    "id": "opp-0047",
+    "company_id": "sentinel-alloys",
+    "name": "Black Hawk manifold",
+    "value": 5400000,
+    "stage": "won",
+    "close_date": "2026-10-04"
+  },
+  {
+    "id": "opp-0048",
+    "company_id": "cardinal-metalworks",
+    "name": "JASSM gearbox component",
+    "value": 8400000,
+    "stage": "qualified",
+    "close_date": "2026-04-25"
+  },
+  {
+    "id": "opp-0049",
+    "company_id": "cardinal-metalworks",
+    "name": "CH-53K manifold",
+    "value": 16100000,
+    "stage": "won",
+    "close_date": "2026-05-05"
+  },
+  {
+    "id": "opp-0050",
+    "company_id": "cardinal-metalworks",
+    "name": "KC-46 bracket assembly",
+    "value": 10300000,
+    "stage": "won",
+    "close_date": "2026-04-02"
+  },
+  {
+    "id": "opp-0051",
+    "company_id": "monarch-alloys",
+    "name": "Patriot structural fitting",
+    "value": 8400000,
+    "stage": "prospecting",
+    "close_date": "2026-07-21"
+  },
+  {
+    "id": "opp-0052",
+    "company_id": "monarch-alloys",
+    "name": "CH-53K hydraulic block",
+    "value": 3500000,
+    "stage": "proposal",
+    "close_date": "2026-05-19"
+  },
+  {
+    "id": "opp-0053",
+    "company_id": "monarch-alloys",
+    "name": "GE9X structural fitting",
+    "value": 18700000,
+    "stage": "prospecting",
+    "close_date": "2026-06-24"
+  },
+  {
+    "id": "opp-0054",
+    "company_id": "monarch-alloys",
+    "name": "SM-6 engine mount",
+    "value": 4400000,
+    "stage": "won",
+    "close_date": "2026-06-02"
+  },
+  {
+    "id": "opp-0055",
+    "company_id": "monarch-alloys",
+    "name": "T-7A turbine blade",
+    "value": 11700000,
+    "stage": "prospecting",
+    "close_date": "2026-07-25"
+  },
+  {
+    "id": "opp-0056",
+    "company_id": "sentinel-aerospace",
+    "name": "LEAP-1B bracket assembly",
+    "value": 17300000,
+    "stage": "lost",
+    "close_date": "2026-05-05"
+  },
+  {
+    "id": "opp-0057",
+    "company_id": "sentinel-aerospace",
+    "name": "T-7A gearbox component",
+    "value": 18700000,
+    "stage": "proposal",
+    "close_date": "2026-05-02"
+  },
+  {
+    "id": "opp-0058",
+    "company_id": "sentinel-aerospace",
+    "name": "LEAP-1B landing-gear pin",
+    "value": 11500000,
+    "stage": "prospecting",
+    "close_date": "2026-10-01"
+  },
+  {
+    "id": "opp-0059",
+    "company_id": "sentinel-aerospace",
+    "name": "CH-53K hydraulic block",
+    "value": 5500000,
+    "stage": "qualified",
+    "close_date": "2026-07-22"
+  },
+  {
+    "id": "opp-0060",
+    "company_id": "sentinel-aerospace",
+    "name": "T408 hydraulic block",
+    "value": 3300000,
+    "stage": "prospecting",
+    "close_date": "2026-08-28"
+  },
+  {
+    "id": "opp-0061",
+    "company_id": "sentinel-aerospace",
+    "name": "F-35 landing-gear pin",
+    "value": 18500000,
+    "stage": "lost",
+    "close_date": "2026-06-10"
+  },
+  {
+    "id": "opp-0062",
+    "company_id": "sentinel-aerospace",
+    "name": "F-15EX hydraulic block",
+    "value": 10800000,
+    "stage": "proposal",
+    "close_date": "2026-06-14"
+  },
+  {
+    "id": "opp-0063",
+    "company_id": "sentinel-aerospace",
+    "name": "SM-6 engine mount",
+    "value": 17600000,
+    "stage": "lost",
+    "close_date": "2026-10-20"
+  },
+  {
+    "id": "opp-0064",
+    "company_id": "beacon-alloys",
+    "name": "GE9X landing-gear pin",
+    "value": 11200000,
+    "stage": "qualified",
+    "close_date": "2026-07-16"
+  },
+  {
+    "id": "opp-0065",
+    "company_id": "beacon-alloys",
+    "name": "F-35 turbine blade",
+    "value": 9000000,
+    "stage": "won",
+    "close_date": "2026-10-19"
+  },
+  {
+    "id": "opp-0066",
+    "company_id": "beacon-alloys",
+    "name": "Gray Wolf bracket assembly",
+    "value": 19800000,
+    "stage": "prospecting",
+    "close_date": "2026-11-05"
+  },
+  {
+    "id": "opp-0067",
+    "company_id": "beacon-alloys",
+    "name": "F-15EX engine mount",
+    "value": 13600000,
+    "stage": "proposal",
+    "close_date": "2026-08-23"
+  },
+  {
+    "id": "opp-0068",
+    "company_id": "beacon-alloys",
+    "name": "GE9X gearbox component",
+    "value": 9100000,
+    "stage": "proposal",
+    "close_date": "2026-07-17"
+  },
+  {
+    "id": "opp-0069",
+    "company_id": "beacon-alloys",
+    "name": "Black Hawk structural fitting",
+    "value": 10500000,
+    "stage": "proposal",
+    "close_date": "2026-10-27"
+  },
+  {
+    "id": "opp-0070",
+    "company_id": "halcyon-components",
+    "name": "GE9X engine mount",
+    "value": 6000000,
+    "stage": "won",
+    "close_date": "2026-10-26"
+  },
+  {
+    "id": "opp-0071",
+    "company_id": "halcyon-components",
+    "name": "F-35 hydraulic block",
+    "value": 300000,
+    "stage": "lost",
+    "close_date": "2026-09-03"
+  },
+  {
+    "id": "opp-0072",
+    "company_id": "halcyon-components",
+    "name": "Black Hawk bulkhead fitting",
+    "value": 8600000,
+    "stage": "prospecting",
+    "close_date": "2026-04-03"
+  },
+  {
+    "id": "opp-0073",
+    "company_id": "halcyon-components",
+    "name": "LEAP-1B bulkhead fitting",
+    "value": 10200000,
+    "stage": "prospecting",
+    "close_date": "2026-07-21"
+  },
+  {
+    "id": "opp-0074",
+    "company_id": "vanguard-systems",
+    "name": "SM-6 bracket assembly",
+    "value": 16500000,
+    "stage": "proposal",
+    "close_date": "2026-11-05"
+  },
+  {
+    "id": "opp-0075",
+    "company_id": "vanguard-systems",
+    "name": "Black Hawk manifold",
+    "value": 12300000,
+    "stage": "qualified",
+    "close_date": "2026-04-01"
+  },
+  {
+    "id": "opp-0076",
+    "company_id": "vanguard-systems",
+    "name": "LEAP-1B engine mount",
+    "value": 15300000,
+    "stage": "qualified",
+    "close_date": "2026-07-12"
+  },
+  {
+    "id": "opp-0077",
+    "company_id": "vanguard-systems",
+    "name": "T408 bulkhead fitting",
+    "value": 1900000,
+    "stage": "proposal",
+    "close_date": "2026-05-28"
+  },
+  {
+    "id": "opp-0078",
+    "company_id": "nimbus-technologies",
+    "name": "T-7A manifold",
+    "value": 1600000,
+    "stage": "qualified",
+    "close_date": "2026-05-05"
+  },
+  {
+    "id": "opp-0079",
+    "company_id": "nimbus-technologies",
+    "name": "Gray Wolf engine mount",
+    "value": 1000000,
+    "stage": "prospecting",
+    "close_date": "2026-12-02"
+  },
+  {
+    "id": "opp-0080",
+    "company_id": "nimbus-technologies",
+    "name": "Gray Wolf bulkhead fitting",
+    "value": 600000,
+    "stage": "proposal",
+    "close_date": "2026-04-08"
+  },
+  {
+    "id": "opp-0081",
+    "company_id": "nimbus-technologies",
+    "name": "SM-6 hydraulic block",
+    "value": 14800000,
+    "stage": "proposal",
+    "close_date": "2026-10-30"
+  },
+  {
+    "id": "opp-0082",
+    "company_id": "nimbus-technologies",
+    "name": "Black Hawk actuator housing",
+    "value": 8800000,
+    "stage": "won",
+    "close_date": "2026-04-30"
+  },
+  {
+    "id": "opp-0083",
+    "company_id": "falcon-tooling",
+    "name": "KC-46 manifold",
+    "value": 10500000,
+    "stage": "proposal",
+    "close_date": "2026-05-13"
+  },
+  {
+    "id": "opp-0084",
+    "company_id": "falcon-tooling",
+    "name": "GE9X structural fitting",
+    "value": 16400000,
+    "stage": "won",
+    "close_date": "2026-12-02"
+  },
+  {
+    "id": "opp-0085",
+    "company_id": "falcon-tooling",
+    "name": "T408 engine mount",
+    "value": 9800000,
+    "stage": "won",
+    "close_date": "2026-04-07"
+  },
+  {
+    "id": "opp-0086",
+    "company_id": "falcon-tooling",
+    "name": "B-21 engine mount",
+    "value": 1900000,
+    "stage": "prospecting",
+    "close_date": "2026-06-02"
+  },
+  {
+    "id": "opp-0087",
+    "company_id": "titan-precision",
+    "name": "SM-6 structural fitting",
+    "value": 13200000,
+    "stage": "qualified",
+    "close_date": "2026-08-30"
+  },
+  {
+    "id": "opp-0088",
+    "company_id": "titan-precision",
+    "name": "F-15EX manifold",
+    "value": 18600000,
+    "stage": "lost",
+    "close_date": "2026-12-23"
+  },
+  {
+    "id": "opp-0089",
+    "company_id": "titan-precision",
+    "name": "Patriot bracket assembly",
+    "value": 14400000,
+    "stage": "qualified",
+    "close_date": "2026-07-30"
+  },
+  {
+    "id": "opp-0090",
+    "company_id": "titan-precision",
+    "name": "KC-46 manifold",
+    "value": 18700000,
+    "stage": "lost",
+    "close_date": "2026-06-01"
+  },
+  {
+    "id": "opp-0091",
+    "company_id": "titan-precision",
+    "name": "LEAP-1B hydraulic block",
+    "value": 1600000,
+    "stage": "lost",
+    "close_date": "2026-08-10"
+  },
+  {
+    "id": "opp-0092",
+    "company_id": "titan-components",
+    "name": "Patriot engine mount",
+    "value": 10900000,
+    "stage": "won",
+    "close_date": "2026-04-24"
+  },
+  {
+    "id": "opp-0093",
+    "company_id": "titan-components",
+    "name": "B-21 bulkhead fitting",
+    "value": 600000,
+    "stage": "qualified",
+    "close_date": "2026-08-01"
+  },
+  {
+    "id": "opp-0094",
+    "company_id": "titan-components",
+    "name": "T-7A engine mount",
+    "value": 5000000,
+    "stage": "won",
+    "close_date": "2026-11-09"
+  },
+  {
+    "id": "opp-0095",
+    "company_id": "titan-components",
+    "name": "F-35 manifold",
+    "value": 3100000,
+    "stage": "qualified",
+    "close_date": "2026-03-04"
+  },
+  {
+    "id": "opp-0096",
+    "company_id": "cardinal-components",
+    "name": "CH-53K manifold",
+    "value": 9400000,
+    "stage": "proposal",
+    "close_date": "2026-03-29"
+  },
+  {
+    "id": "opp-0097",
+    "company_id": "cardinal-components",
+    "name": "F-35 structural fitting",
+    "value": 13700000,
+    "stage": "proposal",
+    "close_date": "2026-04-22"
+  },
+  {
+    "id": "opp-0098",
+    "company_id": "cardinal-components",
+    "name": "Patriot hydraulic block",
+    "value": 2500000,
+    "stage": "proposal",
+    "close_date": "2026-05-23"
+  },
+  {
+    "id": "opp-0099",
+    "company_id": "cardinal-components",
+    "name": "KC-46 manifold",
+    "value": 3900000,
+    "stage": "lost",
+    "close_date": "2026-12-19"
+  },
+  {
+    "id": "opp-0100",
+    "company_id": "cardinal-components",
+    "name": "CH-53K engine mount",
+    "value": 11800000,
+    "stage": "prospecting",
+    "close_date": "2026-07-19"
+  },
+  {
+    "id": "opp-0101",
+    "company_id": "cardinal-components",
+    "name": "B-21 structural fitting",
+    "value": 2700000,
+    "stage": "won",
+    "close_date": "2026-10-10"
+  },
+  {
+    "id": "opp-0102",
+    "company_id": "cardinal-components",
+    "name": "JASSM landing-gear pin",
+    "value": 19100000,
+    "stage": "won",
+    "close_date": "2026-07-31"
+  },
+  {
+    "id": "opp-0103",
+    "company_id": "cardinal-components",
+    "name": "CH-53K actuator housing",
+    "value": 12900000,
+    "stage": "prospecting",
+    "close_date": "2026-07-31"
+  },
+  {
+    "id": "opp-0104",
+    "company_id": "pinnacle-forgings",
+    "name": "KC-46 turbine blade",
+    "value": 3800000,
+    "stage": "prospecting",
+    "close_date": "2026-12-10"
+  },
+  {
+    "id": "opp-0105",
+    "company_id": "pinnacle-forgings",
+    "name": "F-15EX landing-gear pin",
+    "value": 7000000,
+    "stage": "won",
+    "close_date": "2026-07-24"
+  },
+  {
+    "id": "opp-0106",
+    "company_id": "pinnacle-forgings",
+    "name": "LEAP-1B actuator housing",
+    "value": 5600000,
+    "stage": "won",
+    "close_date": "2026-10-15"
+  },
+  {
+    "id": "opp-0107",
+    "company_id": "pinnacle-forgings",
+    "name": "T408 manifold",
+    "value": 16800000,
+    "stage": "proposal",
+    "close_date": "2026-08-29"
+  },
+  {
+    "id": "opp-0108",
+    "company_id": "pinnacle-forgings",
+    "name": "CH-53K hydraulic block",
+    "value": 6500000,
+    "stage": "lost",
+    "close_date": "2026-12-01"
+  },
+  {
+    "id": "opp-0109",
+    "company_id": "pinnacle-forgings",
+    "name": "GE9X structural fitting",
+    "value": 300000,
+    "stage": "lost",
+    "close_date": "2026-12-21"
+  },
+  {
+    "id": "opp-0110",
+    "company_id": "bastion-tooling",
+    "name": "Patriot bulkhead fitting",
+    "value": 11500000,
+    "stage": "lost",
+    "close_date": "2026-10-02"
+  },
+  {
+    "id": "opp-0111",
+    "company_id": "bastion-tooling",
+    "name": "F-35 bracket assembly",
+    "value": 100000,
+    "stage": "prospecting",
+    "close_date": "2026-06-22"
+  },
+  {
+    "id": "opp-0112",
+    "company_id": "bastion-tooling",
+    "name": "T408 engine mount",
+    "value": 7800000,
+    "stage": "qualified",
+    "close_date": "2026-06-30"
+  },
+  {
+    "id": "opp-0113",
+    "company_id": "meridian-systems",
+    "name": "F-35 gearbox component",
+    "value": 700000,
+    "stage": "won",
+    "close_date": "2026-08-04"
+  },
+  {
+    "id": "opp-0114",
+    "company_id": "meridian-systems",
+    "name": "SM-6 bracket assembly",
+    "value": 8400000,
+    "stage": "qualified",
+    "close_date": "2026-03-10"
+  },
+  {
+    "id": "opp-0115",
+    "company_id": "meridian-systems",
+    "name": "T-7A bracket assembly",
+    "value": 4100000,
+    "stage": "lost",
+    "close_date": "2026-04-11"
+  },
+  {
+    "id": "opp-0116",
+    "company_id": "meridian-systems",
+    "name": "B-21 gearbox component",
+    "value": 12900000,
+    "stage": "qualified",
+    "close_date": "2026-11-18"
+  },
+  {
+    "id": "opp-0117",
+    "company_id": "meridian-systems",
+    "name": "T-7A engine mount",
+    "value": 1000000,
+    "stage": "lost",
+    "close_date": "2026-11-04"
+  },
+  {
+    "id": "opp-0118",
+    "company_id": "meridian-systems",
+    "name": "JASSM structural fitting",
+    "value": 10200000,
+    "stage": "won",
+    "close_date": "2026-04-28"
+  },
+  {
+    "id": "opp-0119",
+    "company_id": "meridian-systems",
+    "name": "GE9X bulkhead fitting",
+    "value": 13900000,
+    "stage": "won",
+    "close_date": "2026-08-02"
+  },
+  {
+    "id": "opp-0120",
+    "company_id": "meridian-systems",
+    "name": "Patriot structural fitting",
+    "value": 8200000,
+    "stage": "won",
+    "close_date": "2026-05-03"
+  },
+  {
+    "id": "opp-0121",
+    "company_id": "granite-components",
+    "name": "Patriot engine mount",
+    "value": 17500000,
+    "stage": "won",
+    "close_date": "2026-04-08"
+  },
+  {
+    "id": "opp-0122",
+    "company_id": "granite-components",
+    "name": "F-35 gearbox component",
+    "value": 19500000,
+    "stage": "won",
+    "close_date": "2026-07-14"
+  },
+  {
+    "id": "opp-0123",
+    "company_id": "granite-components",
+    "name": "F-15EX hydraulic block",
+    "value": 16800000,
+    "stage": "lost",
+    "close_date": "2026-09-21"
+  },
+  {
+    "id": "opp-0124",
+    "company_id": "granite-components",
+    "name": "Black Hawk turbine blade",
+    "value": 7200000,
+    "stage": "won",
+    "close_date": "2026-08-27"
+  },
+  {
+    "id": "opp-0125",
+    "company_id": "granite-components",
+    "name": "KC-46 actuator housing",
+    "value": 9700000,
+    "stage": "qualified",
+    "close_date": "2026-07-15"
+  },
+  {
+    "id": "opp-0126",
+    "company_id": "granite-components",
+    "name": "CH-53K turbine blade",
+    "value": 2600000,
+    "stage": "prospecting",
+    "close_date": "2026-12-26"
+  },
+  {
+    "id": "opp-0127",
+    "company_id": "granite-components",
+    "name": "Gray Wolf manifold",
+    "value": 15700000,
+    "stage": "lost",
+    "close_date": "2026-12-17"
+  },
+  {
+    "id": "opp-0128",
+    "company_id": "granite-components",
+    "name": "F-35 turbine blade",
+    "value": 10100000,
+    "stage": "won",
+    "close_date": "2026-03-03"
+  },
+  {
+    "id": "opp-0129",
+    "company_id": "nimbus-components",
+    "name": "GE9X turbine blade",
+    "value": 13600000,
+    "stage": "won",
+    "close_date": "2026-05-04"
+  },
+  {
+    "id": "opp-0130",
+    "company_id": "nimbus-components",
+    "name": "SM-6 turbine blade",
+    "value": 16800000,
+    "stage": "qualified",
+    "close_date": "2026-04-11"
+  },
+  {
+    "id": "opp-0131",
+    "company_id": "nimbus-components",
+    "name": "F-15EX bulkhead fitting",
+    "value": 19400000,
+    "stage": "proposal",
+    "close_date": "2026-11-02"
+  },
+  {
+    "id": "opp-0132",
+    "company_id": "nimbus-components",
+    "name": "T-7A bracket assembly",
+    "value": 1100000,
+    "stage": "prospecting",
+    "close_date": "2026-11-19"
+  },
+  {
+    "id": "opp-0133",
+    "company_id": "nimbus-components",
+    "name": "GE9X bulkhead fitting",
+    "value": 5400000,
+    "stage": "prospecting",
+    "close_date": "2026-08-29"
+  },
+  {
+    "id": "opp-0134",
+    "company_id": "delta-precision",
+    "name": "KC-46 bulkhead fitting",
+    "value": 13400000,
+    "stage": "proposal",
+    "close_date": "2026-04-30"
+  },
+  {
+    "id": "opp-0135",
+    "company_id": "delta-precision",
+    "name": "Patriot actuator housing",
+    "value": 19400000,
+    "stage": "prospecting",
+    "close_date": "2026-12-16"
+  },
+  {
+    "id": "opp-0136",
+    "company_id": "delta-precision",
+    "name": "Patriot manifold",
+    "value": 2700000,
+    "stage": "qualified",
+    "close_date": "2026-05-10"
+  },
+  {
+    "id": "opp-0137",
+    "company_id": "delta-precision",
+    "name": "Patriot actuator housing",
+    "value": 19000000,
+    "stage": "qualified",
+    "close_date": "2026-03-02"
+  },
+  {
+    "id": "opp-0138",
+    "company_id": "delta-precision",
+    "name": "KC-46 bulkhead fitting",
+    "value": 8600000,
+    "stage": "won",
+    "close_date": "2026-05-21"
+  },
+  {
+    "id": "opp-0139",
+    "company_id": "delta-precision",
+    "name": "LEAP-1B hydraulic block",
+    "value": 15300000,
+    "stage": "lost",
+    "close_date": "2026-11-17"
+  },
+  {
+    "id": "opp-0140",
+    "company_id": "delta-precision",
+    "name": "KC-46 bulkhead fitting",
+    "value": 12400000,
+    "stage": "won",
+    "close_date": "2026-05-30"
+  },
+  {
+    "id": "opp-0141",
+    "company_id": "delta-precision",
+    "name": "GE9X hydraulic block",
+    "value": 6000000,
+    "stage": "won",
+    "close_date": "2026-05-29"
+  },
+  {
+    "id": "opp-0142",
+    "company_id": "aegis-components",
+    "name": "T408 actuator housing",
+    "value": 5600000,
+    "stage": "lost",
+    "close_date": "2026-04-30"
+  },
+  {
+    "id": "opp-0143",
+    "company_id": "aegis-components",
+    "name": "GE9X hydraulic block",
+    "value": 15300000,
+    "stage": "proposal",
+    "close_date": "2026-04-21"
+  },
+  {
+    "id": "opp-0144",
+    "company_id": "aegis-components",
+    "name": "T-7A turbine blade",
+    "value": 19200000,
+    "stage": "won",
+    "close_date": "2026-06-19"
+  },
+  {
+    "id": "opp-0145",
+    "company_id": "aegis-components",
+    "name": "CH-53K bulkhead fitting",
+    "value": 6800000,
+    "stage": "won",
+    "close_date": "2026-07-08"
+  },
+  {
+    "id": "opp-0146",
+    "company_id": "meridian-aerospace",
+    "name": "B-21 turbine blade",
+    "value": 18800000,
+    "stage": "qualified",
+    "close_date": "2026-04-16"
+  },
+  {
+    "id": "opp-0147",
+    "company_id": "meridian-aerospace",
+    "name": "Patriot engine mount",
+    "value": 7300000,
+    "stage": "lost",
+    "close_date": "2026-12-26"
+  },
+  {
+    "id": "opp-0148",
+    "company_id": "meridian-aerospace",
+    "name": "F-35 hydraulic block",
+    "value": 5700000,
+    "stage": "prospecting",
+    "close_date": "2026-10-31"
+  },
+  {
+    "id": "opp-0149",
+    "company_id": "meridian-aerospace",
+    "name": "T-7A landing-gear pin",
+    "value": 600000,
+    "stage": "lost",
+    "close_date": "2026-07-27"
+  },
+  {
+    "id": "opp-0150",
+    "company_id": "meridian-aerospace",
+    "name": "B-21 engine mount",
+    "value": 4500000,
+    "stage": "proposal",
+    "close_date": "2026-08-15"
+  },
+  {
+    "id": "opp-0151",
+    "company_id": "meridian-aerospace",
+    "name": "F-35 bulkhead fitting",
+    "value": 8900000,
+    "stage": "prospecting",
+    "close_date": "2026-12-13"
+  },
+  {
+    "id": "opp-0152",
+    "company_id": "meridian-aerospace",
+    "name": "B-21 gearbox component",
+    "value": 4100000,
+    "stage": "prospecting",
+    "close_date": "2026-03-12"
+  },
+  {
+    "id": "opp-0153",
+    "company_id": "meridian-aerospace",
+    "name": "Gray Wolf bulkhead fitting",
+    "value": 5400000,
+    "stage": "won",
+    "close_date": "2026-05-02"
+  },
+  {
+    "id": "opp-0154",
+    "company_id": "meridian-aerospace",
+    "name": "F-15EX engine mount",
+    "value": 9900000,
+    "stage": "prospecting",
+    "close_date": "2026-10-23"
+  },
+  {
+    "id": "opp-0155",
+    "company_id": "axiom-components",
+    "name": "SM-6 manifold",
+    "value": 3300000,
+    "stage": "lost",
+    "close_date": "2026-10-22"
+  },
+  {
+    "id": "opp-0156",
+    "company_id": "axiom-components",
+    "name": "JASSM turbine blade",
+    "value": 6400000,
+    "stage": "proposal",
+    "close_date": "2026-10-30"
+  },
+  {
+    "id": "opp-0157",
+    "company_id": "axiom-components",
+    "name": "B-21 manifold",
+    "value": 8400000,
+    "stage": "qualified",
+    "close_date": "2026-08-07"
+  },
+  {
+    "id": "opp-0158",
+    "company_id": "axiom-components",
+    "name": "F-35 structural fitting",
+    "value": 15700000,
+    "stage": "lost",
+    "close_date": "2026-07-31"
+  },
+  {
+    "id": "opp-0159",
+    "company_id": "meridian-precision",
+    "name": "JASSM manifold",
+    "value": 8800000,
+    "stage": "lost",
+    "close_date": "2026-11-25"
+  },
+  {
+    "id": "opp-0160",
+    "company_id": "meridian-precision",
+    "name": "F-35 landing-gear pin",
+    "value": 8800000,
+    "stage": "proposal",
+    "close_date": "2026-03-04"
+  },
+  {
+    "id": "opp-0161",
+    "company_id": "meridian-precision",
+    "name": "JASSM structural fitting",
+    "value": 8800000,
+    "stage": "lost",
+    "close_date": "2026-09-01"
+  },
+  {
+    "id": "opp-0162",
+    "company_id": "meridian-precision",
+    "name": "Patriot bulkhead fitting",
+    "value": 3000000,
+    "stage": "lost",
+    "close_date": "2026-10-22"
+  },
+  {
+    "id": "opp-0163",
+    "company_id": "meridian-precision",
+    "name": "Patriot hydraulic block",
+    "value": 16100000,
+    "stage": "won",
+    "close_date": "2026-09-26"
+  },
+  {
+    "id": "opp-0164",
+    "company_id": "meridian-precision",
+    "name": "T408 bracket assembly",
+    "value": 9700000,
+    "stage": "qualified",
+    "close_date": "2026-10-13"
+  },
+  {
+    "id": "opp-0165",
+    "company_id": "meridian-precision",
+    "name": "GE9X gearbox component",
+    "value": 8300000,
+    "stage": "proposal",
+    "close_date": "2026-09-10"
+  },
+  {
+    "id": "opp-0166",
+    "company_id": "sterling-turbine",
+    "name": "F-15EX manifold",
+    "value": 17700000,
+    "stage": "qualified",
+    "close_date": "2026-08-06"
+  },
+  {
+    "id": "opp-0167",
+    "company_id": "sterling-turbine",
+    "name": "KC-46 engine mount",
+    "value": 100000,
+    "stage": "proposal",
+    "close_date": "2026-10-01"
+  },
+  {
+    "id": "opp-0168",
+    "company_id": "sterling-turbine",
+    "name": "GE9X landing-gear pin",
+    "value": 17700000,
+    "stage": "won",
+    "close_date": "2026-12-13"
+  },
+  {
+    "id": "opp-0169",
+    "company_id": "sterling-turbine",
+    "name": "F-15EX bracket assembly",
+    "value": 10900000,
+    "stage": "prospecting",
+    "close_date": "2026-07-08"
+  },
+  {
+    "id": "opp-0170",
+    "company_id": "sterling-turbine",
+    "name": "JASSM gearbox component",
+    "value": 13800000,
+    "stage": "prospecting",
+    "close_date": "2026-05-12"
+  },
+  {
+    "id": "opp-0171",
+    "company_id": "sterling-turbine",
+    "name": "JASSM structural fitting",
+    "value": 5600000,
+    "stage": "qualified",
+    "close_date": "2026-05-23"
+  },
+  {
+    "id": "opp-0172",
+    "company_id": "sterling-turbine",
+    "name": "T-7A structural fitting",
+    "value": 100000,
+    "stage": "qualified",
+    "close_date": "2026-08-17"
+  },
+  {
+    "id": "opp-0173",
+    "company_id": "sterling-turbine",
+    "name": "Gray Wolf gearbox component",
+    "value": 10200000,
+    "stage": "won",
+    "close_date": "2026-10-27"
+  },
+  {
+    "id": "opp-0174",
+    "company_id": "sterling-turbine",
+    "name": "F-35 engine mount",
+    "value": 18300000,
+    "stage": "prospecting",
+    "close_date": "2026-03-08"
+  },
+  {
+    "id": "opp-0175",
+    "company_id": "ironclad-defense",
+    "name": "JASSM structural fitting",
+    "value": 16800000,
+    "stage": "won",
+    "close_date": "2026-06-04"
+  },
+  {
+    "id": "opp-0176",
+    "company_id": "ironclad-defense",
+    "name": "F-15EX hydraulic block",
+    "value": 13900000,
+    "stage": "qualified",
+    "close_date": "2026-06-18"
+  },
+  {
+    "id": "opp-0177",
+    "company_id": "ironclad-defense",
+    "name": "CH-53K structural fitting",
+    "value": 5000000,
+    "stage": "qualified",
+    "close_date": "2026-10-28"
+  },
+  {
+    "id": "opp-0178",
+    "company_id": "ironclad-defense",
+    "name": "Gray Wolf bulkhead fitting",
+    "value": 8800000,
+    "stage": "qualified",
+    "close_date": "2026-07-15"
+  },
+  {
+    "id": "opp-0179",
+    "company_id": "ironclad-defense",
+    "name": "CH-53K manifold",
+    "value": 19300000,
+    "stage": "proposal",
+    "close_date": "2026-08-31"
+  },
+  {
+    "id": "opp-0180",
+    "company_id": "vertex-alloys",
+    "name": "F-35 gearbox component",
+    "value": 13800000,
+    "stage": "won",
+    "close_date": "2026-12-17"
+  },
+  {
+    "id": "opp-0181",
+    "company_id": "vertex-alloys",
+    "name": "CH-53K actuator housing",
+    "value": 12600000,
+    "stage": "prospecting",
+    "close_date": "2026-06-20"
+  },
+  {
+    "id": "opp-0182",
+    "company_id": "vertex-alloys",
+    "name": "Black Hawk actuator housing",
+    "value": 14800000,
+    "stage": "won",
+    "close_date": "2026-09-08"
+  },
+  {
+    "id": "opp-0183",
+    "company_id": "vertex-alloys",
+    "name": "F-35 hydraulic block",
+    "value": 15200000,
+    "stage": "proposal",
+    "close_date": "2026-05-14"
+  },
+  {
+    "id": "opp-0184",
+    "company_id": "vertex-alloys",
+    "name": "SM-6 bulkhead fitting",
+    "value": 2000000,
+    "stage": "won",
+    "close_date": "2026-07-25"
+  },
+  {
+    "id": "opp-0185",
+    "company_id": "vertex-alloys",
+    "name": "JASSM gearbox component",
+    "value": 5700000,
+    "stage": "prospecting",
+    "close_date": "2026-07-18"
+  },
+  {
+    "id": "opp-0186",
+    "company_id": "vertex-alloys",
+    "name": "GE9X gearbox component",
+    "value": 16300000,
+    "stage": "lost",
+    "close_date": "2026-07-26"
+  },
+  {
+    "id": "opp-0187",
+    "company_id": "vertex-alloys",
+    "name": "T-7A engine mount",
+    "value": 19000000,
+    "stage": "won",
+    "close_date": "2026-06-26"
+  },
+  {
+    "id": "opp-0188",
+    "company_id": "vertex-alloys",
+    "name": "T-7A structural fitting",
+    "value": 11000000,
+    "stage": "lost",
+    "close_date": "2026-04-17"
+  },
+  {
+    "id": "opp-0189",
+    "company_id": "foundry-precision",
+    "name": "SM-6 landing-gear pin",
+    "value": 12000000,
+    "stage": "proposal",
+    "close_date": "2026-09-05"
+  },
+  {
+    "id": "opp-0190",
+    "company_id": "foundry-precision",
+    "name": "CH-53K gearbox component",
+    "value": 4000000,
+    "stage": "qualified",
+    "close_date": "2026-11-27"
+  },
+  {
+    "id": "opp-0191",
+    "company_id": "foundry-precision",
+    "name": "Patriot hydraulic block",
+    "value": 5500000,
+    "stage": "proposal",
+    "close_date": "2026-03-22"
+  },
+  {
+    "id": "opp-0192",
+    "company_id": "monarch-forgings",
+    "name": "B-21 turbine blade",
+    "value": 3200000,
+    "stage": "prospecting",
+    "close_date": "2026-09-01"
+  },
+  {
+    "id": "opp-0193",
+    "company_id": "monarch-forgings",
+    "name": "Patriot manifold",
+    "value": 4200000,
+    "stage": "qualified",
+    "close_date": "2026-04-06"
+  },
+  {
+    "id": "opp-0194",
+    "company_id": "monarch-forgings",
+    "name": "T408 actuator housing",
+    "value": 15700000,
+    "stage": "prospecting",
+    "close_date": "2026-07-19"
+  },
+  {
+    "id": "opp-0195",
+    "company_id": "monarch-forgings",
+    "name": "LEAP-1B structural fitting",
+    "value": 12800000,
+    "stage": "lost",
+    "close_date": "2026-10-09"
+  },
+  {
+    "id": "opp-0196",
+    "company_id": "monarch-forgings",
+    "name": "T-7A structural fitting",
+    "value": 13000000,
+    "stage": "qualified",
+    "close_date": "2026-08-06"
+  },
+  {
+    "id": "opp-0197",
+    "company_id": "halcyon-manufacturing",
+    "name": "JASSM manifold",
+    "value": 16400000,
+    "stage": "proposal",
+    "close_date": "2026-06-14"
+  },
+  {
+    "id": "opp-0198",
+    "company_id": "halcyon-manufacturing",
+    "name": "LEAP-1B gearbox component",
+    "value": 16500000,
+    "stage": "proposal",
+    "close_date": "2026-08-11"
+  },
+  {
+    "id": "opp-0199",
+    "company_id": "halcyon-manufacturing",
+    "name": "T-7A landing-gear pin",
+    "value": 4800000,
+    "stage": "won",
+    "close_date": "2026-04-16"
+  },
+  {
+    "id": "opp-0200",
+    "company_id": "halcyon-manufacturing",
+    "name": "F-35 turbine blade",
+    "value": 3500000,
+    "stage": "won",
+    "close_date": "2026-11-22"
+  },
+  {
+    "id": "opp-0201",
+    "company_id": "halcyon-manufacturing",
+    "name": "Gray Wolf engine mount",
+    "value": 6400000,
+    "stage": "prospecting",
+    "close_date": "2026-10-12"
+  },
+  {
+    "id": "opp-0202",
+    "company_id": "halcyon-manufacturing",
+    "name": "LEAP-1B manifold",
+    "value": 4000000,
+    "stage": "won",
+    "close_date": "2026-09-10"
+  },
+  {
+    "id": "opp-0203",
+    "company_id": "continental-components",
+    "name": "T408 landing-gear pin",
+    "value": 18500000,
+    "stage": "lost",
+    "close_date": "2026-07-23"
+  },
+  {
+    "id": "opp-0204",
+    "company_id": "continental-components",
+    "name": "JASSM engine mount",
+    "value": 19600000,
+    "stage": "lost",
+    "close_date": "2026-04-27"
+  },
+  {
+    "id": "opp-0205",
+    "company_id": "continental-components",
+    "name": "Patriot gearbox component",
+    "value": 4500000,
+    "stage": "qualified",
+    "close_date": "2026-10-14"
+  },
+  {
+    "id": "opp-0206",
+    "company_id": "continental-components",
+    "name": "T-7A hydraulic block",
+    "value": 1300000,
+    "stage": "prospecting",
+    "close_date": "2026-03-11"
+  },
+  {
+    "id": "opp-0207",
+    "company_id": "continental-components",
+    "name": "T408 turbine blade",
+    "value": 15700000,
+    "stage": "qualified",
+    "close_date": "2026-07-11"
+  },
+  {
+    "id": "opp-0208",
+    "company_id": "continental-components",
+    "name": "JASSM structural fitting",
+    "value": 7900000,
+    "stage": "prospecting",
+    "close_date": "2026-10-15"
+  },
+  {
+    "id": "opp-0209",
+    "company_id": "continental-components",
+    "name": "LEAP-1B turbine blade",
+    "value": 12300000,
+    "stage": "won",
+    "close_date": "2026-06-18"
+  },
+  {
+    "id": "opp-0210",
+    "company_id": "ironclad-dynamics",
+    "name": "LEAP-1B actuator housing",
+    "value": 16300000,
+    "stage": "lost",
+    "close_date": "2026-04-07"
+  },
+  {
+    "id": "opp-0211",
+    "company_id": "ironclad-dynamics",
+    "name": "T408 landing-gear pin",
+    "value": 14900000,
+    "stage": "prospecting",
+    "close_date": "2026-12-20"
+  },
+  {
+    "id": "opp-0212",
+    "company_id": "ironclad-dynamics",
+    "name": "Black Hawk engine mount",
+    "value": 3300000,
+    "stage": "qualified",
+    "close_date": "2026-07-30"
+  },
+  {
+    "id": "opp-0213",
+    "company_id": "ironclad-dynamics",
+    "name": "T-7A manifold",
+    "value": 10500000,
+    "stage": "qualified",
+    "close_date": "2026-04-22"
+  },
+  {
+    "id": "opp-0214",
+    "company_id": "ironclad-dynamics",
+    "name": "JASSM hydraulic block",
+    "value": 10000000,
+    "stage": "lost",
+    "close_date": "2026-03-17"
+  },
+  {
+    "id": "opp-0215",
+    "company_id": "aegis-machining",
+    "name": "Gray Wolf landing-gear pin",
+    "value": 3400000,
+    "stage": "prospecting",
+    "close_date": "2026-03-23"
+  },
+  {
+    "id": "opp-0216",
+    "company_id": "aegis-machining",
+    "name": "T408 bulkhead fitting",
+    "value": 5600000,
+    "stage": "proposal",
+    "close_date": "2026-04-15"
+  },
+  {
+    "id": "opp-0217",
+    "company_id": "aegis-machining",
+    "name": "GE9X gearbox component",
+    "value": 14800000,
+    "stage": "proposal",
+    "close_date": "2026-08-30"
+  },
+  {
+    "id": "opp-0218",
+    "company_id": "aegis-machining",
+    "name": "Gray Wolf structural fitting",
+    "value": 16900000,
+    "stage": "prospecting",
+    "close_date": "2026-04-23"
+  },
+  {
+    "id": "opp-0219",
+    "company_id": "halcyon-castings",
+    "name": "Black Hawk manifold",
+    "value": 8300000,
+    "stage": "qualified",
+    "close_date": "2026-05-31"
+  },
+  {
+    "id": "opp-0220",
+    "company_id": "halcyon-castings",
+    "name": "F-35 bracket assembly",
+    "value": 15700000,
+    "stage": "proposal",
+    "close_date": "2026-08-16"
+  },
+  {
+    "id": "opp-0221",
+    "company_id": "halcyon-castings",
+    "name": "SM-6 landing-gear pin",
+    "value": 13700000,
+    "stage": "qualified",
+    "close_date": "2026-05-16"
+  },
+  {
+    "id": "opp-0222",
+    "company_id": "halcyon-castings",
+    "name": "T-7A gearbox component",
+    "value": 13400000,
+    "stage": "lost",
+    "close_date": "2026-09-02"
+  },
+  {
+    "id": "opp-0223",
+    "company_id": "halcyon-castings",
+    "name": "F-35 landing-gear pin",
+    "value": 3100000,
+    "stage": "won",
+    "close_date": "2026-07-11"
+  },
+  {
+    "id": "opp-0224",
+    "company_id": "halcyon-castings",
+    "name": "SM-6 structural fitting",
+    "value": 13500000,
+    "stage": "qualified",
+    "close_date": "2026-10-04"
+  },
+  {
+    "id": "opp-0225",
+    "company_id": "halcyon-castings",
+    "name": "F-35 gearbox component",
+    "value": 19700000,
+    "stage": "prospecting",
+    "close_date": "2026-08-24"
+  },
+  {
+    "id": "opp-0226",
+    "company_id": "halcyon-castings",
+    "name": "Black Hawk turbine blade",
+    "value": 14400000,
+    "stage": "lost",
+    "close_date": "2026-07-02"
+  },
+  {
+    "id": "opp-0227",
+    "company_id": "falcon-turbine",
+    "name": "KC-46 landing-gear pin",
+    "value": 19800000,
+    "stage": "lost",
+    "close_date": "2026-10-28"
+  },
+  {
+    "id": "opp-0228",
+    "company_id": "falcon-turbine",
+    "name": "JASSM landing-gear pin",
+    "value": 12500000,
+    "stage": "qualified",
+    "close_date": "2026-04-05"
+  },
+  {
+    "id": "opp-0229",
+    "company_id": "falcon-turbine",
+    "name": "JASSM landing-gear pin",
+    "value": 500000,
+    "stage": "won",
+    "close_date": "2026-12-10"
+  },
+  {
+    "id": "opp-0230",
+    "company_id": "falcon-turbine",
+    "name": "T-7A turbine blade",
+    "value": 400000,
+    "stage": "proposal",
+    "close_date": "2026-03-30"
+  },
+  {
+    "id": "opp-0231",
+    "company_id": "falcon-turbine",
+    "name": "Gray Wolf structural fitting",
+    "value": 19700000,
+    "stage": "prospecting",
+    "close_date": "2026-12-21"
+  },
+  {
+    "id": "opp-0232",
+    "company_id": "falcon-turbine",
+    "name": "Black Hawk manifold",
+    "value": 4900000,
+    "stage": "prospecting",
+    "close_date": "2026-09-22"
+  },
+  {
+    "id": "opp-0233",
+    "company_id": "falcon-turbine",
+    "name": "T-7A turbine blade",
+    "value": 2400000,
+    "stage": "won",
+    "close_date": "2026-08-14"
+  },
+  {
+    "id": "opp-0234",
+    "company_id": "halcyon-dynamics",
+    "name": "GE9X bracket assembly",
+    "value": 17900000,
+    "stage": "won",
+    "close_date": "2026-11-18"
+  },
+  {
+    "id": "opp-0235",
+    "company_id": "halcyon-dynamics",
+    "name": "SM-6 engine mount",
+    "value": 8900000,
+    "stage": "prospecting",
+    "close_date": "2026-09-18"
+  },
+  {
+    "id": "opp-0236",
+    "company_id": "halcyon-dynamics",
+    "name": "Patriot manifold",
+    "value": 15500000,
+    "stage": "proposal",
+    "close_date": "2026-07-20"
+  },
+  {
+    "id": "opp-0237",
+    "company_id": "halcyon-dynamics",
+    "name": "GE9X bracket assembly",
+    "value": 11600000,
+    "stage": "prospecting",
+    "close_date": "2026-07-16"
+  },
+  {
+    "id": "opp-0238",
+    "company_id": "halcyon-dynamics",
+    "name": "Black Hawk manifold",
+    "value": 2200000,
+    "stage": "prospecting",
+    "close_date": "2026-03-28"
+  },
+  {
+    "id": "opp-0239",
+    "company_id": "halcyon-dynamics",
+    "name": "B-21 actuator housing",
+    "value": 9600000,
+    "stage": "proposal",
+    "close_date": "2026-08-06"
+  },
+  {
+    "id": "opp-0240",
+    "company_id": "halcyon-dynamics",
+    "name": "GE9X turbine blade",
+    "value": 15200000,
+    "stage": "won",
+    "close_date": "2026-12-27"
+  },
+  {
+    "id": "opp-0241",
+    "company_id": "halcyon-dynamics",
+    "name": "LEAP-1B gearbox component",
+    "value": 3200000,
+    "stage": "qualified",
+    "close_date": "2026-10-07"
+  },
+  {
+    "id": "opp-0242",
+    "company_id": "northwind-controls",
+    "name": "T-7A bulkhead fitting",
+    "value": 2500000,
+    "stage": "proposal",
+    "close_date": "2026-11-02"
+  },
+  {
+    "id": "opp-0243",
+    "company_id": "northwind-controls",
+    "name": "Black Hawk landing-gear pin",
+    "value": 6600000,
+    "stage": "won",
+    "close_date": "2026-03-23"
+  },
+  {
+    "id": "opp-0244",
+    "company_id": "northwind-controls",
+    "name": "Black Hawk manifold",
+    "value": 11500000,
+    "stage": "lost",
+    "close_date": "2026-09-10"
+  },
+  {
+    "id": "opp-0245",
+    "company_id": "northwind-controls",
+    "name": "Patriot gearbox component",
+    "value": 4400000,
+    "stage": "prospecting",
+    "close_date": "2026-09-09"
+  },
+  {
+    "id": "opp-0246",
+    "company_id": "northwind-controls",
+    "name": "SM-6 landing-gear pin",
+    "value": 16900000,
+    "stage": "proposal",
+    "close_date": "2026-05-02"
+  },
+  {
+    "id": "opp-0247",
+    "company_id": "northwind-controls",
+    "name": "SM-6 hydraulic block",
+    "value": 13100000,
+    "stage": "won",
+    "close_date": "2026-05-25"
+  },
+  {
+    "id": "opp-0248",
+    "company_id": "northwind-controls",
+    "name": "CH-53K engine mount",
+    "value": 3000000,
+    "stage": "lost",
+    "close_date": "2026-07-19"
+  },
+  {
+    "id": "opp-0249",
+    "company_id": "northwind-controls",
+    "name": "T-7A structural fitting",
+    "value": 2700000,
+    "stage": "prospecting",
+    "close_date": "2026-08-14"
+  },
+  {
+    "id": "opp-0250",
+    "company_id": "vanguard-machining",
+    "name": "SM-6 bracket assembly",
+    "value": 900000,
+    "stage": "won",
+    "close_date": "2026-07-12"
+  },
+  {
+    "id": "opp-0251",
+    "company_id": "vanguard-machining",
+    "name": "LEAP-1B engine mount",
+    "value": 15500000,
+    "stage": "lost",
+    "close_date": "2026-03-12"
+  },
+  {
+    "id": "opp-0252",
+    "company_id": "vanguard-machining",
+    "name": "JASSM hydraulic block",
+    "value": 7700000,
+    "stage": "proposal",
+    "close_date": "2026-11-15"
+  },
+  {
+    "id": "opp-0253",
+    "company_id": "vanguard-machining",
+    "name": "KC-46 hydraulic block",
+    "value": 11900000,
+    "stage": "qualified",
+    "close_date": "2026-08-06"
+  },
+  {
+    "id": "opp-0254",
+    "company_id": "vanguard-machining",
+    "name": "LEAP-1B landing-gear pin",
+    "value": 6000000,
+    "stage": "lost",
+    "close_date": "2026-07-04"
+  },
+  {
+    "id": "opp-0255",
+    "company_id": "vanguard-machining",
+    "name": "F-35 turbine blade",
+    "value": 19200000,
+    "stage": "lost",
+    "close_date": "2026-04-06"
+  },
+  {
+    "id": "opp-0256",
+    "company_id": "vanguard-machining",
+    "name": "SM-6 landing-gear pin",
+    "value": 8000000,
+    "stage": "won",
+    "close_date": "2026-04-14"
+  },
+  {
+    "id": "opp-0257",
+    "company_id": "vanguard-machining",
+    "name": "Gray Wolf turbine blade",
+    "value": 10200000,
+    "stage": "prospecting",
+    "close_date": "2026-08-13"
+  },
+  {
+    "id": "opp-0258",
+    "company_id": "harbor-components",
+    "name": "CH-53K manifold",
+    "value": 12800000,
+    "stage": "won",
+    "close_date": "2026-04-28"
+  },
+  {
+    "id": "opp-0259",
+    "company_id": "harbor-components",
+    "name": "Black Hawk bulkhead fitting",
+    "value": 20000000,
+    "stage": "prospecting",
+    "close_date": "2026-06-10"
+  },
+  {
+    "id": "opp-0260",
+    "company_id": "harbor-components",
+    "name": "Gray Wolf actuator housing",
+    "value": 3800000,
+    "stage": "prospecting",
+    "close_date": "2026-07-09"
+  },
+  {
+    "id": "opp-0261",
+    "company_id": "harbor-components",
+    "name": "Black Hawk landing-gear pin",
+    "value": 1500000,
+    "stage": "won",
+    "close_date": "2026-03-28"
+  },
+  {
+    "id": "opp-0262",
+    "company_id": "foundry-turbine",
+    "name": "JASSM actuator housing",
+    "value": 9800000,
+    "stage": "proposal",
+    "close_date": "2026-07-25"
+  },
+  {
+    "id": "opp-0263",
+    "company_id": "foundry-turbine",
+    "name": "F-35 bracket assembly",
+    "value": 18600000,
+    "stage": "won",
+    "close_date": "2026-09-04"
+  },
+  {
+    "id": "opp-0264",
+    "company_id": "foundry-turbine",
+    "name": "T-7A hydraulic block",
+    "value": 12600000,
+    "stage": "qualified",
+    "close_date": "2026-12-24"
+  },
+  {
+    "id": "opp-0265",
+    "company_id": "continental-castings",
+    "name": "JASSM landing-gear pin",
+    "value": 10200000,
+    "stage": "lost",
+    "close_date": "2026-12-24"
+  },
+  {
+    "id": "opp-0266",
+    "company_id": "continental-castings",
+    "name": "CH-53K structural fitting",
+    "value": 7200000,
+    "stage": "qualified",
+    "close_date": "2026-09-26"
+  },
+  {
+    "id": "opp-0267",
+    "company_id": "continental-castings",
+    "name": "JASSM bulkhead fitting",
+    "value": 14900000,
+    "stage": "qualified",
+    "close_date": "2026-05-13"
+  },
+  {
+    "id": "opp-0268",
+    "company_id": "continental-castings",
+    "name": "F-35 turbine blade",
+    "value": 13800000,
+    "stage": "qualified",
+    "close_date": "2026-06-29"
+  },
+  {
+    "id": "opp-0269",
+    "company_id": "continental-castings",
+    "name": "F-15EX turbine blade",
+    "value": 17100000,
+    "stage": "won",
+    "close_date": "2026-09-09"
+  },
+  {
+    "id": "opp-0270",
+    "company_id": "continental-castings",
+    "name": "Patriot engine mount",
+    "value": 7800000,
+    "stage": "prospecting",
+    "close_date": "2026-10-11"
+  },
+  {
+    "id": "opp-0271",
+    "company_id": "continental-castings",
+    "name": "JASSM manifold",
+    "value": 10900000,
+    "stage": "proposal",
+    "close_date": "2026-07-12"
+  },
+  {
+    "id": "opp-0272",
+    "company_id": "strata-defense",
+    "name": "LEAP-1B bracket assembly",
+    "value": 6500000,
+    "stage": "won",
+    "close_date": "2026-05-12"
+  },
+  {
+    "id": "opp-0273",
+    "company_id": "strata-defense",
+    "name": "KC-46 actuator housing",
+    "value": 5700000,
+    "stage": "proposal",
+    "close_date": "2026-12-07"
+  },
+  {
+    "id": "opp-0274",
+    "company_id": "strata-defense",
+    "name": "Patriot manifold",
+    "value": 3700000,
+    "stage": "prospecting",
+    "close_date": "2026-11-02"
+  },
+  {
+    "id": "opp-0275",
+    "company_id": "strata-defense",
+    "name": "KC-46 manifold",
+    "value": 2100000,
+    "stage": "lost",
+    "close_date": "2026-03-09"
+  },
+  {
+    "id": "opp-0276",
+    "company_id": "strata-defense",
+    "name": "F-15EX turbine blade",
+    "value": 13100000,
+    "stage": "proposal",
+    "close_date": "2026-06-05"
+  },
+  {
+    "id": "opp-0277",
+    "company_id": "titan-fabrication",
+    "name": "T408 landing-gear pin",
+    "value": 19300000,
+    "stage": "proposal",
+    "close_date": "2026-06-30"
+  },
+  {
+    "id": "opp-0278",
+    "company_id": "titan-fabrication",
+    "name": "F-35 bulkhead fitting",
+    "value": 7800000,
+    "stage": "won",
+    "close_date": "2026-03-25"
+  },
+  {
+    "id": "opp-0279",
+    "company_id": "titan-fabrication",
+    "name": "LEAP-1B hydraulic block",
+    "value": 600000,
+    "stage": "prospecting",
+    "close_date": "2026-05-07"
+  },
+  {
+    "id": "opp-0280",
+    "company_id": "titan-fabrication",
+    "name": "Black Hawk hydraulic block",
+    "value": 18600000,
+    "stage": "won",
+    "close_date": "2026-07-28"
+  },
+  {
+    "id": "opp-0281",
+    "company_id": "falcon-defense",
+    "name": "SM-6 landing-gear pin",
+    "value": 17500000,
+    "stage": "qualified",
+    "close_date": "2026-06-14"
+  },
+  {
+    "id": "opp-0282",
+    "company_id": "falcon-defense",
+    "name": "F-35 turbine blade",
+    "value": 14500000,
+    "stage": "prospecting",
+    "close_date": "2026-12-15"
+  },
+  {
+    "id": "opp-0283",
+    "company_id": "falcon-defense",
+    "name": "F-35 manifold",
+    "value": 12400000,
+    "stage": "won",
+    "close_date": "2026-06-07"
+  },
+  {
+    "id": "opp-0284",
+    "company_id": "falcon-defense",
+    "name": "CH-53K structural fitting",
+    "value": 7100000,
+    "stage": "qualified",
+    "close_date": "2026-03-24"
+  },
+  {
+    "id": "opp-0285",
+    "company_id": "falcon-defense",
+    "name": "T-7A structural fitting",
+    "value": 17900000,
+    "stage": "qualified",
+    "close_date": "2026-07-17"
+  },
+  {
+    "id": "opp-0286",
+    "company_id": "falcon-defense",
+    "name": "B-21 manifold",
+    "value": 15700000,
+    "stage": "proposal",
+    "close_date": "2026-05-16"
+  },
+  {
+    "id": "opp-0287",
+    "company_id": "falcon-defense",
+    "name": "T-7A manifold",
+    "value": 18300000,
+    "stage": "lost",
+    "close_date": "2026-03-15"
+  },
+  {
+    "id": "opp-0288",
+    "company_id": "falcon-defense",
+    "name": "B-21 landing-gear pin",
+    "value": 9800000,
+    "stage": "proposal",
+    "close_date": "2026-05-27"
+  },
+  {
+    "id": "opp-0289",
+    "company_id": "falcon-defense",
+    "name": "T408 turbine blade",
+    "value": 6300000,
+    "stage": "proposal",
+    "close_date": "2026-09-17"
+  },
+  {
+    "id": "opp-0290",
+    "company_id": "torque-turbine",
+    "name": "KC-46 structural fitting",
+    "value": 13100000,
+    "stage": "prospecting",
+    "close_date": "2026-06-07"
+  },
+  {
+    "id": "opp-0291",
+    "company_id": "torque-turbine",
+    "name": "Patriot structural fitting",
+    "value": 9600000,
+    "stage": "prospecting",
+    "close_date": "2026-11-07"
+  },
+  {
+    "id": "opp-0292",
+    "company_id": "torque-turbine",
+    "name": "CH-53K landing-gear pin",
+    "value": 2800000,
+    "stage": "prospecting",
+    "close_date": "2026-12-17"
+  },
+  {
+    "id": "opp-0293",
+    "company_id": "torque-turbine",
+    "name": "F-35 manifold",
+    "value": 1900000,
+    "stage": "prospecting",
+    "close_date": "2026-08-23"
+  },
+  {
+    "id": "opp-0294",
+    "company_id": "torque-turbine",
+    "name": "F-35 bulkhead fitting",
+    "value": 3100000,
+    "stage": "lost",
+    "close_date": "2026-05-07"
+  },
+  {
+    "id": "opp-0295",
+    "company_id": "torque-turbine",
+    "name": "T-7A engine mount",
+    "value": 9200000,
+    "stage": "lost",
+    "close_date": "2026-08-08"
+  },
+  {
+    "id": "opp-0296",
+    "company_id": "torque-turbine",
+    "name": "SM-6 bracket assembly",
+    "value": 12500000,
+    "stage": "lost",
+    "close_date": "2026-06-19"
+  },
+  {
+    "id": "opp-0297",
+    "company_id": "torque-turbine",
+    "name": "JASSM landing-gear pin",
+    "value": 19400000,
+    "stage": "lost",
+    "close_date": "2026-05-09"
+  }
+]

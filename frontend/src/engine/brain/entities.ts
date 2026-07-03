@@ -27,3 +27,24 @@ export interface Contact {
   name: string;
   title: string;
 }
+
+export interface Facility {
+  id: string;
+  company_id: string;
+  city: string;
+  lat: number;
+  lon: number;
+  kind: "HQ" | "plant";
+}
+
+export type OppStage = "prospecting" | "qualified" | "proposal" | "won" | "lost";
+
+export interface Opportunity {
+  id: string;
+  company_id: string;
+  name: string;
+  value: number;
+  stage: OppStage;
+  /** ISO date (YYYY-MM-DD). */
+  close_date: string;
+}

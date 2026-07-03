@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { BrowserMockAdapter } from "../adapters/mock/BrowserMockAdapter.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
 import type { Analysis, Prospect } from "./intelligence.ts";
-import type { Company, Contact } from "../engine/brain/entities.ts";
+import type { Company, Contact, Facility, Opportunity } from "../engine/brain/entities.ts";
 
 const adapter = new BrowserMockAdapter();
 
@@ -13,6 +13,8 @@ export interface World {
   city: string | null;
   companies: Company[];
   contacts: Contact[];
+  facilities: Facility[];
+  opportunities: Opportunity[];
   analysis: Analysis;
   prospects: Prospect[];
 }
@@ -27,11 +29,13 @@ export function useWorld(city: string | null): World | null {
       adapter.getCompanies(filter),
       adapter.getSignals(filter),
       adapter.getContacts(filter),
-    ]).then(([companies, signals, contacts]) => {
+      adapter.getFacilities(filter),
+      adapter.getOpportunities(filter),
+    ]).then(([companies, signals, contacts, facilities, opportunities]) => {
       if (!alive) return;
       const analysis = analyze(companies, signals);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
-      setWorld({ city, companies, contacts, analysis, prospects });
+      setWorld({ city, companies, contacts, facilities, opportunities, analysis, prospects });
     });
     return () => {
       alive = false;

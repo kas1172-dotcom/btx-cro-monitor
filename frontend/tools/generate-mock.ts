@@ -54,6 +54,10 @@ const TITLES = ["VP Supply Chain", "Director of Procurement", "Chief Engineer", 
 
 const CAPABILITY_UNIVERSE = ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "ITAR", "titanium", "aluminum", "sheet metal", "assembly", "NADCAP"];
 
+const PROGRAMS = ["F-35", "F-15EX", "CH-53K", "T-7A", "KC-46", "B-21", "GE9X", "LEAP-1B", "T408", "Black Hawk", "Patriot", "SM-6", "JASSM", "Gray Wolf"];
+const PARTS = ["bracket assembly", "actuator housing", "turbine blade", "structural fitting", "gearbox component", "manifold", "bulkhead fitting", "engine mount", "hydraulic block", "landing-gear pin"];
+const STAGES = ["prospecting", "qualified", "proposal", "won", "lost"];
+
 const REL_POOL: Record<string, string[]> = {
   self:       ["government_contract_award", "contract_win", "contract_loss", "capacity_constraint", "quality_escape", "demand_spike", "pricing_pressure", "competitor_won_deal"],
   supplier:   ["supplier_delay", "quality_escape", "capacity_constraint", "pricing_pressure", "regulatory_change"],
@@ -118,8 +122,12 @@ function quote(ev: string, name: string, value: number | undefined, rival: strin
 const companies: unknown[] = [];
 const signals: unknown[] = [];
 const contacts: unknown[] = [];
+const facilities: unknown[] = [];
+const opportunities: unknown[] = [];
 let sn = 0;
 let cn = 0;
+let fn = 0;
+let on = 0;
 
 for (const c of COMPANIES) {
   const base = CITY[c.city];
@@ -157,10 +165,40 @@ for (const c of COMPANIES) {
       detected_at: new Date(detectedMs).toISOString(),
     });
   }
+
+  // Facilities — plants/HQ near the company's city (dossier density).
+  const facilityCount = int(1, 5);
+  for (let i = 0; i < facilityCount; i++) {
+    fn += 1;
+    facilities.push({
+      id: `fac-${String(fn).padStart(4, "0")}`,
+      company_id: c.id,
+      city: c.city,
+      lat: round4(base.lat + (rnd() - 0.5) * 0.15),
+      lon: round4(base.lon + (rnd() - 0.5) * 0.15),
+      kind: i === 0 ? "HQ" : "plant",
+    });
+  }
+
+  // Opportunities — the pipeline of deals per account.
+  const oppCount = int(3, 9);
+  for (let i = 0; i < oppCount; i++) {
+    on += 1;
+    opportunities.push({
+      id: `opp-${String(on).padStart(4, "0")}`,
+      company_id: c.id,
+      name: `${pick(PROGRAMS)} ${pick(PARTS)}`,
+      value: int(1, 200) * 100000,
+      stage: pick(STAGES),
+      close_date: new Date(AS_OF + int(-120, 180) * 86400000).toISOString().slice(0, 10),
+    });
+  }
 }
 
 const write = (file: string, data: unknown) => writeFileSync(join(OUT_DIR, file), JSON.stringify(data, null, 2) + "\n");
 write("companies.json", companies);
 write("signals.json", signals);
 write("contacts.json", contacts);
-console.log(`generated ${companies.length} companies, ${signals.length} signals, ${contacts.length} contacts (seed ${SEED})`);
+write("facilities.json", facilities);
+write("opportunities.json", opportunities);
+console.log(`generated ${companies.length} companies, ${signals.length} signals, ${contacts.length} contacts, ${facilities.length} facilities, ${opportunities.length} opportunities (seed ${SEED})`);

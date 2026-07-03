@@ -1,0 +1,1354 @@
+[
+  {
+    "id": "fac-0001",
+    "company_id": "btx-precision",
+    "city": "Dallas",
+    "lat": 32.7088,
+    "lon": -96.774,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0002",
+    "company_id": "btx-precision",
+    "city": "Dallas",
+    "lat": 32.7234,
+    "lon": -96.8263,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0003",
+    "company_id": "btx-precision",
+    "city": "Dallas",
+    "lat": 32.7354,
+    "lon": -96.8588,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0004",
+    "company_id": "btx-precision",
+    "city": "Dallas",
+    "lat": 32.7227,
+    "lon": -96.7867,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0005",
+    "company_id": "anvil-manufacturing",
+    "city": "Phoenix",
+    "lat": 33.5157,
+    "lon": -112.1457,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0006",
+    "company_id": "meridian-technologies",
+    "city": "Huntsville",
+    "lat": 34.7844,
+    "lon": -86.527,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0007",
+    "company_id": "meridian-technologies",
+    "city": "Huntsville",
+    "lat": 34.7757,
+    "lon": -86.515,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0008",
+    "company_id": "meridian-technologies",
+    "city": "Huntsville",
+    "lat": 34.7378,
+    "lon": -86.6506,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0009",
+    "company_id": "meridian-technologies",
+    "city": "Huntsville",
+    "lat": 34.7766,
+    "lon": -86.5992,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0010",
+    "company_id": "meridian-technologies",
+    "city": "Huntsville",
+    "lat": 34.6996,
+    "lon": -86.547,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0011",
+    "company_id": "falcon-fabrication",
+    "city": "Greenville",
+    "lat": 34.9121,
+    "lon": -82.424,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0012",
+    "company_id": "falcon-fabrication",
+    "city": "Greenville",
+    "lat": 34.7879,
+    "lon": -82.3622,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0013",
+    "company_id": "falcon-fabrication",
+    "city": "Greenville",
+    "lat": 34.8382,
+    "lon": -82.3225,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0014",
+    "company_id": "falcon-fabrication",
+    "city": "Greenville",
+    "lat": 34.7924,
+    "lon": -82.3337,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0015",
+    "company_id": "monarch-technologies",
+    "city": "Greenville",
+    "lat": 34.8637,
+    "lon": -82.4614,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0016",
+    "company_id": "strata-turbine",
+    "city": "Austin",
+    "lat": 30.2662,
+    "lon": -97.6964,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0017",
+    "company_id": "strata-turbine",
+    "city": "Austin",
+    "lat": 30.3058,
+    "lon": -97.7093,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0018",
+    "company_id": "strata-turbine",
+    "city": "Austin",
+    "lat": 30.2087,
+    "lon": -97.6892,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0019",
+    "company_id": "anvil-systems",
+    "city": "Austin",
+    "lat": 30.3118,
+    "lon": -97.753,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0020",
+    "company_id": "anvil-systems",
+    "city": "Austin",
+    "lat": 30.1984,
+    "lon": -97.7695,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0021",
+    "company_id": "anvil-systems",
+    "city": "Austin",
+    "lat": 30.2445,
+    "lon": -97.6962,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0022",
+    "company_id": "anvil-systems",
+    "city": "Austin",
+    "lat": 30.2257,
+    "lon": -97.7627,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0023",
+    "company_id": "sentinel-alloys",
+    "city": "Cincinnati",
+    "lat": 39.102,
+    "lon": -84.5059,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0024",
+    "company_id": "sentinel-alloys",
+    "city": "Cincinnati",
+    "lat": 39.1313,
+    "lon": -84.5439,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0025",
+    "company_id": "sentinel-alloys",
+    "city": "Cincinnati",
+    "lat": 39.0842,
+    "lon": -84.4929,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0026",
+    "company_id": "sentinel-alloys",
+    "city": "Cincinnati",
+    "lat": 39.04,
+    "lon": -84.4729,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0027",
+    "company_id": "cardinal-metalworks",
+    "city": "Tulsa",
+    "lat": 36.2224,
+    "lon": -95.9205,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0028",
+    "company_id": "cardinal-metalworks",
+    "city": "Tulsa",
+    "lat": 36.1618,
+    "lon": -95.9711,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0029",
+    "company_id": "cardinal-metalworks",
+    "city": "Tulsa",
+    "lat": 36.1714,
+    "lon": -96.0458,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0030",
+    "company_id": "cardinal-metalworks",
+    "city": "Tulsa",
+    "lat": 36.1839,
+    "lon": -96.006,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0031",
+    "company_id": "cardinal-metalworks",
+    "city": "Tulsa",
+    "lat": 36.1005,
+    "lon": -95.9753,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0032",
+    "company_id": "monarch-alloys",
+    "city": "Huntsville",
+    "lat": 34.7115,
+    "lon": -86.6374,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0033",
+    "company_id": "monarch-alloys",
+    "city": "Huntsville",
+    "lat": 34.7208,
+    "lon": -86.6465,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0034",
+    "company_id": "monarch-alloys",
+    "city": "Huntsville",
+    "lat": 34.7204,
+    "lon": -86.5169,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0035",
+    "company_id": "monarch-alloys",
+    "city": "Huntsville",
+    "lat": 34.7139,
+    "lon": -86.6209,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0036",
+    "company_id": "monarch-alloys",
+    "city": "Huntsville",
+    "lat": 34.7289,
+    "lon": -86.5534,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0037",
+    "company_id": "sentinel-aerospace",
+    "city": "San Diego",
+    "lat": 32.7483,
+    "lon": -117.12,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0038",
+    "company_id": "sentinel-aerospace",
+    "city": "San Diego",
+    "lat": 32.7072,
+    "lon": -117.1217,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0039",
+    "company_id": "sentinel-aerospace",
+    "city": "San Diego",
+    "lat": 32.6989,
+    "lon": -117.1936,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0040",
+    "company_id": "sentinel-aerospace",
+    "city": "San Diego",
+    "lat": 32.7837,
+    "lon": -117.1022,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0041",
+    "company_id": "sentinel-aerospace",
+    "city": "San Diego",
+    "lat": 32.7334,
+    "lon": -117.1677,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0042",
+    "company_id": "beacon-alloys",
+    "city": "Phoenix",
+    "lat": 33.4564,
+    "lon": -112.0584,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0043",
+    "company_id": "beacon-alloys",
+    "city": "Phoenix",
+    "lat": 33.3996,
+    "lon": -112.0719,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0044",
+    "company_id": "beacon-alloys",
+    "city": "Phoenix",
+    "lat": 33.4312,
+    "lon": -112.0943,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0045",
+    "company_id": "beacon-alloys",
+    "city": "Phoenix",
+    "lat": 33.4151,
+    "lon": -112.0648,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0046",
+    "company_id": "halcyon-components",
+    "city": "San Diego",
+    "lat": 32.6967,
+    "lon": -117.1796,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0047",
+    "company_id": "vanguard-systems",
+    "city": "Hartford",
+    "lat": 41.7273,
+    "lon": -72.7301,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0048",
+    "company_id": "vanguard-systems",
+    "city": "Hartford",
+    "lat": 41.8274,
+    "lon": -72.745,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0049",
+    "company_id": "vanguard-systems",
+    "city": "Hartford",
+    "lat": 41.7548,
+    "lon": -72.7125,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0050",
+    "company_id": "nimbus-technologies",
+    "city": "Tulsa",
+    "lat": 36.1052,
+    "lon": -95.9476,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0051",
+    "company_id": "nimbus-technologies",
+    "city": "Tulsa",
+    "lat": 36.1575,
+    "lon": -96.0615,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0052",
+    "company_id": "nimbus-technologies",
+    "city": "Tulsa",
+    "lat": 36.1624,
+    "lon": -95.9584,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0053",
+    "company_id": "nimbus-technologies",
+    "city": "Tulsa",
+    "lat": 36.1597,
+    "lon": -95.9679,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0054",
+    "company_id": "nimbus-technologies",
+    "city": "Tulsa",
+    "lat": 36.1476,
+    "lon": -96.0546,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0055",
+    "company_id": "falcon-tooling",
+    "city": "Phoenix",
+    "lat": 33.523,
+    "lon": -112.0226,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0056",
+    "company_id": "titan-precision",
+    "city": "Wichita",
+    "lat": 37.6721,
+    "lon": -97.2769,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0057",
+    "company_id": "titan-precision",
+    "city": "Wichita",
+    "lat": 37.7098,
+    "lon": -97.3868,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0058",
+    "company_id": "titan-precision",
+    "city": "Wichita",
+    "lat": 37.7521,
+    "lon": -97.3843,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0059",
+    "company_id": "titan-precision",
+    "city": "Wichita",
+    "lat": 37.7381,
+    "lon": -97.2774,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0060",
+    "company_id": "titan-components",
+    "city": "Huntsville",
+    "lat": 34.6797,
+    "lon": -86.5506,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0061",
+    "company_id": "titan-components",
+    "city": "Huntsville",
+    "lat": 34.6991,
+    "lon": -86.5224,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0062",
+    "company_id": "titan-components",
+    "city": "Huntsville",
+    "lat": 34.7829,
+    "lon": -86.6265,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0063",
+    "company_id": "titan-components",
+    "city": "Huntsville",
+    "lat": 34.6686,
+    "lon": -86.5576,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0064",
+    "company_id": "titan-components",
+    "city": "Huntsville",
+    "lat": 34.7196,
+    "lon": -86.5118,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0065",
+    "company_id": "cardinal-components",
+    "city": "Cincinnati",
+    "lat": 39.0695,
+    "lon": -84.454,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0066",
+    "company_id": "cardinal-components",
+    "city": "Cincinnati",
+    "lat": 39.0707,
+    "lon": -84.4697,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0067",
+    "company_id": "cardinal-components",
+    "city": "Cincinnati",
+    "lat": 39.1518,
+    "lon": -84.4729,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0068",
+    "company_id": "cardinal-components",
+    "city": "Cincinnati",
+    "lat": 39.1629,
+    "lon": -84.549,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0069",
+    "company_id": "pinnacle-forgings",
+    "city": "San Diego",
+    "lat": 32.6916,
+    "lon": -117.2092,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0070",
+    "company_id": "pinnacle-forgings",
+    "city": "San Diego",
+    "lat": 32.7735,
+    "lon": -117.1919,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0071",
+    "company_id": "pinnacle-forgings",
+    "city": "San Diego",
+    "lat": 32.6412,
+    "lon": -117.1695,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0072",
+    "company_id": "pinnacle-forgings",
+    "city": "San Diego",
+    "lat": 32.7149,
+    "lon": -117.1218,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0073",
+    "company_id": "pinnacle-forgings",
+    "city": "San Diego",
+    "lat": 32.7879,
+    "lon": -117.2121,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0074",
+    "company_id": "bastion-tooling",
+    "city": "Tulsa",
+    "lat": 36.0832,
+    "lon": -95.9937,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0075",
+    "company_id": "bastion-tooling",
+    "city": "Tulsa",
+    "lat": 36.1803,
+    "lon": -95.9248,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0076",
+    "company_id": "bastion-tooling",
+    "city": "Tulsa",
+    "lat": 36.1671,
+    "lon": -96.0447,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0077",
+    "company_id": "bastion-tooling",
+    "city": "Tulsa",
+    "lat": 36.1385,
+    "lon": -95.9297,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0078",
+    "company_id": "bastion-tooling",
+    "city": "Tulsa",
+    "lat": 36.1176,
+    "lon": -95.9794,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0079",
+    "company_id": "meridian-systems",
+    "city": "Cincinnati",
+    "lat": 39.0838,
+    "lon": -84.4715,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0080",
+    "company_id": "granite-components",
+    "city": "Hartford",
+    "lat": 41.7962,
+    "lon": -72.6049,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0081",
+    "company_id": "granite-components",
+    "city": "Hartford",
+    "lat": 41.7659,
+    "lon": -72.7109,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0082",
+    "company_id": "nimbus-components",
+    "city": "Wichita",
+    "lat": 37.737,
+    "lon": -97.2783,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0083",
+    "company_id": "nimbus-components",
+    "city": "Wichita",
+    "lat": 37.728,
+    "lon": -97.3053,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0084",
+    "company_id": "nimbus-components",
+    "city": "Wichita",
+    "lat": 37.7063,
+    "lon": -97.3644,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0085",
+    "company_id": "delta-precision",
+    "city": "Phoenix",
+    "lat": 33.4846,
+    "lon": -112.1253,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0086",
+    "company_id": "delta-precision",
+    "city": "Phoenix",
+    "lat": 33.4387,
+    "lon": -112.0691,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0087",
+    "company_id": "aegis-components",
+    "city": "Wichita",
+    "lat": 37.7499,
+    "lon": -97.2797,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0088",
+    "company_id": "aegis-components",
+    "city": "Wichita",
+    "lat": 37.7131,
+    "lon": -97.2871,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0089",
+    "company_id": "aegis-components",
+    "city": "Wichita",
+    "lat": 37.6294,
+    "lon": -97.3467,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0090",
+    "company_id": "aegis-components",
+    "city": "Wichita",
+    "lat": 37.618,
+    "lon": -97.37,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0091",
+    "company_id": "meridian-aerospace",
+    "city": "Greenville",
+    "lat": 34.7868,
+    "lon": -82.3568,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0092",
+    "company_id": "meridian-aerospace",
+    "city": "Greenville",
+    "lat": 34.8436,
+    "lon": -82.3316,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0093",
+    "company_id": "meridian-aerospace",
+    "city": "Greenville",
+    "lat": 34.8862,
+    "lon": -82.4386,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0094",
+    "company_id": "axiom-components",
+    "city": "Tulsa",
+    "lat": 36.1083,
+    "lon": -95.9462,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0095",
+    "company_id": "axiom-components",
+    "city": "Tulsa",
+    "lat": 36.0799,
+    "lon": -95.9638,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0096",
+    "company_id": "axiom-components",
+    "city": "Tulsa",
+    "lat": 36.0998,
+    "lon": -96.0124,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0097",
+    "company_id": "meridian-precision",
+    "city": "Phoenix",
+    "lat": 33.3867,
+    "lon": -112.0367,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0098",
+    "company_id": "meridian-precision",
+    "city": "Phoenix",
+    "lat": 33.4634,
+    "lon": -112.1011,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0099",
+    "company_id": "meridian-precision",
+    "city": "Phoenix",
+    "lat": 33.4189,
+    "lon": -112.012,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0100",
+    "company_id": "meridian-precision",
+    "city": "Phoenix",
+    "lat": 33.4809,
+    "lon": -112.0744,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0101",
+    "company_id": "sterling-turbine",
+    "city": "Huntsville",
+    "lat": 34.7254,
+    "lon": -86.661,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0102",
+    "company_id": "sterling-turbine",
+    "city": "Huntsville",
+    "lat": 34.7648,
+    "lon": -86.6514,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0103",
+    "company_id": "sterling-turbine",
+    "city": "Huntsville",
+    "lat": 34.6647,
+    "lon": -86.5713,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0104",
+    "company_id": "sterling-turbine",
+    "city": "Huntsville",
+    "lat": 34.785,
+    "lon": -86.6199,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0105",
+    "company_id": "sterling-turbine",
+    "city": "Huntsville",
+    "lat": 34.7818,
+    "lon": -86.5358,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0106",
+    "company_id": "ironclad-defense",
+    "city": "Tulsa",
+    "lat": 36.1669,
+    "lon": -95.9198,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0107",
+    "company_id": "ironclad-defense",
+    "city": "Tulsa",
+    "lat": 36.1271,
+    "lon": -96.0212,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0108",
+    "company_id": "ironclad-defense",
+    "city": "Tulsa",
+    "lat": 36.1271,
+    "lon": -95.9842,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0109",
+    "company_id": "vertex-alloys",
+    "city": "Austin",
+    "lat": 30.3353,
+    "lon": -97.7217,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0110",
+    "company_id": "vertex-alloys",
+    "city": "Austin",
+    "lat": 30.2367,
+    "lon": -97.6916,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0111",
+    "company_id": "vertex-alloys",
+    "city": "Austin",
+    "lat": 30.2249,
+    "lon": -97.7905,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0112",
+    "company_id": "vertex-alloys",
+    "city": "Austin",
+    "lat": 30.2064,
+    "lon": -97.7505,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0113",
+    "company_id": "vertex-alloys",
+    "city": "Austin",
+    "lat": 30.2192,
+    "lon": -97.6788,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0114",
+    "company_id": "foundry-precision",
+    "city": "Austin",
+    "lat": 30.2638,
+    "lon": -97.6707,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0115",
+    "company_id": "monarch-forgings",
+    "city": "Cincinnati",
+    "lat": 39.1238,
+    "lon": -84.5425,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0116",
+    "company_id": "monarch-forgings",
+    "city": "Cincinnati",
+    "lat": 39.1272,
+    "lon": -84.5709,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0117",
+    "company_id": "monarch-forgings",
+    "city": "Cincinnati",
+    "lat": 39.0847,
+    "lon": -84.5834,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0118",
+    "company_id": "halcyon-manufacturing",
+    "city": "Phoenix",
+    "lat": 33.4043,
+    "lon": -112.003,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0119",
+    "company_id": "halcyon-manufacturing",
+    "city": "Phoenix",
+    "lat": 33.4406,
+    "lon": -112.0515,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0120",
+    "company_id": "halcyon-manufacturing",
+    "city": "Phoenix",
+    "lat": 33.5139,
+    "lon": -112.0192,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0121",
+    "company_id": "halcyon-manufacturing",
+    "city": "Phoenix",
+    "lat": 33.4706,
+    "lon": -112.0796,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0122",
+    "company_id": "continental-components",
+    "city": "Dallas",
+    "lat": 32.7655,
+    "lon": -96.7672,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0123",
+    "company_id": "continental-components",
+    "city": "Dallas",
+    "lat": 32.8165,
+    "lon": -96.8692,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0124",
+    "company_id": "continental-components",
+    "city": "Dallas",
+    "lat": 32.7465,
+    "lon": -96.8458,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0125",
+    "company_id": "ironclad-dynamics",
+    "city": "Cincinnati",
+    "lat": 39.0804,
+    "lon": -84.4981,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0126",
+    "company_id": "ironclad-dynamics",
+    "city": "Cincinnati",
+    "lat": 39.0636,
+    "lon": -84.469,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0127",
+    "company_id": "ironclad-dynamics",
+    "city": "Cincinnati",
+    "lat": 39.0344,
+    "lon": -84.479,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0128",
+    "company_id": "aegis-machining",
+    "city": "Wichita",
+    "lat": 37.6363,
+    "lon": -97.3254,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0129",
+    "company_id": "aegis-machining",
+    "city": "Wichita",
+    "lat": 37.6576,
+    "lon": -97.3338,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0130",
+    "company_id": "aegis-machining",
+    "city": "Wichita",
+    "lat": 37.6596,
+    "lon": -97.2912,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0131",
+    "company_id": "aegis-machining",
+    "city": "Wichita",
+    "lat": 37.757,
+    "lon": -97.3124,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0132",
+    "company_id": "halcyon-castings",
+    "city": "Huntsville",
+    "lat": 34.7846,
+    "lon": -86.5669,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0133",
+    "company_id": "halcyon-castings",
+    "city": "Huntsville",
+    "lat": 34.7741,
+    "lon": -86.5662,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0134",
+    "company_id": "halcyon-castings",
+    "city": "Huntsville",
+    "lat": 34.686,
+    "lon": -86.5177,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0135",
+    "company_id": "halcyon-castings",
+    "city": "Huntsville",
+    "lat": 34.7008,
+    "lon": -86.6126,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0136",
+    "company_id": "halcyon-castings",
+    "city": "Huntsville",
+    "lat": 34.7171,
+    "lon": -86.5937,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0137",
+    "company_id": "falcon-turbine",
+    "city": "Austin",
+    "lat": 30.2116,
+    "lon": -97.7802,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0138",
+    "company_id": "falcon-turbine",
+    "city": "Austin",
+    "lat": 30.2107,
+    "lon": -97.7698,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0139",
+    "company_id": "halcyon-dynamics",
+    "city": "Huntsville",
+    "lat": 34.7073,
+    "lon": -86.5866,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0140",
+    "company_id": "northwind-controls",
+    "city": "San Diego",
+    "lat": 32.7553,
+    "lon": -117.1773,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0141",
+    "company_id": "northwind-controls",
+    "city": "San Diego",
+    "lat": 32.6911,
+    "lon": -117.187,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0142",
+    "company_id": "northwind-controls",
+    "city": "San Diego",
+    "lat": 32.667,
+    "lon": -117.1381,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0143",
+    "company_id": "vanguard-machining",
+    "city": "San Diego",
+    "lat": 32.6825,
+    "lon": -117.1449,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0144",
+    "company_id": "harbor-components",
+    "city": "Tulsa",
+    "lat": 36.0841,
+    "lon": -95.9697,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0145",
+    "company_id": "harbor-components",
+    "city": "Tulsa",
+    "lat": 36.1934,
+    "lon": -96.0591,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0146",
+    "company_id": "foundry-turbine",
+    "city": "Phoenix",
+    "lat": 33.4789,
+    "lon": -112.0767,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0147",
+    "company_id": "foundry-turbine",
+    "city": "Phoenix",
+    "lat": 33.4125,
+    "lon": -112.1088,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0148",
+    "company_id": "foundry-turbine",
+    "city": "Phoenix",
+    "lat": 33.432,
+    "lon": -112.0921,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0149",
+    "company_id": "foundry-turbine",
+    "city": "Phoenix",
+    "lat": 33.4099,
+    "lon": -112.1242,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0150",
+    "company_id": "foundry-turbine",
+    "city": "Phoenix",
+    "lat": 33.4385,
+    "lon": -111.9994,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0151",
+    "company_id": "continental-castings",
+    "city": "Cincinnati",
+    "lat": 39.1211,
+    "lon": -84.4839,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0152",
+    "company_id": "continental-castings",
+    "city": "Cincinnati",
+    "lat": 39.0585,
+    "lon": -84.4933,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0153",
+    "company_id": "continental-castings",
+    "city": "Cincinnati",
+    "lat": 39.1164,
+    "lon": -84.4488,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0154",
+    "company_id": "continental-castings",
+    "city": "Cincinnati",
+    "lat": 39.1386,
+    "lon": -84.5352,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0155",
+    "company_id": "continental-castings",
+    "city": "Cincinnati",
+    "lat": 39.1173,
+    "lon": -84.478,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0156",
+    "company_id": "strata-defense",
+    "city": "San Diego",
+    "lat": 32.6779,
+    "lon": -117.1561,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0157",
+    "company_id": "strata-defense",
+    "city": "San Diego",
+    "lat": 32.6407,
+    "lon": -117.1751,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0158",
+    "company_id": "strata-defense",
+    "city": "San Diego",
+    "lat": 32.6714,
+    "lon": -117.1742,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0159",
+    "company_id": "strata-defense",
+    "city": "San Diego",
+    "lat": 32.6492,
+    "lon": -117.091,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0160",
+    "company_id": "titan-fabrication",
+    "city": "Greenville",
+    "lat": 34.8797,
+    "lon": -82.4075,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0161",
+    "company_id": "titan-fabrication",
+    "city": "Greenville",
+    "lat": 34.8542,
+    "lon": -82.3223,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0162",
+    "company_id": "titan-fabrication",
+    "city": "Greenville",
+    "lat": 34.9047,
+    "lon": -82.3675,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0163",
+    "company_id": "titan-fabrication",
+    "city": "Greenville",
+    "lat": 34.802,
+    "lon": -82.4398,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0164",
+    "company_id": "titan-fabrication",
+    "city": "Greenville",
+    "lat": 34.9222,
+    "lon": -82.3493,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0165",
+    "company_id": "falcon-defense",
+    "city": "San Diego",
+    "lat": 32.768,
+    "lon": -117.1712,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0166",
+    "company_id": "falcon-defense",
+    "city": "San Diego",
+    "lat": 32.7415,
+    "lon": -117.1561,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0167",
+    "company_id": "torque-turbine",
+    "city": "Greenville",
+    "lat": 34.8415,
+    "lon": -82.3629,
+    "kind": "HQ"
+  },
+  {
+    "id": "fac-0168",
+    "company_id": "torque-turbine",
+    "city": "Greenville",
+    "lat": 34.9188,
+    "lon": -82.3845,
+    "kind": "plant"
+  },
+  {
+    "id": "fac-0169",
+    "company_id": "torque-turbine",
+    "city": "Greenville",
+    "lat": 34.7992,
+    "lon": -82.3558,
+    "kind": "plant"
+  }
+]

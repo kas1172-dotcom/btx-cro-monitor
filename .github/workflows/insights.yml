@@ -1,8 +1,9 @@
-# Bakes LLM narration into frontend/data/mock/insights.json using the
-# ANTHROPIC_API_KEY repo secret, then commits the result. The key never leaves
-# CI and is never written to disk. Manual trigger (or run it after editing the
-# mock world). The static site reads the committed insights.json.
-name: Generate insights
+# Bakes the LLM artifacts using the ANTHROPIC_API_KEY repo secret, then commits
+# them. The key never leaves CI. Two artifacts:
+#   - insights.json         : dossier narration (explains the deterministic output)
+#   - extracted-signals.json: signals pulled from news text (the extraction layer)
+# The static site reads both. Manual trigger.
+name: Bake LLM artifacts
 
 on:
   workflow_dispatch: {}
@@ -11,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  insights:
+  bake:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,20 +21,27 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Generate insights
+      - name: Generate dossier insights
         working-directory: frontend
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node tools/generate-insights.ts
 
+      - name: Extract signals from news
+        working-directory: frontend
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node tools/extract-signals.ts
+
       - name: Commit if changed
         run: |
-          if ! git diff --quiet -- frontend/data/mock/insights.json; then
+          FILES="frontend/data/mock/insights.json frontend/data/mock/extracted-signals.json"
+          if ! git diff --quiet -- $FILES; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add frontend/data/mock/insights.json
-            git commit -m "chore: regenerate baked insights [skip ci]"
+            git add $FILES
+            git commit -m "chore: bake LLM artifacts (insights + extracted signals) [skip ci]"
             git push
           else
-            echo "insights.json unchanged"
+            echo "no changes"
           fi

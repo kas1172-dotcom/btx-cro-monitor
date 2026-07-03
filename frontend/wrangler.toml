@@ -1,0 +1,6 @@
+# Cloudflare Worker config for the Jarvis proxy. Deploy from the frontend/ dir:
+#   npx wrangler deploy
+# The API key is stored as a Worker secret (see the walkthrough), never here.
+name = "btx-jarvis"
+main = "tools/copilot-worker.js"
+compatibility_date = "2026-07-01"

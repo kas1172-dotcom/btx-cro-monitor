@@ -27,13 +27,22 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const narrative = insight?.opportunity ?? narrateOpportunity(company, opp?.score ?? 0, fit, signals);
   const rec = world.analysis.recById.get(companyId);
   const health = score ? pipelineHealth(score.dimensions.opportunity.score, score.dimensions.competitivePressure.score) : 0;
+  const facilities = world.facilities.filter((f) => f.company_id === companyId);
+  const openOpps = world.opportunities
+    .filter((o) => o.company_id === companyId && o.stage !== "won" && o.stage !== "lost")
+    .sort((a, b) => b.value - a.value);
+  const pipelineValue = openOpps.reduce((s, o) => s + o.value, 0);
+  const fmtM = (v: number) => `$${(v / 1e6).toFixed(1)}M`;
 
   return (
     <div className="dossier">
       <div className="dossier-head">
         <h3>{company.name}</h3>
         <span className={`pill rel-${company.relationship}`}>{company.relationship}</span>
-        <div className="muted">{company.location.city}</div>
+        <div className="muted">
+          {company.location.city}
+          {facilities.length > 0 && ` · ${facilities.length} ${facilities.length === 1 ? "facility" : "facilities"}`}
+        </div>
       </div>
 
       {rec && (
@@ -63,6 +72,21 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         <p className="narrative">{narrative}</p>
         {oppGroups.length > 0 && <p className="audit">scoring: {summarizeGroups(oppGroups)}</p>}
       </section>
+
+      {openOpps.length > 0 && (
+        <section>
+          <h4>Pipeline — {fmtM(pipelineValue)} open ({openOpps.length} deals)</h4>
+          <ul className="opps">
+            {openOpps.slice(0, 6).map((o) => (
+              <li key={o.id}>
+                <span className={`opp-stage stage-${o.stage}`}>{o.stage}</span>
+                <span className="opp-name">{o.name}</span>
+                <span className="opp-val">{fmtM(o.value)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section>
         <h4>How {PROFILE.name} can serve them</h4>

@@ -8,14 +8,26 @@
 // Same contract as the local proxy: POST { system, messages } -> { text }.
 // The key lives in the Worker's secret store; the browser never sees it.
 
+// Only the live site + local dev may use this proxy (stops the URL from being an
+// open proxy on your Claude key). Origin headers can't be spoofed by browsers.
+const ALLOWED_ORIGINS = new Set([
+  "https://kas1172-dotcom.github.io",
+  "http://localhost:5173",
+  "http://localhost:4173",
+]);
+
 export default {
   async fetch(request, env) {
+    const origin = request.headers.get("Origin") ?? "";
+    const allow = ALLOWED_ORIGINS.has(origin) ? origin : "";
     const cors = {
-      "access-control-allow-origin": "*",
+      "access-control-allow-origin": allow,
       "access-control-allow-headers": "content-type",
       "access-control-allow-methods": "POST, OPTIONS",
+      vary: "Origin",
     };
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+    if (!allow) return new Response("forbidden origin", { status: 403, headers: cors });
     if (request.method !== "POST") return new Response("POST only", { status: 405, headers: cors });
 
     try {

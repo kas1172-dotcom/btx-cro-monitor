@@ -6,7 +6,7 @@
 
 import { useSyncExternalStore } from "react";
 
-export type View = "map" | "dashboard" | "graph";
+export type View = "map" | "dashboard" | "graph" | "feed";
 
 export interface UiState {
   city: string;
