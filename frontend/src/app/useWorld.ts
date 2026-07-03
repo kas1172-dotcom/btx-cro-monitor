@@ -2,16 +2,17 @@
 // literal "run the brain for the selected area". Re-runs when the city changes.
 
 import { useEffect, useState } from "react";
-import { BrowserMockAdapter } from "../adapters/mock/BrowserMockAdapter.ts";
+import { createDataAdapter } from "../adapters/createDataAdapter.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
 import { deriveNewsSignals } from "./newsIngest.ts";
-import newsData from "../../data/mock/news.json";
-import extractedData from "../../data/mock/extracted-signals.json";
+import newsData from "../../data/demo/btx/news.json";
+import extractedData from "../../data/demo/btx/extracted-signals.json";
 import type { Analysis, Prospect } from "./intelligence.ts";
 import type { ExtractedRow } from "./newsIngest.ts";
 import type { Company, Contact, Facility, Opportunity, MarketEvent } from "../engine/brain/entities.ts";
+import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 
-const adapter = new BrowserMockAdapter();
+const adapter = createDataAdapter();
 const NEWS = newsData as unknown as MarketEvent[];
 const EXTRACTED = extractedData as unknown as ExtractedRow[];
 
@@ -23,6 +24,8 @@ export interface World {
   opportunities: Opportunity[];
   analysis: Analysis;
   prospects: Prospect[];
+  /** Simulated CRM / ERP-capacity / pipeline / assumptions context (demo snapshot). */
+  snapshot: OperatingSnapshot | null;
 }
 
 export function useWorld(city: string | null): World | null {
@@ -37,12 +40,13 @@ export function useWorld(city: string | null): World | null {
       adapter.getContacts(filter),
       adapter.getFacilities(filter),
       adapter.getOpportunities(filter),
-    ]).then(([companies, signals, contacts, facilities, opportunities]) => {
+      adapter.getOperatingSnapshot().catch(() => null),
+    ]).then(([companies, signals, contacts, facilities, opportunities, snapshot]) => {
       if (!alive) return;
       const newsSignals = deriveNewsSignals(companies, NEWS, EXTRACTED);
-      const analysis = analyze(companies, [...(signals as unknown[]), ...newsSignals]);
+      const analysis = analyze(companies, [...signals, ...newsSignals]);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
-      setWorld({ city, companies, contacts, facilities, opportunities, analysis, prospects });
+      setWorld({ city, companies, contacts, facilities, opportunities, analysis, prospects, snapshot });
     });
     return () => {
       alive = false;

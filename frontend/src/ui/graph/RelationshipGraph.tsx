@@ -14,11 +14,11 @@ import type { Relationship } from "../../engine/brain/entities.ts";
 import { setState } from "../../store/store.ts";
 
 const REL_COLOR: Record<string, string> = {
-  self: "#ffffff",
-  supplier: "#ff5c6c",
-  competitor: "#ffb454",
-  customer: "#5ac8fa",
-  target: "#39d98a",
+  self: "#f4f1dc",
+  supplier: "#d97a67",
+  competitor: "#d6a84f",
+  customer: "#b7c46a",
+  target: "#9ecf6a",
 };
 const REL_ORDER: Relationship[] = ["supplier", "competitor", "customer", "target"];
 
@@ -31,8 +31,8 @@ function headlineScore(world: World, id: string, rel: string): { label: string; 
 
 function nodeStyle(rel: string, isSelf: boolean): React.CSSProperties {
   return {
-    background: isSelf ? "#1a2130" : "#121722",
-    color: "#d6deeb",
+    background: isSelf ? "#202718" : "#171b12",
+    color: "#e4e7d5",
     border: `2px solid ${REL_COLOR[rel]}`,
     borderRadius: 10,
     padding: "8px 10px",
@@ -104,7 +104,7 @@ export function RelationshipGraph({ world }: { world: World }) {
         onNodeClick={(_event, node) => setState({ activeCompanyId: node.id })}
         proOptions={{ hideAttribution: true }}
       >
-        <Background color="#232c3d" gap={20} />
+        <Background color="#35402a" gap={20} />
         <Controls showInteractive={false} />
       </ReactFlow>
       <div className="graph-legend">

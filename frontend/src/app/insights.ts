@@ -2,7 +2,7 @@
 // The file ships empty; the dossier falls back to the deterministic narrator when
 // a company has no baked insight, so the app works with or without the CI run.
 
-import insights from "../../data/mock/insights.json";
+import insights from "../../data/demo/btx/insights.json";
 
 export interface CompanyInsight {
   /** LLM prose explaining "why this is a target" — grounded in the trace. */

@@ -2,13 +2,13 @@
 //   1. GLOBAL  — validate -> score every entity -> leaderboard + self-lens
 //   2. REGIONAL — "run the brain for Austin" -> prospect dossiers (opp + fit + contact)
 //
-// Run it (Node 23.6+ strips TypeScript natively, zero install):
-//   node frontend/demo/run.ts
+// Run it:
+//   npm --prefix frontend run engine
 //
-// Regenerate the frozen mock world first (deterministic, commit the output):
-//   node frontend/tools/generate-mock.ts
+// Regenerate the frozen demo world first (deterministic, commit the output):
+//   npm --prefix frontend run demo:generate
 
-import { MockDataAdapter } from "../src/adapters/mock/MockDataAdapter.ts";
+import { DemoFileDataAdapter } from "./DemoFileDataAdapter.ts";
 import { validateSignals } from "../src/engine/validation/validate.ts";
 import { scorePortfolio, rankBy } from "../src/engine/decision/portfolio.ts";
 import { applySelfLens } from "../src/engine/decision/lens.ts";
@@ -25,7 +25,7 @@ const readCfg = (p: string) => JSON.parse(readFileSync(join(here, p), "utf8"));
 const config = readCfg("../data/config/scoring-weights.v1.json") as WeightsConfig;
 const profile = readCfg("../data/config/client-profile.json") as { capabilities: string[] };
 
-const adapter = new MockDataAdapter();
+const adapter = new DemoFileDataAdapter();
 
 // ── 1. GLOBAL view ──────────────────────────────────────────────────────────
 const companies = await adapter.getCompanies();

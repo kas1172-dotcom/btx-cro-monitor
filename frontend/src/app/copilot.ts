@@ -7,6 +7,7 @@ import type { World } from "./useWorld.ts";
 import type { ScoreDimension } from "../engine/signals/contract.ts";
 import { groupTrace, summarizeGroups } from "../engine/decision/explain.ts";
 import { CONFIG } from "./config.ts";
+import { actionLabel } from "./actionLabels.ts";
 
 const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
   [/\brisk\b/, "risk"],
@@ -18,9 +19,27 @@ const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
 export const SUGGESTIONS = [
   "What needs my attention today?",
   "Who should I call in Austin?",
+  "Why is the top account ranked #1?",
   "Why is BTX Precision high risk?",
   "What's the top opportunity?",
 ];
+
+function rankDriver(world: World, subjectId: string): string {
+  const score = world.analysis.byId.get(subjectId);
+  if (!score) return "No score trace is available.";
+  const d = score.dimensions;
+  const drivers = [
+    d.opportunity.contributions[0]?.event_type ? `opportunity driver ${d.opportunity.contributions[0].event_type}` : "",
+    d.risk.contributions[0]?.event_type ? `risk driver ${d.risk.contributions[0].event_type}` : "",
+    d.capacityRisk.contributions[0]?.event_type ? `capacity driver ${d.capacityRisk.contributions[0].event_type}` : "",
+  ].filter(Boolean);
+  return `Scores: opportunity ${d.opportunity.score}, risk ${d.risk.score}, capacityRisk ${d.capacityRisk.score}, competitivePressure ${d.competitivePressure.score}. ${drivers.length ? `Top drivers: ${drivers.join("; ")}.` : "No contributing signal drivers."}`;
+}
+
+function prospectRank(world: World, subjectId: string): number | null {
+  const idx = world.prospects.findIndex((p) => p.company.id === subjectId);
+  return idx >= 0 ? idx + 1 : null;
+}
 
 export function answer(question: string, world: World): string {
   const q = question.toLowerCase().trim();
@@ -41,6 +60,7 @@ export function answer(question: string, world: World): string {
 
   const dim = DIMENSION_WORDS.find(([re]) => re.test(q))?.[1];
   const wantsProspects = /(call|prospect|who|sell|target|pursue)/.test(q);
+  const wantsRank = /(rank|ranked|ranking|leaderboard|#1|number one|top account|why.*top)/.test(q);
 
   // 1) "who should I call in <city>"
   if (city && (wantsProspects || !company)) {
@@ -58,6 +78,19 @@ export function answer(question: string, world: World): string {
   // 2) a specific company
   if (company) {
     const score = world.analysis.byId.get(company.id);
+    if (wantsRank) {
+      const rank = prospectRank(world, company.id);
+      const prospect = world.prospects.find((p) => p.company.id === company.id);
+      if (rank && prospect) {
+        return (
+          `${company.name} is ranked #${rank} in the prospect list because the presentation rank blends opportunity and fit. ` +
+          `It has opportunity ${prospect.opportunity} and ${prospect.fit.score}% fit` +
+          (prospect.fit.matched.length ? `, with BTX able to serve ${prospect.fit.matched.join(", ")}` : "") +
+          `. ${rankDriver(world, company.id)}`
+        );
+      }
+      if (score) return `${company.name} is not a sellable prospect in the current list, but it is scored by the engine. ${rankDriver(world, company.id)}`;
+    }
     if (dim && dim !== "opportunity" && score) {
       const d = score.dimensions[dim];
       if (d.score === 0) return `${company.name} has no ${dim} signals right now.`;
@@ -81,7 +114,18 @@ export function answer(question: string, world: World): string {
   // 3) portfolio-level
   if (/(what should i do|priorit|\baction|focus|today|attention)/.test(q)) {
     const top = world.analysis.recommendations.filter((r) => r.priority !== "low").slice(0, 5);
-    if (top.length) return "Top actions:\n" + top.map((r) => `• ${r.action} ${nameOf(r.subject_id)} — ${r.reason}`).join("\n");
+    if (top.length) return "Top actions:\n" + top.map((r) => `• ${actionLabel(r.action)}: ${nameOf(r.subject_id)} — ${r.reason}`).join("\n");
+  }
+  if (wantsRank) {
+    const top = world.prospects[0];
+    if (!top) return "No ranked prospects are available right now.";
+    return (
+      `${top.company.name} is ranked #1 because it has the strongest prospect blend in the current engine output: ` +
+      `opportunity ${top.opportunity} plus ${top.fit.score}% fit` +
+      (top.fit.matched.length ? `, with BTX able to serve ${top.fit.matched.join(", ")}` : "") +
+      `. ${rankDriver(world, top.company.id)}` +
+      (top.contact ? ` Call ${top.contact.name}, ${top.contact.title}.` : "")
+    );
   }
   if (/\brisk\b/.test(q)) {
     const top = [...world.analysis.scores].sort((a, b) => b.dimensions.risk.score - a.dimensions.risk.score)[0];

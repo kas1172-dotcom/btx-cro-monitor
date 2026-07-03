@@ -15,6 +15,5 @@
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true
   },
-  "include": ["src"],
-  "exclude": ["src/adapters/mock/MockDataAdapter.ts"]
+  "include": ["src"]
 }

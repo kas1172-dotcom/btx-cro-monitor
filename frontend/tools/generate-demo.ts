@@ -1,8 +1,8 @@
-// Seeded, deterministic mock-world generator. Run OFFLINE, commit the output.
+// Seeded, deterministic demo-world generator. Run OFFLINE, commit the output.
 // Same SEED + AS_OF => byte-identical JSON. All client/industry content lives
 // here in the demo layer, never in src/engine/.
 //
-//   node frontend/tools/generate-mock.ts
+//   npm run demo:generate
 //
 // Scaled to feel like a real enterprise system: ~50 companies across 10 cities,
 // ~500 contacts, a few hundred signals. (Facility/Contract/Opportunity/
@@ -14,7 +14,7 @@ import { dirname, join } from "node:path";
 
 const SEED = 0x42784358;
 const AS_OF = Date.parse("2026-06-30T00:00:00Z");
-const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../data/mock");
+const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../data/demo/btx");
 
 function mulberry32(seed: number): () => number {
   let s = seed >>> 0;
@@ -30,6 +30,11 @@ const pick = <T>(arr: T[]): T => arr[Math.floor(rnd() * arr.length)];
 const int = (min: number, max: number): number => min + Math.floor(rnd() * (max - min + 1));
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 const round4 = (n: number): number => Math.round(n * 10000) / 10000;
+const provenance = (source_name: string) => ({
+  source_type: "demo",
+  source_name,
+  source_mode: "static_snapshot",
+});
 
 const CITY: Record<string, { lat: number; lon: number }> = {
   Dallas:     { lat: 32.7767, lon: -96.7970 },
@@ -42,6 +47,18 @@ const CITY: Record<string, { lat: number; lon: number }> = {
   Tulsa:      { lat: 36.1540, lon: -95.9928 },
   Cincinnati: { lat: 39.1031, lon: -84.5120 },
   Greenville: { lat: 34.8526, lon: -82.3940 },
+};
+const CITY_STATE: Record<string, { state: string; postal: string }> = {
+  Dallas: { state: "TX", postal: "75201" },
+  Austin: { state: "TX", postal: "78701" },
+  Wichita: { state: "KS", postal: "67202" },
+  Phoenix: { state: "AZ", postal: "85004" },
+  Hartford: { state: "CT", postal: "06103" },
+  Huntsville: { state: "AL", postal: "35801" },
+  "San Diego": { state: "CA", postal: "92101" },
+  Tulsa: { state: "OK", postal: "74103" },
+  Cincinnati: { state: "OH", postal: "45202" },
+  Greenville: { state: "SC", postal: "29601" },
 };
 const CITIES = Object.keys(CITY);
 
@@ -66,6 +83,15 @@ const REL_POOL: Record<string, string[]> = {
   target:     ["demand_spike", "government_contract_award", "hiring_surge", "contract_win"],
 };
 const VALUE_EVENTS = new Set(["government_contract_award", "contract_win", "contract_loss"]);
+const RISK_EVENTS = new Set([
+  "quality_escape",
+  "capacity_constraint",
+  "contract_loss",
+  "pricing_pressure",
+  "supplier_delay",
+  "regulatory_change",
+  "competitor_expansion",
+]);
 
 // Weighted relationship mix (excludes self).
 function pickRelationship(): string {
@@ -76,8 +102,47 @@ function pickRelationship(): string {
   return "supplier";
 }
 
+function accountStatusForRelationship(relationship: string): string {
+  if (relationship === "self" || relationship === "customer") return "current_customer";
+  if (relationship === "supplier") return "partner";
+  if (relationship === "competitor") return "competitor";
+  return "target_prospect";
+}
+
+function businessMotionForRelationship(relationship: string): string {
+  if (relationship === "self") return "manage_current_business";
+  if (relationship === "customer") return "grow_existing_business";
+  if (relationship === "target") return "prospect_new_business";
+  return "reduce_risk";
+}
+
+function businessMotionForSignal(relationship: string, eventType: string): string {
+  return RISK_EVENTS.has(eventType) ? "reduce_risk" : businessMotionForRelationship(relationship);
+}
+
+function businessMotionForOpportunity(relationship: string, stage: string): string {
+  if (stage === "lost") return "manage_current_business";
+  if (relationship === "target") return "prospect_new_business";
+  if (relationship === "customer" || relationship === "self") return "grow_existing_business";
+  return "reduce_risk";
+}
+
 function slug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function demoUrl(path: string): string {
+  return `https://demo.btx.example/${path}`;
+}
+
+function addressFor(city: string, n: number): { address: string; state: string; postal_code: string; country: string } {
+  const meta = CITY_STATE[city];
+  return {
+    address: `${1000 + n * 17} Industrial Pkwy`,
+    state: meta.state,
+    postal_code: meta.postal,
+    country: "USA",
+  };
 }
 
 function sample<T>(pool: T[], k: number): T[] {
@@ -131,18 +196,31 @@ let on = 0;
 
 for (const c of COMPANIES) {
   const base = CITY[c.city];
+  const companyAddress = addressFor(c.city, companies.length + 1);
   companies.push({
     id: c.id,
     name: c.name,
     relationship: c.relationship,
-    location: { city: c.city, lat: round4(base.lat + (rnd() - 0.5) * 0.2), lon: round4(base.lon + (rnd() - 0.5) * 0.2) },
+    account_status: accountStatusForRelationship(c.relationship),
+    business_motion: businessMotionForRelationship(c.relationship),
+    location: { city: c.city, lat: round4(base.lat + (rnd() - 0.5) * 0.2), lon: round4(base.lon + (rnd() - 0.5) * 0.2), ...companyAddress },
+    website_url: `https://${c.id}.example`,
+    linkedin_url: demoUrl(`linkedin/company/${c.id}`),
+    source_url: demoUrl(`sources/crm/accounts/${c.id}`),
     needs: sample(CAPABILITY_UNIVERSE, int(2, 5)).sort(),
+    ...provenance("Simulated CRM Account Snapshot"),
   });
 
   const contactCount = int(6, 14); // ~500 total across 50 companies
   for (let i = 0; i < contactCount; i++) {
     cn += 1;
-    contacts.push({ id: `con-${String(cn).padStart(4, "0")}`, company_id: c.id, name: `${pick(FIRST)} ${pick(LAST)}`, title: pick(TITLES) });
+    contacts.push({
+      id: `con-${String(cn).padStart(4, "0")}`,
+      company_id: c.id,
+      name: `${pick(FIRST)} ${pick(LAST)}`,
+      title: pick(TITLES),
+      ...provenance("Simulated CRM Contacts"),
+    });
   }
 
   const signalCount = c.relationship === "self" ? int(5, 8) : int(2, 5);
@@ -159,10 +237,15 @@ for (const c of COMPANIES) {
       event_type: ev,
       entities,
       subject_id: c.id,
+      account_status: accountStatusForRelationship(c.relationship),
+      business_motion: businessMotionForSignal(c.relationship, ev),
       ...(value !== undefined ? { value } : {}),
       confidence,
       source_quote: quote(ev, c.name, value, rival),
+      source_url: demoUrl(`sources/signals/${String(sn).padStart(4, "0")}`),
+      document_url: demoUrl(`documents/signals/${String(sn).padStart(4, "0")}.pdf`),
       detected_at: new Date(detectedMs).toISOString(),
+      ...provenance("Simulated Market Signal Feed"),
     });
   }
 
@@ -170,13 +253,17 @@ for (const c of COMPANIES) {
   const facilityCount = int(1, 5);
   for (let i = 0; i < facilityCount; i++) {
     fn += 1;
+    const facilityAddress = addressFor(c.city, fn + 60);
     facilities.push({
       id: `fac-${String(fn).padStart(4, "0")}`,
       company_id: c.id,
       city: c.city,
+      ...facilityAddress,
       lat: round4(base.lat + (rnd() - 0.5) * 0.15),
       lon: round4(base.lon + (rnd() - 0.5) * 0.15),
       kind: i === 0 ? "HQ" : "plant",
+      source_url: demoUrl(`sources/erp/facilities/${String(fn).padStart(4, "0")}`),
+      ...provenance("Simulated ERP Facility Master"),
     });
   }
 
@@ -184,13 +271,20 @@ for (const c of COMPANIES) {
   const oppCount = int(3, 9);
   for (let i = 0; i < oppCount; i++) {
     on += 1;
+    const stage = pick(STAGES);
     opportunities.push({
       id: `opp-${String(on).padStart(4, "0")}`,
       company_id: c.id,
       name: `${pick(PROGRAMS)} ${pick(PARTS)}`,
+      account_status: stage === "won" ? "current_customer" : stage === "lost" ? "past_customer" : "active_pipeline",
+      business_motion: businessMotionForOpportunity(c.relationship, stage),
       value: int(1, 200) * 100000,
-      stage: pick(STAGES),
+      stage,
+      source_url: demoUrl(`sources/pipeline/${String(on).padStart(4, "0")}`),
+      contract_url: demoUrl(`contracts/${String(on).padStart(4, "0")}`),
+      document_url: demoUrl(`documents/opportunities/${String(on).padStart(4, "0")}.pdf`),
       close_date: new Date(AS_OF + int(-120, 180) * 86400000).toISOString().slice(0, 10),
+      ...provenance("Simulated Salesforce Opportunities"),
     });
   }
 }
@@ -231,9 +325,14 @@ for (const c of newsCompanies) {
     headline: newsHeadline(ev, c.name, value),
     body: `${q} Industry watchers say the move could reshape supplier dynamics in the segment.`,
     subject_id: c.id,
+    account_status: accountStatusForRelationship(c.relationship),
+    business_motion: businessMotionForSignal(c.relationship, ev),
     event_type: ev,
     ...(value !== undefined ? { value } : {}),
     source_quote: q,
+    source_url: demoUrl(`public-news/${String(nn).padStart(2, "0")}`),
+    document_url: demoUrl(`documents/news/${String(nn).padStart(2, "0")}.pdf`),
+    ...provenance("Simulated Public News Snapshot"),
   });
 }
 

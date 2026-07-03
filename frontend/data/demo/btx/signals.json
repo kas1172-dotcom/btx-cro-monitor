@@ -1,0 +1,3171 @@
+[
+  {
+    "id": "sig-0001",
+    "event_type": "government_contract_award",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "value": 1700000,
+    "confidence": 0.91,
+    "source_quote": "BTX Precision was awarded a $1.7M government contract.",
+    "detected_at": "2026-06-17T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "manage_current_business",
+    "source_url": "https://demo.btx.example/sources/signals/0001",
+    "document_url": "https://demo.btx.example/documents/signals/0001.pdf"
+  },
+  {
+    "id": "sig-0002",
+    "event_type": "government_contract_award",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "value": 8000000,
+    "confidence": 0.84,
+    "source_quote": "BTX Precision was awarded a $8.0M government contract.",
+    "detected_at": "2026-06-17T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "manage_current_business",
+    "source_url": "https://demo.btx.example/sources/signals/0002",
+    "document_url": "https://demo.btx.example/documents/signals/0002.pdf"
+  },
+  {
+    "id": "sig-0003",
+    "event_type": "quality_escape",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.79,
+    "source_quote": "A quality escape at BTX Precision triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-10T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0003",
+    "document_url": "https://demo.btx.example/documents/signals/0003.pdf"
+  },
+  {
+    "id": "sig-0004",
+    "event_type": "demand_spike",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.89,
+    "source_quote": "Demand for BTX Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-26T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "manage_current_business",
+    "source_url": "https://demo.btx.example/sources/signals/0004",
+    "document_url": "https://demo.btx.example/documents/signals/0004.pdf"
+  },
+  {
+    "id": "sig-0005",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.96,
+    "source_quote": "BTX Precision is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-12T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0005",
+    "document_url": "https://demo.btx.example/documents/signals/0005.pdf"
+  },
+  {
+    "id": "sig-0006",
+    "event_type": "quality_escape",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "confidence": 0.83,
+    "source_quote": "A quality escape at BTX Precision triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-30T00:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0006",
+    "document_url": "https://demo.btx.example/documents/signals/0006.pdf"
+  },
+  {
+    "id": "sig-0007",
+    "event_type": "contract_loss",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "value": 6000000,
+    "confidence": 0.87,
+    "source_quote": "BTX Precision lost a $6.0M recompete it had held for years.",
+    "detected_at": "2026-06-15T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0007",
+    "document_url": "https://demo.btx.example/documents/signals/0007.pdf"
+  },
+  {
+    "id": "sig-0008",
+    "event_type": "contract_loss",
+    "entities": [
+      "BTX Precision"
+    ],
+    "subject_id": "btx-precision",
+    "value": 3300000,
+    "confidence": 0.76,
+    "source_quote": "BTX Precision lost a $3.3M recompete it had held for years.",
+    "detected_at": "2026-06-05T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0008",
+    "document_url": "https://demo.btx.example/documents/signals/0008.pdf"
+  },
+  {
+    "id": "sig-0009",
+    "event_type": "demand_spike",
+    "entities": [
+      "Anvil Manufacturing"
+    ],
+    "subject_id": "anvil-manufacturing",
+    "confidence": 0.96,
+    "source_quote": "Demand for Anvil Manufacturing's products spiked on new program starts.",
+    "detected_at": "2026-06-13T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0009",
+    "document_url": "https://demo.btx.example/documents/signals/0009.pdf"
+  },
+  {
+    "id": "sig-0010",
+    "event_type": "contract_win",
+    "entities": [
+      "Anvil Manufacturing"
+    ],
+    "subject_id": "anvil-manufacturing",
+    "value": 15900000,
+    "confidence": 0.72,
+    "source_quote": "Anvil Manufacturing booked a $15.9M multi-year production contract.",
+    "detected_at": "2026-06-20T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0010",
+    "document_url": "https://demo.btx.example/documents/signals/0010.pdf"
+  },
+  {
+    "id": "sig-0011",
+    "event_type": "contract_win",
+    "entities": [
+      "Anvil Manufacturing"
+    ],
+    "subject_id": "anvil-manufacturing",
+    "value": 6200000,
+    "confidence": 0.98,
+    "source_quote": "Anvil Manufacturing booked a $6.2M multi-year production contract.",
+    "detected_at": "2026-06-19T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0011",
+    "document_url": "https://demo.btx.example/documents/signals/0011.pdf"
+  },
+  {
+    "id": "sig-0012",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Anvil Manufacturing"
+    ],
+    "subject_id": "anvil-manufacturing",
+    "confidence": 0.73,
+    "source_quote": "Anvil Manufacturing posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-20T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0012",
+    "document_url": "https://demo.btx.example/documents/signals/0012.pdf"
+  },
+  {
+    "id": "sig-0013",
+    "event_type": "quality_escape",
+    "entities": [
+      "Meridian Technologies"
+    ],
+    "subject_id": "meridian-technologies",
+    "confidence": 0.86,
+    "source_quote": "A quality escape at Meridian Technologies triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-26T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0013",
+    "document_url": "https://demo.btx.example/documents/signals/0013.pdf"
+  },
+  {
+    "id": "sig-0014",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Meridian Technologies"
+    ],
+    "subject_id": "meridian-technologies",
+    "confidence": 0.95,
+    "source_quote": "New compliance requirements affect Meridian Technologies's certified processes.",
+    "detected_at": "2026-06-08T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0014",
+    "document_url": "https://demo.btx.example/documents/signals/0014.pdf"
+  },
+  {
+    "id": "sig-0015",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Meridian Technologies"
+    ],
+    "subject_id": "meridian-technologies",
+    "confidence": 0.73,
+    "source_quote": "Meridian Technologies raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-05-31T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0015",
+    "document_url": "https://demo.btx.example/documents/signals/0015.pdf"
+  },
+  {
+    "id": "sig-0016",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Meridian Technologies"
+    ],
+    "subject_id": "meridian-technologies",
+    "confidence": 0.68,
+    "source_quote": "New compliance requirements affect Meridian Technologies's certified processes.",
+    "detected_at": "2026-06-18T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0016",
+    "document_url": "https://demo.btx.example/documents/signals/0016.pdf"
+  },
+  {
+    "id": "sig-0017",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Meridian Technologies"
+    ],
+    "subject_id": "meridian-technologies",
+    "confidence": 0.72,
+    "source_quote": "Meridian Technologies notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-26T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0017",
+    "document_url": "https://demo.btx.example/documents/signals/0017.pdf"
+  },
+  {
+    "id": "sig-0018",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Falcon Fabrication"
+    ],
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.85,
+    "source_quote": "Falcon Fabrication notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-28T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0018",
+    "document_url": "https://demo.btx.example/documents/signals/0018.pdf"
+  },
+  {
+    "id": "sig-0019",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Falcon Fabrication"
+    ],
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.94,
+    "source_quote": "Falcon Fabrication notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-18T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0019",
+    "document_url": "https://demo.btx.example/documents/signals/0019.pdf"
+  },
+  {
+    "id": "sig-0020",
+    "event_type": "quality_escape",
+    "entities": [
+      "Falcon Fabrication"
+    ],
+    "subject_id": "falcon-fabrication",
+    "confidence": 0.74,
+    "source_quote": "A quality escape at Falcon Fabrication triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-12T14:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0020",
+    "document_url": "https://demo.btx.example/documents/signals/0020.pdf"
+  },
+  {
+    "id": "sig-0021",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Monarch Technologies"
+    ],
+    "subject_id": "monarch-technologies",
+    "value": 800000,
+    "confidence": 0.92,
+    "source_quote": "Monarch Technologies was awarded a $0.8M government contract.",
+    "detected_at": "2026-06-24T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0021",
+    "document_url": "https://demo.btx.example/documents/signals/0021.pdf"
+  },
+  {
+    "id": "sig-0022",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Monarch Technologies"
+    ],
+    "subject_id": "monarch-technologies",
+    "confidence": 0.9,
+    "source_quote": "Monarch Technologies posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-06T02:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0022",
+    "document_url": "https://demo.btx.example/documents/signals/0022.pdf"
+  },
+  {
+    "id": "sig-0023",
+    "event_type": "contract_win",
+    "entities": [
+      "Strata Turbine"
+    ],
+    "subject_id": "strata-turbine",
+    "value": 800000,
+    "confidence": 0.83,
+    "source_quote": "Strata Turbine booked a $0.8M multi-year production contract.",
+    "detected_at": "2026-06-17T13:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0023",
+    "document_url": "https://demo.btx.example/documents/signals/0023.pdf"
+  },
+  {
+    "id": "sig-0024",
+    "event_type": "contract_win",
+    "entities": [
+      "Strata Turbine"
+    ],
+    "subject_id": "strata-turbine",
+    "value": 16700000,
+    "confidence": 0.8,
+    "source_quote": "Strata Turbine booked a $16.7M multi-year production contract.",
+    "detected_at": "2026-06-12T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0024",
+    "document_url": "https://demo.btx.example/documents/signals/0024.pdf"
+  },
+  {
+    "id": "sig-0025",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Strata Turbine"
+    ],
+    "subject_id": "strata-turbine",
+    "value": 18400000,
+    "confidence": 0.9,
+    "source_quote": "Strata Turbine was awarded a $18.4M government contract.",
+    "detected_at": "2026-06-01T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0025",
+    "document_url": "https://demo.btx.example/documents/signals/0025.pdf"
+  },
+  {
+    "id": "sig-0026",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Anvil Systems"
+    ],
+    "subject_id": "anvil-systems",
+    "confidence": 0.85,
+    "source_quote": "New compliance requirements affect Anvil Systems's certified processes.",
+    "detected_at": "2026-06-29T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0026",
+    "document_url": "https://demo.btx.example/documents/signals/0026.pdf"
+  },
+  {
+    "id": "sig-0027",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Anvil Systems"
+    ],
+    "subject_id": "anvil-systems",
+    "confidence": 0.81,
+    "source_quote": "Anvil Systems raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-05T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0027",
+    "document_url": "https://demo.btx.example/documents/signals/0027.pdf"
+  },
+  {
+    "id": "sig-0028",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Anvil Systems"
+    ],
+    "subject_id": "anvil-systems",
+    "confidence": 0.7,
+    "source_quote": "Anvil Systems is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-05-31T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0028",
+    "document_url": "https://demo.btx.example/documents/signals/0028.pdf"
+  },
+  {
+    "id": "sig-0029",
+    "event_type": "quality_escape",
+    "entities": [
+      "Anvil Systems"
+    ],
+    "subject_id": "anvil-systems",
+    "confidence": 0.96,
+    "source_quote": "A quality escape at Anvil Systems triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-20T01:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0029",
+    "document_url": "https://demo.btx.example/documents/signals/0029.pdf"
+  },
+  {
+    "id": "sig-0030",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Anvil Systems"
+    ],
+    "subject_id": "anvil-systems",
+    "confidence": 0.97,
+    "source_quote": "Anvil Systems is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-27T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0030",
+    "document_url": "https://demo.btx.example/documents/signals/0030.pdf"
+  },
+  {
+    "id": "sig-0031",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Sentinel Alloys"
+    ],
+    "subject_id": "sentinel-alloys",
+    "value": 12400000,
+    "confidence": 0.67,
+    "source_quote": "Sentinel Alloys was awarded a $12.4M government contract.",
+    "detected_at": "2026-06-20T02:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0031",
+    "document_url": "https://demo.btx.example/documents/signals/0031.pdf"
+  },
+  {
+    "id": "sig-0032",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Sentinel Alloys"
+    ],
+    "subject_id": "sentinel-alloys",
+    "confidence": 0.91,
+    "source_quote": "Sentinel Alloys posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-17T07:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0032",
+    "document_url": "https://demo.btx.example/documents/signals/0032.pdf"
+  },
+  {
+    "id": "sig-0033",
+    "event_type": "contract_win",
+    "entities": [
+      "Cardinal Metalworks"
+    ],
+    "subject_id": "cardinal-metalworks",
+    "value": 2800000,
+    "confidence": 0.89,
+    "source_quote": "Cardinal Metalworks booked a $2.8M multi-year production contract.",
+    "detected_at": "2026-06-20T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0033",
+    "document_url": "https://demo.btx.example/documents/signals/0033.pdf"
+  },
+  {
+    "id": "sig-0034",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Cardinal Metalworks"
+    ],
+    "subject_id": "cardinal-metalworks",
+    "confidence": 0.78,
+    "source_quote": "Cardinal Metalworks posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-15T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0034",
+    "document_url": "https://demo.btx.example/documents/signals/0034.pdf"
+  },
+  {
+    "id": "sig-0035",
+    "event_type": "contract_win",
+    "entities": [
+      "Cardinal Metalworks"
+    ],
+    "subject_id": "cardinal-metalworks",
+    "value": 10300000,
+    "confidence": 0.74,
+    "source_quote": "Cardinal Metalworks booked a $10.3M multi-year production contract.",
+    "detected_at": "2026-06-24T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0035",
+    "document_url": "https://demo.btx.example/documents/signals/0035.pdf"
+  },
+  {
+    "id": "sig-0036",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Cardinal Metalworks"
+    ],
+    "subject_id": "cardinal-metalworks",
+    "confidence": 0.71,
+    "source_quote": "Cardinal Metalworks announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-13T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0036",
+    "document_url": "https://demo.btx.example/documents/signals/0036.pdf"
+  },
+  {
+    "id": "sig-0037",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Cardinal Metalworks"
+    ],
+    "subject_id": "cardinal-metalworks",
+    "confidence": 0.87,
+    "source_quote": "Cardinal Metalworks announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-23T02:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0037",
+    "document_url": "https://demo.btx.example/documents/signals/0037.pdf"
+  },
+  {
+    "id": "sig-0038",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Monarch Alloys"
+    ],
+    "subject_id": "monarch-alloys",
+    "confidence": 0.72,
+    "source_quote": "Monarch Alloys posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-03T18:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0038",
+    "document_url": "https://demo.btx.example/documents/signals/0038.pdf"
+  },
+  {
+    "id": "sig-0039",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Monarch Alloys"
+    ],
+    "subject_id": "monarch-alloys",
+    "value": 5900000,
+    "confidence": 0.65,
+    "source_quote": "Monarch Alloys was awarded a $5.9M government contract.",
+    "detected_at": "2026-06-02T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0039",
+    "document_url": "https://demo.btx.example/documents/signals/0039.pdf"
+  },
+  {
+    "id": "sig-0040",
+    "event_type": "demand_spike",
+    "entities": [
+      "Monarch Alloys"
+    ],
+    "subject_id": "monarch-alloys",
+    "confidence": 0.68,
+    "source_quote": "Demand for Monarch Alloys's products spiked on new program starts.",
+    "detected_at": "2026-06-02T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0040",
+    "document_url": "https://demo.btx.example/documents/signals/0040.pdf"
+  },
+  {
+    "id": "sig-0041",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Monarch Alloys"
+    ],
+    "subject_id": "monarch-alloys",
+    "confidence": 0.86,
+    "source_quote": "Monarch Alloys posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-25T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0041",
+    "document_url": "https://demo.btx.example/documents/signals/0041.pdf"
+  },
+  {
+    "id": "sig-0042",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Sentinel Aerospace"
+    ],
+    "subject_id": "sentinel-aerospace",
+    "value": 15400000,
+    "confidence": 0.97,
+    "source_quote": "Sentinel Aerospace was awarded a $15.4M government contract.",
+    "detected_at": "2026-06-07T18:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0042",
+    "document_url": "https://demo.btx.example/documents/signals/0042.pdf"
+  },
+  {
+    "id": "sig-0043",
+    "event_type": "demand_spike",
+    "entities": [
+      "Sentinel Aerospace"
+    ],
+    "subject_id": "sentinel-aerospace",
+    "confidence": 0.91,
+    "source_quote": "Demand for Sentinel Aerospace's products spiked on new program starts.",
+    "detected_at": "2026-06-01T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0043",
+    "document_url": "https://demo.btx.example/documents/signals/0043.pdf"
+  },
+  {
+    "id": "sig-0044",
+    "event_type": "contract_win",
+    "entities": [
+      "Sentinel Aerospace"
+    ],
+    "subject_id": "sentinel-aerospace",
+    "value": 1400000,
+    "confidence": 0.81,
+    "source_quote": "Sentinel Aerospace booked a $1.4M multi-year production contract.",
+    "detected_at": "2026-06-04T14:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0044",
+    "document_url": "https://demo.btx.example/documents/signals/0044.pdf"
+  },
+  {
+    "id": "sig-0045",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Sentinel Aerospace"
+    ],
+    "subject_id": "sentinel-aerospace",
+    "confidence": 0.88,
+    "source_quote": "Sentinel Aerospace posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-04T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0045",
+    "document_url": "https://demo.btx.example/documents/signals/0045.pdf"
+  },
+  {
+    "id": "sig-0046",
+    "event_type": "demand_spike",
+    "entities": [
+      "Sentinel Aerospace"
+    ],
+    "subject_id": "sentinel-aerospace",
+    "confidence": 0.67,
+    "source_quote": "Demand for Sentinel Aerospace's products spiked on new program starts.",
+    "detected_at": "2026-06-24T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0046",
+    "document_url": "https://demo.btx.example/documents/signals/0046.pdf"
+  },
+  {
+    "id": "sig-0047",
+    "event_type": "quality_escape",
+    "entities": [
+      "Beacon Alloys"
+    ],
+    "subject_id": "beacon-alloys",
+    "confidence": 0.71,
+    "source_quote": "A quality escape at Beacon Alloys triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-24T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0047",
+    "document_url": "https://demo.btx.example/documents/signals/0047.pdf"
+  },
+  {
+    "id": "sig-0048",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Beacon Alloys"
+    ],
+    "subject_id": "beacon-alloys",
+    "confidence": 0.93,
+    "source_quote": "Beacon Alloys is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-03T07:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0048",
+    "document_url": "https://demo.btx.example/documents/signals/0048.pdf"
+  },
+  {
+    "id": "sig-0049",
+    "event_type": "demand_spike",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "confidence": 0.86,
+    "source_quote": "Demand for Halcyon Components's products spiked on new program starts.",
+    "detected_at": "2026-06-22T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0049",
+    "document_url": "https://demo.btx.example/documents/signals/0049.pdf"
+  },
+  {
+    "id": "sig-0050",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "confidence": 0.76,
+    "source_quote": "Halcyon Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-22T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0050",
+    "document_url": "https://demo.btx.example/documents/signals/0050.pdf"
+  },
+  {
+    "id": "sig-0051",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "value": 5900000,
+    "confidence": 0.75,
+    "source_quote": "Halcyon Components was awarded a $5.9M government contract.",
+    "detected_at": "2026-06-05T15:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0051",
+    "document_url": "https://demo.btx.example/documents/signals/0051.pdf"
+  },
+  {
+    "id": "sig-0052",
+    "event_type": "demand_spike",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "confidence": 0.88,
+    "source_quote": "Demand for Halcyon Components's products spiked on new program starts.",
+    "detected_at": "2026-06-09T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0052",
+    "document_url": "https://demo.btx.example/documents/signals/0052.pdf"
+  },
+  {
+    "id": "sig-0053",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Components"
+    ],
+    "subject_id": "halcyon-components",
+    "value": 10800000,
+    "confidence": 0.72,
+    "source_quote": "Halcyon Components was awarded a $10.8M government contract.",
+    "detected_at": "2026-06-16T13:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0053",
+    "document_url": "https://demo.btx.example/documents/signals/0053.pdf"
+  },
+  {
+    "id": "sig-0054",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Vanguard Systems"
+    ],
+    "subject_id": "vanguard-systems",
+    "confidence": 0.77,
+    "source_quote": "Vanguard Systems posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-18T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0054",
+    "document_url": "https://demo.btx.example/documents/signals/0054.pdf"
+  },
+  {
+    "id": "sig-0055",
+    "event_type": "demand_spike",
+    "entities": [
+      "Vanguard Systems"
+    ],
+    "subject_id": "vanguard-systems",
+    "confidence": 0.75,
+    "source_quote": "Demand for Vanguard Systems's products spiked on new program starts.",
+    "detected_at": "2026-06-01T14:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0055",
+    "document_url": "https://demo.btx.example/documents/signals/0055.pdf"
+  },
+  {
+    "id": "sig-0056",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Nimbus Technologies"
+    ],
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.83,
+    "source_quote": "Nimbus Technologies is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-26T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0056",
+    "document_url": "https://demo.btx.example/documents/signals/0056.pdf"
+  },
+  {
+    "id": "sig-0057",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Nimbus Technologies"
+    ],
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.66,
+    "source_quote": "Nimbus Technologies raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-12T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0057",
+    "document_url": "https://demo.btx.example/documents/signals/0057.pdf"
+  },
+  {
+    "id": "sig-0058",
+    "event_type": "quality_escape",
+    "entities": [
+      "Nimbus Technologies"
+    ],
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.74,
+    "source_quote": "A quality escape at Nimbus Technologies triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-02T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0058",
+    "document_url": "https://demo.btx.example/documents/signals/0058.pdf"
+  },
+  {
+    "id": "sig-0059",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Nimbus Technologies"
+    ],
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.76,
+    "source_quote": "New compliance requirements affect Nimbus Technologies's certified processes.",
+    "detected_at": "2026-06-20T01:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0059",
+    "document_url": "https://demo.btx.example/documents/signals/0059.pdf"
+  },
+  {
+    "id": "sig-0060",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Nimbus Technologies"
+    ],
+    "subject_id": "nimbus-technologies",
+    "confidence": 0.97,
+    "source_quote": "Nimbus Technologies is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-06T18:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0060",
+    "document_url": "https://demo.btx.example/documents/signals/0060.pdf"
+  },
+  {
+    "id": "sig-0061",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Falcon Tooling"
+    ],
+    "subject_id": "falcon-tooling",
+    "confidence": 0.96,
+    "source_quote": "Falcon Tooling announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-20T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0061",
+    "document_url": "https://demo.btx.example/documents/signals/0061.pdf"
+  },
+  {
+    "id": "sig-0062",
+    "event_type": "contract_win",
+    "entities": [
+      "Falcon Tooling"
+    ],
+    "subject_id": "falcon-tooling",
+    "value": 5300000,
+    "confidence": 0.89,
+    "source_quote": "Falcon Tooling booked a $5.3M multi-year production contract.",
+    "detected_at": "2026-06-03T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0062",
+    "document_url": "https://demo.btx.example/documents/signals/0062.pdf"
+  },
+  {
+    "id": "sig-0063",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Titan Precision"
+    ],
+    "subject_id": "titan-precision",
+    "confidence": 0.94,
+    "source_quote": "Titan Precision posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-20T00:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0063",
+    "document_url": "https://demo.btx.example/documents/signals/0063.pdf"
+  },
+  {
+    "id": "sig-0064",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Titan Precision"
+    ],
+    "subject_id": "titan-precision",
+    "value": 1200000,
+    "confidence": 0.87,
+    "source_quote": "Titan Precision was awarded a $1.2M government contract.",
+    "detected_at": "2026-05-31T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0064",
+    "document_url": "https://demo.btx.example/documents/signals/0064.pdf"
+  },
+  {
+    "id": "sig-0065",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Titan Components"
+    ],
+    "subject_id": "titan-components",
+    "confidence": 0.95,
+    "source_quote": "Titan Components notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-17T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0065",
+    "document_url": "https://demo.btx.example/documents/signals/0065.pdf"
+  },
+  {
+    "id": "sig-0066",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Titan Components"
+    ],
+    "subject_id": "titan-components",
+    "confidence": 0.78,
+    "source_quote": "New compliance requirements affect Titan Components's certified processes.",
+    "detected_at": "2026-06-07T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0066",
+    "document_url": "https://demo.btx.example/documents/signals/0066.pdf"
+  },
+  {
+    "id": "sig-0067",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Titan Components"
+    ],
+    "subject_id": "titan-components",
+    "confidence": 0.79,
+    "source_quote": "Titan Components is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-25T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0067",
+    "document_url": "https://demo.btx.example/documents/signals/0067.pdf"
+  },
+  {
+    "id": "sig-0068",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Cardinal Components"
+    ],
+    "subject_id": "cardinal-components",
+    "value": 3500000,
+    "confidence": 0.83,
+    "source_quote": "Cardinal Components was awarded a $3.5M government contract.",
+    "detected_at": "2026-06-16T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0068",
+    "document_url": "https://demo.btx.example/documents/signals/0068.pdf"
+  },
+  {
+    "id": "sig-0069",
+    "event_type": "demand_spike",
+    "entities": [
+      "Cardinal Components"
+    ],
+    "subject_id": "cardinal-components",
+    "confidence": 0.72,
+    "source_quote": "Demand for Cardinal Components's products spiked on new program starts.",
+    "detected_at": "2026-06-01T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0069",
+    "document_url": "https://demo.btx.example/documents/signals/0069.pdf"
+  },
+  {
+    "id": "sig-0070",
+    "event_type": "demand_spike",
+    "entities": [
+      "Cardinal Components"
+    ],
+    "subject_id": "cardinal-components",
+    "confidence": 0.7,
+    "source_quote": "Demand for Cardinal Components's products spiked on new program starts.",
+    "detected_at": "2026-06-24T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0070",
+    "document_url": "https://demo.btx.example/documents/signals/0070.pdf"
+  },
+  {
+    "id": "sig-0071",
+    "event_type": "contract_win",
+    "entities": [
+      "Cardinal Components"
+    ],
+    "subject_id": "cardinal-components",
+    "value": 12700000,
+    "confidence": 0.88,
+    "source_quote": "Cardinal Components booked a $12.7M multi-year production contract.",
+    "detected_at": "2026-06-16T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0071",
+    "document_url": "https://demo.btx.example/documents/signals/0071.pdf"
+  },
+  {
+    "id": "sig-0072",
+    "event_type": "demand_spike",
+    "entities": [
+      "Pinnacle Forgings"
+    ],
+    "subject_id": "pinnacle-forgings",
+    "confidence": 0.87,
+    "source_quote": "Demand for Pinnacle Forgings's products spiked on new program starts.",
+    "detected_at": "2026-06-05T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0072",
+    "document_url": "https://demo.btx.example/documents/signals/0072.pdf"
+  },
+  {
+    "id": "sig-0073",
+    "event_type": "contract_win",
+    "entities": [
+      "Pinnacle Forgings"
+    ],
+    "subject_id": "pinnacle-forgings",
+    "value": 16900000,
+    "confidence": 0.7,
+    "source_quote": "Pinnacle Forgings booked a $16.9M multi-year production contract.",
+    "detected_at": "2026-06-20T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0073",
+    "document_url": "https://demo.btx.example/documents/signals/0073.pdf"
+  },
+  {
+    "id": "sig-0074",
+    "event_type": "contract_win",
+    "entities": [
+      "Pinnacle Forgings"
+    ],
+    "subject_id": "pinnacle-forgings",
+    "value": 18000000,
+    "confidence": 0.71,
+    "source_quote": "Pinnacle Forgings booked a $18.0M multi-year production contract.",
+    "detected_at": "2026-06-23T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0074",
+    "document_url": "https://demo.btx.example/documents/signals/0074.pdf"
+  },
+  {
+    "id": "sig-0075",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Bastion Tooling"
+    ],
+    "subject_id": "bastion-tooling",
+    "value": 14600000,
+    "confidence": 0.91,
+    "source_quote": "Bastion Tooling was awarded a $14.6M government contract.",
+    "detected_at": "2026-06-05T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0075",
+    "document_url": "https://demo.btx.example/documents/signals/0075.pdf"
+  },
+  {
+    "id": "sig-0076",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Bastion Tooling"
+    ],
+    "subject_id": "bastion-tooling",
+    "confidence": 0.67,
+    "source_quote": "Bastion Tooling posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-17T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0076",
+    "document_url": "https://demo.btx.example/documents/signals/0076.pdf"
+  },
+  {
+    "id": "sig-0077",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Bastion Tooling"
+    ],
+    "subject_id": "bastion-tooling",
+    "confidence": 0.82,
+    "source_quote": "Bastion Tooling announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-27T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0077",
+    "document_url": "https://demo.btx.example/documents/signals/0077.pdf"
+  },
+  {
+    "id": "sig-0078",
+    "event_type": "quality_escape",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.95,
+    "source_quote": "A quality escape at Meridian Systems triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-10T04:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0078",
+    "document_url": "https://demo.btx.example/documents/signals/0078.pdf"
+  },
+  {
+    "id": "sig-0079",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Meridian Systems"
+    ],
+    "subject_id": "meridian-systems",
+    "confidence": 0.71,
+    "source_quote": "New compliance requirements affect Meridian Systems's certified processes.",
+    "detected_at": "2026-06-08T00:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0079",
+    "document_url": "https://demo.btx.example/documents/signals/0079.pdf"
+  },
+  {
+    "id": "sig-0080",
+    "event_type": "contract_win",
+    "entities": [
+      "Granite Components"
+    ],
+    "subject_id": "granite-components",
+    "value": 8000000,
+    "confidence": 0.68,
+    "source_quote": "Granite Components booked a $8.0M multi-year production contract.",
+    "detected_at": "2026-06-17T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0080",
+    "document_url": "https://demo.btx.example/documents/signals/0080.pdf"
+  },
+  {
+    "id": "sig-0081",
+    "event_type": "contract_win",
+    "entities": [
+      "Granite Components"
+    ],
+    "subject_id": "granite-components",
+    "value": 3900000,
+    "confidence": 0.85,
+    "source_quote": "Granite Components booked a $3.9M multi-year production contract.",
+    "detected_at": "2026-06-08T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0081",
+    "document_url": "https://demo.btx.example/documents/signals/0081.pdf"
+  },
+  {
+    "id": "sig-0082",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Granite Components"
+    ],
+    "subject_id": "granite-components",
+    "confidence": 0.74,
+    "source_quote": "Granite Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-19T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0082",
+    "document_url": "https://demo.btx.example/documents/signals/0082.pdf"
+  },
+  {
+    "id": "sig-0083",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Granite Components"
+    ],
+    "subject_id": "granite-components",
+    "confidence": 0.97,
+    "source_quote": "Granite Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-24T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0083",
+    "document_url": "https://demo.btx.example/documents/signals/0083.pdf"
+  },
+  {
+    "id": "sig-0084",
+    "event_type": "contract_win",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "value": 4700000,
+    "confidence": 0.82,
+    "source_quote": "Nimbus Components booked a $4.7M multi-year production contract.",
+    "detected_at": "2026-06-23T15:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0084",
+    "document_url": "https://demo.btx.example/documents/signals/0084.pdf"
+  },
+  {
+    "id": "sig-0085",
+    "event_type": "demand_spike",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "confidence": 0.82,
+    "source_quote": "Demand for Nimbus Components's products spiked on new program starts.",
+    "detected_at": "2026-06-19T14:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0085",
+    "document_url": "https://demo.btx.example/documents/signals/0085.pdf"
+  },
+  {
+    "id": "sig-0086",
+    "event_type": "demand_spike",
+    "entities": [
+      "Nimbus Components"
+    ],
+    "subject_id": "nimbus-components",
+    "confidence": 0.96,
+    "source_quote": "Demand for Nimbus Components's products spiked on new program starts.",
+    "detected_at": "2026-06-06T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0086",
+    "document_url": "https://demo.btx.example/documents/signals/0086.pdf"
+  },
+  {
+    "id": "sig-0087",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Delta Precision"
+    ],
+    "subject_id": "delta-precision",
+    "value": 10800000,
+    "confidence": 0.78,
+    "source_quote": "Delta Precision was awarded a $10.8M government contract.",
+    "detected_at": "2026-06-29T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0087",
+    "document_url": "https://demo.btx.example/documents/signals/0087.pdf"
+  },
+  {
+    "id": "sig-0088",
+    "event_type": "demand_spike",
+    "entities": [
+      "Delta Precision"
+    ],
+    "subject_id": "delta-precision",
+    "confidence": 0.94,
+    "source_quote": "Demand for Delta Precision's products spiked on new program starts.",
+    "detected_at": "2026-06-12T01:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0088",
+    "document_url": "https://demo.btx.example/documents/signals/0088.pdf"
+  },
+  {
+    "id": "sig-0089",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Delta Precision"
+    ],
+    "subject_id": "delta-precision",
+    "value": 8900000,
+    "confidence": 0.72,
+    "source_quote": "Delta Precision was awarded a $8.9M government contract.",
+    "detected_at": "2026-06-22T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0089",
+    "document_url": "https://demo.btx.example/documents/signals/0089.pdf"
+  },
+  {
+    "id": "sig-0090",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Aegis Components"
+    ],
+    "subject_id": "aegis-components",
+    "confidence": 0.81,
+    "source_quote": "Aegis Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-15T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0090",
+    "document_url": "https://demo.btx.example/documents/signals/0090.pdf"
+  },
+  {
+    "id": "sig-0091",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Aegis Components"
+    ],
+    "subject_id": "aegis-components",
+    "value": 19900000,
+    "confidence": 0.95,
+    "source_quote": "Aegis Components was awarded a $19.9M government contract.",
+    "detected_at": "2026-06-14T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0091",
+    "document_url": "https://demo.btx.example/documents/signals/0091.pdf"
+  },
+  {
+    "id": "sig-0092",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.77,
+    "source_quote": "Meridian Aerospace notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-12T01:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0092",
+    "document_url": "https://demo.btx.example/documents/signals/0092.pdf"
+  },
+  {
+    "id": "sig-0093",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.7,
+    "source_quote": "New compliance requirements affect Meridian Aerospace's certified processes.",
+    "detected_at": "2026-06-20T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0093",
+    "document_url": "https://demo.btx.example/documents/signals/0093.pdf"
+  },
+  {
+    "id": "sig-0094",
+    "event_type": "quality_escape",
+    "entities": [
+      "Meridian Aerospace"
+    ],
+    "subject_id": "meridian-aerospace",
+    "confidence": 0.68,
+    "source_quote": "A quality escape at Meridian Aerospace triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-22T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0094",
+    "document_url": "https://demo.btx.example/documents/signals/0094.pdf"
+  },
+  {
+    "id": "sig-0095",
+    "event_type": "demand_spike",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "confidence": 0.78,
+    "source_quote": "Demand for Axiom Components's products spiked on new program starts.",
+    "detected_at": "2026-06-04T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0095",
+    "document_url": "https://demo.btx.example/documents/signals/0095.pdf"
+  },
+  {
+    "id": "sig-0096",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "value": 9800000,
+    "confidence": 0.82,
+    "source_quote": "Axiom Components was awarded a $9.8M government contract.",
+    "detected_at": "2026-06-06T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0096",
+    "document_url": "https://demo.btx.example/documents/signals/0096.pdf"
+  },
+  {
+    "id": "sig-0097",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Axiom Components"
+    ],
+    "subject_id": "axiom-components",
+    "value": 6900000,
+    "confidence": 0.86,
+    "source_quote": "Axiom Components was awarded a $6.9M government contract.",
+    "detected_at": "2026-06-22T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "source_url": "https://demo.btx.example/sources/signals/0097",
+    "document_url": "https://demo.btx.example/documents/signals/0097.pdf"
+  },
+  {
+    "id": "sig-0098",
+    "event_type": "contract_win",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "value": 5900000,
+    "confidence": 0.77,
+    "source_quote": "Meridian Precision booked a $5.9M multi-year production contract.",
+    "detected_at": "2026-06-11T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0098",
+    "document_url": "https://demo.btx.example/documents/signals/0098.pdf"
+  },
+  {
+    "id": "sig-0099",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "confidence": 0.9,
+    "source_quote": "Meridian Precision posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-13T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0099",
+    "document_url": "https://demo.btx.example/documents/signals/0099.pdf"
+  },
+  {
+    "id": "sig-0100",
+    "event_type": "contract_win",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "value": 7400000,
+    "confidence": 0.83,
+    "source_quote": "Meridian Precision booked a $7.4M multi-year production contract.",
+    "detected_at": "2026-06-19T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0100",
+    "document_url": "https://demo.btx.example/documents/signals/0100.pdf"
+  },
+  {
+    "id": "sig-0101",
+    "event_type": "contract_win",
+    "entities": [
+      "Meridian Precision"
+    ],
+    "subject_id": "meridian-precision",
+    "value": 19800000,
+    "confidence": 0.77,
+    "source_quote": "Meridian Precision booked a $19.8M multi-year production contract.",
+    "detected_at": "2026-06-02T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0101",
+    "document_url": "https://demo.btx.example/documents/signals/0101.pdf"
+  },
+  {
+    "id": "sig-0102",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "confidence": 0.69,
+    "source_quote": "Sterling Turbine posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-10T00:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0102",
+    "document_url": "https://demo.btx.example/documents/signals/0102.pdf"
+  },
+  {
+    "id": "sig-0103",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "value": 2800000,
+    "confidence": 0.78,
+    "source_quote": "Sterling Turbine was awarded a $2.8M government contract.",
+    "detected_at": "2026-06-07T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0103",
+    "document_url": "https://demo.btx.example/documents/signals/0103.pdf"
+  },
+  {
+    "id": "sig-0104",
+    "event_type": "contract_win",
+    "entities": [
+      "Sterling Turbine"
+    ],
+    "subject_id": "sterling-turbine",
+    "value": 3100000,
+    "confidence": 0.93,
+    "source_quote": "Sterling Turbine booked a $3.1M multi-year production contract.",
+    "detected_at": "2026-06-26T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0104",
+    "document_url": "https://demo.btx.example/documents/signals/0104.pdf"
+  },
+  {
+    "id": "sig-0105",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "value": 20000000,
+    "confidence": 0.86,
+    "source_quote": "Ironclad Defense was awarded a $20.0M government contract.",
+    "detected_at": "2026-06-01T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0105",
+    "document_url": "https://demo.btx.example/documents/signals/0105.pdf"
+  },
+  {
+    "id": "sig-0106",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "value": 19200000,
+    "confidence": 0.71,
+    "source_quote": "Ironclad Defense was awarded a $19.2M government contract.",
+    "detected_at": "2026-06-01T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0106",
+    "document_url": "https://demo.btx.example/documents/signals/0106.pdf"
+  },
+  {
+    "id": "sig-0107",
+    "event_type": "demand_spike",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "confidence": 0.83,
+    "source_quote": "Demand for Ironclad Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-14T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0107",
+    "document_url": "https://demo.btx.example/documents/signals/0107.pdf"
+  },
+  {
+    "id": "sig-0108",
+    "event_type": "demand_spike",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "confidence": 0.94,
+    "source_quote": "Demand for Ironclad Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-05T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0108",
+    "document_url": "https://demo.btx.example/documents/signals/0108.pdf"
+  },
+  {
+    "id": "sig-0109",
+    "event_type": "demand_spike",
+    "entities": [
+      "Ironclad Defense"
+    ],
+    "subject_id": "ironclad-defense",
+    "confidence": 0.92,
+    "source_quote": "Demand for Ironclad Defense's products spiked on new program starts.",
+    "detected_at": "2026-06-06T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0109",
+    "document_url": "https://demo.btx.example/documents/signals/0109.pdf"
+  },
+  {
+    "id": "sig-0110",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "value": 10600000,
+    "confidence": 0.9,
+    "source_quote": "Vertex Alloys was awarded a $10.6M government contract.",
+    "detected_at": "2026-06-18T07:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0110",
+    "document_url": "https://demo.btx.example/documents/signals/0110.pdf"
+  },
+  {
+    "id": "sig-0111",
+    "event_type": "contract_win",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "value": 19100000,
+    "confidence": 0.67,
+    "source_quote": "Vertex Alloys booked a $19.1M multi-year production contract.",
+    "detected_at": "2026-06-29T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0111",
+    "document_url": "https://demo.btx.example/documents/signals/0111.pdf"
+  },
+  {
+    "id": "sig-0112",
+    "event_type": "contract_win",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "value": 14700000,
+    "confidence": 0.96,
+    "source_quote": "Vertex Alloys booked a $14.7M multi-year production contract.",
+    "detected_at": "2026-06-26T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0112",
+    "document_url": "https://demo.btx.example/documents/signals/0112.pdf"
+  },
+  {
+    "id": "sig-0113",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "confidence": 0.75,
+    "source_quote": "Vertex Alloys posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-07T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0113",
+    "document_url": "https://demo.btx.example/documents/signals/0113.pdf"
+  },
+  {
+    "id": "sig-0114",
+    "event_type": "contract_win",
+    "entities": [
+      "Vertex Alloys"
+    ],
+    "subject_id": "vertex-alloys",
+    "value": 15700000,
+    "confidence": 0.69,
+    "source_quote": "Vertex Alloys booked a $15.7M multi-year production contract.",
+    "detected_at": "2026-06-04T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0114",
+    "document_url": "https://demo.btx.example/documents/signals/0114.pdf"
+  },
+  {
+    "id": "sig-0115",
+    "event_type": "quality_escape",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.83,
+    "source_quote": "A quality escape at Foundry Precision triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-26T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0115",
+    "document_url": "https://demo.btx.example/documents/signals/0115.pdf"
+  },
+  {
+    "id": "sig-0116",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.9,
+    "source_quote": "New compliance requirements affect Foundry Precision's certified processes.",
+    "detected_at": "2026-06-08T02:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0116",
+    "document_url": "https://demo.btx.example/documents/signals/0116.pdf"
+  },
+  {
+    "id": "sig-0117",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Foundry Precision"
+    ],
+    "subject_id": "foundry-precision",
+    "confidence": 0.93,
+    "source_quote": "Foundry Precision raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-12T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0117",
+    "document_url": "https://demo.btx.example/documents/signals/0117.pdf"
+  },
+  {
+    "id": "sig-0118",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Monarch Forgings"
+    ],
+    "subject_id": "monarch-forgings",
+    "value": 16300000,
+    "confidence": 0.8,
+    "source_quote": "Monarch Forgings was awarded a $16.3M government contract.",
+    "detected_at": "2026-06-20T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0118",
+    "document_url": "https://demo.btx.example/documents/signals/0118.pdf"
+  },
+  {
+    "id": "sig-0119",
+    "event_type": "contract_win",
+    "entities": [
+      "Monarch Forgings"
+    ],
+    "subject_id": "monarch-forgings",
+    "value": 15100000,
+    "confidence": 0.68,
+    "source_quote": "Monarch Forgings booked a $15.1M multi-year production contract.",
+    "detected_at": "2026-06-18T01:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0119",
+    "document_url": "https://demo.btx.example/documents/signals/0119.pdf"
+  },
+  {
+    "id": "sig-0120",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Monarch Forgings"
+    ],
+    "subject_id": "monarch-forgings",
+    "confidence": 0.78,
+    "source_quote": "Monarch Forgings posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-19T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0120",
+    "document_url": "https://demo.btx.example/documents/signals/0120.pdf"
+  },
+  {
+    "id": "sig-0121",
+    "event_type": "contract_win",
+    "entities": [
+      "Halcyon Manufacturing"
+    ],
+    "subject_id": "halcyon-manufacturing",
+    "value": 9100000,
+    "confidence": 0.89,
+    "source_quote": "Halcyon Manufacturing booked a $9.1M multi-year production contract.",
+    "detected_at": "2026-06-23T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0121",
+    "document_url": "https://demo.btx.example/documents/signals/0121.pdf"
+  },
+  {
+    "id": "sig-0122",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Manufacturing"
+    ],
+    "subject_id": "halcyon-manufacturing",
+    "value": 5000000,
+    "confidence": 0.83,
+    "source_quote": "Halcyon Manufacturing was awarded a $5.0M government contract.",
+    "detected_at": "2026-06-05T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0122",
+    "document_url": "https://demo.btx.example/documents/signals/0122.pdf"
+  },
+  {
+    "id": "sig-0123",
+    "event_type": "demand_spike",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "confidence": 0.66,
+    "source_quote": "Demand for Continental Components's products spiked on new program starts.",
+    "detected_at": "2026-06-27T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0123",
+    "document_url": "https://demo.btx.example/documents/signals/0123.pdf"
+  },
+  {
+    "id": "sig-0124",
+    "event_type": "demand_spike",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "confidence": 0.78,
+    "source_quote": "Demand for Continental Components's products spiked on new program starts.",
+    "detected_at": "2026-06-17T04:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0124",
+    "document_url": "https://demo.btx.example/documents/signals/0124.pdf"
+  },
+  {
+    "id": "sig-0125",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "value": 11500000,
+    "confidence": 0.75,
+    "source_quote": "Continental Components was awarded a $11.5M government contract.",
+    "detected_at": "2026-06-01T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0125",
+    "document_url": "https://demo.btx.example/documents/signals/0125.pdf"
+  },
+  {
+    "id": "sig-0126",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "confidence": 0.72,
+    "source_quote": "Continental Components posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-06T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0126",
+    "document_url": "https://demo.btx.example/documents/signals/0126.pdf"
+  },
+  {
+    "id": "sig-0127",
+    "event_type": "demand_spike",
+    "entities": [
+      "Continental Components"
+    ],
+    "subject_id": "continental-components",
+    "confidence": 0.83,
+    "source_quote": "Demand for Continental Components's products spiked on new program starts.",
+    "detected_at": "2026-06-14T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0127",
+    "document_url": "https://demo.btx.example/documents/signals/0127.pdf"
+  },
+  {
+    "id": "sig-0128",
+    "event_type": "quality_escape",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.96,
+    "source_quote": "A quality escape at Ironclad Dynamics triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-22T15:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0128",
+    "document_url": "https://demo.btx.example/documents/signals/0128.pdf"
+  },
+  {
+    "id": "sig-0129",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.88,
+    "source_quote": "Ironclad Dynamics notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-11T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0129",
+    "document_url": "https://demo.btx.example/documents/signals/0129.pdf"
+  },
+  {
+    "id": "sig-0130",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.66,
+    "source_quote": "Ironclad Dynamics raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-01T15:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0130",
+    "document_url": "https://demo.btx.example/documents/signals/0130.pdf"
+  },
+  {
+    "id": "sig-0131",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.66,
+    "source_quote": "Ironclad Dynamics notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-08T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0131",
+    "document_url": "https://demo.btx.example/documents/signals/0131.pdf"
+  },
+  {
+    "id": "sig-0132",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Ironclad Dynamics"
+    ],
+    "subject_id": "ironclad-dynamics",
+    "confidence": 0.81,
+    "source_quote": "Ironclad Dynamics raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-21T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0132",
+    "document_url": "https://demo.btx.example/documents/signals/0132.pdf"
+  },
+  {
+    "id": "sig-0133",
+    "event_type": "quality_escape",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.8,
+    "source_quote": "A quality escape at Aegis Machining triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-05T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0133",
+    "document_url": "https://demo.btx.example/documents/signals/0133.pdf"
+  },
+  {
+    "id": "sig-0134",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.77,
+    "source_quote": "Aegis Machining is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-08T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0134",
+    "document_url": "https://demo.btx.example/documents/signals/0134.pdf"
+  },
+  {
+    "id": "sig-0135",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Aegis Machining"
+    ],
+    "subject_id": "aegis-machining",
+    "confidence": 0.95,
+    "source_quote": "Aegis Machining is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-14T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0135",
+    "document_url": "https://demo.btx.example/documents/signals/0135.pdf"
+  },
+  {
+    "id": "sig-0136",
+    "event_type": "demand_spike",
+    "entities": [
+      "Halcyon Castings"
+    ],
+    "subject_id": "halcyon-castings",
+    "confidence": 0.7,
+    "source_quote": "Demand for Halcyon Castings's products spiked on new program starts.",
+    "detected_at": "2026-06-28T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0136",
+    "document_url": "https://demo.btx.example/documents/signals/0136.pdf"
+  },
+  {
+    "id": "sig-0137",
+    "event_type": "demand_spike",
+    "entities": [
+      "Halcyon Castings"
+    ],
+    "subject_id": "halcyon-castings",
+    "confidence": 0.7,
+    "source_quote": "Demand for Halcyon Castings's products spiked on new program starts.",
+    "detected_at": "2026-06-06T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0137",
+    "document_url": "https://demo.btx.example/documents/signals/0137.pdf"
+  },
+  {
+    "id": "sig-0138",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.75,
+    "source_quote": "Falcon Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-14T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0138",
+    "document_url": "https://demo.btx.example/documents/signals/0138.pdf"
+  },
+  {
+    "id": "sig-0139",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Falcon Turbine"
+    ],
+    "subject_id": "falcon-turbine",
+    "confidence": 0.83,
+    "source_quote": "Falcon Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-05-31T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0139",
+    "document_url": "https://demo.btx.example/documents/signals/0139.pdf"
+  },
+  {
+    "id": "sig-0140",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Dynamics"
+    ],
+    "subject_id": "halcyon-dynamics",
+    "value": 6700000,
+    "confidence": 0.66,
+    "source_quote": "Halcyon Dynamics was awarded a $6.7M government contract.",
+    "detected_at": "2026-06-24T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0140",
+    "document_url": "https://demo.btx.example/documents/signals/0140.pdf"
+  },
+  {
+    "id": "sig-0141",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Halcyon Dynamics"
+    ],
+    "subject_id": "halcyon-dynamics",
+    "value": 15900000,
+    "confidence": 0.68,
+    "source_quote": "Halcyon Dynamics was awarded a $15.9M government contract.",
+    "detected_at": "2026-06-21T07:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0141",
+    "document_url": "https://demo.btx.example/documents/signals/0141.pdf"
+  },
+  {
+    "id": "sig-0142",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Northwind Controls"
+    ],
+    "subject_id": "northwind-controls",
+    "confidence": 0.7,
+    "source_quote": "Northwind Controls raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-07T21:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0142",
+    "document_url": "https://demo.btx.example/documents/signals/0142.pdf"
+  },
+  {
+    "id": "sig-0143",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Northwind Controls"
+    ],
+    "subject_id": "northwind-controls",
+    "confidence": 0.89,
+    "source_quote": "Northwind Controls raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-10T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0143",
+    "document_url": "https://demo.btx.example/documents/signals/0143.pdf"
+  },
+  {
+    "id": "sig-0144",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Northwind Controls"
+    ],
+    "subject_id": "northwind-controls",
+    "confidence": 0.87,
+    "source_quote": "Northwind Controls notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-02T17:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0144",
+    "document_url": "https://demo.btx.example/documents/signals/0144.pdf"
+  },
+  {
+    "id": "sig-0145",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Northwind Controls"
+    ],
+    "subject_id": "northwind-controls",
+    "confidence": 0.89,
+    "source_quote": "Northwind Controls raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-27T09:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0145",
+    "document_url": "https://demo.btx.example/documents/signals/0145.pdf"
+  },
+  {
+    "id": "sig-0146",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "value": 19000000,
+    "confidence": 0.84,
+    "source_quote": "Vanguard Machining was awarded a $19.0M government contract.",
+    "detected_at": "2026-06-13T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0146",
+    "document_url": "https://demo.btx.example/documents/signals/0146.pdf"
+  },
+  {
+    "id": "sig-0147",
+    "event_type": "demand_spike",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "confidence": 0.8,
+    "source_quote": "Demand for Vanguard Machining's products spiked on new program starts.",
+    "detected_at": "2026-06-09T22:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0147",
+    "document_url": "https://demo.btx.example/documents/signals/0147.pdf"
+  },
+  {
+    "id": "sig-0148",
+    "event_type": "demand_spike",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "confidence": 0.71,
+    "source_quote": "Demand for Vanguard Machining's products spiked on new program starts.",
+    "detected_at": "2026-06-24T02:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0148",
+    "document_url": "https://demo.btx.example/documents/signals/0148.pdf"
+  },
+  {
+    "id": "sig-0149",
+    "event_type": "demand_spike",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "confidence": 0.76,
+    "source_quote": "Demand for Vanguard Machining's products spiked on new program starts.",
+    "detected_at": "2026-06-26T06:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0149",
+    "document_url": "https://demo.btx.example/documents/signals/0149.pdf"
+  },
+  {
+    "id": "sig-0150",
+    "event_type": "hiring_surge",
+    "entities": [
+      "Vanguard Machining"
+    ],
+    "subject_id": "vanguard-machining",
+    "confidence": 0.78,
+    "source_quote": "Vanguard Machining posted a surge of openings, signaling a growth push.",
+    "detected_at": "2026-06-05T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0150",
+    "document_url": "https://demo.btx.example/documents/signals/0150.pdf"
+  },
+  {
+    "id": "sig-0151",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.81,
+    "source_quote": "Harbor Components notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-14T11:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0151",
+    "document_url": "https://demo.btx.example/documents/signals/0151.pdf"
+  },
+  {
+    "id": "sig-0152",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.77,
+    "source_quote": "New compliance requirements affect Harbor Components's certified processes.",
+    "detected_at": "2026-06-05T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0152",
+    "document_url": "https://demo.btx.example/documents/signals/0152.pdf"
+  },
+  {
+    "id": "sig-0153",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.77,
+    "source_quote": "New compliance requirements affect Harbor Components's certified processes.",
+    "detected_at": "2026-06-14T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0153",
+    "document_url": "https://demo.btx.example/documents/signals/0153.pdf"
+  },
+  {
+    "id": "sig-0154",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.81,
+    "source_quote": "Harbor Components is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-01T13:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0154",
+    "document_url": "https://demo.btx.example/documents/signals/0154.pdf"
+  },
+  {
+    "id": "sig-0155",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Harbor Components"
+    ],
+    "subject_id": "harbor-components",
+    "confidence": 0.9,
+    "source_quote": "Harbor Components notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-20T15:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0155",
+    "document_url": "https://demo.btx.example/documents/signals/0155.pdf"
+  },
+  {
+    "id": "sig-0156",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.65,
+    "source_quote": "Foundry Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-02T19:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0156",
+    "document_url": "https://demo.btx.example/documents/signals/0156.pdf"
+  },
+  {
+    "id": "sig-0157",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.7,
+    "source_quote": "Foundry Turbine is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-22T10:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0157",
+    "document_url": "https://demo.btx.example/documents/signals/0157.pdf"
+  },
+  {
+    "id": "sig-0158",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.76,
+    "source_quote": "Foundry Turbine notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-12T14:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0158",
+    "document_url": "https://demo.btx.example/documents/signals/0158.pdf"
+  },
+  {
+    "id": "sig-0159",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.95,
+    "source_quote": "Foundry Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-27T20:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0159",
+    "document_url": "https://demo.btx.example/documents/signals/0159.pdf"
+  },
+  {
+    "id": "sig-0160",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Foundry Turbine"
+    ],
+    "subject_id": "foundry-turbine",
+    "confidence": 0.95,
+    "source_quote": "New compliance requirements affect Foundry Turbine's certified processes.",
+    "detected_at": "2026-06-06T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0160",
+    "document_url": "https://demo.btx.example/documents/signals/0160.pdf"
+  },
+  {
+    "id": "sig-0161",
+    "event_type": "contract_win",
+    "entities": [
+      "Continental Castings"
+    ],
+    "subject_id": "continental-castings",
+    "value": 3400000,
+    "confidence": 0.89,
+    "source_quote": "Continental Castings booked a $3.4M multi-year production contract.",
+    "detected_at": "2026-06-04T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0161",
+    "document_url": "https://demo.btx.example/documents/signals/0161.pdf"
+  },
+  {
+    "id": "sig-0162",
+    "event_type": "competitor_expansion",
+    "entities": [
+      "Continental Castings"
+    ],
+    "subject_id": "continental-castings",
+    "confidence": 0.91,
+    "source_quote": "Continental Castings announced a facility expansion to add machining capacity.",
+    "detected_at": "2026-06-19T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "competitor",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0162",
+    "document_url": "https://demo.btx.example/documents/signals/0162.pdf"
+  },
+  {
+    "id": "sig-0163",
+    "event_type": "capacity_constraint",
+    "entities": [
+      "Strata Defense"
+    ],
+    "subject_id": "strata-defense",
+    "confidence": 0.86,
+    "source_quote": "Strata Defense is quoting extended lead times, indicating its floor is near capacity.",
+    "detected_at": "2026-06-06T16:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0163",
+    "document_url": "https://demo.btx.example/documents/signals/0163.pdf"
+  },
+  {
+    "id": "sig-0164",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Strata Defense"
+    ],
+    "subject_id": "strata-defense",
+    "confidence": 0.84,
+    "source_quote": "New compliance requirements affect Strata Defense's certified processes.",
+    "detected_at": "2026-06-16T03:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0164",
+    "document_url": "https://demo.btx.example/documents/signals/0164.pdf"
+  },
+  {
+    "id": "sig-0165",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Strata Defense"
+    ],
+    "subject_id": "strata-defense",
+    "confidence": 0.77,
+    "source_quote": "New compliance requirements affect Strata Defense's certified processes.",
+    "detected_at": "2026-06-07T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0165",
+    "document_url": "https://demo.btx.example/documents/signals/0165.pdf"
+  },
+  {
+    "id": "sig-0166",
+    "event_type": "regulatory_change",
+    "entities": [
+      "Titan Fabrication"
+    ],
+    "subject_id": "titan-fabrication",
+    "confidence": 0.98,
+    "source_quote": "New compliance requirements affect Titan Fabrication's certified processes.",
+    "detected_at": "2026-06-28T07:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0166",
+    "document_url": "https://demo.btx.example/documents/signals/0166.pdf"
+  },
+  {
+    "id": "sig-0167",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Titan Fabrication"
+    ],
+    "subject_id": "titan-fabrication",
+    "confidence": 0.79,
+    "source_quote": "Titan Fabrication notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-28T02:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0167",
+    "document_url": "https://demo.btx.example/documents/signals/0167.pdf"
+  },
+  {
+    "id": "sig-0168",
+    "event_type": "quality_escape",
+    "entities": [
+      "Titan Fabrication"
+    ],
+    "subject_id": "titan-fabrication",
+    "confidence": 0.98,
+    "source_quote": "A quality escape at Titan Fabrication triggered a customer source-inspection hold.",
+    "detected_at": "2026-06-22T23:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0168",
+    "document_url": "https://demo.btx.example/documents/signals/0168.pdf"
+  },
+  {
+    "id": "sig-0169",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "value": 500000,
+    "confidence": 0.86,
+    "source_quote": "Falcon Defense was awarded a $0.5M government contract.",
+    "detected_at": "2026-06-25T12:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0169",
+    "document_url": "https://demo.btx.example/documents/signals/0169.pdf"
+  },
+  {
+    "id": "sig-0170",
+    "event_type": "government_contract_award",
+    "entities": [
+      "Falcon Defense"
+    ],
+    "subject_id": "falcon-defense",
+    "value": 19100000,
+    "confidence": 0.65,
+    "source_quote": "Falcon Defense was awarded a $19.1M government contract.",
+    "detected_at": "2026-06-19T13:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "source_url": "https://demo.btx.example/sources/signals/0170",
+    "document_url": "https://demo.btx.example/documents/signals/0170.pdf"
+  },
+  {
+    "id": "sig-0171",
+    "event_type": "supplier_delay",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.98,
+    "source_quote": "Torque Turbine notified customers of a multi-week slip on shipments.",
+    "detected_at": "2026-06-05T05:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0171",
+    "document_url": "https://demo.btx.example/documents/signals/0171.pdf"
+  },
+  {
+    "id": "sig-0172",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.95,
+    "source_quote": "Torque Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-06-14T01:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0172",
+    "document_url": "https://demo.btx.example/documents/signals/0172.pdf"
+  },
+  {
+    "id": "sig-0173",
+    "event_type": "pricing_pressure",
+    "entities": [
+      "Torque Turbine"
+    ],
+    "subject_id": "torque-turbine",
+    "confidence": 0.97,
+    "source_quote": "Torque Turbine raised quoted prices, citing material and labor cost inflation.",
+    "detected_at": "2026-05-31T08:00:00.000Z",
+    "source_type": "demo",
+    "source_name": "Simulated Market Signal Feed",
+    "source_mode": "static_snapshot",
+    "account_status": "partner",
+    "business_motion": "reduce_risk",
+    "source_url": "https://demo.btx.example/sources/signals/0173",
+    "document_url": "https://demo.btx.example/documents/signals/0173.pdf"
+  }
+]

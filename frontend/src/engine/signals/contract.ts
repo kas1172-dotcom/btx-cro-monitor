@@ -3,6 +3,8 @@
 // under src/engine/). The engine knows about signals, dimensions and weights —
 // never about a specific company or industry. Mock/demo data lives in data/.
 
+import type { AccountStatus, BusinessMotion } from "../brain/entities.ts";
+
 /**
  * The dimensions the decision engine scores. To introduce a new score, add it
  * here and add a weight row in the weights config — no engine code changes.
@@ -29,12 +31,16 @@ export interface Signal {
   entities: string[];
   /** The entity (company) this signal is scored against. Required for scoring. */
   subject_id: string;
+  account_status?: AccountStatus;
+  business_motion?: BusinessMotion;
   /** Optional. Present ONLY when a number was explicitly stated in the source. */
   value?: number;
   /** Extraction confidence, 0..1. The validation layer gates on this. */
   confidence: number;
   /** Verbatim supporting text — the audit trail back to the source. */
   source_quote: string;
+  source_url?: string;
+  document_url?: string;
   /** ISO-8601 timestamp the signal was detected (recency / decay / audit). */
   detected_at: string;
 }

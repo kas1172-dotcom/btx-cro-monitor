@@ -7,6 +7,11 @@ import type { World } from "../../app/useWorld.ts";
 import type { ScoreDimension } from "../../engine/signals/contract.ts";
 import { rankBy } from "../../engine/decision/portfolio.ts";
 import { setState } from "../../store/store.ts";
+import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
+import { explainRankingPrompt, expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
+import { rankingExplanation } from "../../app/rankingExplain.ts";
+import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { RankingWhy } from "../ranking/RankingWhy.tsx";
 
 function RankList({ world, dimension, title }: { world: World; dimension: ScoreDimension; title: string }) {
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
@@ -20,11 +25,18 @@ function RankList({ world, dimension, title }: { world: World; dimension: ScoreD
       {rows.length === 0 && <p className="muted">none</p>}
       {rows.map((s) => {
         const v = s.dimensions[dimension].score;
+        const company = world.companies.find((c) => c.id === s.subject_id);
+        const explanation = company ? rankingExplanation(world, company, { dimension, heading: title }) : null;
         return (
           <button key={s.subject_id} className="rank-row" onClick={() => setState({ activeCompanyId: s.subject_id })}>
             <span className="rank-name">{nameOf(s.subject_id)}</span>
             <span className="rank-bar"><span style={{ width: `${v}%`, background: color }} /></span>
             <span className="rank-val">{v}</span>
+            {explanation && <RankingWhy explanation={explanation} />}
+            <AskChatpilButton
+              label="Explain ranking"
+              prompt={explainRankingPrompt(nameOf(s.subject_id), `${title}. ${explanation?.summary ?? `${dimension} score ${v}`}. ${explanation?.driverLine ?? ""} ${explanation?.signalLine ?? ""} ${explanation?.contextLine ?? ""}`)}
+            />
           </button>
         );
       })}
@@ -52,9 +64,15 @@ export function Dashboard({ world }: { world: World }) {
           .slice(0, 6)
           .map((r) => (
             <button key={r.subject_id} className="rec-row" onClick={() => setState({ activeCompanyId: r.subject_id })}>
-              <span className={`rec-tag rec-${r.action}`}>{r.action}</span>
+              <span className={`rec-tag rec-${r.action}`} title={actionDescription(r.action)}>
+                {actionLabel(r.action)}
+              </span>
               <span className="rec-name">{nameOf(r.subject_id)}</span>
               <span className="muted">{r.reason}</span>
+              <AskChatpilButton
+                label="Explain"
+                prompt={nextActionPrompt(nameOf(r.subject_id), `Dashboard recommendation: ${actionLabel(r.action)}. Priority ${r.priority}. Reason: ${r.reason}.`)}
+              />
             </button>
           ))}
       </div>
@@ -71,6 +89,10 @@ export function Dashboard({ world }: { world: World }) {
             <span className={`sev sev-${a.severity}`}>{a.severity}</span>
             <span className="alert-main">{nameOf(a.subject_id)} — {a.dimension} {a.score}</span>
             <span className="muted">{a.reason}</span>
+            <AskChatpilButton
+              label="Explain"
+              prompt={`Explain this alert using only engine context. Account: ${nameOf(a.subject_id)}. Dimension: ${a.dimension}. Score: ${a.score}. Severity: ${a.severity}. Reason: ${a.reason}. Do not invent numbers.`}
+            />
           </button>
         ))}
       </div>
@@ -81,6 +103,7 @@ export function Dashboard({ world }: { world: World }) {
           <button key={s.id} className="feed-row" onClick={() => setState({ activeCompanyId: s.subject_id })}>
             <span className="feed-ev">{s.event_type}</span>
             <span className="feed-q">{nameOf(s.subject_id)}: {s.source_quote}</span>
+            <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(s, nameOf(s.subject_id))} />
           </button>
         ))}
       </div>

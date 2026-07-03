@@ -149,7 +149,9 @@ For each item, return a "sections" object containing exactly these keys:
 {chr(10).join(section_lines)}
 
 Ground every statement in the item's own content; do not invent facts not \
-supported by the source. Produce in-depth analysis for ALL items in the batch.
+supported by the source. Distinguish what the source states from what you infer, and treat any \
+detail the source omits as "not stated" rather than estimating it. Produce in-depth analysis for \
+ALL items in the batch.
 """.strip()
 
 

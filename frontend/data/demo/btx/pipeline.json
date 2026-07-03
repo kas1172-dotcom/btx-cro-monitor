@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-07-03",
+  "summary": {
+    "open_pipeline_value": 81200000,
+    "weighted_pipeline_value": 34100000,
+    "priority_accounts": [
+      "ironclad-defense",
+      "vanguard-machining",
+      "sentinel-aerospace"
+    ],
+    "top_action": "Prioritize accounts with new awards plus capacity-risk signals."
+  },
+  "records": [
+    {
+      "company_id": "ironclad-defense",
+      "recommended_action": "Pursue overflow machining work now",
+      "reason": "Multiple contract awards and demand-spike signals indicate funded near-term production strain.",
+      "source_type": "demo",
+      "source_name": "Simulated Pipeline Snapshot",
+      "source_mode": "static_snapshot"
+    },
+    {
+      "company_id": "vanguard-machining",
+      "recommended_action": "Offer surge capacity and ITAR-qualified support",
+      "reason": "High fit and rapid growth signals suggest capacity may lag awarded work.",
+      "source_type": "demo",
+      "source_name": "Simulated Pipeline Snapshot",
+      "source_mode": "static_snapshot"
+    }
+  ],
+  "source_type": "demo",
+  "source_name": "Simulated Pipeline Snapshot",
+  "source_mode": "static_snapshot"
+}

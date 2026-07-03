@@ -32,6 +32,10 @@ export function deriveNewsSignals(companies: Company[], news: MarketEvent[], ext
     let value: number | undefined;
     let confidence: number;
     let source_quote: string;
+    let source_url = n.source_url;
+    let document_url = n.document_url;
+    let account_status = n.account_status;
+    let business_motion = n.business_motion;
 
     if (ex) {
       // LLM ran for this article — honor its validation result.
@@ -43,6 +47,10 @@ export function deriveNewsSignals(companies: Company[], news: MarketEvent[], ext
       value = ex.extracted.value;
       confidence = ex.extracted.confidence;
       source_quote = ex.extracted.source_quote;
+      source_url = undefined;
+      document_url = undefined;
+      account_status = undefined;
+      business_motion = undefined;
     } else {
       // No LLM extraction — offline fallback to the embedded ground truth.
       subject_id = n.subject_id;
@@ -59,9 +67,13 @@ export function deriveNewsSignals(companies: Company[], news: MarketEvent[], ext
       event_type,
       entities: [company.name],
       subject_id,
+      ...(account_status ? { account_status } : {}),
+      ...(business_motion ? { business_motion } : {}),
       ...(value !== undefined ? { value } : {}),
       confidence,
       source_quote,
+      ...(source_url ? { source_url } : {}),
+      ...(document_url ? { document_url } : {}),
       detected_at: new Date(n.published_date).toISOString(),
     });
   }

@@ -1,73 +1,240 @@
-// Signal Feed — the loop, visible end to end: unstructured news on the left, the
-// strict validated signal in the middle, and the score it moves on the right.
-// The same signals shown here are the ones the engine actually scored (via
-// deriveNewsSignals in useWorld), so this isn't a display — it's the pipeline.
-
-import news from "../../../data/mock/news.json";
-import extracted from "../../../data/mock/extracted-signals.json";
+import { useMemo, useState } from "react";
+import news from "../../../data/demo/btx/news.json";
 import { CONFIG } from "../../app/config.ts";
-import { deriveNewsSignals } from "../../app/newsIngest.ts";
-import type { ExtractedRow } from "../../app/newsIngest.ts";
 import type { World } from "../../app/useWorld.ts";
 import type { MarketEvent } from "../../engine/brain/entities.ts";
+import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../engine/brain/classification.ts";
 import { SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
+import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
+import { actionLabel } from "../../app/actionLabels.ts";
+import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
+import { formatAddress } from "../../app/format.ts";
+import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { ExternalLink } from "../common/ExternalLink.tsx";
 
 const NEWS = news as unknown as MarketEvent[];
-const EXTRACTED = extracted as unknown as ExtractedRow[];
 
-function effect(eventType: string): string {
+type Filter = "all" | "current" | "prospecting" | "revenue" | "risk" | "competitor" | "contract" | "high_confidence";
+type Sort = "priority" | "newest" | "confidence" | "impact";
+type MotionLabel = "Current Business" | "Prospecting" | "Both" | "Monitor";
+
+const FILTERS: Array<{ id: Filter; label: string }> = [
+  { id: "all", label: "All" },
+  { id: "current", label: "Current Business" },
+  { id: "prospecting", label: "Prospecting" },
+  { id: "revenue", label: "Revenue Signals" },
+  { id: "risk", label: "Risk Signals" },
+  { id: "competitor", label: "Competitor Signals" },
+  { id: "contract", label: "Contract Signals" },
+  { id: "high_confidence", label: "High Confidence" },
+];
+
+const PRIORITY_RANK = { high: 3, medium: 2, low: 1, none: 0 };
+
+function money(n: number): string {
+  return `$${(n / 1e6).toFixed(1)}M`;
+}
+
+function titleCase(value: string): string {
+  return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function scoreImpact(eventType: string): { text: string; total: number; dimensions: ScoreDimension[] } {
   const row = CONFIG.weights[eventType];
-  if (!row) return "no scored effect";
-  return SCORE_DIMENSIONS.filter((d) => row[d]).map((d) => `${d} +${row[d]}`).join(", ");
+  if (!row) return { text: "No scored effect", total: 0, dimensions: [] };
+  const dimensions = SCORE_DIMENSIONS.filter((d) => row[d]);
+  return {
+    text: dimensions.length ? dimensions.map((d) => `${titleCase(d)} +${row[d]}`).join(", ") : "No scored effect",
+    total: dimensions.reduce((sum, d) => sum + Math.abs(row[d] ?? 0), 0),
+    dimensions,
+  };
+}
+
+function motionForSignal(world: World, signal: Signal): MotionLabel {
+  const company = world.companies.find((c) => c.id === signal.subject_id);
+  if (!company) return "Monitor";
+  const motion = signal.business_motion ?? businessMotionForAccount(company);
+  const current = isCurrentBusinessAccount(company) || motion === "manage_current_business" || motion === "grow_existing_business" || motion === "reduce_risk";
+  const prospecting = isProspectingAccount(company) || motion === "prospect_new_business";
+  if (current && prospecting) return "Both";
+  if (prospecting) return "Prospecting";
+  if (current) return "Current Business";
+  return "Monitor";
+}
+
+function whyItMatters(world: World, signal: Signal): string {
+  const company = world.companies.find((c) => c.id === signal.subject_id);
+  const rec = world.analysis.recById.get(signal.subject_id);
+  const impact = scoreImpact(signal.event_type);
+  const openPipeline = world.opportunities
+    .filter((o) => o.company_id === signal.subject_id && o.stage !== "won" && o.stage !== "lost")
+    .reduce((sum, o) => sum + o.value, 0);
+  if (rec) return `${actionLabel(rec.action)} is recommended because this signal contributes to the account's current score context.`;
+  if (impact.dimensions.includes("opportunity")) return `${company?.name ?? "This account"} has a revenue-related signal that can raise pursuit priority.`;
+  if (impact.dimensions.includes("risk") || impact.dimensions.includes("capacityRisk")) return `This signal can affect delivery, capacity, supplier, or account risk.`;
+  if (openPipeline > 0) return `${money(openPipeline)} in open pipeline is attached to this account.`;
+  return `This signal is validated evidence for monitoring ${company?.name ?? "the account"}.`;
+}
+
+function filterRow(filter: Filter, row: SignalRow): boolean {
+  switch (filter) {
+    case "current":
+      return row.motion === "Current Business" || row.motion === "Both";
+    case "prospecting":
+      return row.motion === "Prospecting" || row.motion === "Both";
+    case "revenue":
+      return row.impact.dimensions.includes("opportunity") || Boolean(row.signal.value);
+    case "risk":
+      return row.impact.dimensions.includes("risk") || row.impact.dimensions.includes("capacityRisk");
+    case "competitor":
+      return row.companyRelationship === "competitor" || row.signal.event_type.includes("competitor");
+    case "contract":
+      return row.signal.event_type.includes("contract") || row.signal.event_type.includes("award");
+    case "high_confidence":
+      return row.signal.confidence >= 0.9;
+    case "all":
+      return true;
+  }
+}
+
+interface SignalRow {
+  signal: Signal;
+  companyName: string;
+  companyRelationship: string;
+  headline: string;
+  source: string;
+  sourceDate: string;
+  sourceUrl: string | undefined;
+  documentUrl: string | undefined;
+  address: string | null;
+  motion: MotionLabel;
+  impact: { text: string; total: number; dimensions: ScoreDimension[] };
+  priority: "high" | "medium" | "low" | "none";
+  actionText: string;
+  why: string;
 }
 
 export function SignalFeed({ world }: { world: World }) {
+  const [filter, setFilter] = useState<Filter>("all");
+  const [sort, setSort] = useState<Sort>("priority");
+  const newsById = new Map(NEWS.map((item) => [`news-sig-${item.id}`, item]));
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
-  const exByNews = new Map(EXTRACTED.map((r) => [r.news_id, r]));
-  const derived = new Map(deriveNewsSignals(world.companies, NEWS, EXTRACTED).map((s) => [s.id, s]));
-  const hasLLM = EXTRACTED.length > 0;
+
+  const rows = useMemo<SignalRow[]>(() => {
+    return world.analysis.valid.map((signal) => {
+      const company = world.companies.find((c) => c.id === signal.subject_id);
+      const rec = world.analysis.recById.get(signal.subject_id);
+      const article = newsById.get(signal.id);
+      const impact = scoreImpact(signal.event_type);
+      return {
+        signal,
+        companyName: nameOf(signal.subject_id),
+        companyRelationship: company?.relationship ?? "unknown",
+        address: company ? formatAddress(company.location) : null,
+        headline: article?.headline ?? titleCase(signal.event_type),
+        source: article?.source ?? "Simulated Market Signal Feed",
+        sourceDate: article?.published_date ?? signal.detected_at.slice(0, 10),
+        sourceUrl: article?.source_url ?? signal.source_url,
+        documentUrl: article?.document_url ?? signal.document_url,
+        motion: motionForSignal(world, signal),
+        impact,
+        priority: rec?.priority ?? "none",
+        actionText: rec ? `${actionLabel(rec.action)} - ${rec.reason}` : "Monitor this account; no immediate action is recommended.",
+        why: whyItMatters(world, signal),
+      };
+    });
+  }, [world]);
+
+  const visible = rows
+    .filter((row) => filterRow(filter, row))
+    .sort((a, b) => {
+      if (sort === "priority") return PRIORITY_RANK[b.priority] - PRIORITY_RANK[a.priority] || b.impact.total - a.impact.total;
+      if (sort === "newest") return b.signal.detected_at.localeCompare(a.signal.detected_at);
+      if (sort === "confidence") return b.signal.confidence - a.signal.confidence;
+      return b.impact.total - a.impact.total || b.signal.confidence - a.signal.confidence;
+    });
 
   return (
-    <div className="feed">
-      <div className="feed-head">
-        Signal extraction — news → validated signal → score
-        {!hasLLM && <span className="muted"> · offline extraction (run “Update demo” for live LLM extraction)</span>}
+    <div className="feed signal-inbox">
+      <div className="feed-head signal-inbox-head">
+        <div>
+          <p className="eyebrow">Signal Inbox</p>
+          <h1>What changed, who is affected, and what should BTX do?</h1>
+          <p>Validated market, contract, risk, and competitor signals currently feeding scores and recommendations.</p>
+        </div>
+        <label>
+          <span>Sort</span>
+          <select value={sort} onChange={(event) => setSort(event.target.value as Sort)}>
+            <option value="priority">Action priority</option>
+            <option value="newest">Newest</option>
+            <option value="confidence">Confidence</option>
+            <option value="impact">Score impact</option>
+          </select>
+        </label>
       </div>
-      {NEWS.map((a) => {
-        const ex = exByNews.get(a.id);
-        const sig = derived.get(`news-sig-${a.id}`);
-        return (
-          <div key={a.id} className="feed-item">
-            <div className="feed-news">
-              <div className="feed-src">{a.source} · {a.published_date}</div>
-              <div className="feed-headline">{a.headline}</div>
-              <div className="feed-body">{a.body}</div>
+
+      <div className="signal-filter-bar">
+        {FILTERS.map((item) => (
+          <button key={item.id} className={filter === item.id ? "active" : ""} onClick={() => setFilter(item.id)}>
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="signal-list">
+        {visible.map((row) => (
+          <article key={row.signal.id} className="signal-inbox-card">
+            <div className="signal-card-head">
+              <div>
+                <span className="sig-type">{titleCase(row.signal.event_type)}</span>
+                <h2>{row.headline}</h2>
+                <p>{row.source} · {row.sourceDate}</p>
+              </div>
+              <span className={`motion-pill motion-${row.motion.replace(/\s+/g, "-").toLowerCase()}`}>{row.motion}</span>
             </div>
-            <div className="feed-arrow">→</div>
-            <div className="feed-signal">
-              {sig ? (
-                <div className="sig-card valid">
-                  <div className="sig-type">{sig.event_type}</div>
-                  <div className="sig-meta">
-                    conf {sig.confidence.toFixed(2)}
-                    {sig.value ? ` · $${(sig.value / 1e6).toFixed(1)}M` : ""}
-                    {ex ? " · LLM" : " · offline"}
-                  </div>
-                  <div className="sig-quote">“{sig.source_quote}”</div>
-                  <div className="sig-effect">→ {nameOf(sig.subject_id)}: {effect(sig.event_type)}</div>
-                </div>
-              ) : ex && !ex.valid ? (
-                <div className="sig-card rejected">
-                  <div className="sig-type">rejected</div>
-                  <div className="muted">{ex.reason ?? "failed validation"}</div>
-                </div>
-              ) : (
-                <div className="sig-card"><div className="muted">no signal</div></div>
-              )}
+
+            <div className="signal-card-grid">
+              <div>
+                <span>Affects</span>
+                <strong>{row.companyName}</strong>
+                <em>{titleCase(row.companyRelationship)}</em>
+                {row.address && <em>{row.address}</em>}
+              </div>
+              <div>
+                <span>Why it matters</span>
+                <strong>{row.why}</strong>
+              </div>
+              <div>
+                <span>Recommended action</span>
+                <strong>{row.actionText}</strong>
+              </div>
+              <div>
+                <span>Score impact</span>
+                <strong>{row.impact.text}</strong>
+                <em>Confidence {(row.signal.confidence * 100).toFixed(0)}%{row.signal.value ? ` · value ${money(row.signal.value)}` : ""}</em>
+              </div>
             </div>
-          </div>
-        );
-      })}
+
+            <div className="signal-evidence">
+              <span>Evidence</span>
+              <p>{row.signal.source_quote}</p>
+              <div className="link-row">
+                <ExternalLink href={row.sourceUrl} label="Open source" />
+                <ExternalLink href={row.documentUrl} label="Document" />
+              </div>
+              {!row.sourceUrl && !row.documentUrl && <em>No source link in static demo snapshot</em>}
+            </div>
+
+            <div className="signal-actions">
+              <AskChatpilButton label="Explain" prompt={expandSignalPrompt(row.signal, row.companyName)} />
+              <AskChatpilButton
+                label="What should I do?"
+                prompt={nextActionPrompt(row.companyName, `Signal inbox item. Event ${row.signal.event_type}. Motion ${row.motion}. Score impact ${row.impact.text}. Recommended action: ${row.actionText}. Evidence: ${row.signal.source_quote}`)}
+              />
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }

@@ -9,6 +9,11 @@ import { CONFIG, PROFILE } from "../../app/config.ts";
 import { narrateOpportunity, findingMeaning } from "../../app/narrate.ts";
 import { getInsight } from "../../app/insights.ts";
 import { pipelineHealth } from "../../engine/decision/health.ts";
+import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
+import { explainAccountPrompt, expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
+import { companyLinks, formatAddress } from "../../app/format.ts";
+import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { ExternalLink } from "../common/ExternalLink.tsx";
 
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
   const company = world.companies.find((c) => c.id === companyId);
@@ -33,6 +38,8 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
     .sort((a, b) => b.value - a.value);
   const pipelineValue = openOpps.reduce((s, o) => s + o.value, 0);
   const fmtM = (v: number) => `$${(v / 1e6).toFixed(1)}M`;
+  const companyAddress = formatAddress(company.location);
+  const links = companyLinks(company);
 
   return (
     <div className="dossier">
@@ -43,12 +50,24 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           {company.location.city}
           {facilities.length > 0 && ` · ${facilities.length} ${facilities.length === 1 ? "facility" : "facilities"}`}
         </div>
+        {companyAddress && <div className="muted">{companyAddress}</div>}
+        {links.length > 0 && (
+          <div className="link-row">
+            {links.map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}
+          </div>
+        )}
       </div>
 
       {rec && (
         <div className={`rec rec-${rec.action}`}>
-          <span className="rec-action">{rec.action}</span>
+          <span className="rec-action" title={actionDescription(rec.action)}>
+            {actionLabel(rec.action)}
+          </span>
           <span className="rec-reason">{rec.reason}</span>
+          <AskChatpilButton
+            label="Explain"
+            prompt={nextActionPrompt(company.name, `Dossier recommendation: ${actionLabel(rec.action)}. Reason: ${rec.reason}.`)}
+          />
         </div>
       )}
 
@@ -71,6 +90,10 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         <h4>Why this is a target</h4>
         <p className="narrative">{narrative}</p>
         {oppGroups.length > 0 && <p className="audit">scoring: {summarizeGroups(oppGroups)}</p>}
+        <AskChatpilButton
+          label="Why this account?"
+          prompt={explainAccountPrompt(company, `Dossier narrative: ${narrative}. Opportunity ${opp?.score ?? 0}, fit ${fit.score}%, pipeline health ${health}.`)}
+        />
       </section>
 
       {openOpps.length > 0 && (
@@ -82,6 +105,23 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
                 <span className={`opp-stage stage-${o.stage}`}>{o.stage}</span>
                 <span className="opp-name">{o.name}</span>
                 <span className="opp-val">{fmtM(o.value)}</span>
+                <ExternalLink href={o.contract_url} label="Contract" />
+                <ExternalLink href={o.document_url} label="Document" />
+                <ExternalLink href={o.source_url} label="Source" />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {facilities.length > 0 && (
+        <section>
+          <h4>Facilities</h4>
+          <ul className="contacts">
+            {facilities.map((f) => (
+              <li key={f.id}>
+                <strong>{f.kind}</strong> — {formatAddress(f) ?? f.city}
+                <div className="link-row"><ExternalLink href={f.source_url} label="ERP source" /></div>
               </li>
             ))}
           </ul>
@@ -111,6 +151,11 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
                 <span className="q">{s.source_quote}</span>
                 {meaning && <span className="meaning">{meaning}</span>}
                 <span className="conf">conf {s.confidence.toFixed(2)}</span>
+                <div className="link-row">
+                  <ExternalLink href={s.source_url} label="Source" />
+                  <ExternalLink href={s.document_url} label="Document" />
+                </div>
+                <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(s, company.name)} />
               </li>
             );
           })}

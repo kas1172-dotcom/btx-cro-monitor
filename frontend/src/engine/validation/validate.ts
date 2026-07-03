@@ -6,14 +6,35 @@
 import { z } from "zod";
 import type { Signal } from "../signals/contract.ts";
 
+const AccountStatusSchema = z.enum([
+  "current_customer",
+  "active_pipeline",
+  "past_customer",
+  "target_prospect",
+  "new_logo",
+  "partner",
+  "competitor",
+]);
+
+const BusinessMotionSchema = z.enum([
+  "manage_current_business",
+  "grow_existing_business",
+  "prospect_new_business",
+  "reduce_risk",
+]);
+
 const SignalSchema = z.object({
   id: z.string().min(1),
   event_type: z.string().min(1),
   entities: z.array(z.string()),
   subject_id: z.string().min(1),
+  account_status: AccountStatusSchema.optional(),
+  business_motion: BusinessMotionSchema.optional(),
   value: z.number().optional(),
   confidence: z.number().min(0).max(1),
   source_quote: z.string().min(1),
+  source_url: z.string().optional(),
+  document_url: z.string().optional(),
   detected_at: z.string().min(1),
 });
 

@@ -4,7 +4,7 @@
 // that EXPLAINS it: a "why this is a target" narrative + one line per signal.
 // The model never computes or changes a score — it translates the trace.
 //
-// Output is committed to data/mock/insights.json (frozen → deterministic demo).
+// Output is committed to data/demo/btx/insights.json (frozen -> deterministic demo).
 // Raw fetch, no SDK, so the project stays dependency-free (CLAUDE.md rule #5).
 //
 //   ANTHROPIC_API_KEY=... node frontend/tools/generate-insights.ts
@@ -32,19 +32,21 @@ const read = (p: string) => JSON.parse(readFileSync(join(here, p), "utf8"));
 
 const config = read("../data/config/scoring-weights.v1.json") as WeightsConfig;
 const profile = read("../data/config/client-profile.json") as { name: string; capabilities: string[] };
-const companies = read("../data/mock/companies.json") as Company[];
-const rawSignals = read("../data/mock/signals.json") as unknown[];
+const companies = read("../data/demo/btx/companies.json") as Company[];
+const rawSignals = read("../data/demo/btx/signals.json") as unknown[];
 
 const { valid } = validateSignals(rawSignals, config.min_confidence);
 const scores = scorePortfolio(companies.map((c) => c.id), valid, config);
 const scoreById = new Map(scores.map((s) => [s.subject_id, s]));
 
-const SYSTEM = `You are a corporate strategist for ${profile.name}, a precision-machining manufacturer.
-You are given a DETERMINISTIC scoring output for a prospect. Your ONLY job is to EXPLAIN it in
-plain business language a sales rep can act on. Rules:
-- NEVER invent, change, or recompute any number. Use only the numbers and signals provided.
-- Ground every claim in a provided signal or the fit data.
-- Be concrete and concise. No hedging, no preamble.`;
+const SYSTEM = `You are the CRO explanation layer for ${profile.name}, a precision-machining manufacturer.
+You are given a DETERMINISTIC scoring output for an account. Explain it for a revenue leader, in
+plain language they can act on. Rules:
+- The provided scores, fit, and signals are your ONLY source of truth. NEVER invent, change, estimate, or recompute a number.
+- Ground every claim in a specific provided signal or the fit data, and reference that evidence.
+- Cover, concisely: WHY it matters now, WHAT changed (the recent signals), and the RECOMMENDED next action for ${profile.name}.
+- Distinguish stated facts from inference; if a detail isn't provided, don't guess.
+- No hedging, no preamble.`;
 
 const SCHEMA = {
   type: "object",
@@ -83,10 +85,10 @@ async function narrate(company: Company, signals: Signal[]): Promise<Insight | n
     `Opportunity score: ${score?.dimensions.opportunity.score ?? 0}`,
     `Fit to ${profile.name}: ${fit.score}% — can serve: ${fit.matched.join(", ") || "none"}; gaps: ${fit.missing.join(", ") || "none"}`,
     `Score trace: ${trace || "none"}`,
-    `Signals:`,
+    `Signals (evidence):`,
     ...signals.map((s) => `  [${s.id}] ${s.event_type}: ${s.source_quote}`),
     ``,
-    `Write a 2-3 sentence "why this is a target" narrative, then one short "what this means for ${profile.name}" line per signal (by signal_id).`,
+    `Write the "opportunity" field as 2-4 sentences that cover, in order: why this account matters now, what recently changed (grounded in the signals above), and the recommended next action for ${profile.name}. Then, for each signal, write one short evidence-grounded "what this means for ${profile.name}" line (keyed by its signal_id). Use only the provided numbers and signals; if the signals don't support a claim, leave it out.`,
   ].join("\n");
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -129,5 +131,5 @@ for (const company of companies) {
   }
 }
 
-writeFileSync(join(here, "../data/mock/insights.json"), JSON.stringify(insights, null, 2) + "\n");
+writeFileSync(join(here, "../data/demo/btx/insights.json"), JSON.stringify(insights, null, 2) + "\n");
 console.log(`wrote insights for ${Object.keys(insights).length} companies`);

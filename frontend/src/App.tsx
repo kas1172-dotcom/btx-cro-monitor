@@ -2,24 +2,37 @@ import { useStore, setState } from "./store/store.ts";
 import type { View } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES, PROFILE } from "./app/config.ts";
+import { Home } from "./ui/home/Home.tsx";
+import { CurrentBusiness } from "./ui/current/CurrentBusiness.tsx";
+import { Prospecting } from "./ui/prospecting/Prospecting.tsx";
 import { ProspectMap } from "./ui/map/ProspectMap.tsx";
 import { Dashboard } from "./ui/dashboard/Dashboard.tsx";
 import { RelationshipGraph } from "./ui/graph/RelationshipGraph.tsx";
 import { SignalFeed } from "./ui/feed/SignalFeed.tsx";
+import { OperatingSnapshot } from "./ui/operating/OperatingSnapshot.tsx";
+import { Integrations } from "./ui/integrations/Integrations.tsx";
 import { Copilot } from "./ui/copilot/Copilot.tsx";
 import { Dossier } from "./ui/company/Dossier.tsx";
 
 const VIEWS: Array<{ id: View; label: string }> = [
-  { id: "map", label: "Prospect Map" },
+  { id: "home", label: "Home" },
+  { id: "current", label: "Current Business" },
+  { id: "prospecting", label: "Prospecting" },
+  { id: "map", label: "Map" },
   { id: "dashboard", label: "Dashboard" },
-  { id: "graph", label: "Relationships" },
-  { id: "feed", label: "Signal Feed" },
+  { id: "graph", label: "Graph" },
+  { id: "feed", label: "Signals" },
+  { id: "operating", label: "Operating Snapshot" },
+  { id: "integrations", label: "Integrations" },
 ];
+
+const ALL_MARKETS_VALUE = "__all_markets__";
 
 export function App() {
   const { city, view, activeCompanyId } = useStore();
-  const cityWorld = useWorld(city); // city-scoped — the prospect map
+  const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
+  const marketLabel = city ?? "All Markets";
 
   return (
     <div className="shell">
@@ -27,10 +40,20 @@ export function App() {
         <div className="brand">
           <span className="brand-mark">◇</span> {PROFILE.name} <span className="brand-sub">Enterprise Brain</span>
         </div>
+        <div className="demo-banner">
+          Demo Mode — simulated CRM, ERP/capacity, contacts, pipeline, and market data.
+        </div>
         <div className="controls">
           <label className="city-picker">
-            <span>You are in</span>
-            <select value={city} onChange={(e) => setState({ city: e.target.value, activeCompanyId: null })}>
+            <span>Market</span>
+            <select
+              value={city ?? ALL_MARKETS_VALUE}
+              onChange={(e) => setState({
+                city: e.target.value === ALL_MARKETS_VALUE ? null : e.target.value,
+                activeCompanyId: null,
+              })}
+            >
+              <option value={ALL_MARKETS_VALUE}>All Markets</option>
               {CITIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -51,12 +74,22 @@ export function App() {
       </header>
 
       <main className="stage">
-        {view === "map" ? (
-          cityWorld ? <ProspectMap world={cityWorld} /> : <div className="loading">running the brain for {city}…</div>
+        {view === "home" ? (
+          world ? <Home world={world} cityWorld={marketWorld} /> : <div className="loading">loading…</div>
+        ) : view === "current" ? (
+          world ? <CurrentBusiness world={world} /> : <div className="loading">loading…</div>
+        ) : view === "prospecting" ? (
+          world ? <Prospecting world={world} /> : <div className="loading">loading…</div>
+        ) : view === "map" ? (
+          marketWorld ? <ProspectMap world={marketWorld} /> : <div className="loading">running the brain for {marketLabel}…</div>
         ) : view === "dashboard" ? (
           world ? <Dashboard world={world} /> : <div className="loading">loading…</div>
         ) : view === "feed" ? (
           world ? <SignalFeed world={world} /> : <div className="loading">loading…</div>
+        ) : view === "operating" ? (
+          <OperatingSnapshot />
+        ) : view === "integrations" ? (
+          <Integrations />
         ) : (
           world ? <RelationshipGraph world={world} /> : <div className="loading">loading…</div>
         )}

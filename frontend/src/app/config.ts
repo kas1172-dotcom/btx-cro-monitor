@@ -3,7 +3,7 @@
 
 import weights from "../../data/config/scoring-weights.v1.json";
 import profile from "../../data/config/client-profile.json";
-import companies from "../../data/mock/companies.json";
+import companies from "../../data/demo/btx/companies.json";
 import type { WeightsConfig } from "../engine/decision/weights.ts";
 
 export const CONFIG = weights as unknown as WeightsConfig;

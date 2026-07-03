@@ -1,0 +1,41 @@
+[
+  {
+    "account_id": "ironclad-defense",
+    "crm_account_name": "Ironclad Defense",
+    "owner": "BTX Growth Team",
+    "account_tier": "Strategic",
+    "last_activity_at": "2026-07-01T15:30:00.000Z",
+    "next_step": "Book capacity-planning call with VP Supply Chain",
+    "relationship_health": "warming",
+    "open_pipeline_value": 39200000,
+    "source_type": "demo",
+    "source_name": "Simulated Salesforce",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "account_id": "vanguard-machining",
+    "crm_account_name": "Vanguard Machining",
+    "owner": "BTX Growth Team",
+    "account_tier": "Strategic",
+    "last_activity_at": "2026-06-30T18:00:00.000Z",
+    "next_step": "Send overflow machining capacity brief",
+    "relationship_health": "new",
+    "open_pipeline_value": 19000000,
+    "source_type": "demo",
+    "source_name": "Simulated Salesforce",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "account_id": "sentinel-aerospace",
+    "crm_account_name": "Sentinel Aerospace",
+    "owner": "BTX Growth Team",
+    "account_tier": "Priority",
+    "last_activity_at": "2026-06-28T13:15:00.000Z",
+    "next_step": "Validate 5-axis CNC and aluminum demand",
+    "relationship_health": "active",
+    "open_pipeline_value": 15400000,
+    "source_type": "demo",
+    "source_name": "Simulated Salesforce",
+    "source_mode": "static_snapshot"
+  }
+]

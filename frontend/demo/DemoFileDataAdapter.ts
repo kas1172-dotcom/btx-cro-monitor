@@ -1,27 +1,21 @@
-// The mock implementation of the DataAdapter port. Reads frozen JSON fixtures
-// from data/mock/. A real adapter (Salesforce / ERP / SAM.gov) would implement
-// the SAME interface against a live API — the engine and UI can't tell which one
-// they're talking to. This is the seam that lets the decision model be tested on
-// fake or real data interchangeably.
-//
-// RegionFilter is honored locally here (filter the frozen data by city); a live
-// adapter would push the filter down into the API query so only that region's
-// data is ever fetched — "run the brain for the selected area".
+// Node/fs implementation of the demo adapter for CLI smoke tests. The browser
+// DemoDataAdapter imports JSON through Vite; this one reads the same snapshots
+// from disk so scripts exercise the same core DataAdapter contract.
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-import type { DataAdapter, RegionFilter } from "../../engine/brain/ports.ts";
-import type { Company, Contact, Facility, Opportunity } from "../../engine/brain/entities.ts";
+import type { DataAdapter, RegionFilter } from "../src/engine/brain/ports.ts";
+import type { Company, Contact, Facility, Opportunity } from "../src/engine/brain/entities.ts";
 
-const MOCK_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../../data/mock");
+const DEMO_DIR = join(dirname(fileURLToPath(import.meta.url)), "../data/demo/btx");
 
 function readJson<T>(file: string): T {
-  return JSON.parse(readFileSync(join(MOCK_DIR, file), "utf8")) as T;
+  return JSON.parse(readFileSync(join(DEMO_DIR, file), "utf8")) as T;
 }
 
-export class MockDataAdapter implements DataAdapter {
+export class DemoFileDataAdapter implements DataAdapter {
   async getCompanies(filter?: RegionFilter): Promise<Company[]> {
     const all = readJson<Company[]>("companies.json");
     return filter?.city ? all.filter((c) => c.location.city === filter.city) : all;

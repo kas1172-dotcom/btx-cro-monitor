@@ -6,20 +6,26 @@
 
 import { useSyncExternalStore } from "react";
 
-export type View = "map" | "dashboard" | "graph" | "feed";
+export type View = "home" | "current" | "prospecting" | "map" | "dashboard" | "graph" | "feed" | "operating" | "integrations";
 
 export interface UiState {
-  city: string;
+  city: string | null;
   view: View;
   activeCompanyId: string | null;
+  copilotPrompt: string | null;
+  copilotPromptId: number;
 }
 
-let state: UiState = { city: "Austin", view: "map", activeCompanyId: null };
+let state: UiState = { city: "Austin", view: "home", activeCompanyId: null, copilotPrompt: null, copilotPromptId: 0 };
 const listeners = new Set<() => void>();
 
 export function setState(patch: Partial<UiState>): void {
   state = { ...state, ...patch };
   listeners.forEach((l) => l());
+}
+
+export function openCopilotWithPrompt(prompt: string): void {
+  setState({ copilotPrompt: prompt, copilotPromptId: state.copilotPromptId + 1 });
 }
 
 function subscribe(listener: () => void): () => void {

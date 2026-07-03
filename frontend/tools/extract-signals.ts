@@ -1,9 +1,9 @@
 // Signal Extraction layer — the front of the pipeline. Reads unstructured news
-// (data/mock/news.json), and for each article asks Claude to extract ONE strict
+// (data/demo/btx/news.json), and for each article asks Claude to extract ONE strict
 // JSON signal (event_type from a fixed taxonomy, entities, optional value ONLY
 // if explicitly stated, confidence, verbatim source_quote). Then the VALIDATION
 // gate runs: a signal counts only if event_type != "none" and confidence >= 0.7.
-// Output committed to data/mock/extracted-signals.json (frozen; the Feed view
+// Output committed to data/demo/btx/extracted-signals.json (frozen; the Feed view
 // renders it). Runs OFFLINE/CI with ANTHROPIC_API_KEY — never in the browser.
 // Raw fetch, no SDK, so the project stays dependency-free.
 //
@@ -27,19 +27,19 @@ const EVENT_TYPES = [
   "demand_spike", "competitor_expansion", "hiring_surge", "competitor_won_deal", "none",
 ];
 
-const news = JSON.parse(readFileSync(join(here, "../data/mock/news.json"), "utf8")) as Array<{
+const news = JSON.parse(readFileSync(join(here, "../data/demo/btx/news.json"), "utf8")) as Array<{
   id: string;
   headline: string;
   body: string;
 }>;
 
-const SYSTEM = `You extract exactly ONE structured signal from a news article. Rules:
-- event_type MUST be one of the provided enum values; use "none" if there is no clear business signal.
-- entities: the named companies/organizations the signal is about.
-- value: include ONLY if a specific dollar amount is explicitly stated in the text; otherwise omit it. Never guess a number.
-- confidence: 0..1, how clearly the text supports the event (hedged/rumored text is low).
-- source_quote: a VERBATIM span copied from the body that supports the signal.
-No free-text reasoning, no interpretation — just the structured extraction.`;
+const SYSTEM = `You extract exactly ONE structured business signal from a news article. A signal is a concrete, actionable business EVENT (a contract award, a supplier delay, a quality issue, a capacity change, a price move, a hiring surge, a regulatory change), not a vague topic, opinion, or general summary. Rules:
+- event_type MUST be one of the provided enum values. If the text describes no clear, specific business event, use "none".
+- entities: the canonical/full company or organization name(s) the event is about (not abbreviations or partials).
+- value: include ONLY if a specific dollar amount is explicitly stated in the text; otherwise omit it. Never guess or estimate a number.
+- confidence: 0..1, how clearly the text supports the event. Firm, stated fact -> high (>=0.85). Hedged/rumored/unconfirmed ("may", "could", "reportedly", "sources say") -> low (<0.5).
+- source_quote: a VERBATIM span copied from the body that directly supports the signal — do not paraphrase.
+Extract only what the text states. No free-text reasoning, no interpretation, no invented detail — just the structured extraction.`;
 
 const SCHEMA = {
   type: "object",
@@ -99,5 +99,5 @@ for (const article of news) {
   console.log(`  ${valid ? "✓" : "✗"} ${article.id} ${extracted?.event_type ?? "?"} (${extracted?.confidence ?? "?"})`);
 }
 
-writeFileSync(join(here, "../data/mock/extracted-signals.json"), JSON.stringify(out, null, 2) + "\n");
+writeFileSync(join(here, "../data/demo/btx/extracted-signals.json"), JSON.stringify(out, null, 2) + "\n");
 console.log(`extracted ${out.filter((o) => (o as { valid: boolean }).valid).length}/${news.length} valid signals`);

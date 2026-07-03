@@ -3,17 +3,22 @@
 // state) when a proxy is configured, else the rule-based resolver. Never
 // computes the numbers — the engine does that; Jarvis explains and advises.
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { askJarvis, openingBrief, jarvisLive } from "../../app/jarvis.ts";
 import type { Msg } from "../../app/jarvis.ts";
 import { SUGGESTIONS } from "../../app/copilot.ts";
+import { useStore } from "../../store/store.ts";
+
+type CopilotState = "closed" | "normal" | "expanded" | "minimized";
 
 export function Copilot({ world }: { world: World }) {
-  const [open, setOpen] = useState(false);
+  const [windowState, setWindowState] = useState<CopilotState>("closed");
   const [q, setQ] = useState("");
   const [log, setLog] = useState<Msg[]>([]);
   const [busy, setBusy] = useState(false);
+  const { copilotPrompt, copilotPromptId } = useStore();
+  const lastPromptId = useRef(0);
 
   async function ask(question: string) {
     const text = question.trim();
@@ -27,21 +32,48 @@ export function Copilot({ world }: { world: World }) {
     setBusy(false);
   }
 
-  if (!open) {
+  useEffect(() => {
+    if (!copilotPrompt || copilotPromptId === lastPromptId.current) return;
+    lastPromptId.current = copilotPromptId;
+    setWindowState("normal");
+    void ask(copilotPrompt);
+  }, [copilotPrompt, copilotPromptId]);
+
+  if (windowState === "closed") {
     return (
-      <button className="copilot-fab" onClick={() => setOpen(true)}>
+      <button className="copilot-fab" onClick={() => setWindowState("normal")}>
         ✦ Chatpil
       </button>
     );
   }
 
+  if (windowState === "minimized") {
+    return (
+      <button className="copilot-mini" onClick={() => setWindowState("normal")}>
+        <span>✦ Chatpil</span>
+        <em>{busy ? "thinking..." : log.length ? `${log.length} messages` : "ready"}</em>
+      </button>
+    );
+  }
+
+  const expanded = windowState === "expanded";
+
   return (
-    <div className="copilot">
+    <div className={expanded ? "copilot expanded" : "copilot"}>
       <div className="copilot-head">
         <span>
           ✦ Chatpil <em className={jarvisLive ? "live" : "offline"}>{jarvisLive ? "live" : "offline"}</em>
         </span>
-        <button onClick={() => setOpen(false)} aria-label="close">×</button>
+        <div className="copilot-controls">
+          <button onClick={() => setWindowState("minimized")} aria-label="minimize Chatpil">−</button>
+          <button
+            onClick={() => setWindowState(expanded ? "normal" : "expanded")}
+            aria-label={expanded ? "restore Chatpil" : "expand Chatpil"}
+          >
+            {expanded ? "↙" : "↗"}
+          </button>
+          <button onClick={() => setWindowState("closed")} aria-label="close Chatpil">×</button>
+        </div>
       </div>
       <div className="copilot-body">
         <div className="copilot-brief">{openingBrief(world)}</div>

@@ -1,0 +1,28 @@
+[
+  {
+    "facility_id": "btx-dallas-main",
+    "facility_name": "BTX Dallas Main",
+    "city": "Dallas",
+    "available_5_axis_hours_next_30d": 420,
+    "available_turning_hours_next_30d": 260,
+    "constraint": "inspection queue",
+    "quoted_lead_time_days": 24,
+    "capacity_status": "selective_capacity",
+    "source_type": "demo",
+    "source_name": "Simulated ERP Capacity",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "facility_id": "btx-austin-cell",
+    "facility_name": "BTX Austin Partner Cell",
+    "city": "Austin",
+    "available_5_axis_hours_next_30d": 180,
+    "available_turning_hours_next_30d": 140,
+    "constraint": "material availability",
+    "quoted_lead_time_days": 18,
+    "capacity_status": "available_for_overflow",
+    "source_type": "demo",
+    "source_name": "Simulated ERP Capacity",
+    "source_mode": "static_snapshot"
+  }
+]
