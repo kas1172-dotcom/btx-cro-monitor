@@ -76,6 +76,10 @@ p { line-height: 1.55; }
   gap: 22px; padding: 24px;
   background: radial-gradient(circle at 20% 0%, rgba(183, 196, 106, .10), transparent 34%), var(--bg);
 }
+.home-welcome {
+  width: min(980px, 100%); margin: 0 0 -8px; text-align: center;
+  color: var(--accent); font-weight: 500; font-size: 20px; letter-spacing: .2px;
+}
 .today-strip {
   width: min(980px, 100%); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
 }
