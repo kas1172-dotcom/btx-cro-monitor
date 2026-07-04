@@ -18,3 +18,19 @@ Use this checklist for UI behaviors that are not covered by the deterministic Ty
 - Param popup: open "Plan a trip", confirm skeleton loading bars from a prior request are not visible behind the popup; confirm the × close button is at least 32×32px and clearly visible.
 - Overflow auditor (DEV only): in the browser console run `window.__btxAudit?.()` after navigating to each tab. No red warnings should appear. If any appear, record the selector and report.
 - Width sweep: at 1512, 1280, and 1024px — verify no column is squished to zero, no button label is cut mid-word, no table overflows its container, and no rail badge overlaps the nav icon.
+
+## Chatpil smoke tests (run in both proxy-on and proxy-off states)
+
+**Proxy-off (no VITE_COPILOT_ENDPOINT set):**
+1. Open Chatpil. Badge shows "offline" (not "live" or "…"). Opening brief appears.
+2. Ask a data question: "What's the top opportunity?" → grounded deterministic answer, no debug text, no raw JSON or "model:" string.
+3. Type "open top risk account" → dossier opens for the highest-risk account; thread shows "Opened dossier for …" confirmation.
+4. Ask an out-of-scope question: "What is the European churn rate?" → response mentions the data isn't available, offers what IS in context. No hallucinated numbers.
+5. Suggestion chips show entity names from world data (not "BTX Precision"). Clicking a chip fires the question.
+
+**Proxy-on (VITE_COPILOT_ENDPOINT set to running proxy):**
+1. Open Chatpil. Badge shows "…" briefly then "live" after health-check completes.
+2. Ask "What needs my attention today?" → LLM answer grounded in account names, scores, and recommendations; no "model:", no raw JSON. "based on:" line present.
+3. Receive an OFFER button from the LLM response → clicking it either opens a dossier or drafts an outreach; a confirmation message follows in the thread.
+4. After proxy is stopped (kill the process mid-session): ask another question → falls back to deterministic answer + one offline note. Badge flips to "offline". The thread shows no debug text.
+5. Restart the proxy → on the next question the health-check recovers: badge returns to "live", offline note is not repeated.

@@ -17,7 +17,7 @@ if (!KEY) {
   process.exit(1);
 }
 const PORT = Number(process.env.PORT ?? 8787);
-const DEFAULT_MODEL = process.env.COPILOT_MODEL ?? "claude-3-5-haiku-latest";
+const DEFAULT_MODEL = process.env.COPILOT_MODEL ?? "claude-haiku-4-5-20251001";
 
 createServer(async (req, res) => {
   res.setHeader("access-control-allow-origin", "*");
