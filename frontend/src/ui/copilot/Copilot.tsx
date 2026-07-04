@@ -5,9 +5,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
-import { askJarvis, openingBrief, jarvisLive } from "../../app/jarvis.ts";
-import type { Msg } from "../../app/jarvis.ts";
-import { SUGGESTIONS } from "../../app/copilot.ts";
+import { askJarvis, openingBrief, jarvisLive } from "../../brain/jarvis.ts";
+import type { Msg } from "../../brain/jarvis.ts";
+import { SUGGESTIONS } from "../../brain/copilot.ts";
 import { useStore } from "../../store/store.ts";
 
 type CopilotState = "closed" | "normal" | "expanded" | "minimized";
@@ -17,8 +17,32 @@ export function Copilot({ world }: { world: World }) {
   const [q, setQ] = useState("");
   const [log, setLog] = useState<Msg[]>([]);
   const [busy, setBusy] = useState(false);
-  const { copilotPrompt, copilotPromptId } = useStore();
+  const { copilotPrompt, copilotPromptId, activeBrainArea } = useStore();
   const lastPromptId = useRef(0);
+  const threadKey = `btx.chatpil.thread.${activeBrainArea}`;
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(threadKey);
+      setLog(raw ? JSON.parse(raw) as Msg[] : []);
+    } catch {
+      setLog([]);
+    }
+  }, [threadKey]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(threadKey, JSON.stringify(log));
+    } catch {
+      // best effort only
+    }
+  }, [log, threadKey]);
+
+  useEffect(() => {
+    const clear = () => setLog([]);
+    window.addEventListener("btx:clear-chatpil-thread", clear);
+    return () => window.removeEventListener("btx:clear-chatpil-thread", clear);
+  }, []);
 
   async function ask(question: string) {
     const text = question.trim();
@@ -63,6 +87,7 @@ export function Copilot({ world }: { world: World }) {
       <div className="copilot-head">
         <span>
           ✦ Chatpil <em className={jarvisLive ? "live" : "offline"}>{jarvisLive ? "live" : "offline"}</em>
+          <small>{activeBrainArea} thread</small>
         </span>
         <div className="copilot-controls">
           <button onClick={() => setWindowState("minimized")} aria-label="minimize Chatpil">−</button>

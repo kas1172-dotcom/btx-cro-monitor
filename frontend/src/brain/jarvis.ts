@@ -4,12 +4,12 @@
 // otherwise it degrades gracefully to the rule-based resolver so the app still
 // works. The engine stays the source of truth — Jarvis is the voice, not the math.
 
-import type { World } from "./useWorld.ts";
+import type { World } from "../app/useWorld.ts";
 import { pipelineHealth, healthLabel } from "../engine/decision/health.ts";
 import { answer as deterministicAnswer } from "./copilot.ts";
-import { PROFILE } from "./config.ts";
-import { actionLabel } from "./actionLabels.ts";
-import { GROUNDING_CONTRACT, CURRENT_VS_PROSPECTING } from "./promptContract.ts";
+import { PROFILE } from "../app/config.ts";
+import { actionLabel } from "../app/actionLabels.ts";
+import { GROUNDING_CONTRACT, CURRENT_VS_PROSPECTING } from "../app/promptContract.ts";
 
 const ENDPOINT = import.meta.env.VITE_COPILOT_ENDPOINT;
 export const jarvisLive = Boolean(ENDPOINT);

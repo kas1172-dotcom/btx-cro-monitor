@@ -1,0 +1,242 @@
+[
+  {
+    "month": "2024-08",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 140000,
+    "loss_value": 180000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "wins": 2,
+    "losses": 3,
+    "win_value": 350000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 210000,
+    "loss_value": 300000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 245000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 280000,
+    "loss_value": 180000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "wins": 2,
+    "losses": 3,
+    "win_value": 280000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 175000,
+    "loss_value": 300000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 210000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 245000,
+    "loss_value": 180000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "wins": 2,
+    "losses": 3,
+    "win_value": 560000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 140000,
+    "loss_value": 300000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 175000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 210000,
+    "loss_value": 180000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "wins": 2,
+    "losses": 3,
+    "win_value": 490000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 280000,
+    "loss_value": 300000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 140000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 175000,
+    "loss_value": 180000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "wins": 2,
+    "losses": 3,
+    "win_value": 420000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 245000,
+    "loss_value": 300000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 280000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 140000,
+    "loss_value": 180000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "wins": 2,
+    "losses": 3,
+    "win_value": 350000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 210000,
+    "loss_value": 300000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "wins": 1,
+    "losses": 2,
+    "win_value": 245000,
+    "loss_value": 360000,
+    "source_type": "demo",
+    "source_name": "Simulated Win Loss History",
+    "source_mode": "static_snapshot"
+  }
+]

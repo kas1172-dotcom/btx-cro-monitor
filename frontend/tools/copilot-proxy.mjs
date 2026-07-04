@@ -5,7 +5,7 @@
 //   echo 'VITE_COPILOT_ENDPOINT=http://localhost:8787' > .env.local
 //   npm run dev
 //
-// The browser POSTs { system, messages }; this forwards to Claude and returns
+// The browser POSTs { model?, system, messages }; this forwards to Claude and returns
 // { text }. For the DEPLOYED site, use tools/copilot-worker.js (Cloudflare) or
 // any serverless function with the same contract.
 
@@ -17,7 +17,7 @@ if (!KEY) {
   process.exit(1);
 }
 const PORT = Number(process.env.PORT ?? 8787);
-const MODEL = process.env.COPILOT_MODEL ?? "claude-opus-4-8";
+const DEFAULT_MODEL = process.env.COPILOT_MODEL ?? "claude-3-5-haiku-latest";
 
 createServer(async (req, res) => {
   res.setHeader("access-control-allow-origin", "*");
@@ -29,11 +29,12 @@ createServer(async (req, res) => {
   let body = "";
   for await (const chunk of req) body += chunk;
   try {
-    const { system, messages } = JSON.parse(body);
+    const { model, system, messages } = JSON.parse(body);
+    const selectedModel = typeof model === "string" && model.trim() ? model : DEFAULT_MODEL;
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "x-api-key": KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({ model: MODEL, max_tokens: 1024, system, messages }),
+      body: JSON.stringify({ model: selectedModel, max_tokens: 1024, system, messages }),
     });
     const data = await r.json();
     const text = (data.content ?? []).filter((b) => b.type === "text").map((b) => b.text).join("");
@@ -43,4 +44,4 @@ createServer(async (req, res) => {
   } catch (e) {
     res.writeHead(500, { "content-type": "application/json" }).end(JSON.stringify({ error: String(e) }));
   }
-}).listen(PORT, () => console.log(`Jarvis proxy → http://localhost:${PORT} (model ${MODEL})`));
+}).listen(PORT, () => console.log(`Jarvis proxy → http://localhost:${PORT} (default model ${DEFAULT_MODEL})`));

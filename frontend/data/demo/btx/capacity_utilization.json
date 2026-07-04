@@ -1,0 +1,722 @@
+[
+  {
+    "month": "2024-08",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 63,
+    "available_5_axis_hours": 468,
+    "quoted_lead_time_days": 14,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 70,
+    "available_5_axis_hours": 409,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 77,
+    "available_5_axis_hours": 319,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 65,
+    "available_5_axis_hours": 485,
+    "quoted_lead_time_days": 15,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 72,
+    "available_5_axis_hours": 387,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 79,
+    "available_5_axis_hours": 310,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 67,
+    "available_5_axis_hours": 460,
+    "quoted_lead_time_days": 16,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 74,
+    "available_5_axis_hours": 371,
+    "quoted_lead_time_days": 20,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 81,
+    "available_5_axis_hours": 318,
+    "quoted_lead_time_days": 24,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 69,
+    "available_5_axis_hours": 449,
+    "quoted_lead_time_days": 17,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 76,
+    "available_5_axis_hours": 369,
+    "quoted_lead_time_days": 21,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 83,
+    "available_5_axis_hours": 295,
+    "quoted_lead_time_days": 25,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 71,
+    "available_5_axis_hours": 470,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 78,
+    "available_5_axis_hours": 374,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 85,
+    "available_5_axis_hours": 290,
+    "quoted_lead_time_days": 26,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 73,
+    "available_5_axis_hours": 446,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 80,
+    "available_5_axis_hours": 366,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 87,
+    "available_5_axis_hours": 288,
+    "quoted_lead_time_days": 27,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 75,
+    "available_5_axis_hours": 460,
+    "quoted_lead_time_days": 14,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 82,
+    "available_5_axis_hours": 371,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 89,
+    "available_5_axis_hours": 279,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 77,
+    "available_5_axis_hours": 452,
+    "quoted_lead_time_days": 15,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 84,
+    "available_5_axis_hours": 352,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 91,
+    "available_5_axis_hours": 269,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 63,
+    "available_5_axis_hours": 430,
+    "quoted_lead_time_days": 16,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 70,
+    "available_5_axis_hours": 360,
+    "quoted_lead_time_days": 20,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 77,
+    "available_5_axis_hours": 286,
+    "quoted_lead_time_days": 24,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 65,
+    "available_5_axis_hours": 439,
+    "quoted_lead_time_days": 17,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 72,
+    "available_5_axis_hours": 350,
+    "quoted_lead_time_days": 21,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 79,
+    "available_5_axis_hours": 278,
+    "quoted_lead_time_days": 25,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 67,
+    "available_5_axis_hours": 439,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 74,
+    "available_5_axis_hours": 353,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 81,
+    "available_5_axis_hours": 258,
+    "quoted_lead_time_days": 26,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 69,
+    "available_5_axis_hours": 435,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 76,
+    "available_5_axis_hours": 327,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 83,
+    "available_5_axis_hours": 269,
+    "quoted_lead_time_days": 27,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 71,
+    "available_5_axis_hours": 429,
+    "quoted_lead_time_days": 14,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 78,
+    "available_5_axis_hours": 340,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 85,
+    "available_5_axis_hours": 250,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 73,
+    "available_5_axis_hours": 423,
+    "quoted_lead_time_days": 15,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 80,
+    "available_5_axis_hours": 316,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 87,
+    "available_5_axis_hours": 250,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 75,
+    "available_5_axis_hours": 416,
+    "quoted_lead_time_days": 16,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 82,
+    "available_5_axis_hours": 323,
+    "quoted_lead_time_days": 20,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 89,
+    "available_5_axis_hours": 240,
+    "quoted_lead_time_days": 24,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 77,
+    "available_5_axis_hours": 407,
+    "quoted_lead_time_days": 17,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 84,
+    "available_5_axis_hours": 326,
+    "quoted_lead_time_days": 21,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 91,
+    "available_5_axis_hours": 251,
+    "quoted_lead_time_days": 25,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 63,
+    "available_5_axis_hours": 399,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 70,
+    "available_5_axis_hours": 321,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 77,
+    "available_5_axis_hours": 221,
+    "quoted_lead_time_days": 26,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 65,
+    "available_5_axis_hours": 376,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 72,
+    "available_5_axis_hours": 301,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 79,
+    "available_5_axis_hours": 221,
+    "quoted_lead_time_days": 27,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 67,
+    "available_5_axis_hours": 394,
+    "quoted_lead_time_days": 14,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 74,
+    "available_5_axis_hours": 318,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 81,
+    "available_5_axis_hours": 232,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 69,
+    "available_5_axis_hours": 389,
+    "quoted_lead_time_days": 15,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 76,
+    "available_5_axis_hours": 298,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 83,
+    "available_5_axis_hours": 228,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 71,
+    "available_5_axis_hours": 372,
+    "quoted_lead_time_days": 16,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 78,
+    "available_5_axis_hours": 288,
+    "quoted_lead_time_days": 20,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 85,
+    "available_5_axis_hours": 229,
+    "quoted_lead_time_days": 24,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 73,
+    "available_5_axis_hours": 382,
+    "quoted_lead_time_days": 17,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 80,
+    "available_5_axis_hours": 294,
+    "quoted_lead_time_days": 21,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 87,
+    "available_5_axis_hours": 209,
+    "quoted_lead_time_days": 25,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 75,
+    "available_5_axis_hours": 373,
+    "quoted_lead_time_days": 18,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 82,
+    "available_5_axis_hours": 286,
+    "quoted_lead_time_days": 22,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 89,
+    "available_5_axis_hours": 191,
+    "quoted_lead_time_days": 26,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "facility_id": "btx-dallas-main",
+    "utilization_pct": 77,
+    "available_5_axis_hours": 371,
+    "quoted_lead_time_days": 19,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "facility_id": "btx-austin-cell",
+    "utilization_pct": 84,
+    "available_5_axis_hours": 293,
+    "quoted_lead_time_days": 23,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "facility_id": "btx-san-antonio-partner",
+    "utilization_pct": 91,
+    "available_5_axis_hours": 191,
+    "quoted_lead_time_days": 27,
+    "source_type": "demo",
+    "source_name": "Simulated Capacity History",
+    "source_mode": "static_snapshot"
+  }
+]

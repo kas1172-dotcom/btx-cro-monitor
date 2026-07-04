@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     max_body_bytes: int = 1_048_576          # reject payloads larger than 1 MiB
     signature_header: str = "X-BTX-Signature"
     idempotency_header: str = "X-Idempotency-Key"
+    frontend_origin: str = "http://localhost:5173"
+    anthropic_api_key: str | None = None
+    hubspot_access_token: str | None = None
+    gmail_allowlist: str = ""
 
 
 @lru_cache

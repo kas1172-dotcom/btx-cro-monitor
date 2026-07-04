@@ -1,400 +1,211 @@
 {
-  "btx-precision": {
-    "opportunity": "BTX Precision scored 57 on opportunity with a perfect 100% fit—it can fully serve ITAR, build-to-print, and precision machining with no gaps. The account is being pulled in two directions: strong new demand from two government contract awards ($1.7M and $8.0M) plus a demand spike, set against elevated risk (94) from capacity constraints, repeated quality escapes, and two lost recompetes. This is a target where winning new work depends on relieving capacity and fixing quality before those pressures cost more contracts.",
+  "lonestar-aero-systems": {
+    "opportunity": "Lonestar Aero Systems is a strategic current-business account in Austin. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0001": "A $1.7M government contract win adds fresh, fundable demand to pursue.",
-      "sig-0002": "An $8.0M government contract win is a major new workload that will strain an already tight floor.",
-      "sig-0003": "A quality escape triggered a customer source-inspection hold—quality controls need immediate attention before it jeopardizes deliveries.",
-      "sig-0004": "Demand spiked on new program starts, increasing volume just as capacity is running short.",
-      "sig-0005": "Extended quoted lead times show the floor is near capacity—a bottleneck that limits taking on the new awards.",
-      "sig-0006": "A second quality escape and source-inspection hold confirms quality problems are recurring, not one-off.",
-      "sig-0007": "Losing a $6.0M recompete held for years signals competitive erosion on core, long-standing business.",
-      "sig-0008": "Losing a $3.3M recompete held for years adds to the pattern of shrinking incumbent revenue that must be defended."
+      "sig-0001": "New compliance requirements affect certified work at Lonestar Aero Systems.",
+      "sig-0002": "Lonestar Aero Systems is quoting longer lead times because its production floor is near capacity.",
+      "sig-0003": "Lonestar Aero Systems was awarded a $1.0M government production contract."
     }
   },
-  "anvil-manufacturing": {
-    "opportunity": "Anvil Manufacturing scores 83, driven by two multi-year production contract wins ($15.9M and $6.2M), a demand spike on new program starts, and a hiring surge signaling growth. BTX Precision is a 50% fit—well-positioned to serve build-to-print and titanium work, though NADCAP and sheet metal are gaps. As an existing customer in Phoenix experiencing rapid growth and capacity pressure, Anvil is a strong outsourcing target now.",
+  "trinity-defense-components": {
+    "opportunity": "Trinity Defense Components is a strategic current-business account in Dallas. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0009": "New program starts are spiking demand—Anvil likely needs overflow capacity, opening a near-term outsourcing opportunity for build-to-print and titanium work.",
-      "sig-0010": "A $15.9M multi-year contract commits Anvil to sustained production volume, creating recurring demand BTX can support as a subcontractor.",
-      "sig-0011": "A second $6.2M multi-year contract adds further production load, reinforcing the case for offloading work to BTX.",
-      "sig-0012": "The hiring surge shows Anvil is straining to scale internally—position BTX as faster-to-capacity than adding headcount."
+      "sig-0004": "Trinity Defense Components raised quoted prices because of material and labor pressure.",
+      "sig-0005": "Trinity Defense Components lost a $0.4M recompete it had held for years.",
+      "sig-0006": "Trinity Defense Components booked a $0.3M multi-year production program.",
+      "sig-0007": "Trinity Defense Components is quoting longer lead times because its production floor is near capacity."
     }
   },
-  "meridian-technologies": {
-    "opportunity": "Meridian Technologies scores 0 as an opportunity but carries a high risk profile (75), driven by a quality escape, supplier delays, regulatory change, and pricing pressure. These stacked disruptions make Meridian's customers vulnerable and open to a more reliable second source. BTX fits at 50% — able to serve AS9100 and build-to-print work — making it a candidate to capture displaced demand, though NADCAP and sheet metal gaps limit full coverage.",
+  "pecan-valley-machining": {
+    "opportunity": "Pecan Valley Machining is a priority current-business account in San Antonio. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0013": "A quality escape triggered a customer source-inspection hold — Meridian's customers are actively questioning quality, giving BTX an opening to position its AS9100 reliability.",
-      "sig-0014": "New compliance requirements affect Meridian's certified processes, adding regulatory risk that customers may want to hedge against with an alternate supplier.",
-      "sig-0015": "Meridian raised prices citing material and labor inflation — a chance for BTX to compete on quoted work where cost is now under scrutiny.",
-      "sig-0017": "Meridian notified customers of a multi-week shipment slip — delivery unreliability creates urgency for a backup source BTX can fill on build-to-print work."
+      "sig-0008": "Demand for Pecan Valley Machining's assemblies increased after new program starts.",
+      "sig-0009": "Pecan Valley Machining raised quoted prices because of material and labor pressure.",
+      "sig-0010": "New compliance requirements affect certified work at Pecan Valley Machining.",
+      "sig-0011": "Pecan Valley Machining posted a surge of manufacturing and supply-chain openings."
     }
   },
-  "falcon-fabrication": {
-    "opportunity": "Falcon Fabrication scores 0 as an outbound opportunity because the signals point to it being a struggling supplier, not a buyer — its risk profile (60) is driven by repeated multi-week shipment slips and a quality escape. However, BTX Precision has strong 80% fit (5-axis CNC, aluminum, build-to-print, titanium), so the real play is targeting Falcon's disrupted customers who now need a reliable alternative. The only fit gap is NADCAP, which may limit certain aerospace work.",
+  "clearfork-turbine-works": {
+    "opportunity": "Clearfork Turbine Works is a priority current-business account in Fort Worth. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0018": "Falcon told customers of a multi-week shipment slip — those customers are actively exposed to delivery risk and open to a backup supplier like BTX.",
-      "sig-0019": "A second multi-week slip notification confirms this is a recurring delivery problem, strengthening the case to approach Falcon's customers now.",
-      "sig-0020": "A quality escape triggered a customer source-inspection hold, signaling quality-driven accounts that BTX's build-to-print precision capability can win over."
+      "sig-0012": "Clearfork Turbine Works raised quoted prices because of material and labor pressure.",
+      "sig-0013": "Clearfork Turbine Works lost a $0.8M recompete it had held for years.",
+      "sig-0014": "New compliance requirements affect certified work at Clearfork Turbine Works.",
+      "sig-0015": "Clearfork Turbine Works notified buyers of multi-week shipment delays."
     }
   },
-  "monarch-technologies": {
-    "opportunity": "Monarch Technologies is a perfect fit for BTX Precision (100%) with no capability gaps across 5-axis CNC and build-to-print work. With an opportunity score of 30 driven by a new $0.8M government contract award and a hiring surge, Monarch is entering a growth phase that will likely require additional precision-machining capacity. As an existing customer in Greenville, they are well-positioned for expanded engagement now.",
+  "bluebonnet-avionics": {
+    "opportunity": "Bluebonnet Avionics is a core current-business account in Austin. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0021": "The $0.8M government contract award means Monarch will need reliable build-to-print production—BTX can position to fulfill parts tied to this new contract.",
-      "sig-0022": "The hiring surge signals a growth push, indicating rising volume needs BTX can support with its 5-axis CNC capacity."
+      "sig-0016": "Bluebonnet Avionics notified buyers of multi-week shipment delays.",
+      "sig-0017": "A customer quality hold was opened after a quality escape at Bluebonnet Avionics.",
+      "sig-0018": "Bluebonnet Avionics was awarded a $0.6M government production contract.",
+      "sig-0019": "A customer quality hold was opened after a quality escape at Bluebonnet Avionics."
     }
   },
-  "strata-turbine": {
-    "opportunity": "Strata Turbine scored 68, driven by three recent contract wins totaling over $35M, including a $16.7M multi-year production contract and an $18.4M government award. With an 80% fit to BTX Precision's capabilities (ITAR, aluminum, build-to-print, precision machining), this Austin-based target is scaling production and likely needs precision-machining capacity to deliver on new commitments. The only gap is sheet metal, so lead with the core machining strengths.",
+  "gulf-coast-propulsion": {
+    "opportunity": "Gulf Coast Propulsion is a strategic current-business account in Houston. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0023": "A $0.8M multi-year production contract signals steady recurring work where BTX can position as a build-to-print machining supplier.",
-      "sig-0024": "The $16.7M multi-year production contract points to significant sustained volume—a strong opening for a long-term precision-machining supply agreement.",
-      "sig-0025": "The $18.4M government award aligns directly with BTX's ITAR capability, making this defense-grade work a natural fit to pursue."
+      "sig-0020": "Gulf Coast Propulsion posted a surge of manufacturing and supply-chain openings.",
+      "sig-0021": "Gulf Coast Propulsion raised quoted prices because of material and labor pressure.",
+      "sig-0022": "A customer quality hold was opened after a quality escape at Gulf Coast Propulsion.",
+      "sig-0023": "Gulf Coast Propulsion was awarded a $0.7M government production contract."
     }
   },
-  "anvil-systems": {
-    "opportunity": "Anvil Systems scores 0 on opportunity but carries a very high risk profile (risk=98, capacityRisk=56), driven by repeated capacity constraints, a quality escape, pricing pressure, and regulatory change. This combination signals a supplier that is straining to meet its customers' needs, creating an opening for BTX Precision to capture displaced work on AS9100 and build-to-print jobs (50% fit). Note the fit gaps—assembly and sheet metal—mean BTX cannot absorb Anvil's full scope, so target the machining-heavy, certified work BTX can serve.",
+  "brazos-precision-castings": {
+    "opportunity": "Brazos Precision Castings is a core current-business account in Waco. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0026": "New compliance requirements on Anvil's certified processes create risk for its customers; BTX's AS9100 capability lets it position as a compliant alternative for affected certified work.",
-      "sig-0027": "Anvil raised prices citing cost inflation, so its customers are now open to competitive quotes—BTX should approach on price-sensitive, build-to-print parts.",
-      "sig-0028": "Extended lead times show Anvil's floor is near capacity; BTX can pitch faster turnaround to win overflow machining work.",
-      "sig-0029": "A quality escape triggered a source-inspection hold at a customer, damaging trust in Anvil—BTX should lead with quality assurance and AS9100 credentials to displace them.",
-      "sig-0030": "A second capacity-constraint signal reinforces that Anvil is over-committed; prioritize outreach on time-critical certified jobs BTX can deliver now."
+      "sig-0024": "Brazos Precision Castings is quoting longer lead times because its production floor is near capacity.",
+      "sig-0025": "Brazos Precision Castings raised quoted prices because of material and labor pressure.",
+      "sig-0026": "Brazos Precision Castings booked a $1.9M multi-year production program.",
+      "sig-0027": "Brazos Precision Castings notified buyers of multi-week shipment delays."
     }
   },
-  "sentinel-alloys": {
-    "opportunity": "Sentinel Alloys is an existing customer in Cincinnati with a strong 67% fit to BTX Precision's capabilities, matching directly on 5-axis CNC and ITAR work. Their opportunity score of 10 is driven entirely by a hiring surge, signaling a growth push that could expand their production needs. As a current customer already aligned on high-value machining and ITAR requirements, they are positioned for account expansion.",
+  "red-river-assemblies": {
+    "opportunity": "Red River Assemblies is a core current-business account in Dallas. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0032": "Sentinel Alloys' surge in job openings signals a growth push—reach out now to capture increased 5-axis CNC and ITAR machining demand before competitors do."
+      "sig-0028": "Red River Assemblies booked a $0.7M multi-year production program.",
+      "sig-0029": "Demand for Red River Assemblies's assemblies increased after new program starts.",
+      "sig-0030": "Red River Assemblies is quoting longer lead times because its production floor is near capacity.",
+      "sig-0031": "Red River Assemblies raised quoted prices because of material and labor pressure."
     }
   },
-  "cardinal-metalworks": {
-    "opportunity": "Cardinal Metalworks scores 58, driven by two multi-year production contract wins ($2.8M and $10.3M) plus a hiring surge, signaling aggressive growth. As a competitor in Tulsa expanding machining capacity, they overlap with BTX's 5-axis CNC and build-to-print capabilities (50% fit), but their NADCAP and assembly gaps mark where BTX can differentiate and win overflow or specialized work.",
+  "high-plains-actuation": {
+    "opportunity": "High Plains Actuation is a watch current-business account in Amarillo. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0033": "A $2.8M multi-year contract win shows Cardinal is taking production volume BTX could compete for or backfill via overflow capacity.",
-      "sig-0034": "A surge in job openings signals Cardinal is scaling to meet demand, creating a window for BTX to capture work they can't yet staff.",
-      "sig-0035": "A $10.3M multi-year contract win confirms significant new demand in the market that BTX should target for subcontracting or competitive displacement.",
-      "sig-0036": "Cardinal's facility expansion to add machining capacity intensifies local competitive pressure; BTX should lead with its NADCAP and assembly strengths where Cardinal has gaps.",
-      "sig-0037": "A second expansion signal reinforces Cardinal's capacity buildout, underscoring the need for BTX to differentiate on qualifications Cardinal lacks rather than compete on raw machining capacity."
+      "sig-0032": "High Plains Actuation is quoting longer lead times because its production floor is near capacity.",
+      "sig-0033": "High Plains Actuation posted a surge of manufacturing and supply-chain openings.",
+      "sig-0034": "High Plains Actuation lost a $0.5M recompete it had held for years.",
+      "sig-0035": "High Plains Actuation was awarded a $0.4M government production contract."
     }
   },
-  "monarch-alloys": {
-    "opportunity": "Monarch Alloys scored 16, driven entirely by two hiring-surge signals (+10 and +6), indicating an active growth push. With 80% fit, BTX Precision can directly serve their 5-axis CNC, AS9100, ITAR, and precision-machining needs, though sheet metal remains a gap. The combination of expansion signals and strong capability alignment makes this a solid target worth pursuing.",
+  "alamo-composite-tooling": {
+    "opportunity": "Alamo Composite Tooling is a priority current-business account in San Antonio. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0038": "Monarch's surge in job openings signals growth—likely new capacity or program demand BTX can support with 5-axis CNC and precision machining.",
-      "sig-0041": "A second hiring-surge signal reinforces the expansion, strengthening the case that Monarch needs added precision-machining, AS9100, and ITAR-qualified capacity now."
+      "sig-0036": "Alamo Composite Tooling lost a $0.5M recompete it had held for years.",
+      "sig-0037": "Alamo Composite Tooling was awarded a $0.7M government production contract.",
+      "sig-0038": "New compliance requirements affect certified work at Alamo Composite Tooling.",
+      "sig-0039": "Alamo Composite Tooling lost a $0.7M recompete it had held for years."
     }
   },
-  "sentinel-aerospace": {
-    "opportunity": "Sentinel Aerospace scores 85, driven by a $1.4M multi-year production contract win, a demand spike on new program starts, a $15.4M government contract award, and a hiring surge. This convergence of new work and growth signals strong, near-term demand for precision-machined parts, where BTX fits at 67% on aluminum and precision machining. Prioritize this target now, while noting BTX cannot cover assembly and demand-spike adds a capacity risk of 10.",
+  "hill-country-aerostructures": {
+    "opportunity": "Hill Country Aerostructures is a strategic prospecting account in Austin. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0042": "A $15.4M government contract award means Sentinel needs qualified suppliers for precision aluminum parts—BTX can bid on the machining scope.",
-      "sig-0043": "Demand spiking on new program starts signals urgent production volume, but also flags a capacity risk (10) BTX must plan for before committing.",
-      "sig-0044": "A $1.4M multi-year production contract points to steady, recurring machining work BTX can position for as a long-term supplier.",
-      "sig-0045": "The hiring surge confirms Sentinel is scaling up, reinforcing that they will need outside precision-machining capacity BTX can provide."
+      "sig-0040": "Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings.",
+      "sig-0041": "Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings."
     }
   },
-  "beacon-alloys": {
-    "opportunity": "Beacon Alloys scores 0 on opportunity but shows strong 80% fit to BTX Precision, covering 5-axis CNC, ITAR, build-to-print, and titanium (only gap is assembly). The zero score is driven by high risk (50) and capacity risk (35) from a capacity constraint and a quality escape. This is a displacement target: their floor is near capacity and a quality escape has triggered a customer source-inspection hold, creating openings to capture overflow or at-risk work.",
+  "caprock-guidance-systems": {
+    "opportunity": "Caprock Guidance Systems is a priority prospecting account in Lubbock. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0047": "A quality escape triggered a customer source-inspection hold at Beacon Alloys — pitch BTX's quality reliability to win at-risk ITAR and build-to-print work from a dissatisfied customer.",
-      "sig-0048": "Beacon Alloys is quoting extended lead times with a near-capacity floor — position BTX to absorb overflow 5-axis CNC and titanium work they can't take on."
+      "sig-0042": "Caprock Guidance Systems was awarded a $1.1M government production contract.",
+      "sig-0043": "Caprock Guidance Systems booked a $0.3M multi-year production program.",
+      "sig-0044": "Demand for Caprock Guidance Systems's assemblies increased after new program starts.",
+      "sig-0045": "Demand for Caprock Guidance Systems's assemblies increased after new program starts."
     }
   },
-  "halcyon-components": {
-    "opportunity": "Halcyon Components scores 82, driven by strong demand signals and two government contract wins totaling $16.7M that create urgent capacity needs. BTX Precision has a 60% fit, well-matched on 5-axis CNC, AS9100, and precision machining—exactly the capabilities these new programs require. The demand spikes also carry a capacity risk of 16, signaling Halcyon may need outside machining partners to keep pace.",
+  "cypress-creek-fabrication": {
+    "opportunity": "Cypress Creek Fabrication is a core prospecting account in Houston. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0049": "New program starts are spiking demand—an opening for BTX to supply overflow precision-machining work.",
-      "sig-0050": "Their hiring surge signals a growth push, meaning near-term capacity gaps BTX can help fill.",
-      "sig-0051": "A $5.9M government contract means AS9100-compliant precision work is needed—directly in BTX's wheelhouse.",
-      "sig-0052": "A second demand spike reinforces sustained new-program volume that could exceed Halcyon's in-house capacity.",
-      "sig-0053": "A $10.8M government contract adds significant machining demand where BTX's 5-axis CNC and AS9100 fit align."
+      "sig-0046": "Cypress Creek Fabrication booked a $1.7M multi-year production program.",
+      "sig-0047": "Cypress Creek Fabrication booked a $1.7M multi-year production program."
     }
   },
-  "vanguard-systems": {
-    "opportunity": "Vanguard Systems scores 35, driven by a demand spike (+25) on new program starts and a hiring surge (+10) signaling active growth. With 80% fit—BTX can serve their 5-axis CNC, AS9100, aluminum, and titanium needs—this is a timely target, though the NADCAP gap could limit certain aerospace work. Engage now while new programs are ramping and they're scaling capacity.",
+  "mesquite-defense-manufacturing": {
+    "opportunity": "Mesquite Defense Manufacturing is a strategic prospecting account in Dallas. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0054": "Their hiring surge signals a growth push—BTX can position as an outsourced capacity partner while they staff up.",
-      "sig-0055": "New program starts spiked demand—reach out now to win machining work on these fresh programs before suppliers lock in."
+      "sig-0048": "Mesquite Defense Manufacturing booked a $0.2M multi-year production program.",
+      "sig-0049": "Demand for Mesquite Defense Manufacturing's assemblies increased after new program starts."
     }
   },
-  "nimbus-technologies": {
-    "opportunity": "Nimbus Technologies scores 0 on opportunity but shows a high risk level of 83 and capacity risk of 56, signaling a supplier under strain that its customers may need to source around. With BTX serving ITAR, aluminum, and titanium (60% fit), the extended lead times, quality escape, and new compliance pressure at Nimbus create openings to win displaced work in overlapping capabilities. Prioritize outreach to Nimbus's customers seeking a more reliable alternative in these process areas.",
+  "violet-crown-micro-precision": {
+    "opportunity": "Violet Crown Micro Precision is a priority prospecting account in Austin. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0056": "Nimbus is quoting extended lead times (capacity_constraint +30 to risk, +35 to capacity risk), so its customers likely need overflow capacity BTX can offer.",
-      "sig-0058": "A quality escape triggered a source-inspection hold (quality_escape +20 risk, +10 competitive pressure), giving BTX a quality-and-reliability angle to displace Nimbus.",
-      "sig-0059": "New compliance requirements affect Nimbus's certified processes (regulatory_change +15 risk), a moment when customers reevaluate suppliers and BTX can step in on ITAR work.",
-      "sig-0060": "A second capacity-constraint signal (+18 risk, +21 capacity risk) confirms Nimbus's floor is near capacity, reinforcing the need for an alternate source like BTX."
+      "sig-0050": "Violet Crown Micro Precision was awarded a $1.8M government production contract.",
+      "sig-0051": "Violet Crown Micro Precision was awarded a $0.3M government production contract."
     }
   },
-  "falcon-tooling": {
-    "opportunity": "Falcon Tooling scored 30, driven entirely by a contract win worth $5.3M in multi-year production work (contract_win +30). As a Phoenix-based competitor, they show 50% fit to BTX Precision—able to serve AS9100 and build-to-print work but with gaps in assembly and sheet metal. Their facility expansion adds competitive pressure (+20), signaling growing machining capacity in the region.",
+  "ranger-landing-gear": {
+    "opportunity": "Ranger Landing Gear is a strategic prospecting account in Fort Worth. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0061": "Falcon's facility expansion adds machining capacity in Phoenix, raising local competitive pressure BTX should monitor and counter.",
-      "sig-0062": "Falcon's $5.3M multi-year contract win drove the score to 30; it signals a funded, growing account worth watching for displacement or partnership on their assembly and sheet metal gaps."
+      "sig-0052": "Ranger Landing Gear posted a surge of manufacturing and supply-chain openings.",
+      "sig-0053": "Ranger Landing Gear was awarded a $1.1M government production contract."
     }
   },
-  "titan-precision": {
-    "opportunity": "Titan Precision scored 30, driven by a $1.2M government contract award (+20) and a hiring surge (+10), both signaling active growth and capacity expansion. Even as a Wichita competitor, BTX can serve their 5-axis CNC and precision machining needs at a 67% fit, though the NADCAP gap limits full coverage. The combination of new contract funding and hiring makes them likely to need additional machining capacity soon.",
+  "live-oak-sensor-housings": {
+    "opportunity": "Live Oak Sensor Housings is a core prospecting account in San Marcos. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0063": "Their hiring surge signals a growth push that may outpace internal capacity, opening a window for BTX to offer overflow 5-axis CNC and precision machining support.",
-      "sig-0064": "The $1.2M government contract award means fresh funding and delivery pressure, creating near-term demand BTX can help meet on precision machining work."
+      "sig-0054": "Live Oak Sensor Housings posted a surge of manufacturing and supply-chain openings.",
+      "sig-0055": "Live Oak Sensor Housings was awarded a $1.1M government production contract.",
+      "sig-0056": "Live Oak Sensor Housings was awarded a $1.6M government production contract.",
+      "sig-0057": "Live Oak Sensor Housings posted a surge of manufacturing and supply-chain openings."
     }
   },
-  "titan-components": {
-    "opportunity": "Titan Components scores 0 on opportunity but shows high risk (70) and capacity risk (50), signaling a supplier under strain rather than a healthy prospect. With multi-week shipment slips, a floor near capacity, and new compliance pressures on its certified processes, Titan's customers are exposed and may be seeking alternate suppliers. BTX Precision can serve AS9100 and ITAR needs (50% fit) and target Titan's at-risk customers, though NADCAP and sheet metal gaps limit full coverage.",
+  "blackland-hydraulics": {
+    "opportunity": "Blackland Hydraulics is a priority prospecting account in Waco. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0065": "Titan's multi-week shipment slip (supplier_delay+25 to risk, +15 to capacity risk) means its customers face delivery gaps BTX can step in to fill.",
-      "sig-0066": "New compliance requirements on Titan's certified processes (regulatory_change+15 to risk) may disrupt its qualified work, opening displacement openings for BTX's AS9100/ITAR-capable lines.",
-      "sig-0067": "Titan quoting extended lead times from a near-capacity floor (capacity_constraint+30 to risk, +35 to capacity risk) signals overflow work BTX can absorb now."
+      "sig-0058": "Blackland Hydraulics booked a $1.2M multi-year production program.",
+      "sig-0059": "Blackland Hydraulics booked a $1.4M multi-year production program.",
+      "sig-0060": "Blackland Hydraulics booked a $1.2M multi-year production program.",
+      "sig-0061": "Blackland Hydraulics booked a $0.3M multi-year production program."
     }
   },
-  "cardinal-components": {
-    "opportunity": "Cardinal Components scores 90, driven by a $12.7M multi-year production contract win (+30), demand spikes on new program starts (+25 and +15), and a $3.5M government contract award (+20). BTX can serve their titanium needs but only fits at 50% because assembly is a gap. With capacityRisk at 16 from stacked demand spikes, Cardinal likely needs outside precision-machining capacity now.",
+  "mesa-verde-aerosystems": {
+    "opportunity": "Mesa Verde Aerosystems is a strategic prospecting account in Phoenix. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0068": "The $3.5M government contract award means Cardinal has funded, compliance-driven work that needs qualified titanium machining suppliers.",
-      "sig-0069": "A demand spike on new program starts signals near-term capacity strain BTX can absorb with titanium machining.",
-      "sig-0070": "A second demand spike compounds the capacity risk, strengthening the case that Cardinal needs an outside machining partner.",
-      "sig-0071": "The $12.7M multi-year production contract means sustained, high-volume demand BTX can pursue for recurring titanium work."
+      "sig-0062": "Mesa Verde Aerosystems posted a surge of manufacturing and supply-chain openings.",
+      "sig-0063": "Demand for Mesa Verde Aerosystems's assemblies increased after new program starts.",
+      "sig-0064": "Mesa Verde Aerosystems posted a surge of manufacturing and supply-chain openings.",
+      "sig-0065": "Mesa Verde Aerosystems booked a $1.6M multi-year production program."
     }
   },
-  "pinnacle-forgings": {
-    "opportunity": "Pinnacle Forgings scores 73, driven by two multi-year production contract wins ($16.9M and $18.0M) plus a demand spike from new program starts. BTX is a strong 75% fit—covering AS9100, precision machining, and titanium—which aligns directly with the aerospace-grade production ramp this account is entering. The only gap is assembly, so BTX should position around machining scope while noting a modest capacity-risk factor of 10 tied to the demand surge.",
+  "rocky-mountain-flight-controls": {
+    "opportunity": "Rocky Mountain Flight Controls is a priority prospecting account in Denver. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0072": "New program starts are spiking demand—Pinnacle needs added machining capacity now, and BTX can capture overflow work.",
-      "sig-0073": "A $16.9M multi-year contract win means sustained production volume BTX can support with AS9100 precision machining and titanium capabilities.",
-      "sig-0074": "An $18.0M multi-year contract win adds further long-term volume, reinforcing a multi-year supplier opportunity for BTX."
+      "sig-0066": "Rocky Mountain Flight Controls posted a surge of manufacturing and supply-chain openings.",
+      "sig-0067": "Demand for Rocky Mountain Flight Controls's assemblies increased after new program starts."
     }
   },
-  "bastion-tooling": {
-    "opportunity": "Bastion Tooling scores 20 on opportunity, driven entirely by a recent $14.6M government contract award. Fit to BTX Precision is strong at 80% — they align on ITAR, aluminum, build-to-print, and precision machining, with the only gap being assembly. As a Tulsa-based competitor that is both winning contracts and expanding capacity, they represent a target worth watching closely for competitive and partnership positioning.",
+  "carolina-nacelle-works": {
+    "opportunity": "Carolina Nacelle Works is a core prospecting account in Greenville. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0075": "Bastion Tooling's $14.6M government contract award signals rising demand they must fulfill — a potential overflow or subcontracting opening for BTX Precision's ITAR and precision machining capabilities.",
-      "sig-0077": "Bastion Tooling's facility expansion to add machining capacity indicates a competitor scaling up in the same market — BTX Precision should monitor this to defend accounts and identify build-to-print work they may not cover, such as assembly."
+      "sig-0068": "Carolina Nacelle Works booked a $0.1M multi-year production program.",
+      "sig-0069": "Carolina Nacelle Works booked a $1.7M multi-year production program.",
+      "sig-0070": "Carolina Nacelle Works was awarded a $0.5M government production contract."
     }
   },
-  "meridian-systems": {
-    "opportunity": "Meridian Systems scores 0 with 0% fit to BTX Precision — we can serve none of their needs and have gaps in NADCAP and assembly. However, the score trace shows elevated risk (35) driven by a quality escape (+20) and regulatory change (+15), plus competitive pressure (10) from the quality escape (+10). These stress signals suggest Meridian is under operational and compliance strain that could open a conversation, even though current fit is not there.",
+  "chesapeake-rotor-systems": {
+    "opportunity": "Chesapeake Rotor Systems is a strategic prospecting account in Baltimore. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0078": "A quality escape triggered a customer source-inspection hold, indicating Meridian is under quality scrutiny — a moment where a precision partner could be positioned, but note BTX cannot currently serve them due to 0% fit.",
-      "sig-0079": "New compliance requirements affect Meridian's certified processes, signaling regulatory pressure on their certifications — though our NADCAP gap limits how BTX can directly help today."
+      "sig-0071": "Demand for Chesapeake Rotor Systems's assemblies increased after new program starts.",
+      "sig-0072": "Chesapeake Rotor Systems booked a $0.3M multi-year production program.",
+      "sig-0073": "Chesapeake Rotor Systems booked a $1.3M multi-year production program.",
+      "sig-0074": "Demand for Chesapeake Rotor Systems's assemblies increased after new program starts."
     }
   },
-  "granite-components": {
-    "opportunity": "Granite Components scores 46, driven primarily by a $3.9M multi-year production contract win (+30) reinforced by two hiring-surge signals (+10, +6). At 75% fit, BTX Precision can serve their AS9100, ITAR, and titanium needs, with the only gap being sheet metal. The combination of new committed work and active hiring points to real, near-term capacity demand this prospect will need to fill.",
+  "great-lakes-engine-cases": {
+    "opportunity": "Great Lakes Engine Cases is a priority prospecting account in Cincinnati. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0081": "The $3.9M multi-year production contract means Granite has committed work to deliver and will likely need outside precision-machining capacity BTX can supply.",
-      "sig-0082": "A surge in job openings signals a growth push, indicating Granite may be capacity-constrained and open to a machining partner like BTX.",
-      "sig-0083": "A second hiring-surge signal reinforces that Granite is scaling fast, strengthening the case for BTX to offer overflow or specialized AS9100/ITAR/titanium support."
+      "sig-0075": "Great Lakes Engine Cases booked a $1.9M multi-year production program.",
+      "sig-0076": "Great Lakes Engine Cases was awarded a $1.2M government production contract.",
+      "sig-0077": "Great Lakes Engine Cases was awarded a $0.7M government production contract."
     }
   },
-  "nimbus-components": {
-    "opportunity": "Nimbus Components is a strong target with an opportunity score of 70 and 80% fit to BTX Precision, capable of supporting 5-axis CNC, AS9100, build-to-print, and titanium work. A recent $4.7M multi-year production contract win (sig-0084, +30) plus two demand spikes on new program starts (sig-0085, sig-0086, +25 and +15) are driving up their need for capacity. With capacityRisk at 16, Nimbus likely faces overflow pressure that BTX can absorb—though sheet metal remains a gap.",
+  "cascade-actuator-products": {
+    "opportunity": "Cascade Actuator Products is a core prospecting account in Seattle. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0084": "The $4.7M multi-year contract win signals sustained, funded production demand—position BTX as an overflow or dedicated build-to-print partner for this program.",
-      "sig-0085": "A demand spike from new program starts means near-term capacity pressure—pitch 5-axis CNC and titanium machining support now.",
-      "sig-0086": "A second demand spike on new program starts reinforces overflow risk—lead with AS9100-qualified capacity to capture work Nimbus can't cover in-house."
+      "sig-0078": "Demand for Cascade Actuator Products's assemblies increased after new program starts.",
+      "sig-0079": "Cascade Actuator Products booked a $1.0M multi-year production program.",
+      "sig-0080": "Cascade Actuator Products was awarded a $1.5M government production contract."
     }
   },
-  "delta-precision": {
-    "opportunity": "Delta Precision scores 57, driven by a demand spike (+25) and two government contract awards ($10.8M and $8.9M, +20 and +12), signaling rapid growth and new program starts. With 80% fit—covering 5-axis CNC, AS9100, ITAR, and build-to-print—BTX Precision is well-positioned to support their ramp, though the NADCAP gap is a consideration. The combination of fresh federal funding and surging demand makes this a strong, timely target.",
+  "desert-sky-machining": {
+    "opportunity": "Desert Sky Machining is a priority prospecting account in Tucson. Use the deterministic scores, validated signals, CRM context, and capacity context before committing resources.",
     "findings": {
-      "sig-0087": "A $10.8M government contract gives Delta the funded backlog and urgency to outsource machining—BTX can pitch ITAR/AS9100-compliant build-to-print capacity now.",
-      "sig-0088": "Demand spiking on new program starts (also flagged as capacity risk +10) means Delta likely needs overflow supplier support—BTX's 5-axis CNC can absorb the surge.",
-      "sig-0089": "A second $8.9M government award confirms sustained, funded growth—position BTX as a repeatable partner for their expanding federal program work."
-    }
-  },
-  "aegis-components": {
-    "opportunity": "Aegis Components scored 30, driven by a $19.9M government contract award (+20) and a hiring surge (+10) that together signal active growth and new capacity demand. Fit is moderate at 50%—BTX can serve their AS9100 requirements, though sheet metal remains a gap. As a Wichita-based competitor now scaling up, Aegis represents a timely opening to capture overflow or specialized precision-machining work tied to their new contract.",
-    "findings": {
-      "sig-0090": "The hiring surge indicates Aegis is ramping capacity—an opening for BTX to supply AS9100 precision-machining support they may not staff fast enough internally.",
-      "sig-0091": "The $19.9M government contract award means new production demand is coming; BTX should position for AS9100 machining work tied to fulfilling that contract."
-    }
-  },
-  "meridian-aerospace": {
-    "opportunity": "Meridian Aerospace scored 0 on opportunity, driven entirely by risk (40) and capacity risk (15) — this is a distressed supplier, not a warm buyer. They can serve ITAR, build-to-print, and precision machining needs at a 60% fit, but gaps in NADCAP and assembly limit full coverage. The multi-week shipment slip plus new regulatory pressure on their certified processes signals an opening for BTX to step in as backup or replacement capacity for Meridian's affected customers.",
-    "findings": {
-      "sig-0092": "Meridian's multi-week shipment slip means their customers need alternate capacity now — BTX can offer precision machining and build-to-print to absorb the delayed work.",
-      "sig-0093": "New compliance requirements are straining Meridian's certified processes — BTX can position as a compliant ITAR-capable alternative, though it must address the NADCAP gap to fully match."
-    }
-  },
-  "axiom-components": {
-    "opportunity": "Axiom Components scores 57, driven by a demand spike from new program starts (+25) plus two government contract awards ($9.8M +20 and $6.9M +12). BTX can serve their 5-axis CNC and AS9100 needs (50% fit), making this a strong target for machining overflow, though assembly and sheet metal fall outside BTX's scope. Note a capacity risk flag (10) tied to the demand spike, so move quickly before Axiom's needs are locked up.",
-    "findings": {
-      "sig-0095": "New program starts are spiking Axiom's demand, signaling immediate need for additional 5-axis CNC capacity BTX can supply.",
-      "sig-0096": "The $9.8M government contract means new production volume requiring AS9100-certified machining that BTX can fulfill.",
-      "sig-0097": "The additional $6.9M government contract compounds Axiom's workload, increasing the likelihood they'll outsource machining to BTX."
-    }
-  },
-  "meridian-precision": {
-    "opportunity": "Meridian Precision scores 69, driven overwhelmingly by three multi-year production contract wins totaling $33.1M plus an active hiring surge. This is a growing shop taking on major new production commitments, and BTX Precision fits 67% of their needs with proven aluminum and titanium capability. The main caveat is a sheet metal gap, so scope BTX's role around machined aluminum and titanium components tied to their new contract volume.",
-    "findings": {
-      "sig-0098": "A $5.9M multi-year contract adds production volume that can require outsourced aluminum/titanium machining BTX can supply.",
-      "sig-0099": "The hiring surge shows a growth push and likely capacity strain—an opening to position BTX as overflow or specialized machining support.",
-      "sig-0100": "A $7.4M multi-year contract further increases sustained demand BTX can attach to on aluminum and titanium parts.",
-      "sig-0101": "The $19.8M multi-year contract is the largest driver—significant, long-horizon volume worth prioritizing outreach and capacity discussions around."
-    }
-  },
-  "sterling-turbine": {
-    "opportunity": "Sterling Turbine is a strong target with a perfect 100% fit—BTX can serve all their needs (5-axis CNC, build-to-print, titanium) with no gaps. Their opportunity score of 50 is driven by two recent contract wins totaling nearly $6M, signaling active production ramp-up and capacity demands. As a competitor in Huntsville, their new commitments may create overflow work or subcontracting opportunities BTX can capture.",
-    "findings": {
-      "sig-0103": "The $2.8M government contract award means Sterling Turbine faces new compliance and delivery deadlines—BTX can position as a qualified subcontractor for surge capacity.",
-      "sig-0104": "The $3.1M multi-year production contract signals sustained volume that may exceed their in-house capacity, opening the door for BTX to supply 5-axis CNC and titanium build-to-print work."
-    }
-  },
-  "ironclad-defense": {
-    "opportunity": "Ironclad Defense scores 81 with a perfect 100% fit to BTX Precision's 5-axis CNC and aluminum capabilities and no capability gaps. Two recent government contract awards totaling $39.2M plus three demand spikes on new program starts point to a well-funded prospect with immediate, rising production needs. The capacityRisk of 20 driven by the demand spikes signals they may be stretched to meet volume, opening a clear opening for BTX to supply overflow machining work.",
-    "findings": {
-      "sig-0105": "A $20.0M contract award means Ironclad has funded, near-term work that will require precision-machined parts BTX can produce.",
-      "sig-0106": "A second $19.2M contract award confirms sustained, funded demand and a broader program pipeline to pursue.",
-      "sig-0107": "A demand spike on new program starts signals ramping production volume BTX can help absorb via 5-axis CNC capacity.",
-      "sig-0108": "A repeat demand spike reinforces that Ironclad's internal capacity may be strained, creating overflow opportunities for BTX.",
-      "sig-0109": "A third demand spike on new program starts underscores urgent, recurring machining needs BTX is positioned to fill now."
-    }
-  },
-  "vertex-alloys": {
-    "opportunity": "Vertex Alloys scores a 60 opportunity with a 67% fit to BTX Precision, driven by two major contract wins totaling $25.3M and an active hiring push. BTX can already serve their aluminum and titanium needs, though a NADCAP gap remains to close for full qualification. The combination of new production commitments and growth signals makes this a strong, well-timed target.",
-    "findings": {
-      "sig-0110": "The $10.6M government contract award means Vertex needs qualified precision-machining capacity now—engage early, but confirm whether NADCAP is a requirement given the BTX gap.",
-      "sig-0112": "The $14.7M multi-year production contract signals sustained, recurring demand where BTX's aluminum and titanium capabilities directly fit—pursue a long-term supply relationship.",
-      "sig-0113": "The hiring surge indicates a scaling operation likely to outstrip internal capacity, opening the door for BTX to offer outsourced machining support."
-    }
-  },
-  "foundry-precision": {
-    "opportunity": "Foundry Precision scores 0 on opportunity but carries a risk load of 50 and competitive pressure of 20, driven by a quality escape, a regulatory change, and pricing pressure — all signals of instability at an incumbent supplier. Fit to BTX Precision is strong at 75%, covering 5-axis CNC, ITAR, and build-to-print, with only sheet metal as a gap. This makes Foundry Precision a displacement target: their customers are exposed to quality, compliance, and cost issues that BTX can position against.",
-    "findings": {
-      "sig-0115": "A quality escape triggered a customer source-inspection hold, opening a window for BTX to pitch reliable quality on 5-axis CNC and build-to-print work.",
-      "sig-0116": "New compliance requirements are straining their certified processes — BTX's ITAR capability is a direct alternative for affected regulated work.",
-      "sig-0117": "Foundry raised prices citing material and labor inflation, giving BTX a cost-competitive opening with affected customers."
-    }
-  },
-  "monarch-forgings": {
-    "opportunity": "Monarch Forgings scored 30, driven by a $16.3M government contract award and a hiring surge signaling active growth. BTX Precision is a 60% fit — able to serve their 5-axis CNC, AS9100, and precision machining needs, though gaps in NADCAP and assembly may limit full coverage. The combination of new funded work and expansion makes this a timely outreach target.",
-    "findings": {
-      "sig-0118": "The $16.3M government contract adds +20 to the score and means Monarch has funded demand and likely needs precision machining capacity BTX can supply.",
-      "sig-0120": "The hiring surge adds +10 and indicates a growth push, suggesting Monarch may need outside machining partners to scale output."
-    }
-  },
-  "halcyon-manufacturing": {
-    "opportunity": "Halcyon Manufacturing scored 50 and is a perfect 100% fit for BTX Precision, with full capability to serve their ITAR and precision machining needs and no gaps. Their recent contract wins totaling over $14M in new business signal ramping production demand and a strong need for reliable machining partners. This makes them a high-priority target worth immediate outreach.",
-    "findings": {
-      "sig-0121": "Halcyon's $9.1M multi-year production contract means sustained, predictable demand—BTX can position for a long-term supply relationship rather than one-off orders.",
-      "sig-0122": "The $5.0M government contract award signals ITAR-scoped work where BTX's ITAR-compliant precision machining is a direct fit for their compliance and quality requirements."
-    }
-  },
-  "continental-components": {
-    "opportunity": "Continental Components scores 70 with a strong 80% fit to BTX Precision, aligning on 5-axis CNC, aluminum, build-to-print, and titanium. The opportunity is driven by a $11.5M government contract award, multiple demand spikes on new program starts, and a hiring surge signaling growth. With only sheet metal as a gap, this Dallas prospect is a well-matched, actively expanding target worth prioritizing.",
-    "findings": {
-      "sig-0124": "New program starts are driving demand, creating immediate need for outsourced precision-machining capacity BTX can fill.",
-      "sig-0125": "The $11.5M government contract award means funded, ongoing work and likely subcontracting opportunities aligned to BTX's build-to-print and titanium capabilities.",
-      "sig-0126": "The hiring surge signals a growth push, indicating they may need external machining partners to scale faster than they can staff.",
-      "sig-0127": "A second demand spike on new program starts reinforces sustained volume and strengthens the case for engaging now."
-    }
-  },
-  "ironclad-dynamics": {
-    "opportunity": "Ironclad Dynamics is a distressed supplier showing all three risk markers—a quality escape (+20), a multi-week delivery slip (+25), and rising prices (+15)—driving total risk to 60. Their customers are exposed and looking for alternatives, and BTX Precision fits 67% with proven 5-axis CNC and AS9100 capability to absorb displaced work. The main coverage gap is sheet metal, so target parts that align with BTX's core machining strengths.",
-    "findings": {
-      "sig-0128": "A quality escape triggered a customer source-inspection hold—BTX's AS9100 certification is a direct selling point to win quality-sensitive work now under scrutiny.",
-      "sig-0129": "Ironclad warned customers of multi-week shipment slips—BTX can pitch reliable, on-time delivery to capture at-risk volume from frustrated buyers.",
-      "sig-0132": "Ironclad raised quoted prices citing cost inflation—BTX has an opening to offer competitive quotes and displace them on price-pressured programs."
-    }
-  },
-  "aegis-machining": {
-    "opportunity": "Aegis Machining scores a 0 on opportunity, driven by a risk profile of 68 and capacity risk of 56 — both flagged by repeated capacity constraints and a quality escape. With only 40% fit (can serve ITAR and aluminum, but gaps in NADCAP, assembly, and sheet metal), Aegis is a stressed supplier whose overloaded floor and quality issues create an opening for BTX to capture displaced or at-risk work. Target it where BTX's ITAR and aluminum capabilities overlap and Aegis is struggling to deliver.",
-    "findings": {
-      "sig-0133": "Aegis had a quality escape that triggered a customer source-inspection hold (quality_escape+20 to risk, +10 competitive pressure) — pitch BTX as a reliable alternative for customers now questioning Aegis's quality.",
-      "sig-0134": "Aegis is quoting extended lead times, signaling its floor is near capacity (capacity_constraint+30 risk, +35 capacity risk) — position BTX to absorb overflow work Aegis can't schedule.",
-      "sig-0135": "A second capacity-constraint signal reinforces the extended-lead-time strain (capacity_constraint+18 risk, +21 capacity risk) — press BTX's available capacity to win time-sensitive jobs Aegis is delaying."
-    }
-  },
-  "halcyon-castings": {
-    "opportunity": "Halcyon Castings scores 40 on opportunity, driven entirely by two demand spikes tied to new program starts (+25 and +15). With a 67% fit—BTX can serve their AS9100 and titanium needs but not sheet metal—this is a solid target where rising demand meets real capability overlap. The demand spikes also carry a capacityRisk of 16 (+10, +6), signaling Halcyon may be stretched and open to outside machining support.",
-    "findings": {
-      "sig-0136": "New program starts are spiking Halcyon's demand—BTX can pitch AS9100/titanium machining capacity to absorb overflow they may struggle to handle in-house.",
-      "sig-0137": "A second demand spike from new program starts reinforces urgency—position BTX as a ready capacity partner before their production bottlenecks worsen."
-    }
-  },
-  "falcon-turbine": {
-    "opportunity": "Falcon Turbine scores 0 on opportunity despite an 80% fit, because the only signals present are pricing pressure that drives risk (24) and competitive pressure (16) rather than any buying intent. They align well with BTX capabilities (5-axis CNC, AS9100, aluminum, build-to-print), but the NADCAP gap and cost-inflation posture make this a low-priority, watch-and-qualify target rather than an active pursuit.",
-    "findings": {
-      "sig-0138": "Falcon Turbine's price increases tied to material and labor inflation signal margin strain—BTX should probe whether cost pressure opens a door to displace a current supplier on price or reliability.",
-      "sig-0139": "A repeated pricing-pressure signal reinforces cost-inflation exposure; BTX should confirm their sourcing pain points before investing sales effort, given the NADCAP gap limits some qualified work."
-    }
-  },
-  "northwind-controls": {
-    "opportunity": "Northwind Controls scores 0 on opportunity, meaning they are not a buying prospect but a supplier under strain. The signals show a multi-week shipment slip (capacityRisk=15) plus repeated price increases driven by material and labor inflation (competitivePressure=20), pushing overall risk to 54. With 67% fit—BTX can cover build-to-print and precision machining but not sheet metal—this is a chance to win business from Northwind's customers who are exposed to their delays and rising prices.",
-    "findings": {
-      "sig-0142": "Northwind is raising prices on inflation—position BTX as a more cost-stable precision machining and build-to-print alternative for their affected customers.",
-      "sig-0143": "A second price increase reinforces Northwind's cost pressure; use it to justify approaching their customers now.",
-      "sig-0144": "The multi-week shipment slip creates delivery risk for Northwind's customers—lead with BTX's reliability to capture displaced volume.",
-      "sig-0145": "A third price hike signals sustained pricing pressure, strengthening the case for customers to dual-source or switch to BTX."
-    }
-  },
-  "vanguard-machining": {
-    "opportunity": "Vanguard Machining scores 79 with a perfect 100% fit to BTX Precision — they can serve ITAR and precision machining work with no gaps. A fresh $19.0M government contract award combined with three separate demand spikes on new program starts and a hiring surge signals a company scaling fast and likely needing outside machining capacity. This is a high-priority target: strong demand, aligned capabilities, and a capacity-risk read of 20 driven by those demand spikes suggests they may struggle to meet the load alone.",
-    "findings": {
-      "sig-0146": "A $19.0M government contract award means Vanguard has funded, near-term work — approach them as a capacity partner before they lock in other suppliers.",
-      "sig-0147": "A demand spike on new program starts signals ramping volume BTX can help absorb through overflow machining.",
-      "sig-0148": "A second demand spike reinforces sustained new-program demand — position BTX for repeatable, ongoing work.",
-      "sig-0149": "A third demand spike shows demand pressure is broad, not a one-off — a strong opening to offer supplemental precision capacity.",
-      "sig-0150": "A hiring surge shows Vanguard is scaling but may hit ramp-up delays — pitch BTX as immediate capacity while they build headcount."
-    }
-  },
-  "harbor-components": {
-    "opportunity": "Harbor Components scores 0 on opportunity with only a 33% fit and a very high risk score of 94, driven by capacity constraints, supplier delays, and regulatory changes. While BTX can serve aluminum work, Harbor's core gaps are in assembly and sheet metal—areas BTX doesn't cover—so this is a low-priority, poor-fit target. The stacked delays and near-capacity floor signal distress, but the misalignment on capabilities limits any near-term deal potential.",
-    "findings": {
-      "sig-0151": "Harbor's multi-week shipment slip means its customers may be seeking backup suppliers—BTX can capture aluminum overflow only.",
-      "sig-0152": "New compliance requirements on Harbor's certified processes may disrupt its output, opening a window for a compliant alternative.",
-      "sig-0153": "A second regulatory-change hit compounds the compliance pressure on Harbor's certified processes, raising switching motivation among its buyers.",
-      "sig-0154": "Harbor's extended lead-time quotes show its floor is near capacity, so BTX could position for spillover aluminum demand.",
-      "sig-0155": "Repeated multi-week delay notices confirm ongoing delivery instability at Harbor, reinforcing the case to offer aluminum coverage to affected customers."
-    }
-  },
-  "foundry-turbine": {
-    "opportunity": "Foundry Turbine is a perfect capability match for BTX Precision (100% fit across AS9100, ITAR, aluminum, build-to-print, and precision machining with no gaps), but its opportunity score is 0 because the signals reflect a supplier under strain rather than a buyer to sell to. The high risk reading (85) is driven by capacity constraints, shipment delays, price increases, and new regulatory pressure — all indicators that Foundry Turbine's own delivery is faltering. This makes them a target as a stressed competitor whose displaced customers BTX can pursue, not as a direct buyer.",
-    "findings": {
-      "sig-0157": "Foundry Turbine's extended lead times signal its floor is near capacity — BTX can offer faster turnaround to their waiting customers.",
-      "sig-0158": "The multi-week shipment slip means their customers are exposed to delays now — a moment for BTX to step in as a reliable alternate source.",
-      "sig-0159": "Their price increases give BTX a competitive pricing opening with cost-sensitive accounts.",
-      "sig-0160": "New compliance requirements strain their certified processes — BTX's AS9100/ITAR credentials position it to absorb affected work."
-    }
-  },
-  "continental-castings": {
-    "opportunity": "Continental Castings scored 30, driven entirely by a contract_win signal (+30). At 75% fit, BTX can already serve their AS9100, build-to-print, and titanium needs, though the NADCAP gap is a limitation. This is a competitor showing momentum, not a buying account, so treat it as a competitive-intelligence target rather than a sales opportunity.",
-    "findings": {
-      "sig-0161": "Continental Castings won a $3.4M multi-year production contract, signaling they are taking on more work BTX could compete for — track this to understand which end markets they are winning in.",
-      "sig-0162": "Their announced facility expansion adds machining capacity (competitivePressure +20), meaning increased head-to-head competition for BTX in the Cincinnati region on build-to-print and titanium work."
-    }
-  },
-  "strata-defense": {
-    "opportunity": "Strata Defense is a perfect capability match for BTX Precision (100% fit across 5-axis CNC, ITAR, build-to-print, precision machining, and titanium, with no gaps), yet its opportunity score is 0 because it is a supplier under strain rather than a buying customer. Its floor is near capacity with extended lead times (capacityRisk=35) and it faces new compliance pressures affecting its certified processes, driving overall risk to 54. This is a target for capacity overflow or subcontract work where BTX can absorb demand Strata cannot currently meet.",
-    "findings": {
-      "sig-0163": "Strata's extended lead times and near-full capacity mean BTX can position itself as an overflow supplier to take on work Strata cannot deliver on time.",
-      "sig-0164": "New compliance requirements on Strata's certified processes create an opening for BTX to offer ITAR-compliant capacity while Strata adjusts.",
-      "sig-0165": "Repeated regulatory pressure on Strata's certified processes reinforces BTX's opportunity to step in with already-qualified precision machining capability."
-    }
-  },
-  "titan-fabrication": {
-    "opportunity": "Titan Fabrication scores 0 as a sales opportunity but registers high risk (60) driven by supplier delays, a quality escape, and regulatory change—signaling a supplier in distress, not a buyer to pursue. With 80% fit (ITAR, aluminum, build-to-print, titanium) and only a sheet metal gap, BTX Precision is well-positioned to step in as an alternate source for Titan's affected customers. Target the customers exposed to Titan's slips and quality holds, not Titan itself.",
-    "findings": {
-      "sig-0166": "New compliance requirements are straining Titan's certified processes; BTX Precision can offer ITAR-compliant capacity to customers worried about Titan's regulatory standing.",
-      "sig-0167": "Titan's multi-week shipment slip (adds +25 risk, +15 capacity risk) opens a window for BTX Precision to win expedited, build-to-print work from delayed customers.",
-      "sig-0168": "A quality escape triggered a source-inspection hold (+20 risk, +10 competitive pressure); BTX Precision can pitch reliable quality on aluminum and titanium parts to customers now scrutinizing Titan."
-    }
-  },
-  "falcon-defense": {
-    "opportunity": "Falcon Defense is a target prospect scoring 20, driven entirely by a recent $0.5M government contract award. BTX Precision has a 60% fit, matching on critical requirements like AS9100, ITAR, and titanium capabilities, though gaps remain in NADCAP and sheet metal. The contract award signals active spending and near-term production needs where BTX's aerospace and defense-grade credentials align.",
-    "findings": {
-      "sig-0169": "The $0.5M government contract award means Falcon Defense has funded work in motion—reach out now to position BTX's AS9100, ITAR, and titanium machining against their new production requirements."
-    }
-  },
-  "torque-turbine": {
-    "opportunity": "Torque Turbine scores 0 as a direct opportunity and is only a 33% fit — they can serve titanium but leave gaps in assembly and sheet metal, and they're a supplier rather than a buyer. However, the risk profile is elevated (risk=49) driven by a multi-week shipment slip and repeated price increases, signaling their customers may be exposed and looking for alternatives. The real play here is not selling to Torque Turbine but positioning BTX Precision to capture their destabilized customers where our titanium capability overlaps.",
-    "findings": {
-      "sig-0171": "Their multi-week shipment slip (capacityRisk+15, risk+25) means their customers face delivery gaps — an opening for BTX to pitch reliable titanium supply.",
-      "sig-0172": "Their price increase citing material and labor inflation (risk+15, competitivePressure+10) makes their customers cost-sensitive and open to competitive quotes from BTX.",
-      "sig-0173": "A second price increase (risk+9, competitivePressure+6) reinforces that Torque Turbine's pricing is unstable, strengthening BTX's case as a steadier alternative on titanium work."
+      "sig-0081": "Desert Sky Machining booked a $0.7M multi-year production program.",
+      "sig-0082": "Desert Sky Machining was awarded a $0.2M government production contract.",
+      "sig-0083": "Desert Sky Machining booked a $1.1M multi-year production program.",
+      "sig-0084": "Demand for Desert Sky Machining's assemblies increased after new program starts."
     }
   }
 }

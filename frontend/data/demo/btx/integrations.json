@@ -5,8 +5,8 @@
     "category": "CRM",
     "status": "demo_connected",
     "demo_file": "crm.json",
-    "production_method": "OAuth-connected Salesforce REST/Bulk APIs via FastAPI backend",
-    "description": "Simulated account, opportunity, activity, and contact data for the CRO workflow.",
+    "production_method": "OAuth-connected Salesforce REST/Bulk APIs via backend adapter",
+    "description": "Simulated account, contact, activity, and opportunity context.",
     "is_demo": true
   },
   {
@@ -15,48 +15,18 @@
     "category": "Operations",
     "status": "demo_connected",
     "demo_file": "erp_capacity.json",
-    "production_method": "Authenticated ERP or MES adapter that normalizes work-center capacity and backlog",
-    "description": "Simulated available hours, constraint notes, and lead-time pressure by facility.",
+    "production_method": "Authenticated ERP/MES adapter normalizing work-center capacity and backlog",
+    "description": "Simulated capacity, lead time, and constraint context.",
     "is_demo": true
   },
   {
-    "id": "sam-gov",
-    "name": "SAM.gov",
-    "category": "Public Contracts",
-    "status": "available",
-    "demo_file": "signals.json",
-    "production_method": "Public contract API ingestion through the monitor and backend cache",
-    "description": "Contract award and solicitation signals shaped for account scoring.",
-    "is_demo": true
-  },
-  {
-    "id": "email-calendar",
-    "name": "Email / Calendar",
-    "category": "Productivity",
-    "status": "future",
-    "demo_file": "contacts.json",
-    "production_method": "Microsoft Graph or Google Workspace OAuth with user-scoped permissions",
-    "description": "Future relationship activity, meeting recency, and stakeholder coverage signals.",
-    "is_demo": true
-  },
-  {
-    "id": "hubspot",
-    "name": "HubSpot",
-    "category": "CRM",
-    "status": "not_connected",
-    "demo_file": "crm.json",
-    "production_method": "Private app token or OAuth-backed HubSpot CRM API adapter",
-    "description": "Alternative CRM source for companies that use HubSpot instead of Salesforce.",
-    "is_demo": true
-  },
-  {
-    "id": "netsuite-erp",
-    "name": "NetSuite / Generic ERP",
-    "category": "ERP",
-    "status": "not_connected",
-    "demo_file": "erp_capacity.json",
-    "production_method": "SuiteTalk REST or client-specific ERP connector through FastAPI",
-    "description": "Future order, backlog, shipment, inventory, and capacity source.",
+    "id": "pipeline-history",
+    "name": "Pipeline History",
+    "category": "Revenue Operations",
+    "status": "demo_connected",
+    "demo_file": "pipeline_snapshots.json",
+    "production_method": "CRM opportunity history snapshots",
+    "description": "Simulated 24-month pipeline trend data.",
     "is_demo": true
   },
   {
@@ -65,8 +35,18 @@
     "category": "Market Intelligence",
     "status": "demo_connected",
     "demo_file": "news.json",
-    "production_method": "Python monitor ingestion of RSS, web pages, APIs, and validated extracted signals",
-    "description": "Static market events that become validated scoring signals in the demo.",
+    "production_method": "Monitor ingestion of RSS, APIs, and validated extracted signals",
+    "description": "Static market events shaped for signal extraction.",
+    "is_demo": true
+  },
+  {
+    "id": "email-calendar",
+    "name": "Email / Calendar",
+    "category": "Productivity",
+    "status": "future",
+    "demo_file": "contacts.json",
+    "production_method": "Microsoft Graph or Google Workspace OAuth",
+    "description": "Future relationship activity and meeting recency signals.",
     "is_demo": true
   }
 ]

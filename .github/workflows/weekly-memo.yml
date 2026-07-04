@@ -1,0 +1,32 @@
+name: Weekly Revenue Brain Memo
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
+
+jobs:
+  weekly-memo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Generate weekly memo
+        working-directory: frontend
+        run: npm run weekly:memo
+      - name: Commit memo archive
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/memo_archive
+          git diff --cached --quiet || git commit -m "Archive weekly revenue brain memo"
+          git push

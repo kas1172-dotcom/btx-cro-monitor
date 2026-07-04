@@ -1,0 +1,2162 @@
+[
+  {
+    "month": "2024-08",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 582321,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "trinity-defense-components",
+    "revenue": 310856,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "pecan-valley-machining",
+    "revenue": 263032,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 241462,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 213100,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 190359,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "brazos-precision-castings",
+    "revenue": 180218,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "red-river-assemblies",
+    "revenue": 163285,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "high-plains-actuation",
+    "revenue": 145580,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-08",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 106023,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 589006,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "trinity-defense-components",
+    "revenue": 311339,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "pecan-valley-machining",
+    "revenue": 271265,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 240677,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 216609,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 195387,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "brazos-precision-castings",
+    "revenue": 181397,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "red-river-assemblies",
+    "revenue": 168474,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "high-plains-actuation",
+    "revenue": 144406,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 110439,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 589920,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "trinity-defense-components",
+    "revenue": 330460,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "pecan-valley-machining",
+    "revenue": 269060,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 250600,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 225540,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 201440,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "brazos-precision-castings",
+    "revenue": 187950,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "red-river-assemblies",
+    "revenue": 172060,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "high-plains-actuation",
+    "revenue": 151800,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 113310,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 599428,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "trinity-defense-components",
+    "revenue": 335741,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "pecan-valley-machining",
+    "revenue": 280081,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 260691,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 234622,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 198838,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "brazos-precision-castings",
+    "revenue": 188232,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "red-river-assemblies",
+    "revenue": 182484,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "high-plains-actuation",
+    "revenue": 155686,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 117311,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 608993,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "trinity-defense-components",
+    "revenue": 336261,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "pecan-valley-machining",
+    "revenue": 292639,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 262349,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 233902,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 210862,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "brazos-precision-castings",
+    "revenue": 192154,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "red-river-assemblies",
+    "revenue": 186225,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "high-plains-actuation",
+    "revenue": 153723,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 119716,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 624584,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "trinity-defense-components",
+    "revenue": 349629,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "pecan-valley-machining",
+    "revenue": 287635,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 260243,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 235338,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 217146,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "brazos-precision-castings",
+    "revenue": 194250,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "red-river-assemblies",
+    "revenue": 184781,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "high-plains-actuation",
+    "revenue": 160621,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 119907,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 593564,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "trinity-defense-components",
+    "revenue": 324559,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "pecan-valley-machining",
+    "revenue": 281068,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 250832,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 229965,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 203476,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "brazos-precision-castings",
+    "revenue": 189002,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "red-river-assemblies",
+    "revenue": 172303,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "high-plains-actuation",
+    "revenue": 149796,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 114456,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 603233,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "trinity-defense-components",
+    "revenue": 337540,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "pecan-valley-machining",
+    "revenue": 288219,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 252533,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 236883,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 207717,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "brazos-precision-castings",
+    "revenue": 189400,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "red-river-assemblies",
+    "revenue": 176773,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "high-plains-actuation",
+    "revenue": 155076,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 113106,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 638880,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "trinity-defense-components",
+    "revenue": 339820,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "pecan-valley-machining",
+    "revenue": 283580,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 266200,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 234180,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 207200,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "brazos-precision-castings",
+    "revenue": 200550,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "red-river-assemblies",
+    "revenue": 188020,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "high-plains-actuation",
+    "revenue": 156840,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 118170,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 640232,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "trinity-defense-components",
+    "revenue": 351528,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "pecan-valley-machining",
+    "revenue": 293440,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 267978,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 238994,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 211468,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "brazos-precision-castings",
+    "revenue": 203716,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "red-river-assemblies",
+    "revenue": 185884,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "high-plains-actuation",
+    "revenue": 162244,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 118950,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 659128,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "trinity-defense-components",
+    "revenue": 349041,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "pecan-valley-machining",
+    "revenue": 296694,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 273408,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 248279,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 215777,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "brazos-precision-castings",
+    "revenue": 209664,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "red-river-assemblies",
+    "revenue": 193966,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "high-plains-actuation",
+    "revenue": 167731,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 125798,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 684257,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "trinity-defense-components",
+    "revenue": 364175,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "pecan-valley-machining",
+    "revenue": 309515,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 280134,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 246527,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 225102,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "brazos-precision-castings",
+    "revenue": 208236,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "red-river-assemblies",
+    "revenue": 191743,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "high-plains-actuation",
+    "revenue": 168081,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 122704,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 646971,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "trinity-defense-components",
+    "revenue": 342830,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "pecan-valley-machining",
+    "revenue": 290087,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 261373,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 235236,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 208161,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "brazos-precision-castings",
+    "revenue": 198665,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "red-river-assemblies",
+    "revenue": 187880,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "high-plains-actuation",
+    "revenue": 161040,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 117618,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 643069,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "trinity-defense-components",
+    "revenue": 343705,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "pecan-valley-machining",
+    "revenue": 297348,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 271502,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 239017,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 216253,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "brazos-precision-castings",
+    "revenue": 198292,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "red-river-assemblies",
+    "revenue": 192541,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "high-plains-actuation",
+    "revenue": 162190,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 118975,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 656160,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "trinity-defense-components",
+    "revenue": 360100,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "pecan-valley-machining",
+    "revenue": 296780,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 273400,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 244980,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 219680,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "brazos-precision-castings",
+    "revenue": 202350,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "red-river-assemblies",
+    "revenue": 193060,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "high-plains-actuation",
+    "revenue": 167640,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 121950,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 666463,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "trinity-defense-components",
+    "revenue": 361001,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "pecan-valley-machining",
+    "revenue": 312141,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 284979,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 248831,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 227983,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "brazos-precision-castings",
+    "revenue": 209180,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "red-river-assemblies",
+    "revenue": 192685,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "high-plains-actuation",
+    "revenue": 166616,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 125508,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 679772,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "trinity-defense-components",
+    "revenue": 371405,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "pecan-valley-machining",
+    "revenue": 314266,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 280781,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 259338,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 234455,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "brazos-precision-castings",
+    "revenue": 218880,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "red-river-assemblies",
+    "revenue": 196547,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "high-plains-actuation",
+    "revenue": 172155,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 129116,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 693208,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "trinity-defense-components",
+    "revenue": 386801,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "pecan-valley-machining",
+    "revenue": 319088,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 286350,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 262191,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 232064,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "brazos-precision-castings",
+    "revenue": 214763,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "red-river-assemblies",
+    "revenue": 208277,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "high-plains-actuation",
+    "revenue": 175540,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 130536,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 658214,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "trinity-defense-components",
+    "revenue": 355010,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "pecan-valley-machining",
+    "revenue": 311988,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 273085,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 244722,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 224090,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "brazos-precision-castings",
+    "revenue": 209206,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "red-river-assemblies",
+    "revenue": 191159,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "high-plains-actuation",
+    "revenue": 169473,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 127632,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 691442,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "trinity-defense-components",
+    "revenue": 366825,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "pecan-valley-machining",
+    "revenue": 306478,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 282173,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 250754,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 225738,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "brazos-precision-castings",
+    "revenue": 216965,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "red-river-assemblies",
+    "revenue": 197521,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "high-plains-actuation",
+    "revenue": 167881,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 127511,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 699360,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "trinity-defense-components",
+    "revenue": 372580,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "pecan-valley-machining",
+    "revenue": 321860,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 287800,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 259020,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 226400,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "brazos-precision-castings",
+    "revenue": 216750,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "red-river-assemblies",
+    "revenue": 199780,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "high-plains-actuation",
+    "revenue": 176280,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 127890,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 704352,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "trinity-defense-components",
+    "revenue": 378367,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "pecan-valley-machining",
+    "revenue": 322828,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 292266,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 270690,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 231869,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "brazos-precision-castings",
+    "revenue": 220110,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "red-river-assemblies",
+    "revenue": 208836,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "high-plains-actuation",
+    "revenue": 179003,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 130973,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 726958,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "trinity-defense-components",
+    "revenue": 387379,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "pecan-valley-machining",
+    "revenue": 326431,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 296755,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 271503,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 236421,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "brazos-precision-castings",
+    "revenue": 225331,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "red-river-assemblies",
+    "revenue": 206008,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "high-plains-actuation",
+    "revenue": 181002,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 134646,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "lonestar-aero-systems",
+    "revenue": 737964,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "trinity-defense-components",
+    "revenue": 391649,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "pecan-valley-machining",
+    "revenue": 342336,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "clearfork-turbine-works",
+    "revenue": 307485,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "bluebonnet-avionics",
+    "revenue": 278974,
+    "gross_margin_pct": 0.27,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "gulf-coast-propulsion",
+    "revenue": 243999,
+    "gross_margin_pct": 0.28,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "brazos-precision-castings",
+    "revenue": 233411,
+    "gross_margin_pct": 0.29,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "red-river-assemblies",
+    "revenue": 212629,
+    "gross_margin_pct": 0.23,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "high-plains-actuation",
+    "revenue": 183745,
+    "gross_margin_pct": 0.24,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "account_id": "alamo-composite-tooling",
+    "revenue": 138368,
+    "gross_margin_pct": 0.25,
+    "source_type": "demo",
+    "source_name": "Simulated Monthly Revenue",
+    "source_mode": "static_snapshot"
+  }
+]

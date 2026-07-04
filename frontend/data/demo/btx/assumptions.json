@@ -1,12 +1,12 @@
 {
   "as_of": "2026-07-03",
   "is_static_demo": true,
-  "summary": "Internal CRM, ERP/capacity, contacts, opportunities, and pipeline data are simulated for demo purposes.",
+  "summary": "CRM, ERP/capacity, contacts, opportunities, pipeline, and operating history are simulated for demo purposes.",
   "assumptions": [
-    "Opportunity values are illustrative and should not be represented as BTX production data.",
-    "Capacity values are modeled to demonstrate CRO prioritization, not to quote real shop availability.",
-    "Public market and contract signals are represented as static snapshots in this demo.",
-    "Future production adapters should preserve IDs and provenance while replacing static snapshots with authenticated API data."
+    "All account names, addresses, contacts, values, and operating history are fictional demo records.",
+    "Opportunity values are deterministic illustrative values between $50k and $2M.",
+    "Capacity values demonstrate prioritization logic and are not production shop commitments.",
+    "Future production adapters should preserve stable IDs and provenance while replacing static snapshots with authenticated API data."
   ],
   "source_type": "demo",
   "source_name": "BTX Demo Assumptions",

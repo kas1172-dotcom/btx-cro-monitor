@@ -14,6 +14,30 @@ It ships **two views** off one static, no-backend site:
 The two views cross-link in the header, so the CRO opens one URL and moves
 between "what's happening" and "who to call."
 
+## Local Enterprise Brain Demo
+
+The React cockpit in `frontend/` runs fully in static demo mode:
+
+```bash
+cd frontend
+npm install
+npm run gen
+npm run dev
+```
+
+Optional thin backend for Phase 10 integration routes:
+
+```bash
+pip install -e ".[dev]"
+uvicorn btx_platform.asgi:app --reload --port 8000
+```
+
+Keep `VITE_DATA_MODE=demo` for the complete static demo. Set
+`VITE_DATA_MODE=live` and `VITE_BACKEND_ENDPOINT=http://localhost:8000` only
+when testing the backend adapter. Without HubSpot/Gmail/Calendar credentials,
+the backend returns typed `not_configured` errors and performs no external
+writes.
+
 **Architecture in one sentence:** A GitHub Actions workflow pulls sources +
 accounts, scores them (Claude for the brief, deterministic rules for map fit),
 and commits `index.html` + `map.html` + JSON artifacts back to the repo.

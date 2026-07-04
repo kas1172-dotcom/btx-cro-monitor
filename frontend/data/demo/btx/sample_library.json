@@ -1,0 +1,1572 @@
+[
+  {
+    "id": "deliv-1783188406617-board-deck",
+    "type": "board_deck",
+    "title": "Q2 2026 Revenue Review",
+    "createdAt": "2026-07-04T18:06:46.617Z",
+    "brainArea": "revenue",
+    "entityIds": [
+      "clearfork-turbine-works",
+      "brazos-precision-castings",
+      "lonestar-aero-systems",
+      "trinity-defense-components",
+      "red-river-assemblies"
+    ],
+    "confidence": "high",
+    "sections": [
+      {
+        "id": "quarter-verdict",
+        "heading": "Quarter in One Slide",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Demand is steady but capacity discipline matters: 1.00 book-to-bill on $8.8M Q2 revenue."
+          },
+          {
+            "kind": "text",
+            "text": "Backlog ended at $8.6M, down from the prior quarter, while win rate was 36%."
+          },
+          {
+            "kind": "text",
+            "text": "Priority: protect the riskiest accounts while using capacity selectively on high-fit growth."
+          }
+        ]
+      },
+      {
+        "id": "executive-summary",
+        "heading": "Executive Summary",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Verdict: Q2 2026 is a healthy but capacity-sensitive quarter, with demand slightly ahead of shipments and account risk requiring follow-up."
+          },
+          {
+            "kind": "text",
+            "text": "Evidence: revenue was $8.8M, bookings were $8.4M, book-to-bill was 1.00, and backlog ended at $8.6M."
+          },
+          {
+            "kind": "text",
+            "text": "Implication: leadership should protect Clearfork Turbine Works, prioritize high-fit work, and avoid filling constrained capacity with low-fit demand."
+          }
+        ]
+      },
+      {
+        "id": "kpi-strip",
+        "heading": "KPI Strip",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Metric",
+              "Value",
+              "So what"
+            ],
+            "rows": [
+              [
+                "Revenue",
+                "$8.8M",
+                "Recognized current-business revenue"
+              ],
+              [
+                "Bookings",
+                "$8.4M",
+                "New order intake"
+              ],
+              [
+                "Backlog",
+                "$8.6M",
+                "End-of-quarter backlog"
+              ],
+              [
+                "Book-to-bill",
+                "1.00",
+                "Demand vs shipments"
+              ],
+              [
+                "Win rate",
+                "36%",
+                "Commercial conversion"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "heading": "Growth: demand outruns shipments at 1.00 book-to-bill",
+        "blocks": [
+          {
+            "kind": "chart-spec",
+            "title": "Bookings trend",
+            "spec": {
+              "viz": "trend",
+              "metric": "bookings",
+              "timeRange": {
+                "from": "2026-01",
+                "to": "2026-06"
+              }
+            }
+          },
+          {
+            "kind": "chart-spec",
+            "title": "Backlog trend",
+            "spec": {
+              "viz": "trend",
+              "metric": "backlog",
+              "timeRange": {
+                "from": "2026-01",
+                "to": "2026-06"
+              }
+            }
+          },
+          {
+            "kind": "chart-spec",
+            "title": "Book-to-bill trend",
+            "spec": {
+              "viz": "trend",
+              "metric": "book_to_bill",
+              "timeRange": {
+                "from": "2026-01",
+                "to": "2026-06"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "predictability",
+        "heading": "Predictability: pipeline coverage is 2.8x versus a 3.0x planning target",
+        "blocks": [
+          {
+            "kind": "chart-spec",
+            "title": "Pipeline coverage trend",
+            "spec": {
+              "viz": "trend",
+              "metric": "pipeline_coverage",
+              "timeRange": {
+                "from": "2026-01",
+                "to": "2026-06"
+              }
+            }
+          },
+          {
+            "kind": "text",
+            "text": "Coverage is calculated as weighted pipeline divided by average monthly revenue in the quarter."
+          }
+        ]
+      },
+      {
+        "id": "efficiency",
+        "heading": "Efficiency: capacity averages 80%, margin 26%",
+        "blocks": [
+          {
+            "kind": "chart-spec",
+            "title": "Capacity utilization trend",
+            "spec": {
+              "viz": "trend",
+              "metric": "capacity_utilization",
+              "timeRange": {
+                "from": "2026-01",
+                "to": "2026-06"
+              }
+            }
+          },
+          {
+            "kind": "chart-spec",
+            "title": "Average order value trend",
+            "spec": {
+              "viz": "trend",
+              "metric": "avg_order_value",
+              "timeRange": {
+                "from": "2026-01",
+                "to": "2026-06"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "concentration-risks",
+        "heading": "Concentration is 24%; top risks need account action",
+        "blocks": [
+          {
+            "kind": "chart-spec",
+            "title": "Revenue concentration by account",
+            "spec": {
+              "viz": "ranked_bar",
+              "metric": "revenue",
+              "rows": "account",
+              "timeRange": {
+                "from": "2026-04",
+                "to": "2026-06"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "risk-register",
+        "heading": "Risk Register",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Account",
+              "Risk score",
+              "Top driver",
+              "Action"
+            ],
+            "rows": [
+              [
+                "Clearfork Turbine Works",
+                "75",
+                "supplier delay",
+                "Create account follow-up"
+              ],
+              [
+                "Brazos Precision Castings",
+                "70",
+                "capacity constraint",
+                "Create account follow-up"
+              ],
+              [
+                "Lonestar Aero Systems",
+                "65",
+                "capacity constraint",
+                "Create account follow-up"
+              ],
+              [
+                "Trinity Defense Components",
+                "65",
+                "capacity constraint",
+                "Create account follow-up"
+              ],
+              [
+                "Red River Assemblies",
+                "65",
+                "capacity constraint",
+                "Create account follow-up"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "priorities",
+        "heading": "Priorities and Asks",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Protect accounts with elevated risk before they become delivery or revenue slippage."
+          },
+          {
+            "kind": "text",
+            "text": "Use 80% average capacity utilization to keep sales focus aligned with production reality."
+          },
+          {
+            "kind": "text",
+            "text": "Watch customer concentration at 24% and keep prospecting active in priority markets."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "account_monthly_revenue.json",
+        "records": [
+          "lonestar-aero-systems:2026-04",
+          "trinity-defense-components:2026-04",
+          "pecan-valley-machining:2026-04",
+          "clearfork-turbine-works:2026-04",
+          "bluebonnet-avionics:2026-04",
+          "gulf-coast-propulsion:2026-04",
+          "brazos-precision-castings:2026-04",
+          "red-river-assemblies:2026-04",
+          "high-plains-actuation:2026-04",
+          "alamo-composite-tooling:2026-04",
+          "lonestar-aero-systems:2026-05",
+          "trinity-defense-components:2026-05",
+          "pecan-valley-machining:2026-05",
+          "clearfork-turbine-works:2026-05",
+          "bluebonnet-avionics:2026-05",
+          "gulf-coast-propulsion:2026-05",
+          "brazos-precision-castings:2026-05",
+          "red-river-assemblies:2026-05",
+          "high-plains-actuation:2026-05",
+          "alamo-composite-tooling:2026-05",
+          "lonestar-aero-systems:2026-06",
+          "trinity-defense-components:2026-06",
+          "pecan-valley-machining:2026-06",
+          "clearfork-turbine-works:2026-06",
+          "bluebonnet-avionics:2026-06",
+          "gulf-coast-propulsion:2026-06",
+          "brazos-precision-castings:2026-06",
+          "red-river-assemblies:2026-06",
+          "high-plains-actuation:2026-06",
+          "alamo-composite-tooling:2026-06"
+        ],
+        "reason": "Computed Revenue from deterministic demo records."
+      },
+      {
+        "source": "bookings_backlog.json",
+        "records": [
+          "2026-04",
+          "2026-05",
+          "2026-06"
+        ],
+        "reason": "Computed Bookings from deterministic demo records. Computed Backlog from deterministic demo records."
+      },
+      {
+        "source": "win_loss_history.json",
+        "records": [
+          "2026-04",
+          "2026-05",
+          "2026-06"
+        ],
+        "reason": "Computed Win rate from deterministic demo records."
+      },
+      {
+        "source": "scoring trace",
+        "records": [
+          "clearfork-turbine-works",
+          "brazos-precision-castings",
+          "lonestar-aero-systems",
+          "trinity-defense-components",
+          "red-river-assemblies"
+        ],
+        "reason": "Top account risks for board risk register."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "board_deck"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "download-pptx",
+        "label": "Download PPTX",
+        "kind": "download_markdown"
+      },
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "board",
+    "form": "deck"
+  },
+  {
+    "id": "deliv-1783188406618-itinerary",
+    "type": "itinerary",
+    "title": "Austin Visit Plan",
+    "createdAt": "2026-07-04T18:06:46.618Z",
+    "brainArea": "geographic",
+    "entityIds": [
+      "violet-crown-micro-precision",
+      "bluebonnet-avionics",
+      "lonestar-aero-systems",
+      "hill-country-aerostructures",
+      "live-oak-sensor-housings",
+      "pecan-valley-machining",
+      "alamo-composite-tooling"
+    ],
+    "confidence": "high",
+    "sections": [
+      {
+        "id": "schedule",
+        "heading": "Day-by-Day Schedule",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Day",
+              "Time",
+              "Account",
+              "Travel note"
+            ],
+            "rows": [
+              [
+                "1",
+                "9:00",
+                "Violet Crown Micro Precision",
+                "2400 Montopolis Dr, Austin, TX. Start in the Austin cluster."
+              ],
+              [
+                "1",
+                "11:30",
+                "Bluebonnet Avionics",
+                "6300 Burleson Rd, Austin, TX. ~10 min est. from prior stop."
+              ],
+              [
+                "1",
+                "14:30",
+                "Lonestar Aero Systems",
+                "9401 Metric Blvd, Austin, TX. ~19 min est. from prior stop."
+              ],
+              [
+                "2",
+                "9:00",
+                "Hill Country Aerostructures",
+                "15820 Bratton Ln, Austin, TX. Start in the Austin cluster."
+              ],
+              [
+                "2",
+                "11:30",
+                "Live Oak Sensor Housings",
+                "1550 Clovis Barker Rd, San Marcos, TX. ~57 min est. from prior stop."
+              ],
+              [
+                "2",
+                "14:30",
+                "Pecan Valley Machining",
+                "4810 Industry Park Dr, San Antonio, TX. ~54 min est. from prior stop."
+              ],
+              [
+                "3",
+                "9:00",
+                "Alamo Composite Tooling",
+                "11600 Huebner Rd, San Antonio, TX. Start in the San Antonio cluster."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "map",
+        "heading": "Visit Map",
+        "blocks": [
+          {
+            "kind": "map-ref",
+            "title": "Austin numbered stops",
+            "entityIds": [
+              "violet-crown-micro-precision",
+              "bluebonnet-avionics",
+              "lonestar-aero-systems",
+              "hill-country-aerostructures",
+              "live-oak-sensor-housings",
+              "pecan-valley-machining",
+              "alamo-composite-tooling"
+            ],
+            "stops": [
+              {
+                "entityId": "violet-crown-micro-precision",
+                "label": "Violet Crown Micro Precision",
+                "day": 1,
+                "lat": 30.2317,
+                "lon": -97.7137
+              },
+              {
+                "entityId": "bluebonnet-avionics",
+                "label": "Bluebonnet Avionics",
+                "day": 1,
+                "lat": 30.2016,
+                "lon": -97.7079
+              },
+              {
+                "entityId": "lonestar-aero-systems",
+                "label": "Lonestar Aero Systems",
+                "day": 1,
+                "lat": 30.4014,
+                "lon": -97.7132
+              },
+              {
+                "entityId": "hill-country-aerostructures",
+                "label": "Hill Country Aerostructures",
+                "day": 2,
+                "lat": 30.4444,
+                "lon": -97.6816
+              },
+              {
+                "entityId": "live-oak-sensor-housings",
+                "label": "Live Oak Sensor Housings",
+                "day": 2,
+                "lat": 29.8833,
+                "lon": -97.9414
+              },
+              {
+                "entityId": "pecan-valley-machining",
+                "label": "Pecan Valley Machining",
+                "day": 2,
+                "lat": 29.4442,
+                "lon": -98.3831
+              },
+              {
+                "entityId": "alamo-composite-tooling",
+                "label": "Alamo Composite Tooling",
+                "day": 3,
+                "lat": 29.5331,
+                "lon": -98.4698
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "briefs",
+        "heading": "Per-Stop Briefs",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Stop 1: Violet Crown Micro Precision. Opportunity 32, fit 50%. Contact: Elena Wright, Commodity Manager. Why visit: Violet Crown Micro Precision was awarded a $1.8M government production contract. Talking point: Lead with precision machining because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Violet Crown Micro Precision was awarded a $1.8M government production contract."
+          },
+          {
+            "kind": "text",
+            "text": "Stop 2: Bluebonnet Avionics. Opportunity 32, fit 25%. Contact: Priya Alvarez, Quality Director. Why visit: Bluebonnet Avionics notified buyers of multi-week shipment delays. Talking point: Lead with AS9100 because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Bluebonnet Avionics notified buyers of multi-week shipment delays."
+          },
+          {
+            "kind": "text",
+            "text": "Stop 3: Lonestar Aero Systems. Opportunity 20, fit 60%. Contact: Hannah Price, Sourcing Lead. Why visit: A customer quality hold was opened after a quality escape at Lonestar Aero Systems. Talking point: Lead with 5-axis CNC because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: A customer quality hold was opened after a quality escape at Lonestar Aero Systems."
+          },
+          {
+            "kind": "text",
+            "text": "Stop 4: Hill Country Aerostructures. Opportunity 20, fit 75%. Contact: Linda Bennett, Quality Director. Why visit: Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings. Talking point: Lead with 5-axis CNC because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings."
+          },
+          {
+            "kind": "text",
+            "text": "Stop 5: Live Oak Sensor Housings. Opportunity 48, fit 75%. Contact: Omar Walker, Program Manager. Why visit: Live Oak Sensor Housings posted a surge of manufacturing and supply-chain openings. Talking point: Lead with aluminum because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Live Oak Sensor Housings posted a surge of manufacturing and supply-chain openings."
+          },
+          {
+            "kind": "text",
+            "text": "Stop 6: Pecan Valley Machining. Opportunity 55, fit 75%. Contact: Omar Sato, Director of Procurement. Why visit: Demand for Pecan Valley Machining's assemblies increased after new program starts. Talking point: Lead with build-to-print because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Demand for Pecan Valley Machining's assemblies increased after new program starts."
+          },
+          {
+            "kind": "text",
+            "text": "Stop 7: Alamo Composite Tooling. Opportunity 45, fit 50%. Contact: Kevin Nguyen, Sourcing Lead. Why visit: Alamo Composite Tooling lost a $0.7M recompete it had held for years. Talking point: Lead with AS9100 because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Alamo Composite Tooling lost a $0.7M recompete it had held for years."
+          }
+        ]
+      },
+      {
+        "id": "outreach",
+        "heading": "Intro Outreach Drafts",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Stop 1: Violet Crown Micro Precision, we saw this validated signal: Violet Crown Micro Precision was awarded a $1.8M government production contract. Lead with precision machining because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Violet Crown Micro Precision was awarded a $1.8M government production contract. Would a 20-minute production-capacity discussion be useful while we are in market?"
+          },
+          {
+            "kind": "text",
+            "text": "Stop 2: Bluebonnet Avionics, we saw this validated signal: Bluebonnet Avionics notified buyers of multi-week shipment delays. Lead with AS9100 because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Bluebonnet Avionics notified buyers of multi-week shipment delays. Would a 20-minute production-capacity discussion be useful while we are in market?"
+          },
+          {
+            "kind": "text",
+            "text": "Stop 3: Lonestar Aero Systems, we saw this validated signal: A customer quality hold was opened after a quality escape at Lonestar Aero Systems. Lead with 5-axis CNC because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: A customer quality hold was opened after a quality escape at Lonestar Aero Systems. Would a 20-minute production-capacity discussion be useful while we are in market?"
+          },
+          {
+            "kind": "text",
+            "text": "Stop 4: Hill Country Aerostructures, we saw this validated signal: Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings. Lead with 5-axis CNC because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings. Would a 20-minute production-capacity discussion be useful while we are in market?"
+          }
+        ]
+      },
+      {
+        "id": "methodology",
+        "heading": "Methodology Note",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Travel estimates are planning approximations derived from straight-line distance, grouped to avoid back-to-back legs above roughly 60 miles where possible. They are not route-optimization or traffic estimates."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "companies.json",
+        "records": [
+          "violet-crown-micro-precision",
+          "bluebonnet-avionics",
+          "lonestar-aero-systems",
+          "hill-country-aerostructures",
+          "live-oak-sensor-housings",
+          "pecan-valley-machining",
+          "alamo-composite-tooling"
+        ],
+        "reason": "Addresses, coordinates, relationship status, and market clustering."
+      },
+      {
+        "source": "signals.json + news.json",
+        "records": [
+          "sig-0050",
+          "sig-0016",
+          "news-sig-news-01",
+          "sig-0041",
+          "sig-0054",
+          "sig-0008",
+          "sig-0039"
+        ],
+        "reason": "Trigger signals and why-now evidence for each stop."
+      },
+      {
+        "source": "contacts.json",
+        "records": [
+          "con-0038",
+          "con-0013",
+          "con-0001",
+          "con-0027",
+          "con-0043",
+          "con-0007",
+          "con-0025"
+        ],
+        "reason": "Recommended contacts for meeting prep."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "itinerary"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      },
+      {
+        "id": "download",
+        "label": "Download Markdown",
+        "kind": "download_markdown"
+      },
+      {
+        "id": "calendar",
+        "label": "Add Trip to Calendar",
+        "kind": "simulated_send"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "internal",
+    "form": "itinerary"
+  },
+  {
+    "id": "deliv-1783188406619-gulf-coast-propulsion",
+    "type": "meeting_brief",
+    "title": "Meeting Brief - Gulf Coast Propulsion",
+    "createdAt": "2026-07-04T18:06:46.619Z",
+    "brainArea": "customer",
+    "entityIds": [
+      "gulf-coast-propulsion"
+    ],
+    "confidence": "high",
+    "sections": [
+      {
+        "id": "overview",
+        "heading": "Overview",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Gulf Coast Propulsion is a customer account in Houston. Opportunity score is 55, risk score is 35, and BTX Precision fit is 75%."
+          }
+        ]
+      },
+      {
+        "id": "relationship",
+        "heading": "Relationship & History",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Status",
+              "Contact",
+              "Open pipeline",
+              "Pipeline health"
+            ],
+            "rows": [
+              [
+                "current_customer",
+                "Alyssa Wright, Program Manager",
+                "$270k",
+                "at risk"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "signals",
+        "heading": "Live Signals",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Gulf Coast Propulsion posted a surge of manufacturing and supply-chain openings."
+          }
+        ]
+      },
+      {
+        "id": "talking-points",
+        "heading": "Talking Points",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Lead with precision machining, ITAR, aluminum because those capabilities match the account's stated needs. Be transparent about gaps such as assembly and frame them as qualification questions or teaming needs."
+          }
+        ]
+      },
+      {
+        "id": "risks",
+        "heading": "Risks & Open Questions",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Confirm decision process, delivery timing, qualification requirements, and whether BTX Precision capacity can support the next production window."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "companies.json",
+        "records": [
+          "gulf-coast-propulsion"
+        ],
+        "reason": "Account profile, market, relationship, and capability needs."
+      },
+      {
+        "source": "contacts.json",
+        "records": [
+          "con-0015",
+          "con-0016"
+        ],
+        "reason": "Recommended stakeholder coverage."
+      },
+      {
+        "source": "opportunities.json",
+        "records": [
+          "opp-0011"
+        ],
+        "reason": "Open pipeline, stages, close dates, and values."
+      },
+      {
+        "source": "signals.json + news.json",
+        "records": [
+          "sig-0020",
+          "sig-0021",
+          "news-sig-news-06",
+          "sig-0023",
+          "sig-0022"
+        ],
+        "reason": "Validated evidence and timing."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "meeting_brief"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      },
+      {
+        "id": "download",
+        "label": "Download Markdown",
+        "kind": "download_markdown"
+      },
+      {
+        "id": "task",
+        "label": "Create CRM Task",
+        "kind": "simulated_crm_task"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "internal",
+    "form": "brief"
+  },
+  {
+    "id": "deliv-1783188406619-capabilities-assessment",
+    "type": "capabilities_assessment",
+    "title": "Capabilities Assessment - Gulf Coast Propulsion",
+    "createdAt": "2026-07-04T18:06:46.619Z",
+    "brainArea": "capability",
+    "entityIds": [
+      "gulf-coast-propulsion"
+    ],
+    "confidence": "medium",
+    "confidenceReason": "Verdict pursue-with-caution: based on fit 75%, capacity hours, constraints, and known needs.",
+    "sections": [
+      {
+        "id": "likely-need",
+        "heading": "What They Likely Need",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Inference: Gulf Coast Propulsion likely needs support around Gulf Coast Propulsion posted a surge of manufacturing and supply-chain openings.. This is inferred from the account's needs (precision machining, ITAR, aluminum, assembly), recent evidence, and 1 opportunity record(s), not from a confirmed statement of work."
+          }
+        ]
+      },
+      {
+        "id": "fit-lines",
+        "heading": "BTX Fit, Line by Line",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Their need",
+              "BTX capability",
+              "Strength",
+              "Reason"
+            ],
+            "rows": [
+              [
+                "precision machining",
+                "precision machining",
+                "Strong",
+                "Need maps to a listed BTX capability."
+              ],
+              [
+                "ITAR",
+                "ITAR",
+                "Strong",
+                "Need maps to a listed BTX capability."
+              ],
+              [
+                "aluminum",
+                "aluminum",
+                "Strong",
+                "Need maps to a listed BTX capability."
+              ],
+              [
+                "assembly",
+                "No direct BTX match",
+                "Weak",
+                "Treat as a gap, partner need, or disqualifier."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gaps-risks",
+        "heading": "Gaps and Risks",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Capability gaps: assembly. Production constraints to clear before quoting: inspection queue, material availability, programmer availability. Be honest about any gap that requires a partner, qualification work, or schedule buffer."
+          }
+        ]
+      },
+      {
+        "id": "capacity-check",
+        "heading": "Capacity Check",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Current capacity context shows 715 available 5-axis hours and 495 available turning hours in the next 30 days. The first quoted lead time is 24 days, with status \"selective_capacity\"."
+          }
+        ]
+      },
+      {
+        "id": "verdict",
+        "heading": "Verdict",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Verdict: pursue-with-caution. Deciding factor: fit or capacity is workable but constraints must be cleared before committing. Next step: qualify drawings, materials, certifications, timing, and whether constrained work should be pursued directly, partnered, or declined."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "companies.json",
+        "records": [
+          "gulf-coast-propulsion"
+        ],
+        "reason": "Account needs, segment, and relationship."
+      },
+      {
+        "source": "signals.json + news.json",
+        "records": [
+          "sig-0020",
+          "sig-0021",
+          "news-sig-news-06",
+          "sig-0023",
+          "sig-0022"
+        ],
+        "reason": "Recent evidence used to infer need."
+      },
+      {
+        "source": "opportunities.json",
+        "records": [
+          "opp-0011"
+        ],
+        "reason": "Program and pipeline context."
+      },
+      {
+        "source": "erp_capacity.json",
+        "records": [
+          "btx-dallas-main",
+          "btx-austin-cell",
+          "btx-san-antonio-partner"
+        ],
+        "reason": "Capacity availability, lead time, and constraints."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "capabilities_assessment"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      },
+      {
+        "id": "task",
+        "label": "Create CRM Task",
+        "kind": "simulated_crm_task"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "internal",
+    "form": "brief"
+  },
+  {
+    "id": "deliv-1783188406619-sales-pitch",
+    "type": "sales_pitch",
+    "title": "Sales Pitch - Gulf Coast Propulsion",
+    "createdAt": "2026-07-04T18:06:46.619Z",
+    "brainArea": "workflow",
+    "entityIds": [
+      "gulf-coast-propulsion"
+    ],
+    "confidence": "high",
+    "confidenceReason": "High: account need, public trigger, fit, and capacity context are available.",
+    "sections": [
+      {
+        "id": "opening-hook",
+        "heading": "Opening Hook",
+        "audience": "prospect",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Gulf Coast Propulsion is balancing new production demand with qualified supplier capacity."
+          }
+        ]
+      },
+      {
+        "id": "what-btx-does",
+        "heading": "What BTX Does for Companies Like Them",
+        "audience": "prospect",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "BTX Precision helps aerospace and defense manufacturers move qualified machined work through certified outside capacity. For Gulf Coast Propulsion, the most relevant fit is precision machining, ITAR, aluminum. We keep the conversation practical: prints, materials, timing, and what can be supported without overpromising."
+          }
+        ]
+      },
+      {
+        "id": "proof-points",
+        "heading": "Proof Points",
+        "audience": "prospect",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "BTX brings AS9100 and ITAR discipline, 5-axis machining capacity, build-to-print execution, and delivery follow-through for production teams that need dependable support."
+          }
+        ]
+      },
+      {
+        "id": "why-now",
+        "heading": "Why Now",
+        "audience": "prospect",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Recent public evidence points to timing: Gulf Coast Propulsion posted a surge of manufacturing and supply-chain openings. That makes now a useful moment to compare what they need against where BTX may help."
+          }
+        ]
+      },
+      {
+        "id": "the-ask",
+        "heading": "The Ask",
+        "audience": "prospect",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Ask Alyssa Wright for a 20-minute fit call with one current print package or work statement, then confirm materials, certifications, delivery window, and whether BTX Dallas Main has available 5-axis capacity with quoted lead time of 24 days."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "companies.json",
+        "records": [
+          "gulf-coast-propulsion"
+        ],
+        "reason": "Account profile, market, and stated needs."
+      },
+      {
+        "source": "signals.json + news.json",
+        "records": [
+          "sig-0020"
+        ],
+        "reason": "Account-specific public trigger."
+      },
+      {
+        "source": "erp_capacity.json",
+        "records": [
+          "btx-dallas-main"
+        ],
+        "reason": "Capacity context used for the pitch."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "sales_pitch"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      },
+      {
+        "id": "task",
+        "label": "Create CRM Task",
+        "kind": "simulated_crm_task"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "prospect",
+    "form": "one_pager"
+  },
+  {
+    "id": "deliv-1783188406619",
+    "type": "weekly_memo",
+    "title": "Week of 2026-06-29",
+    "createdAt": "2026-07-04T18:06:46.619Z",
+    "brainArea": "revenue",
+    "entityIds": [
+      "desert-sky-machining",
+      "clearfork-turbine-works",
+      "desert-sky-machining"
+    ],
+    "confidence": "high",
+    "confidenceReason": "High: opportunity, risk, and evidence are all linked.",
+    "sections": [
+      {
+        "id": "answer",
+        "heading": "This Week's Answer",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Verdict: BTX Precision should focus this week on Desert Sky Machining while protecting Clearfork Turbine Works from delivery or account risk. All markets: $44.8M remains open, and the strongest current evidence is government contract award tied to Desert Sky Machining."
+          }
+        ]
+      },
+      {
+        "id": "opportunity",
+        "heading": "Top Opportunity",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Account",
+              "Opportunity score",
+              "Fit",
+              "Why now"
+            ],
+            "rows": [
+              [
+                "Desert Sky Machining",
+                "93",
+                "75%",
+                "Desert Sky Machining was awarded a $0.2M government production contract"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "risk",
+        "heading": "Top Risk",
+        "blocks": [
+          {
+            "kind": "table",
+            "columns": [
+              "Account",
+              "Risk score",
+              "Evidence"
+            ],
+            "rows": [
+              [
+                "Clearfork Turbine Works",
+                "75",
+                "Clearfork Turbine Works notified buyers of multi-week shipment delays"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "actions",
+        "heading": "Recommended Actions",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Pursue revenue: Opportunity 93 with 75% fit — lead with precision machining."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "companies.json",
+        "records": [
+          "lonestar-aero-systems",
+          "trinity-defense-components",
+          "pecan-valley-machining",
+          "clearfork-turbine-works",
+          "bluebonnet-avionics",
+          "gulf-coast-propulsion",
+          "brazos-precision-castings",
+          "red-river-assemblies",
+          "high-plains-actuation",
+          "alamo-composite-tooling",
+          "hill-country-aerostructures",
+          "caprock-guidance-systems",
+          "cypress-creek-fabrication",
+          "mesquite-defense-manufacturing",
+          "violet-crown-micro-precision",
+          "ranger-landing-gear",
+          "live-oak-sensor-housings",
+          "blackland-hydraulics",
+          "mesa-verde-aerosystems",
+          "rocky-mountain-flight-controls",
+          "carolina-nacelle-works",
+          "chesapeake-rotor-systems",
+          "great-lakes-engine-cases",
+          "cascade-actuator-products",
+          "desert-sky-machining"
+        ],
+        "reason": "Account names, markets, and relationship status."
+      },
+      {
+        "source": "signals.json + news.json",
+        "records": [
+          "sig-0001",
+          "sig-0002",
+          "sig-0003",
+          "sig-0004",
+          "sig-0005",
+          "sig-0006",
+          "sig-0007",
+          "sig-0008",
+          "sig-0009",
+          "sig-0010",
+          "sig-0011",
+          "sig-0012"
+        ],
+        "reason": "Validated market and risk evidence used in scores."
+      },
+      {
+        "source": "opportunities.json",
+        "records": [
+          "opp-0001",
+          "opp-0002",
+          "opp-0003",
+          "opp-0004",
+          "opp-0005",
+          "opp-0006",
+          "opp-0007",
+          "opp-0008",
+          "opp-0009",
+          "opp-0010",
+          "opp-0011",
+          "opp-0012"
+        ],
+        "reason": "Open pipeline value and opportunity context."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "weekly_memo"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      },
+      {
+        "id": "download",
+        "label": "Download Markdown",
+        "kind": "download_markdown"
+      },
+      {
+        "id": "send",
+        "label": "Send via Outlook",
+        "kind": "simulated_send"
+      },
+      {
+        "id": "task",
+        "label": "Create CRM Task",
+        "kind": "simulated_crm_task"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "internal",
+    "form": "memo"
+  },
+  {
+    "id": "deliv-1783188406620-outreach",
+    "type": "outreach",
+    "title": "Draft Outreach - Desert Sky Machining",
+    "createdAt": "2026-07-04T18:06:46.620Z",
+    "brainArea": "workflow",
+    "entityIds": [
+      "desert-sky-machining"
+    ],
+    "confidence": "high",
+    "confidenceReason": "High: named contact, public business hook, and capacity context are available.",
+    "sections": [
+      {
+        "id": "recipient",
+        "heading": "Recipient",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "David Mendez, VP Supply Chain at Desert Sky Machining."
+          }
+        ]
+      },
+      {
+        "id": "subject",
+        "heading": "Subject",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Desert Sky Machining production-capacity conversation"
+          }
+        ]
+      },
+      {
+        "id": "body",
+        "heading": "Body",
+        "audience": "prospect",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Hi David,\n\nI noticed Desert Sky Machining was awarded a $0.2M government production contract. BTX Precision supports aerospace and defense teams with precision machining, 5-axis machining, and certified build-to-print work when programs need qualified outside capacity. Could we schedule 20 minutes next week to see whether there is a useful fit?\n\nAlyssa Hart\nChief Revenue Officer, BTX Precision"
+          }
+        ]
+      },
+      {
+        "id": "why-this-works",
+        "heading": "Why This Works",
+        "audience": "internal",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Internal rationale: outreach uses opportunity score 93, fit 75%, contact selection note \"Role matched to operations, supply chain, engineering, procurement, program, or sourcing.\", and the top public hook \"Desert Sky Machining was awarded a $0.2M government production contract.\"."
+          }
+        ]
+      },
+      {
+        "id": "provenance",
+        "heading": "Provenance",
+        "audience": "internal",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Internal source note: built from 3 account, contact, and evidence records."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "companies.json",
+        "records": [
+          "desert-sky-machining"
+        ],
+        "reason": "Account and location context."
+      },
+      {
+        "source": "signals.json + news.json",
+        "records": [
+          "sig-0082"
+        ],
+        "reason": "Specific outreach hook."
+      },
+      {
+        "source": "contacts.json",
+        "records": [
+          "con-0063"
+        ],
+        "reason": "Recipient context."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "outreach"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      },
+      {
+        "id": "send",
+        "label": "Send via Outlook",
+        "kind": "simulated_send"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "prospect",
+    "form": "email"
+  },
+  {
+    "id": "deliv-1783188406620-analysis-annotation",
+    "type": "analysis_view",
+    "title": "Revenue Annotation — Q2 2026",
+    "createdAt": "2026-07-04T18:06:46.620Z",
+    "brainArea": "decision",
+    "entityIds": [
+      "lonestar-aero-systems",
+      "trinity-defense-components",
+      "pecan-valley-machining",
+      "clearfork-turbine-works",
+      "bluebonnet-avionics",
+      "gulf-coast-propulsion"
+    ],
+    "confidence": "high",
+    "confidenceReason": "Current and prior quarter data both available.",
+    "sections": [
+      {
+        "id": "annotation",
+        "heading": "Analysis Annotation",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "Revenue for Q2 2026: $8.8M across 10 active accounts. Lonestar Aero Systems leads with $2.1M (24% of total). This is roughly flat 4% versus Q1 2026 ($8.5M). Top account is Lonestar Aero Systems at 24% — no single-account concentration risk."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "account_monthly_revenue.json",
+        "records": [
+          "lonestar-aero-systems:2026-04",
+          "trinity-defense-components:2026-04",
+          "pecan-valley-machining:2026-04",
+          "clearfork-turbine-works:2026-04",
+          "bluebonnet-avionics:2026-04",
+          "gulf-coast-propulsion:2026-04",
+          "brazos-precision-castings:2026-04",
+          "red-river-assemblies:2026-04",
+          "high-plains-actuation:2026-04",
+          "alamo-composite-tooling:2026-04",
+          "lonestar-aero-systems:2026-05",
+          "trinity-defense-components:2026-05",
+          "pecan-valley-machining:2026-05",
+          "clearfork-turbine-works:2026-05",
+          "bluebonnet-avionics:2026-05",
+          "gulf-coast-propulsion:2026-05",
+          "brazos-precision-castings:2026-05",
+          "red-river-assemblies:2026-05",
+          "high-plains-actuation:2026-05",
+          "alamo-composite-tooling:2026-05",
+          "lonestar-aero-systems:2026-06",
+          "trinity-defense-components:2026-06",
+          "pecan-valley-machining:2026-06",
+          "clearfork-turbine-works:2026-06",
+          "bluebonnet-avionics:2026-06",
+          "gulf-coast-propulsion:2026-06",
+          "brazos-precision-castings:2026-06",
+          "red-river-assemblies:2026-06",
+          "high-plains-actuation:2026-06",
+          "alamo-composite-tooling:2026-06"
+        ],
+        "reason": "Computed Revenue from deterministic demo records."
+      },
+      {
+        "source": "account_monthly_revenue.json",
+        "records": [
+          "lonestar-aero-systems:2026-01",
+          "trinity-defense-components:2026-01",
+          "pecan-valley-machining:2026-01",
+          "clearfork-turbine-works:2026-01",
+          "bluebonnet-avionics:2026-01",
+          "gulf-coast-propulsion:2026-01",
+          "brazos-precision-castings:2026-01",
+          "red-river-assemblies:2026-01",
+          "high-plains-actuation:2026-01",
+          "alamo-composite-tooling:2026-01",
+          "lonestar-aero-systems:2026-02",
+          "trinity-defense-components:2026-02",
+          "pecan-valley-machining:2026-02",
+          "clearfork-turbine-works:2026-02",
+          "bluebonnet-avionics:2026-02",
+          "gulf-coast-propulsion:2026-02",
+          "brazos-precision-castings:2026-02",
+          "red-river-assemblies:2026-02",
+          "high-plains-actuation:2026-02",
+          "alamo-composite-tooling:2026-02",
+          "lonestar-aero-systems:2026-03",
+          "trinity-defense-components:2026-03",
+          "pecan-valley-machining:2026-03",
+          "clearfork-turbine-works:2026-03",
+          "bluebonnet-avionics:2026-03",
+          "gulf-coast-propulsion:2026-03",
+          "brazos-precision-castings:2026-03",
+          "red-river-assemblies:2026-03",
+          "high-plains-actuation:2026-03",
+          "alamo-composite-tooling:2026-03"
+        ],
+        "reason": "Computed Revenue from deterministic demo records."
+      },
+      {
+        "source": "composition path",
+        "records": [
+          "analysis_annotation"
+        ],
+        "reason": "Composed: template"
+      }
+    ],
+    "actions": [
+      {
+        "id": "copy",
+        "label": "Copy",
+        "kind": "copy"
+      }
+    ],
+    "compositionPath": "Composed: template",
+    "audience": "internal",
+    "form": "view"
+  },
+  {
+    "id": "sample-analysis-revenue-heatmap",
+    "type": "analysis_view",
+    "title": "Revenue Heatmap by Account and Quarter",
+    "createdAt": "2026-07-03T12:00:00.000Z",
+    "brainArea": "decision",
+    "entityIds": [
+      "lonestar-aero-systems",
+      "trinity-defense-components",
+      "pecan-valley-machining",
+      "clearfork-turbine-works",
+      "bluebonnet-avionics",
+      "gulf-coast-propulsion",
+      "brazos-precision-castings",
+      "red-river-assemblies",
+      "high-plains-actuation",
+      "alamo-composite-tooling"
+    ],
+    "confidence": "high",
+    "sections": [
+      {
+        "id": "spec",
+        "heading": "Analysis Spec",
+        "blocks": [
+          {
+            "kind": "chart-spec",
+            "title": "Revenue by account by quarter",
+            "spec": {
+              "viz": "heatmap",
+              "metric": "revenue",
+              "rows": "account",
+              "cols": "quarter",
+              "color": "revenue_yoy_change"
+            }
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "account_monthly_revenue.json",
+        "records": [
+          "24-month revenue history"
+        ],
+        "reason": "Seeded analysis view generated from the metric chart-spec engine."
+      }
+    ],
+    "actions": [
+      {
+        "id": "open",
+        "label": "Open",
+        "kind": "copy"
+      }
+    ]
+  },
+  {
+    "id": "sample-analysis-retention-grid",
+    "type": "analysis_view",
+    "title": "Repeat Revenue Retention Grid",
+    "createdAt": "2026-07-03T12:00:00.000Z",
+    "brainArea": "decision",
+    "entityIds": [
+      "lonestar-aero-systems",
+      "trinity-defense-components",
+      "pecan-valley-machining",
+      "clearfork-turbine-works",
+      "bluebonnet-avionics",
+      "gulf-coast-propulsion",
+      "brazos-precision-castings",
+      "red-river-assemblies",
+      "high-plains-actuation",
+      "alamo-composite-tooling"
+    ],
+    "confidence": "high",
+    "sections": [
+      {
+        "id": "spec",
+        "heading": "Analysis Spec",
+        "blocks": [
+          {
+            "kind": "chart-spec",
+            "title": "Repeat revenue grid",
+            "spec": {
+              "viz": "retention_grid",
+              "metric": "repeat_revenue_rate",
+              "rows": "account",
+              "cols": "month"
+            }
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "source": "account_monthly_revenue.json",
+        "records": [
+          "24-month revenue history"
+        ],
+        "reason": "Seeded analysis view generated from the metric chart-spec engine."
+      }
+    ],
+    "actions": [
+      {
+        "id": "open",
+        "label": "Open",
+        "kind": "copy"
+      }
+    ]
+  }
+]

@@ -2,34 +2,44 @@ import type { DataAdapter, RegionFilter } from "../../engine/brain/ports.ts";
 import type { Company, Contact, Facility, Opportunity } from "../../engine/brain/entities.ts";
 import type { OperatingSnapshot } from "../../engine/brain/operatingSnapshot.ts";
 
-const MESSAGE = "Live API mode is not configured for this static demo. Use VITE_DATA_MODE=demo.";
+const ENDPOINT = (import.meta as ImportMeta & { env?: { VITE_BACKEND_ENDPOINT?: string } }).env?.VITE_BACKEND_ENDPOINT;
+const MESSAGE = "Live API mode requires VITE_BACKEND_ENDPOINT. Use VITE_DATA_MODE=demo when the backend is unavailable.";
 
 export class LiveDataAdapter implements DataAdapter {
-  private fail(): never {
-    throw new Error(MESSAGE);
+  private async getJson<T>(path: string): Promise<T> {
+    if (!ENDPOINT) throw new Error(MESSAGE);
+    const response = await fetch(`${ENDPOINT}${path}`);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Live adapter ${path} failed (${response.status}): ${body}`);
+    }
+    return response.json() as Promise<T>;
   }
 
   async getCompanies(_filter?: RegionFilter): Promise<Company[]> {
-    this.fail();
+    const data = await this.getJson<{ records: Company[] }>("/crm/accounts");
+    return data.records;
   }
 
   async getSignals(_filter?: RegionFilter): Promise<unknown[]> {
-    this.fail();
+    return [];
   }
 
   async getContacts(_filter?: RegionFilter): Promise<Contact[]> {
-    this.fail();
+    const data = await this.getJson<{ records: Contact[] }>("/crm/contacts");
+    return data.records;
   }
 
   async getFacilities(_filter?: RegionFilter): Promise<Facility[]> {
-    this.fail();
+    return [];
   }
 
   async getOpportunities(_filter?: RegionFilter): Promise<Opportunity[]> {
-    this.fail();
+    const data = await this.getJson<{ records: Opportunity[] }>("/crm/deals");
+    return data.records;
   }
 
   async getOperatingSnapshot(): Promise<OperatingSnapshot> {
-    this.fail();
+    throw new Error("Live operating snapshot is not implemented yet. Use demo mode for the full cockpit.");
   }
 }

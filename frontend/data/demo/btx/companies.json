@@ -1,1394 +1,703 @@
 [
   {
-    "id": "btx-precision",
-    "name": "BTX Precision",
-    "relationship": "self",
+    "id": "lonestar-aero-systems",
+    "name": "Lonestar Aero Systems",
+    "relationship": "customer",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
     "location": {
-      "city": "Dallas",
-      "lat": 32.709,
-      "lon": -96.8206,
-      "address": "1017 Industrial Pkwy",
+      "city": "Austin",
+      "lat": 30.4014,
+      "lon": -97.7132,
+      "address": "9401 Metric Blvd",
       "state": "TX",
-      "postal_code": "75201",
+      "postal_code": "78758",
       "country": "USA"
     },
+    "website_url": "https://lonestar-aero-systems.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/lonestar-aero-systems",
+    "source_url": "https://demo.btx.example/crm/accounts/lonestar-aero-systems",
     "needs": [
-      "ITAR",
-      "build-to-print",
-      "precision machining"
+      "5-axis CNC",
+      "AS9100",
+      "aluminum",
+      "assembly",
+      "hydraulic blocks"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "trinity-defense-components",
+    "name": "Trinity Defense Components",
+    "relationship": "customer",
     "account_status": "current_customer",
     "business_motion": "manage_current_business",
-    "website_url": "https://btx-precision.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/btx-precision",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/btx-precision"
-  },
-  {
-    "id": "anvil-manufacturing",
-    "name": "Anvil Manufacturing",
-    "relationship": "customer",
     "location": {
-      "city": "Phoenix",
-      "lat": 33.4669,
-      "lon": -112.0117,
-      "address": "1034 Industrial Pkwy",
-      "state": "AZ",
-      "postal_code": "85004",
-      "country": "USA"
-    },
-    "needs": [
-      "NADCAP",
-      "build-to-print",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "current_customer",
-    "business_motion": "grow_existing_business",
-    "website_url": "https://anvil-manufacturing.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/anvil-manufacturing",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/anvil-manufacturing"
-  },
-  {
-    "id": "meridian-technologies",
-    "name": "Meridian Technologies",
-    "relationship": "supplier",
-    "location": {
-      "city": "Huntsville",
-      "lat": 34.6641,
-      "lon": -86.6851,
-      "address": "1051 Industrial Pkwy",
-      "state": "AL",
-      "postal_code": "35801",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "NADCAP",
-      "build-to-print",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://meridian-technologies.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/meridian-technologies",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/meridian-technologies"
-  },
-  {
-    "id": "falcon-fabrication",
-    "name": "Falcon Fabrication",
-    "relationship": "supplier",
-    "location": {
-      "city": "Greenville",
-      "lat": 34.9453,
-      "lon": -82.4057,
-      "address": "1068 Industrial Pkwy",
-      "state": "SC",
-      "postal_code": "29601",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "NADCAP",
-      "aluminum",
-      "build-to-print",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://falcon-fabrication.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/falcon-fabrication",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/falcon-fabrication"
-  },
-  {
-    "id": "monarch-technologies",
-    "name": "Monarch Technologies",
-    "relationship": "customer",
-    "location": {
-      "city": "Greenville",
-      "lat": 34.9496,
-      "lon": -82.4717,
-      "address": "1085 Industrial Pkwy",
-      "state": "SC",
-      "postal_code": "29601",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "build-to-print"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "current_customer",
-    "business_motion": "grow_existing_business",
-    "website_url": "https://monarch-technologies.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/monarch-technologies",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/monarch-technologies"
-  },
-  {
-    "id": "strata-turbine",
-    "name": "Strata Turbine",
-    "relationship": "target",
-    "location": {
-      "city": "Austin",
-      "lat": 30.2639,
-      "lon": -97.7274,
-      "address": "1102 Industrial Pkwy",
+      "city": "Dallas",
+      "lat": 32.8141,
+      "lon": -96.8738,
+      "address": "2210 Commonwealth Dr",
       "state": "TX",
-      "postal_code": "78701",
+      "postal_code": "75247",
       "country": "USA"
     },
+    "website_url": "https://trinity-defense-components.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/trinity-defense-components",
+    "source_url": "https://demo.btx.example/crm/accounts/trinity-defense-components",
     "needs": [
       "ITAR",
-      "aluminum",
-      "build-to-print",
       "precision machining",
+      "titanium",
       "sheet metal"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://strata-turbine.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/strata-turbine",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/strata-turbine"
+    "source_mode": "static_snapshot"
   },
   {
-    "id": "anvil-systems",
-    "name": "Anvil Systems",
-    "relationship": "supplier",
+    "id": "pecan-valley-machining",
+    "name": "Pecan Valley Machining",
+    "relationship": "customer",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
     "location": {
-      "city": "Austin",
-      "lat": 30.2789,
-      "lon": -97.8348,
-      "address": "1119 Industrial Pkwy",
+      "city": "San Antonio",
+      "lat": 29.4442,
+      "lon": -98.3831,
+      "address": "4810 Industry Park Dr",
       "state": "TX",
-      "postal_code": "78701",
+      "postal_code": "78219",
       "country": "USA"
     },
+    "website_url": "https://pecan-valley-machining.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/pecan-valley-machining",
+    "source_url": "https://demo.btx.example/crm/accounts/pecan-valley-machining",
     "needs": [
-      "AS9100",
-      "assembly",
       "build-to-print",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://anvil-systems.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/anvil-systems",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/anvil-systems"
-  },
-  {
-    "id": "sentinel-alloys",
-    "name": "Sentinel Alloys",
-    "relationship": "customer",
-    "location": {
-      "city": "Cincinnati",
-      "lat": 39.2014,
-      "lon": -84.531,
-      "address": "1136 Industrial Pkwy",
-      "state": "OH",
-      "postal_code": "45202",
-      "country": "USA"
-    },
-    "needs": [
       "5-axis CNC",
-      "ITAR",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "current_customer",
-    "business_motion": "grow_existing_business",
-    "website_url": "https://sentinel-alloys.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/sentinel-alloys",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/sentinel-alloys"
-  },
-  {
-    "id": "cardinal-metalworks",
-    "name": "Cardinal Metalworks",
-    "relationship": "competitor",
-    "location": {
-      "city": "Tulsa",
-      "lat": 36.0827,
-      "lon": -95.9364,
-      "address": "1153 Industrial Pkwy",
-      "state": "OK",
-      "postal_code": "74103",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "NADCAP",
-      "assembly",
-      "build-to-print"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://cardinal-metalworks.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/cardinal-metalworks",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/cardinal-metalworks"
-  },
-  {
-    "id": "monarch-alloys",
-    "name": "Monarch Alloys",
-    "relationship": "target",
-    "location": {
-      "city": "Huntsville",
-      "lat": 34.7294,
-      "lon": -86.6785,
-      "address": "1170 Industrial Pkwy",
-      "state": "AL",
-      "postal_code": "35801",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "ITAR",
-      "precision machining",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://monarch-alloys.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/monarch-alloys",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/monarch-alloys"
-  },
-  {
-    "id": "sentinel-aerospace",
-    "name": "Sentinel Aerospace",
-    "relationship": "target",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.6214,
-      "lon": -117.1458,
-      "address": "1187 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
       "aluminum",
-      "assembly",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://sentinel-aerospace.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/sentinel-aerospace",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/sentinel-aerospace"
-  },
-  {
-    "id": "beacon-alloys",
-    "name": "Beacon Alloys",
-    "relationship": "supplier",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.4187,
-      "lon": -112.0544,
-      "address": "1204 Industrial Pkwy",
-      "state": "AZ",
-      "postal_code": "85004",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "ITAR",
-      "assembly",
-      "build-to-print",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://beacon-alloys.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/beacon-alloys",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/beacon-alloys"
-  },
-  {
-    "id": "halcyon-components",
-    "name": "Halcyon Components",
-    "relationship": "target",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.7662,
-      "lon": -117.1669,
-      "address": "1221 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "assembly",
-      "precision machining",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://halcyon-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/halcyon-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/halcyon-components"
-  },
-  {
-    "id": "vanguard-systems",
-    "name": "Vanguard Systems",
-    "relationship": "target",
-    "location": {
-      "city": "Hartford",
-      "lat": 41.7631,
-      "lon": -72.7126,
-      "address": "1238 Industrial Pkwy",
-      "state": "CT",
-      "postal_code": "06103",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "NADCAP",
-      "aluminum",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://vanguard-systems.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/vanguard-systems",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/vanguard-systems"
-  },
-  {
-    "id": "nimbus-technologies",
-    "name": "Nimbus Technologies",
-    "relationship": "supplier",
-    "location": {
-      "city": "Tulsa",
-      "lat": 36.1408,
-      "lon": -95.9998,
-      "address": "1255 Industrial Pkwy",
-      "state": "OK",
-      "postal_code": "74103",
-      "country": "USA"
-    },
-    "needs": [
-      "ITAR",
-      "NADCAP",
-      "aluminum",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://nimbus-technologies.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/nimbus-technologies",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/nimbus-technologies"
-  },
-  {
-    "id": "falcon-tooling",
-    "name": "Falcon Tooling",
-    "relationship": "competitor",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.4007,
-      "lon": -112.0483,
-      "address": "1272 Industrial Pkwy",
-      "state": "AZ",
-      "postal_code": "85004",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "assembly",
-      "build-to-print",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://falcon-tooling.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/falcon-tooling",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/falcon-tooling"
-  },
-  {
-    "id": "titan-precision",
-    "name": "Titan Precision",
-    "relationship": "competitor",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.5932,
-      "lon": -97.2306,
-      "address": "1289 Industrial Pkwy",
-      "state": "KS",
-      "postal_code": "67202",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "NADCAP",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://titan-precision.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/titan-precision",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/titan-precision"
-  },
-  {
-    "id": "titan-components",
-    "name": "Titan Components",
-    "relationship": "supplier",
-    "location": {
-      "city": "Huntsville",
-      "lat": 34.7471,
-      "lon": -86.6706,
-      "address": "1306 Industrial Pkwy",
-      "state": "AL",
-      "postal_code": "35801",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "ITAR",
-      "NADCAP",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://titan-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/titan-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/titan-components"
-  },
-  {
-    "id": "cardinal-components",
-    "name": "Cardinal Components",
-    "relationship": "target",
-    "location": {
-      "city": "Cincinnati",
-      "lat": 39.0191,
-      "lon": -84.5897,
-      "address": "1323 Industrial Pkwy",
-      "state": "OH",
-      "postal_code": "45202",
-      "country": "USA"
-    },
-    "needs": [
-      "assembly",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://cardinal-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/cardinal-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/cardinal-components"
-  },
-  {
-    "id": "pinnacle-forgings",
-    "name": "Pinnacle Forgings",
-    "relationship": "customer",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.7801,
-      "lon": -117.2356,
-      "address": "1340 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "assembly",
-      "precision machining",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "current_customer",
-    "business_motion": "grow_existing_business",
-    "website_url": "https://pinnacle-forgings.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/pinnacle-forgings",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/pinnacle-forgings"
-  },
-  {
-    "id": "bastion-tooling",
-    "name": "Bastion Tooling",
-    "relationship": "competitor",
-    "location": {
-      "city": "Tulsa",
-      "lat": 36.1157,
-      "lon": -95.8931,
-      "address": "1357 Industrial Pkwy",
-      "state": "OK",
-      "postal_code": "74103",
-      "country": "USA"
-    },
-    "needs": [
-      "ITAR",
-      "aluminum",
-      "assembly",
-      "build-to-print",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://bastion-tooling.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/bastion-tooling",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/bastion-tooling"
-  },
-  {
-    "id": "meridian-systems",
-    "name": "Meridian Systems",
-    "relationship": "supplier",
-    "location": {
-      "city": "Cincinnati",
-      "lat": 39.0917,
-      "lon": -84.5228,
-      "address": "1374 Industrial Pkwy",
-      "state": "OH",
-      "postal_code": "45202",
-      "country": "USA"
-    },
-    "needs": [
-      "NADCAP",
       "assembly"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://meridian-systems.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/meridian-systems",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/meridian-systems"
+    "source_mode": "static_snapshot"
   },
   {
-    "id": "granite-components",
-    "name": "Granite Components",
-    "relationship": "target",
-    "location": {
-      "city": "Hartford",
-      "lat": 41.8114,
-      "lon": -72.7593,
-      "address": "1391 Industrial Pkwy",
-      "state": "CT",
-      "postal_code": "06103",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "ITAR",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://granite-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/granite-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/granite-components"
-  },
-  {
-    "id": "nimbus-components",
-    "name": "Nimbus Components",
-    "relationship": "target",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.6546,
-      "lon": -97.3036,
-      "address": "1408 Industrial Pkwy",
-      "state": "KS",
-      "postal_code": "67202",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "build-to-print",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://nimbus-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/nimbus-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/nimbus-components"
-  },
-  {
-    "id": "delta-precision",
-    "name": "Delta Precision",
-    "relationship": "target",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.5469,
-      "lon": -112.0824,
-      "address": "1425 Industrial Pkwy",
-      "state": "AZ",
-      "postal_code": "85004",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "ITAR",
-      "NADCAP",
-      "build-to-print"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://delta-precision.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/delta-precision",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/delta-precision"
-  },
-  {
-    "id": "aegis-components",
-    "name": "Aegis Components",
-    "relationship": "competitor",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.6628,
-      "lon": -97.3499,
-      "address": "1442 Industrial Pkwy",
-      "state": "KS",
-      "postal_code": "67202",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://aegis-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/aegis-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/aegis-components"
-  },
-  {
-    "id": "meridian-aerospace",
-    "name": "Meridian Aerospace",
-    "relationship": "supplier",
-    "location": {
-      "city": "Greenville",
-      "lat": 34.9014,
-      "lon": -82.4537,
-      "address": "1459 Industrial Pkwy",
-      "state": "SC",
-      "postal_code": "29601",
-      "country": "USA"
-    },
-    "needs": [
-      "ITAR",
-      "NADCAP",
-      "assembly",
-      "build-to-print",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://meridian-aerospace.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/meridian-aerospace",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/meridian-aerospace"
-  },
-  {
-    "id": "axiom-components",
-    "name": "Axiom Components",
+    "id": "clearfork-turbine-works",
+    "name": "Clearfork Turbine Works",
     "relationship": "customer",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
     "location": {
-      "city": "Tulsa",
-      "lat": 36.168,
-      "lon": -95.8981,
-      "address": "1476 Industrial Pkwy",
-      "state": "OK",
-      "postal_code": "74103",
+      "city": "Fort Worth",
+      "lat": 32.8031,
+      "lon": -97.3539,
+      "address": "2650 Railhead Rd",
+      "state": "TX",
+      "postal_code": "76106",
       "country": "USA"
     },
+    "website_url": "https://clearfork-turbine-works.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/clearfork-turbine-works",
+    "source_url": "https://demo.btx.example/crm/accounts/clearfork-turbine-works",
     "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "assembly",
-      "sheet metal"
+      "NADCAP",
+      "titanium",
+      "precision machining",
+      "assembly"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "bluebonnet-avionics",
+    "name": "Bluebonnet Avionics",
+    "relationship": "customer",
+    "account_status": "active_pipeline",
+    "business_motion": "grow_existing_business",
+    "location": {
+      "city": "Austin",
+      "lat": 30.2016,
+      "lon": -97.7079,
+      "address": "6300 Burleson Rd",
+      "state": "TX",
+      "postal_code": "78744",
+      "country": "USA"
+    },
+    "website_url": "https://bluebonnet-avionics.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/bluebonnet-avionics",
+    "source_url": "https://demo.btx.example/crm/accounts/bluebonnet-avionics",
+    "needs": [
+      "assembly",
+      "AS9100",
+      "sheet metal",
+      "NADCAP"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "gulf-coast-propulsion",
+    "name": "Gulf Coast Propulsion",
+    "relationship": "customer",
+    "account_status": "current_customer",
+    "business_motion": "manage_current_business",
+    "location": {
+      "city": "Houston",
+      "lat": 29.6175,
+      "lon": -95.2048,
+      "address": "9100 Aerospace Ave",
+      "state": "TX",
+      "postal_code": "77034",
+      "country": "USA"
+    },
+    "website_url": "https://gulf-coast-propulsion.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/gulf-coast-propulsion",
+    "source_url": "https://demo.btx.example/crm/accounts/gulf-coast-propulsion",
+    "needs": [
+      "precision machining",
+      "ITAR",
+      "aluminum",
+      "assembly"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "brazos-precision-castings",
+    "name": "Brazos Precision Castings",
+    "relationship": "customer",
+    "account_status": "current_customer",
+    "business_motion": "reduce_risk",
+    "location": {
+      "city": "Waco",
+      "lat": 31.5132,
+      "lon": -97.2104,
+      "address": "1501 Foundry Loop",
+      "state": "TX",
+      "postal_code": "76712",
+      "country": "USA"
+    },
+    "website_url": "https://brazos-precision-castings.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/brazos-precision-castings",
+    "source_url": "https://demo.btx.example/crm/accounts/brazos-precision-castings",
+    "needs": [
+      "AS9100",
+      "titanium",
+      "NADCAP",
+      "hydraulic blocks"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "red-river-assemblies",
+    "name": "Red River Assemblies",
+    "relationship": "customer",
     "account_status": "current_customer",
     "business_motion": "grow_existing_business",
-    "website_url": "https://axiom-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/axiom-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/axiom-components"
-  },
-  {
-    "id": "meridian-precision",
-    "name": "Meridian Precision",
-    "relationship": "target",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.4675,
-      "lon": -112.1486,
-      "address": "1493 Industrial Pkwy",
-      "state": "AZ",
-      "postal_code": "85004",
-      "country": "USA"
-    },
-    "needs": [
-      "aluminum",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://meridian-precision.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/meridian-precision",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/meridian-precision"
-  },
-  {
-    "id": "sterling-turbine",
-    "name": "Sterling Turbine",
-    "relationship": "competitor",
-    "location": {
-      "city": "Huntsville",
-      "lat": 34.6894,
-      "lon": -86.5137,
-      "address": "1510 Industrial Pkwy",
-      "state": "AL",
-      "postal_code": "35801",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "build-to-print",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://sterling-turbine.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/sterling-turbine",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/sterling-turbine"
-  },
-  {
-    "id": "ironclad-defense",
-    "name": "Ironclad Defense",
-    "relationship": "target",
-    "location": {
-      "city": "Tulsa",
-      "lat": 36.197,
-      "lon": -95.949,
-      "address": "1527 Industrial Pkwy",
-      "state": "OK",
-      "postal_code": "74103",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "aluminum"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://ironclad-defense.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/ironclad-defense",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/ironclad-defense"
-  },
-  {
-    "id": "vertex-alloys",
-    "name": "Vertex Alloys",
-    "relationship": "target",
-    "location": {
-      "city": "Austin",
-      "lat": 30.2577,
-      "lon": -97.7673,
-      "address": "1544 Industrial Pkwy",
-      "state": "TX",
-      "postal_code": "78701",
-      "country": "USA"
-    },
-    "needs": [
-      "NADCAP",
-      "aluminum",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://vertex-alloys.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/vertex-alloys",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/vertex-alloys"
-  },
-  {
-    "id": "foundry-precision",
-    "name": "Foundry Precision",
-    "relationship": "supplier",
-    "location": {
-      "city": "Austin",
-      "lat": 30.3387,
-      "lon": -97.8178,
-      "address": "1561 Industrial Pkwy",
-      "state": "TX",
-      "postal_code": "78701",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "ITAR",
-      "build-to-print",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://foundry-precision.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/foundry-precision",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/foundry-precision"
-  },
-  {
-    "id": "monarch-forgings",
-    "name": "Monarch Forgings",
-    "relationship": "target",
-    "location": {
-      "city": "Cincinnati",
-      "lat": 39.0093,
-      "lon": -84.5568,
-      "address": "1578 Industrial Pkwy",
-      "state": "OH",
-      "postal_code": "45202",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "NADCAP",
-      "assembly",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://monarch-forgings.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/monarch-forgings",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/monarch-forgings"
-  },
-  {
-    "id": "halcyon-manufacturing",
-    "name": "Halcyon Manufacturing",
-    "relationship": "target",
-    "location": {
-      "city": "Phoenix",
-      "lat": 33.4805,
-      "lon": -112.1419,
-      "address": "1595 Industrial Pkwy",
-      "state": "AZ",
-      "postal_code": "85004",
-      "country": "USA"
-    },
-    "needs": [
-      "ITAR",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://halcyon-manufacturing.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/halcyon-manufacturing",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/halcyon-manufacturing"
-  },
-  {
-    "id": "continental-components",
-    "name": "Continental Components",
-    "relationship": "target",
     "location": {
       "city": "Dallas",
-      "lat": 32.8261,
-      "lon": -96.7503,
-      "address": "1612 Industrial Pkwy",
+      "lat": 32.7812,
+      "lon": -96.8886,
+      "address": "7700 Singleton Blvd",
       "state": "TX",
-      "postal_code": "75201",
+      "postal_code": "75212",
       "country": "USA"
     },
+    "website_url": "https://red-river-assemblies.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/red-river-assemblies",
+    "source_url": "https://demo.btx.example/crm/accounts/red-river-assemblies",
     "needs": [
-      "5-axis CNC",
-      "aluminum",
-      "build-to-print",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://continental-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/continental-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/continental-components"
-  },
-  {
-    "id": "ironclad-dynamics",
-    "name": "Ironclad Dynamics",
-    "relationship": "supplier",
-    "location": {
-      "city": "Cincinnati",
-      "lat": 39.0882,
-      "lon": -84.4242,
-      "address": "1629 Industrial Pkwy",
-      "state": "OH",
-      "postal_code": "45202",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "AS9100",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://ironclad-dynamics.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/ironclad-dynamics",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/ironclad-dynamics"
-  },
-  {
-    "id": "aegis-machining",
-    "name": "Aegis Machining",
-    "relationship": "supplier",
-    "location": {
-      "city": "Wichita",
-      "lat": 37.7426,
-      "lon": -97.3334,
-      "address": "1646 Industrial Pkwy",
-      "state": "KS",
-      "postal_code": "67202",
-      "country": "USA"
-    },
-    "needs": [
-      "ITAR",
-      "NADCAP",
-      "aluminum",
       "assembly",
-      "sheet metal"
+      "sheet metal",
+      "build-to-print",
+      "tooling"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://aegis-machining.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/aegis-machining",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/aegis-machining"
+    "source_mode": "static_snapshot"
   },
   {
-    "id": "halcyon-castings",
-    "name": "Halcyon Castings",
-    "relationship": "target",
+    "id": "high-plains-actuation",
+    "name": "High Plains Actuation",
+    "relationship": "customer",
+    "account_status": "past_customer",
+    "business_motion": "manage_current_business",
     "location": {
-      "city": "Huntsville",
-      "lat": 34.7679,
-      "lon": -86.6746,
-      "address": "1663 Industrial Pkwy",
-      "state": "AL",
-      "postal_code": "35801",
+      "city": "Amarillo",
+      "lat": 35.2233,
+      "lon": -101.7059,
+      "address": "3400 Tradewind St",
+      "state": "TX",
+      "postal_code": "79111",
       "country": "USA"
     },
+    "website_url": "https://high-plains-actuation.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/high-plains-actuation",
+    "source_url": "https://demo.btx.example/crm/accounts/high-plains-actuation",
     "needs": [
-      "AS9100",
-      "sheet metal",
-      "titanium"
+      "precision machining",
+      "aluminum",
+      "5-axis CNC",
+      "tooling"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
-    "business_motion": "prospect_new_business",
-    "website_url": "https://halcyon-castings.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/halcyon-castings",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/halcyon-castings"
+    "source_mode": "static_snapshot"
   },
   {
-    "id": "falcon-turbine",
-    "name": "Falcon Turbine",
-    "relationship": "supplier",
+    "id": "alamo-composite-tooling",
+    "name": "Alamo Composite Tooling",
+    "relationship": "customer",
+    "account_status": "active_pipeline",
+    "business_motion": "grow_existing_business",
+    "location": {
+      "city": "San Antonio",
+      "lat": 29.5331,
+      "lon": -98.4698,
+      "address": "11600 Huebner Rd",
+      "state": "TX",
+      "postal_code": "78216",
+      "country": "USA"
+    },
+    "website_url": "https://alamo-composite-tooling.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/alamo-composite-tooling",
+    "source_url": "https://demo.btx.example/crm/accounts/alamo-composite-tooling",
+    "needs": [
+      "tooling",
+      "AS9100",
+      "build-to-print",
+      "assembly"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "hill-country-aerostructures",
+    "name": "Hill Country Aerostructures",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
     "location": {
       "city": "Austin",
-      "lat": 30.3245,
-      "lon": -97.8129,
-      "address": "1680 Industrial Pkwy",
+      "lat": 30.4444,
+      "lon": -97.6816,
+      "address": "15820 Bratton Ln",
       "state": "TX",
-      "postal_code": "78701",
+      "postal_code": "78728",
       "country": "USA"
     },
+    "website_url": "https://hill-country-aerostructures.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/hill-country-aerostructures",
+    "source_url": "https://demo.btx.example/crm/accounts/hill-country-aerostructures",
     "needs": [
       "5-axis CNC",
-      "AS9100",
-      "NADCAP",
-      "aluminum",
-      "build-to-print"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://falcon-turbine.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/falcon-turbine",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/falcon-turbine"
-  },
-  {
-    "id": "halcyon-dynamics",
-    "name": "Halcyon Dynamics",
-    "relationship": "competitor",
-    "location": {
-      "city": "Huntsville",
-      "lat": 34.7683,
-      "lon": -86.6826,
-      "address": "1697 Industrial Pkwy",
-      "state": "AL",
-      "postal_code": "35801",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "NADCAP",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://halcyon-dynamics.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/halcyon-dynamics",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/halcyon-dynamics"
-  },
-  {
-    "id": "northwind-controls",
-    "name": "Northwind Controls",
-    "relationship": "supplier",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.6327,
-      "lon": -117.1247,
-      "address": "1714 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
-      "build-to-print",
-      "precision machining",
-      "sheet metal"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://northwind-controls.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/northwind-controls",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/northwind-controls"
-  },
-  {
-    "id": "vanguard-machining",
-    "name": "Vanguard Machining",
-    "relationship": "target",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.6648,
-      "lon": -117.2602,
-      "address": "1731 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
       "ITAR",
-      "precision machining"
+      "aluminum",
+      "electronics assembly"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "caprock-guidance-systems",
+    "name": "Caprock Guidance Systems",
+    "relationship": "target",
     "account_status": "target_prospect",
     "business_motion": "prospect_new_business",
-    "website_url": "https://vanguard-machining.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/vanguard-machining",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/vanguard-machining"
-  },
-  {
-    "id": "harbor-components",
-    "name": "Harbor Components",
-    "relationship": "supplier",
     "location": {
-      "city": "Tulsa",
-      "lat": 36.24,
-      "lon": -95.9838,
-      "address": "1748 Industrial Pkwy",
-      "state": "OK",
-      "postal_code": "74103",
+      "city": "Lubbock",
+      "lat": 33.563,
+      "lon": -101.8377,
+      "address": "2801 Slaton Rd",
+      "state": "TX",
+      "postal_code": "79404",
       "country": "USA"
     },
+    "website_url": "https://caprock-guidance-systems.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/caprock-guidance-systems",
+    "source_url": "https://demo.btx.example/crm/accounts/caprock-guidance-systems",
     "needs": [
-      "aluminum",
-      "assembly",
-      "sheet metal"
+      "precision machining",
+      "electronics assembly",
+      "AS9100",
+      "hydraulic blocks"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://harbor-components.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/harbor-components",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/harbor-components"
+    "source_mode": "static_snapshot"
   },
   {
-    "id": "foundry-turbine",
-    "name": "Foundry Turbine",
-    "relationship": "supplier",
+    "id": "cypress-creek-fabrication",
+    "name": "Cypress Creek Fabrication",
+    "relationship": "target",
+    "account_status": "new_logo",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Houston",
+      "lat": 29.8617,
+      "lon": -95.5711,
+      "address": "10800 Tanner Rd",
+      "state": "TX",
+      "postal_code": "77041",
+      "country": "USA"
+    },
+    "website_url": "https://cypress-creek-fabrication.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/cypress-creek-fabrication",
+    "source_url": "https://demo.btx.example/crm/accounts/cypress-creek-fabrication",
+    "needs": [
+      "sheet metal",
+      "assembly",
+      "aluminum",
+      "electronics assembly"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "mesquite-defense-manufacturing",
+    "name": "Mesquite Defense Manufacturing",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Dallas",
+      "lat": 32.8151,
+      "lon": -96.6336,
+      "address": "3200 Skyline Dr",
+      "state": "TX",
+      "postal_code": "75150",
+      "country": "USA"
+    },
+    "website_url": "https://mesquite-defense-manufacturing.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/mesquite-defense-manufacturing",
+    "source_url": "https://demo.btx.example/crm/accounts/mesquite-defense-manufacturing",
+    "needs": [
+      "ITAR",
+      "build-to-print",
+      "5-axis CNC",
+      "assembly"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "violet-crown-micro-precision",
+    "name": "Violet Crown Micro Precision",
+    "relationship": "target",
+    "account_status": "new_logo",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Austin",
+      "lat": 30.2317,
+      "lon": -97.7137,
+      "address": "2400 Montopolis Dr",
+      "state": "TX",
+      "postal_code": "78741",
+      "country": "USA"
+    },
+    "website_url": "https://violet-crown-micro-precision.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/violet-crown-micro-precision",
+    "source_url": "https://demo.btx.example/crm/accounts/violet-crown-micro-precision",
+    "needs": [
+      "precision machining",
+      "titanium",
+      "NADCAP",
+      "tooling"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "ranger-landing-gear",
+    "name": "Ranger Landing Gear",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Fort Worth",
+      "lat": 32.9811,
+      "lon": -97.3193,
+      "address": "9700 North Fwy",
+      "state": "TX",
+      "postal_code": "76177",
+      "country": "USA"
+    },
+    "website_url": "https://ranger-landing-gear.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/ranger-landing-gear",
+    "source_url": "https://demo.btx.example/crm/accounts/ranger-landing-gear",
+    "needs": [
+      "5-axis CNC",
+      "titanium",
+      "AS9100",
+      "hydraulic blocks"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "live-oak-sensor-housings",
+    "name": "Live Oak Sensor Housings",
+    "relationship": "target",
+    "account_status": "new_logo",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "San Marcos",
+      "lat": 29.8833,
+      "lon": -97.9414,
+      "address": "1550 Clovis Barker Rd",
+      "state": "TX",
+      "postal_code": "78666",
+      "country": "USA"
+    },
+    "website_url": "https://live-oak-sensor-housings.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/live-oak-sensor-housings",
+    "source_url": "https://demo.btx.example/crm/accounts/live-oak-sensor-housings",
+    "needs": [
+      "aluminum",
+      "precision machining",
+      "build-to-print",
+      "assembly"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "blackland-hydraulics",
+    "name": "Blackland Hydraulics",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Waco",
+      "lat": 31.6057,
+      "lon": -97.1147,
+      "address": "7300 Imperial Dr",
+      "state": "TX",
+      "postal_code": "76705",
+      "country": "USA"
+    },
+    "website_url": "https://blackland-hydraulics.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/blackland-hydraulics",
+    "source_url": "https://demo.btx.example/crm/accounts/blackland-hydraulics",
+    "needs": [
+      "hydraulic blocks",
+      "5-axis CNC",
+      "AS9100",
+      "tooling"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "mesa-verde-aerosystems",
+    "name": "Mesa Verde Aerosystems",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
     "location": {
       "city": "Phoenix",
-      "lat": 33.5214,
-      "lon": -112.1513,
-      "address": "1765 Industrial Pkwy",
+      "lat": 33.4301,
+      "lon": -112.0115,
+      "address": "3801 E Air Lane",
       "state": "AZ",
-      "postal_code": "85004",
+      "postal_code": "85034",
       "country": "USA"
     },
+    "website_url": "https://mesa-verde-aerosystems.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/mesa-verde-aerosystems",
+    "source_url": "https://demo.btx.example/crm/accounts/mesa-verde-aerosystems",
     "needs": [
-      "AS9100",
-      "ITAR",
-      "aluminum",
-      "build-to-print",
-      "precision machining"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://foundry-turbine.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/foundry-turbine",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/foundry-turbine"
-  },
-  {
-    "id": "continental-castings",
-    "name": "Continental Castings",
-    "relationship": "competitor",
-    "location": {
-      "city": "Cincinnati",
-      "lat": 39.0214,
-      "lon": -84.5787,
-      "address": "1782 Industrial Pkwy",
-      "state": "OH",
-      "postal_code": "45202",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "NADCAP",
-      "build-to-print",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "competitor",
-    "business_motion": "reduce_risk",
-    "website_url": "https://continental-castings.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/continental-castings",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/continental-castings"
-  },
-  {
-    "id": "strata-defense",
-    "name": "Strata Defense",
-    "relationship": "supplier",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.6694,
-      "lon": -117.2098,
-      "address": "1799 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
-      "5-axis CNC",
-      "ITAR",
-      "build-to-print",
+      "titanium",
       "precision machining",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://strata-defense.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/strata-defense",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/strata-defense"
-  },
-  {
-    "id": "titan-fabrication",
-    "name": "Titan Fabrication",
-    "relationship": "supplier",
-    "location": {
-      "city": "Greenville",
-      "lat": 34.8992,
-      "lon": -82.3116,
-      "address": "1816 Industrial Pkwy",
-      "state": "SC",
-      "postal_code": "29601",
-      "country": "USA"
-    },
-    "needs": [
       "ITAR",
-      "aluminum",
-      "build-to-print",
-      "sheet metal",
-      "titanium"
+      "assembly"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://titan-fabrication.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/titan-fabrication",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/titan-fabrication"
+    "source_mode": "static_snapshot"
   },
   {
-    "id": "falcon-defense",
-    "name": "Falcon Defense",
+    "id": "rocky-mountain-flight-controls",
+    "name": "Rocky Mountain Flight Controls",
     "relationship": "target",
-    "location": {
-      "city": "San Diego",
-      "lat": 32.6294,
-      "lon": -117.1086,
-      "address": "1833 Industrial Pkwy",
-      "state": "CA",
-      "postal_code": "92101",
-      "country": "USA"
-    },
-    "needs": [
-      "AS9100",
-      "ITAR",
-      "NADCAP",
-      "sheet metal",
-      "titanium"
-    ],
-    "source_type": "demo",
-    "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "target_prospect",
+    "account_status": "new_logo",
     "business_motion": "prospect_new_business",
-    "website_url": "https://falcon-defense.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/falcon-defense",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/falcon-defense"
-  },
-  {
-    "id": "torque-turbine",
-    "name": "Torque Turbine",
-    "relationship": "supplier",
     "location": {
-      "city": "Greenville",
-      "lat": 34.8933,
-      "lon": -82.3465,
-      "address": "1850 Industrial Pkwy",
-      "state": "SC",
-      "postal_code": "29601",
+      "city": "Denver",
+      "lat": 39.7847,
+      "lon": -104.9717,
+      "address": "4600 York St",
+      "state": "CO",
+      "postal_code": "80216",
       "country": "USA"
     },
+    "website_url": "https://rocky-mountain-flight-controls.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/rocky-mountain-flight-controls",
+    "source_url": "https://demo.btx.example/crm/accounts/rocky-mountain-flight-controls",
     "needs": [
       "assembly",
-      "sheet metal",
-      "titanium"
+      "AS9100",
+      "aluminum",
+      "NADCAP"
     ],
     "source_type": "demo",
     "source_name": "Simulated CRM Account Snapshot",
-    "source_mode": "static_snapshot",
-    "account_status": "partner",
-    "business_motion": "reduce_risk",
-    "website_url": "https://torque-turbine.example",
-    "linkedin_url": "https://demo.btx.example/linkedin/company/torque-turbine",
-    "source_url": "https://demo.btx.example/sources/crm/accounts/torque-turbine"
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "carolina-nacelle-works",
+    "name": "Carolina Nacelle Works",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Greenville",
+      "lat": 34.8047,
+      "lon": -82.385,
+      "address": "2100 Perimeter Rd",
+      "state": "SC",
+      "postal_code": "29605",
+      "country": "USA"
+    },
+    "website_url": "https://carolina-nacelle-works.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/carolina-nacelle-works",
+    "source_url": "https://demo.btx.example/crm/accounts/carolina-nacelle-works",
+    "needs": [
+      "sheet metal",
+      "build-to-print",
+      "NADCAP",
+      "hydraulic blocks"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "chesapeake-rotor-systems",
+    "name": "Chesapeake Rotor Systems",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Baltimore",
+      "lat": 39.2787,
+      "lon": -76.5488,
+      "address": "5900 Holabird Ave",
+      "state": "MD",
+      "postal_code": "21224",
+      "country": "USA"
+    },
+    "website_url": "https://chesapeake-rotor-systems.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/chesapeake-rotor-systems",
+    "source_url": "https://demo.btx.example/crm/accounts/chesapeake-rotor-systems",
+    "needs": [
+      "5-axis CNC",
+      "titanium",
+      "ITAR",
+      "sheet metal"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "great-lakes-engine-cases",
+    "name": "Great Lakes Engine Cases",
+    "relationship": "target",
+    "account_status": "new_logo",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Cincinnati",
+      "lat": 39.287,
+      "lon": -84.4696,
+      "address": "10100 Alliance Rd",
+      "state": "OH",
+      "postal_code": "45246",
+      "country": "USA"
+    },
+    "website_url": "https://great-lakes-engine-cases.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/great-lakes-engine-cases",
+    "source_url": "https://demo.btx.example/crm/accounts/great-lakes-engine-cases",
+    "needs": [
+      "precision machining",
+      "aluminum",
+      "AS9100",
+      "hydraulic blocks"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "cascade-actuator-products",
+    "name": "Cascade Actuator Products",
+    "relationship": "target",
+    "account_status": "target_prospect",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Seattle",
+      "lat": 47.5447,
+      "lon": -122.3131,
+      "address": "7200 East Marginal Way",
+      "state": "WA",
+      "postal_code": "98108",
+      "country": "USA"
+    },
+    "website_url": "https://cascade-actuator-products.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/cascade-actuator-products",
+    "source_url": "https://demo.btx.example/crm/accounts/cascade-actuator-products",
+    "needs": [
+      "assembly",
+      "5-axis CNC",
+      "build-to-print",
+      "NADCAP"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "desert-sky-machining",
+    "name": "Desert Sky Machining",
+    "relationship": "target",
+    "account_status": "new_logo",
+    "business_motion": "prospect_new_business",
+    "location": {
+      "city": "Tucson",
+      "lat": 32.118,
+      "lon": -110.9363,
+      "address": "6600 S Country Club Rd",
+      "state": "AZ",
+      "postal_code": "85756",
+      "country": "USA"
+    },
+    "website_url": "https://desert-sky-machining.example",
+    "linkedin_url": "https://demo.btx.example/linkedin/company/desert-sky-machining",
+    "source_url": "https://demo.btx.example/crm/accounts/desert-sky-machining",
+    "needs": [
+      "precision machining",
+      "ITAR",
+      "aluminum",
+      "tooling"
+    ],
+    "source_type": "demo",
+    "source_name": "Simulated CRM Account Snapshot",
+    "source_mode": "static_snapshot"
   }
 ]

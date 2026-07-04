@@ -1,4 +1,4 @@
-import type { AccountStatus, BusinessMotion, Company, Relationship } from "./entities.ts";
+import type { AccountStatus, BusinessMotion, Company, Relationship } from "../engine/brain/entities.ts";
 
 const BUSINESS_MOTION_LABELS: Record<BusinessMotion, string> = {
   manage_current_business: "Manage Current Business",

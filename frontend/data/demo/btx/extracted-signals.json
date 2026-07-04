@@ -1,200 +1,202 @@
 [
   {
     "news_id": "news-01",
-    "headline": "Anvil Manufacturing posts a hiring surge",
+    "headline": "Lonestar Aero Systems faces customer quality hold",
     "extracted": {
-      "event_type": "hiring_surge",
+      "event_type": "quality_escape",
       "entities": [
-        "Anvil Manufacturing"
+        "Lonestar Aero Systems"
       ],
-      "confidence": 0.85,
-      "source_quote": "Anvil Manufacturing posted a surge of openings, signaling a growth push."
+      "confidence": 0.91,
+      "source_quote": "A customer quality hold was opened after a quality escape at Lonestar Aero Systems."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-02",
-    "headline": "Meridian Technologies faces new compliance requirements",
+    "headline": "Trinity Defense Components books multi-year production program ($0.7M)",
     "extracted": {
-      "event_type": "regulatory_change",
+      "event_type": "contract_win",
       "entities": [
-        "Meridian Technologies"
+        "Trinity Defense Components"
       ],
-      "confidence": 0.72,
-      "source_quote": "New compliance requirements affect Meridian Technologies's certified processes."
+      "value": 670000,
+      "confidence": 0.84,
+      "source_quote": "Trinity Defense Components booked a $0.7M multi-year production program."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-03",
-    "headline": "Falcon Fabrication hit with a customer quality hold",
+    "headline": "Pecan Valley Machining wins government production award ($0.3M)",
     "extracted": {
-      "event_type": "quality_escape",
+      "event_type": "government_contract_award",
       "entities": [
-        "Falcon Fabrication"
+        "Pecan Valley Machining"
       ],
-      "confidence": 0.95,
-      "source_quote": "A quality escape at Falcon Fabrication triggered a customer source-inspection hold."
+      "value": 340000,
+      "confidence": 0.93,
+      "source_quote": "Pecan Valley Machining was awarded a $0.3M government production contract."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-04",
-    "headline": "Monarch Technologies posts a hiring surge",
+    "headline": "Clearfork Turbine Works wins government production award ($0.9M)",
     "extracted": {
-      "event_type": "hiring_surge",
+      "event_type": "government_contract_award",
       "entities": [
-        "Monarch Technologies"
+        "Clearfork Turbine Works"
       ],
-      "confidence": 0.85,
-      "source_quote": "Monarch Technologies posted a surge of openings, signaling a growth push."
+      "value": 910000,
+      "confidence": 0.89,
+      "source_quote": "Clearfork Turbine Works was awarded a $0.9M government production contract."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-05",
-    "headline": "Strata Turbine books a multi-year production contract ($17.5M)",
+    "headline": "Bluebonnet Avionics wins government production award ($1.6M)",
     "extracted": {
-      "event_type": "contract_win",
+      "event_type": "government_contract_award",
       "entities": [
-        "Strata Turbine"
+        "Bluebonnet Avionics"
       ],
-      "value": 17500000,
-      "confidence": 0.95,
-      "source_quote": "Strata Turbine booked a $17.5M multi-year production contract."
+      "value": 1610000,
+      "confidence": 0.85,
+      "source_quote": "Bluebonnet Avionics was awarded a $1.6M government production contract."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-06",
-    "headline": "Anvil Systems raises quoted prices on cost inflation",
+    "headline": "Gulf Coast Propulsion sees demand rise on new starts",
     "extracted": {
-      "event_type": "pricing_pressure",
+      "event_type": "demand_spike",
       "entities": [
-        "Anvil Systems"
+        "Gulf Coast Propulsion"
       ],
-      "confidence": 0.9,
-      "source_quote": "Anvil Systems raised quoted prices, citing material and labor cost inflation."
+      "confidence": 0.83,
+      "source_quote": "Demand for Gulf Coast Propulsion's assemblies increased after new program starts."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-07",
-    "headline": "Sentinel Alloys posts a hiring surge",
+    "headline": "Brazos Precision Castings adds manufacturing and sourcing roles",
     "extracted": {
       "event_type": "hiring_surge",
       "entities": [
-        "Sentinel Alloys"
+        "Brazos Precision Castings"
       ],
-      "confidence": 0.85,
-      "source_quote": "Sentinel Alloys posted a surge of openings, signaling a growth push."
+      "confidence": 0.83,
+      "source_quote": "Brazos Precision Castings posted a surge of manufacturing and supply-chain openings."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-08",
-    "headline": "Cardinal Metalworks expands machining capacity",
+    "headline": "Red River Assemblies faces customer quality hold",
     "extracted": {
-      "event_type": "competitor_expansion",
+      "event_type": "quality_escape",
       "entities": [
-        "Cardinal Metalworks"
+        "Red River Assemblies"
       ],
-      "confidence": 0.85,
-      "source_quote": "Cardinal Metalworks announced a facility expansion to add machining capacity."
+      "confidence": 0.92,
+      "source_quote": "A customer quality hold was opened after a quality escape at Red River Assemblies."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-09",
-    "headline": "Monarch Alloys wins a government contract ($7.5M)",
+    "headline": "High Plains Actuation wins government production award ($1.9M)",
     "extracted": {
       "event_type": "government_contract_award",
       "entities": [
-        "Monarch Alloys"
+        "High Plains Actuation"
       ],
-      "value": 7500000,
-      "confidence": 0.97,
-      "source_quote": "Monarch Alloys was awarded a $7.5M government contract."
+      "value": 1880000,
+      "confidence": 0.8,
+      "source_quote": "High Plains Actuation was awarded a $1.9M government production contract."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-10",
-    "headline": "Sentinel Aerospace books a multi-year production contract ($16.5M)",
+    "headline": "Alamo Composite Tooling sees demand rise on new starts",
     "extracted": {
-      "event_type": "contract_win",
+      "event_type": "demand_spike",
       "entities": [
-        "Sentinel Aerospace"
+        "Alamo Composite Tooling"
       ],
-      "value": 16500000,
-      "confidence": 0.95,
-      "source_quote": "Sentinel Aerospace booked a $16.5M multi-year production contract."
+      "confidence": 0.94,
+      "source_quote": "Demand for Alamo Composite Tooling's assemblies increased after new program starts."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-11",
-    "headline": "Beacon Alloys faces new compliance requirements",
+    "headline": "Hill Country Aerostructures adds manufacturing and sourcing roles",
     "extracted": {
-      "event_type": "regulatory_change",
+      "event_type": "hiring_surge",
       "entities": [
-        "Beacon Alloys"
+        "Hill Country Aerostructures"
       ],
-      "confidence": 0.85,
-      "source_quote": "New compliance requirements affect Beacon Alloys's certified processes."
+      "confidence": 0.81,
+      "source_quote": "Hill Country Aerostructures posted a surge of manufacturing and supply-chain openings."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-12",
-    "headline": "Halcyon Components books a multi-year production contract ($9.6M)",
+    "headline": "Caprock Guidance Systems adds manufacturing and sourcing roles",
     "extracted": {
-      "event_type": "contract_win",
+      "event_type": "hiring_surge",
       "entities": [
-        "Halcyon Components"
+        "Caprock Guidance Systems"
       ],
-      "value": 9600000,
-      "confidence": 0.95,
-      "source_quote": "Halcyon Components booked a $9.6M multi-year production contract."
+      "confidence": 0.88,
+      "source_quote": "Caprock Guidance Systems posted a surge of manufacturing and supply-chain openings."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-13",
-    "headline": "Vanguard Systems sees demand surge on new program starts",
+    "headline": "Cypress Creek Fabrication wins government production award ($0.7M)",
     "extracted": {
-      "event_type": "demand_spike",
+      "event_type": "government_contract_award",
       "entities": [
-        "Vanguard Systems"
+        "Cypress Creek Fabrication"
       ],
-      "confidence": 0.9,
-      "source_quote": "Demand for Vanguard Systems's products spiked on new program starts."
+      "value": 710000,
+      "confidence": 0.81,
+      "source_quote": "Cypress Creek Fabrication was awarded a $0.7M government production contract."
     },
     "valid": true,
     "reason": ""
   },
   {
     "news_id": "news-14",
-    "headline": "Nimbus Technologies raises quoted prices on cost inflation",
+    "headline": "Mesquite Defense Manufacturing adds manufacturing and sourcing roles",
     "extracted": {
-      "event_type": "pricing_pressure",
+      "event_type": "hiring_surge",
       "entities": [
-        "Nimbus Technologies"
+        "Mesquite Defense Manufacturing"
       ],
-      "confidence": 0.9,
-      "source_quote": "Nimbus Technologies raised quoted prices, citing material and labor cost inflation."
+      "confidence": 0.78,
+      "source_quote": "Mesquite Defense Manufacturing posted a surge of manufacturing and supply-chain openings."
     },
     "valid": true,
     "reason": ""

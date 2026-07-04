@@ -3,11 +3,11 @@
 // the trace, and the prospect list. (The LLM free-form upgrade later swaps this
 // resolver for a proxy call, keeping the same "explain, don't decide" contract.)
 
-import type { World } from "./useWorld.ts";
+import type { World } from "../app/useWorld.ts";
 import type { ScoreDimension } from "../engine/signals/contract.ts";
 import { groupTrace, summarizeGroups } from "../engine/decision/explain.ts";
-import { CONFIG } from "./config.ts";
-import { actionLabel } from "./actionLabels.ts";
+import { CONFIG } from "../app/config.ts";
+import { actionLabel } from "../app/actionLabels.ts";
 
 const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
   [/\brisk\b/, "risk"],

@@ -43,7 +43,7 @@ export function ProspectMap({ world }: { world: World }) {
             <CircleMarker
               key={c.id}
               center={[c.location.lat, c.location.lon]}
-              radius={prospect ? Math.min(18, 8 + opp / 10) : 6}
+              radius={prospect ? Math.min(16, 7 + opp / 12) : 5}
               pathOptions={{
                 color: active ? "#f4f1dc" : color,
                 weight: active ? 3 : 1,
@@ -52,10 +52,9 @@ export function ProspectMap({ world }: { world: World }) {
               }}
               eventHandlers={{ click: () => setState({ activeCompanyId: c.id }) }}
             >
-              <Tooltip permanent={prospect} direction="top" opacity={0.92}>
-                {c.name}
-                {prospect ? ` · opp ${opp}` : ` · ${c.relationship}`}
-                {formatAddress(c.location) ? ` · ${formatAddress(c.location)}` : ""}
+              <Tooltip direction="top" opacity={0.93} permanent={false} sticky={false}>
+                <strong>{c.name}</strong>
+                {prospect ? `  ·  opp ${opp}` : `  ·  ${c.relationship}`}
               </Tooltip>
             </CircleMarker>
           );

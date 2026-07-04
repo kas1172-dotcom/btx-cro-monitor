@@ -2,7 +2,7 @@ import type { World } from "../../app/useWorld.ts";
 import { PROFILE } from "../../app/config.ts";
 import { setState, useStore } from "../../store/store.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
-import { isCurrentBusinessAccount, isProspectingAccount } from "../../engine/brain/classification.ts";
+import { isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
 import type { BusinessMotion } from "../../engine/brain/entities.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
