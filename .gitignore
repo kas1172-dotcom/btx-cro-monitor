@@ -10,6 +10,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Generated weekly-memo output
+frontend/memo_archive/
+
 # Secrets / env (keep the example template)
 .env
 .env.*

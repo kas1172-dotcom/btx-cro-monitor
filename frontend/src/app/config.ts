@@ -12,6 +12,8 @@ export interface ClientProfile {
   client_id: string;
   name: string;
   home_city: string;
+  sender_name: string;
+  sender_title: string;
   capabilities: string[];
 }
 export const PROFILE = profile as unknown as ClientProfile;
