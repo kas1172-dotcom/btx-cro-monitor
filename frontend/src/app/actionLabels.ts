@@ -7,19 +7,19 @@ export interface ActionCopy {
 
 export const ACTION_COPY: Record<Action, ActionCopy> = {
   pursue: {
-    label: "Pursue Revenue",
+    label: "Pursue revenue",
     description: "Actively pursue a new or existing revenue opportunity.",
   },
   defend: {
-    label: "Defend Account",
+    label: "Defend account",
     description: "Protect an existing account from churn, competitor activity, or relationship risk.",
   },
   derisk: {
-    label: "Reduce Risk",
+    label: "Reduce risk",
     description: "Address delivery, capacity, supplier, quality, or revenue risk.",
   },
   expand: {
-    label: "Expand Relationship",
+    label: "Expand relationship",
     description: "Grow an existing relationship through additional work, facilities, programs, or contacts.",
   },
   watch: {

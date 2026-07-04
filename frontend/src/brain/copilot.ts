@@ -3,11 +3,11 @@
 // the trace, and the prospect list. (The LLM free-form upgrade later swaps this
 // resolver for a proxy call, keeping the same "explain, don't decide" contract.)
 
-import type { World } from "./useWorld.ts";
+import type { World } from "../app/useWorld.ts";
 import type { ScoreDimension } from "../engine/signals/contract.ts";
 import { groupTrace, summarizeGroups } from "../engine/decision/explain.ts";
-import { CONFIG } from "./config.ts";
-import { actionLabel } from "./actionLabels.ts";
+import { CONFIG } from "../app/config.ts";
+import { actionLabel } from "../app/actionLabels.ts";
 
 const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
   [/\brisk\b/, "risk"],
@@ -16,13 +16,27 @@ const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
   [/(opportunit|prospect|target|sell|win|pursue)/, "opportunity"],
 ];
 
-export const SUGGESTIONS = [
+// Static fallback suggestions — overridden at render time by world-derived ones.
+export const STATIC_SUGGESTIONS = [
   "What needs my attention today?",
-  "Who should I call in Austin?",
-  "Why is the top account ranked #1?",
-  "Why is BTX Precision high risk?",
   "What's the top opportunity?",
+  "Which accounts are at risk this quarter?",
+  "Who should I call next?",
 ];
+
+/** Suggestions built from current world entities — never hardcoded account names. */
+export function worldSuggestions(world: World): string[] {
+  const topRisk = [...world.analysis.scores].sort((a, b) => b.dimensions.risk.score - a.dimensions.risk.score)[0];
+  const topProspect = world.prospects[0];
+  const city = topProspect?.company.location.city ?? world.companies[0]?.location.city;
+  const riskName = world.companies.find((c) => c.id === topRisk?.subject_id)?.name;
+  const suggestions: string[] = ["What needs my attention today?"];
+  if (riskName) suggestions.push(`Why is ${riskName} high risk?`);
+  if (topProspect) suggestions.push(`Why is ${topProspect.company.name} ranked #1?`);
+  if (city) suggestions.push(`Who should I call in ${city}?`);
+  suggestions.push("What's the top opportunity?");
+  return suggestions.slice(0, 5);
+}
 
 function rankDriver(world: World, subjectId: string): string {
   const score = world.analysis.byId.get(subjectId);

@@ -31,3 +31,42 @@ class IngestAccepted(BaseModel):
     event_id: str
     status: str
     duplicate: bool = False
+
+
+class LlmMessage(BaseModel):
+    role: str
+    content: str
+
+
+class LlmProxyRequest(BaseModel):
+    system: str
+    messages: list[LlmMessage]
+
+
+class LlmProxyResponse(BaseModel):
+    text: str
+
+
+class IntegrationError(BaseModel):
+    code: str
+    detail: str
+
+
+class CrmTaskRequest(BaseModel):
+    account_id: str | None = None
+    title: str
+    evidence: str | None = None
+    owner: str | None = None
+
+
+class EmailSendRequest(BaseModel):
+    to: str
+    subject: str
+    body: str
+
+
+class CalendarEventRequest(BaseModel):
+    title: str
+    starts_at: str
+    ends_at: str
+    attendees: list[str] = []

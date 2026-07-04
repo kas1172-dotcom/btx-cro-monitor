@@ -2,6 +2,8 @@
   "client_id": "btx-precision",
   "name": "BTX Precision",
   "home_city": "Dallas",
+  "sender_name": "Alyssa Hart",
+  "sender_title": "Chief Revenue Officer",
   "capabilities": [
     "5-axis CNC",
     "precision machining",

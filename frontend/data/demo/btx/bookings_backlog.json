@@ -1,0 +1,218 @@
+[
+  {
+    "month": "2024-08",
+    "bookings": 2117314,
+    "backlog": 5964852,
+    "shipments": 2252462,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "bookings": 2315346,
+    "backlog": 5953217,
+    "shipments": 2326981,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "bookings": 2553945,
+    "backlog": 6074833,
+    "shipments": 2432329,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "bookings": 2651919,
+    "backlog": 6326825,
+    "shipments": 2399927,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "bookings": 2885798,
+    "backlog": 6724866,
+    "shipments": 2487757,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "bookings": 2416660,
+    "backlog": 6570611,
+    "shipments": 2570915,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "bookings": 2346688,
+    "backlog": 6558819,
+    "shipments": 2358480,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "bookings": 2575587,
+    "backlog": 6681466,
+    "shipments": 2452940,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "bookings": 2840112,
+    "backlog": 6951341,
+    "shipments": 2570237,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "bookings": 2916203,
+    "backlog": 7353576,
+    "shipments": 2513968,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "bookings": 2466962,
+    "backlog": 7196110,
+    "shipments": 2624428,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "bookings": 2719597,
+    "backlog": 7182444,
+    "shipments": 2733263,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "bookings": 2615412,
+    "backlog": 7306987,
+    "shipments": 2490869,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "bookings": 2840083,
+    "backlog": 7576859,
+    "shipments": 2570211,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "bookings": 3097703,
+    "backlog": 8004128,
+    "shipments": 2670434,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "bookings": 2470004,
+    "backlog": 7846468,
+    "shipments": 2627664,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "bookings": 2723049,
+    "backlog": 7832784,
+    "shipments": 2736733,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "bookings": 2980956,
+    "backlog": 7974734,
+    "shipments": 2839006,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "bookings": 2871568,
+    "backlog": 8247598,
+    "shipments": 2598704,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "bookings": 3148576,
+    "backlog": 8681884,
+    "shipments": 2714290,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "bookings": 2649310,
+    "backlog": 8512779,
+    "shipments": 2818415,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "bookings": 2749121,
+    "backlog": 8498964,
+    "shipments": 2762936,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "bookings": 3010090,
+    "backlog": 8642302,
+    "shipments": 2866752,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "bookings": 3311538,
+    "backlog": 8956973,
+    "shipments": 2996867,
+    "source_type": "demo",
+    "source_name": "Simulated Bookings Backlog",
+    "source_mode": "static_snapshot"
+  }
+]

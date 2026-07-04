@@ -1,0 +1,218 @@
+[
+  {
+    "month": "2024-08",
+    "open_pipeline_value": 8386826,
+    "weighted_pipeline_value": 6230214,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-09",
+    "open_pipeline_value": 9035876,
+    "weighted_pipeline_value": 6752617,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-10",
+    "open_pipeline_value": 9819032,
+    "weighted_pipeline_value": 7376734,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-11",
+    "open_pipeline_value": 10620954,
+    "weighted_pipeline_value": 6638096,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2024-12",
+    "open_pipeline_value": 9088884,
+    "weighted_pipeline_value": 7219171,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-01",
+    "open_pipeline_value": 9798978,
+    "weighted_pipeline_value": 7797037,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-02",
+    "open_pipeline_value": 9885543,
+    "weighted_pipeline_value": 6523455,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-03",
+    "open_pipeline_value": 10651597,
+    "weighted_pipeline_value": 7118134,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-04",
+    "open_pipeline_value": 9217040,
+    "weighted_pipeline_value": 7794982,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-05",
+    "open_pipeline_value": 9948894,
+    "weighted_pipeline_value": 6953528,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-06",
+    "open_pipeline_value": 10793575,
+    "weighted_pipeline_value": 7615771,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-07",
+    "open_pipeline_value": 11649972,
+    "weighted_pipeline_value": 8289403,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-08",
+    "open_pipeline_value": 9274514,
+    "weighted_pipeline_value": 6889639,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-09",
+    "open_pipeline_value": 9980358,
+    "weighted_pipeline_value": 7458440,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-10",
+    "open_pipeline_value": 10780234,
+    "weighted_pipeline_value": 8098856,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-11",
+    "open_pipeline_value": 11628810,
+    "weighted_pipeline_value": 7268006,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2025-12",
+    "open_pipeline_value": 9998503,
+    "weighted_pipeline_value": 7941668,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-01",
+    "open_pipeline_value": 10820803,
+    "weighted_pipeline_value": 8610101,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-02",
+    "open_pipeline_value": 10892441,
+    "weighted_pipeline_value": 7187905,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-03",
+    "open_pipeline_value": 11786478,
+    "weighted_pipeline_value": 7876541,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-04",
+    "open_pipeline_value": 10107020,
+    "weighted_pipeline_value": 8547651,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-05",
+    "open_pipeline_value": 10934174,
+    "weighted_pipeline_value": 7642164,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-06",
+    "open_pipeline_value": 11790190,
+    "weighted_pipeline_value": 8318967,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "month": "2026-07",
+    "open_pipeline_value": 12773530,
+    "weighted_pipeline_value": 9088858,
+    "prospect_count": 5,
+    "source_type": "demo",
+    "source_name": "Simulated Pipeline History",
+    "source_mode": "static_snapshot"
+  }
+]

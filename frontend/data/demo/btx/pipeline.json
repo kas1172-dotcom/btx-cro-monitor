@@ -1,28 +1,52 @@
 {
   "as_of": "2026-07-03",
   "summary": {
-    "open_pipeline_value": 81200000,
-    "weighted_pipeline_value": 34100000,
+    "open_pipeline_value": 44810000,
+    "weighted_pipeline_value": 14359500,
     "priority_accounts": [
-      "ironclad-defense",
-      "vanguard-machining",
-      "sentinel-aerospace"
+      "lonestar-aero-systems",
+      "hill-country-aerostructures",
+      "mesquite-defense-manufacturing"
     ],
-    "top_action": "Prioritize accounts with new awards plus capacity-risk signals."
+    "top_action": "Prioritize accounts with validated demand signals and available BTX capacity."
   },
   "records": [
     {
-      "company_id": "ironclad-defense",
-      "recommended_action": "Pursue overflow machining work now",
-      "reason": "Multiple contract awards and demand-spike signals indicate funded near-term production strain.",
+      "company_id": "lonestar-aero-systems",
+      "recommended_action": "Expand Relationship",
+      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
       "source_type": "demo",
       "source_name": "Simulated Pipeline Snapshot",
       "source_mode": "static_snapshot"
     },
     {
-      "company_id": "vanguard-machining",
-      "recommended_action": "Offer surge capacity and ITAR-qualified support",
-      "reason": "High fit and rapid growth signals suggest capacity may lag awarded work.",
+      "company_id": "clearfork-turbine-works",
+      "recommended_action": "Expand Relationship",
+      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
+      "source_type": "demo",
+      "source_name": "Simulated Pipeline Snapshot",
+      "source_mode": "static_snapshot"
+    },
+    {
+      "company_id": "hill-country-aerostructures",
+      "recommended_action": "Pursue Revenue",
+      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
+      "source_type": "demo",
+      "source_name": "Simulated Pipeline Snapshot",
+      "source_mode": "static_snapshot"
+    },
+    {
+      "company_id": "mesquite-defense-manufacturing",
+      "recommended_action": "Pursue Revenue",
+      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
+      "source_type": "demo",
+      "source_name": "Simulated Pipeline Snapshot",
+      "source_mode": "static_snapshot"
+    },
+    {
+      "company_id": "ranger-landing-gear",
+      "recommended_action": "Pursue Revenue",
+      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
       "source_type": "demo",
       "source_name": "Simulated Pipeline Snapshot",
       "source_mode": "static_snapshot"

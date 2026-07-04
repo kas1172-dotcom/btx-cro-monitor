@@ -1,6 +1,6 @@
 import type { World } from "../../app/useWorld.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
-import { accountStatus, isProspectingAccount } from "../../engine/brain/classification.ts";
+import { accountStatus, isProspectingAccount } from "../../brain/classification.ts";
 import type { AccountStatus, BusinessMotion, Company } from "../../engine/brain/entities.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import { setState, useStore } from "../../store/store.ts";

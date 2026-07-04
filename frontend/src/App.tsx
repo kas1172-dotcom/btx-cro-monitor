@@ -1,56 +1,116 @@
-import { useStore, setState, closeDemoAction } from "./store/store.ts";
-import type { View } from "./store/store.ts";
+import { useEffect } from "react";
+import type React from "react";
+import { useStore, setState, closeDemoAction, goHome, clearTourRequest } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES, PROFILE } from "./app/config.ts";
-import { Home } from "./ui/home/Home.tsx";
 import { CurrentBusiness } from "./ui/current/CurrentBusiness.tsx";
 import { Prospecting } from "./ui/prospecting/Prospecting.tsx";
 import { ProspectMap } from "./ui/map/ProspectMap.tsx";
 import { Dashboard } from "./ui/dashboard/Dashboard.tsx";
-import { RelationshipGraph } from "./ui/graph/RelationshipGraph.tsx";
 import { SignalFeed } from "./ui/feed/SignalFeed.tsx";
 import { OperatingSnapshot } from "./ui/operating/OperatingSnapshot.tsx";
 import { Integrations } from "./ui/integrations/Integrations.tsx";
 import { Copilot } from "./ui/copilot/Copilot.tsx";
 import { Dossier } from "./ui/company/Dossier.tsx";
-
-const VIEWS: Array<{ id: View; label: string }> = [
-  { id: "home", label: "Home" },
-  { id: "current", label: "Current Business" },
-  { id: "prospecting", label: "Prospecting" },
-  { id: "map", label: "Map" },
-  { id: "dashboard", label: "Dashboard" },
-  { id: "graph", label: "Graph" },
-  { id: "feed", label: "Signals" },
-  { id: "operating", label: "Operating Snapshot" },
-  { id: "integrations", label: "Integrations" },
-];
+import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
+import { BrainHome } from "./ui/brain/BrainHome.tsx";
+import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
+import { AskBrainBar } from "./ui/brain/AskBrainBar.tsx";
+import { RightContextPanel } from "./ui/brain/RightContextPanel.tsx";
+import { TourHud } from "./ui/brain/TourHud.tsx";
+import { DocumentViewer } from "./ui/deliverables/DocumentViewer.tsx";
+import { MemoryPanel } from "./ui/brain/MemoryPanel.tsx";
+import { recordSimulatedAction, useMemory } from "./memory/localMemory.ts";
+import { AnalysisView } from "./ui/analysis/AnalysisView.tsx";
+import { isMarketScopedView } from "./app/viewScope.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 
 export function App() {
-  const { city, view, activeCompanyId, demoAction } = useStore();
+  const { city, activeBrainArea, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
+  const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
-  const marketLabel = city ?? "All Markets";
+  const marketScoped = isMarketScopedView({ activeBrainArea, brainResponse, activeDeliverable, activeAnalysisSpec });
+  const viewWorld = marketScoped ? marketWorld ?? world : world;
+  const homeActive = activeBrainArea === "revenue" && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+
+  // Right-panel: dossier takes priority over context panel, one at a time.
+  const dossierOpen = !!activeCompanyId;
+  const contextPanelOpen = !dossierOpen && !!brainResponse;
+  const rightW = dossierOpen ? "minmax(360px, 420px)" : contextPanelOpen ? "320px" : "0px";
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      // Close topmost open panel only — never navigate away.
+      if (activeCompanyId) {
+        event.stopPropagation();
+        setState({ activeCompanyId: null });
+        return;
+      }
+      if (brainResponse) {
+        event.stopPropagation();
+        setState({ brainResponse: null });
+        return;
+      }
+      goHome();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [activeCompanyId, brainResponse]);
+  const renderDefault = () => {
+    if (!world) return <div className="loading">loading…</div>;
+    if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
+    if (activeDeliverable) return <DocumentViewer deliverable={activeDeliverable} world={world} />;
+    if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
+    switch (activeBrainArea) {
+      case "market": return <SignalFeed world={viewWorld ?? world} />;
+      case "customer": return <CurrentBusiness world={world} />;
+      case "capability": return <OperatingSnapshot />;
+      case "geographic": return viewWorld ? <ProspectMap world={viewWorld} /> : <div className="loading">loading map…</div>;
+      case "decision": return <MemoryPanel />;
+      case "workflow": return <Integrations />;
+      case "revenue":
+      default: return <BrainHome world={world} askBar={<AskBrainBar world={world} large />} />;
+    }
+  };
+  const memoryCounts = memory.activity.reduce<Partial<Record<typeof activeBrainArea, number>>>((acc, item) => {
+    acc[item.brainArea] = (acc[item.brainArea] ?? 0) + 1;
+    return acc;
+  }, {});
+  const counts = world ? {
+    market: world.analysis.valid.length,
+    customer: world.companies.filter((c) => c.relationship === "customer").length,
+    capability: world.snapshot?.capacity.length ?? 0,
+    revenue: world.analysis.recommendations.filter((r) => r.priority !== "low").length,
+    geographic: world.prospects.filter((p) => !city || p.company.location.city === city).length,
+    decision: world.analysis.alerts.length,
+    workflow: 0,
+    ...memoryCounts,
+  } : {};
+
+  const rightPanelOpen = dossierOpen || contextPanelOpen;
 
   return (
-    <div className="shell">
-      <header className="topbar">
-        <div className="brand">
-          <span className="brand-mark">◇</span> {PROFILE.name} <span className="brand-sub">Enterprise Brain</span>
-        </div>
-        <div className="demo-banner">
-          Demo Mode — simulated CRM, ERP/capacity, contacts, pipeline, and market data.
-        </div>
-        <div className="controls">
-          <label className="city-picker">
+    <div
+      className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
+      style={{ "--right-w": rightW } as React.CSSProperties}
+    >
+      <BrainSidebar activeBrainArea={activeBrainArea} counts={counts} homeActive={homeActive} />
+      <main className="quiet-main" onClickCapture={() => {
+        if (activeCompanyId) setState({ activeCompanyId: null });
+      }}>
+        <header className="quiet-topbar">
+          <button className="quiet-brand" onClick={goHome}>{PROFILE.name} Revenue Brain</button>
+          {marketScoped && <label className="cockpit-city-picker">
             <span>Market</span>
             <select
               value={city ?? ALL_MARKETS_VALUE}
               onChange={(e) => setState({
                 city: e.target.value === ALL_MARKETS_VALUE ? null : e.target.value,
                 activeCompanyId: null,
+                activeAnalysisSpec: null,
               })}
             >
               <option value={ALL_MARKETS_VALUE}>All Markets</option>
@@ -58,56 +118,23 @@ export function App() {
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
-          </label>
-          <nav className="tabs">
-            {VIEWS.map((v) => (
-              <button
-                key={v.id}
-                className={v.id === view ? "tab active" : "tab"}
-                onClick={() => setState({ view: v.id })}
-              >
-                {v.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      <main className="stage">
-        {view === "home" ? (
-          world ? <Home world={world} cityWorld={marketWorld} /> : <div className="loading">loading…</div>
-        ) : view === "current" ? (
-          world ? <CurrentBusiness world={world} /> : <div className="loading">loading…</div>
-        ) : view === "prospecting" ? (
-          world ? <Prospecting world={world} /> : <div className="loading">loading…</div>
-        ) : view === "map" ? (
-          marketWorld ? <ProspectMap world={marketWorld} /> : <div className="loading">running the brain for {marketLabel}…</div>
-        ) : view === "dashboard" ? (
-          world ? <Dashboard world={world} /> : <div className="loading">loading…</div>
-        ) : view === "feed" ? (
-          world ? <SignalFeed world={world} /> : <div className="loading">loading…</div>
-        ) : view === "operating" ? (
-          <OperatingSnapshot />
-        ) : view === "integrations" ? (
-          <Integrations />
-        ) : (
-          world ? <RelationshipGraph world={world} /> : <div className="loading">loading…</div>
-        )}
+          </label>}
+        </header>
+        <section className="quiet-stage">{renderDefault()}</section>
+        {world && !homeActive && <AskBrainBar world={viewWorld ?? world} />}
         {world && <Copilot world={world} />}
       </main>
+      <RightContextPanel response={brainResponse} />
 
-      <aside className={activeCompanyId ? "inspector open" : "inspector"}>
-        {activeCompanyId && (
-          <button className="inspector-back" onClick={() => setState({ activeCompanyId: null })}>← Back</button>
+      <aside className={dossierOpen ? "inspector open" : "inspector"}>
+        {dossierOpen && (
+          <div className="inspector-topbar">
+            <button className="inspector-back" onClick={() => setState({ activeCompanyId: null })} aria-label="Close dossier">×</button>
+          </div>
         )}
         {world && activeCompanyId ? (
           <Dossier world={world} companyId={activeCompanyId} />
-        ) : (
-          <div className="inspector-empty">
-            <h3>Sale dossier</h3>
-            <p>Click a pin or a row to see the prospect's opportunity, fit to {PROFILE.name}, buying signals, and who to call.</p>
-          </div>
-        )}
+        ) : null}
       </aside>
 
       {demoAction && (
@@ -132,9 +159,26 @@ export function App() {
               <span>Assign owner</span>
               <span>Schedule follow-up</span>
             </div>
-            <button onClick={closeDemoAction}>Close</button>
+            <div className="demo-action-modal-actions">
+              <button
+                onClick={() => {
+                  recordSimulatedAction({
+                    title: demoAction.title,
+                    summary: "Confirmed simulated workflow. Demo mode - no external writes occurred.",
+                    brainArea: "workflow",
+                  });
+                  closeDemoAction();
+                }}
+              >
+                Confirm Demo Action
+              </button>
+              <button onClick={closeDemoAction}>Cancel</button>
+            </div>
           </div>
         </div>
+      )}
+      {tourRequested && world && (
+        <TourHud world={world} autoStart onDismiss={clearTourRequest} />
       )}
     </div>
   );

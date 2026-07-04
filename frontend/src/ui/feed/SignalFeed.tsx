@@ -3,7 +3,7 @@ import news from "../../../data/demo/btx/news.json";
 import { CONFIG } from "../../app/config.ts";
 import type { World } from "../../app/useWorld.ts";
 import type { MarketEvent } from "../../engine/brain/entities.ts";
-import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../engine/brain/classification.ts";
+import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
 import { SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
 import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
@@ -20,13 +20,13 @@ type MotionLabel = "Current Business" | "Prospecting" | "Both" | "Monitor";
 
 const FILTERS: Array<{ id: Filter; label: string }> = [
   { id: "all", label: "All" },
-  { id: "current", label: "Current Business" },
+  { id: "current", label: "Current business" },
   { id: "prospecting", label: "Prospecting" },
-  { id: "revenue", label: "Revenue Signals" },
-  { id: "risk", label: "Risk Signals" },
-  { id: "competitor", label: "Competitor Signals" },
-  { id: "contract", label: "Contract Signals" },
-  { id: "high_confidence", label: "High Confidence" },
+  { id: "revenue", label: "Revenue signals" },
+  { id: "risk", label: "Risk signals" },
+  { id: "competitor", label: "Competitor signals" },
+  { id: "contract", label: "Contract signals" },
+  { id: "high_confidence", label: "High confidence" },
 ];
 
 const PRIORITY_RANK = { high: 3, medium: 2, low: 1, none: 0 };

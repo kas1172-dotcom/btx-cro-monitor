@@ -1,6 +1,7 @@
+import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
-import { accountStatus, businessMotionForAccount, getBusinessMotionLabel, isCurrentBusinessAccount } from "../../engine/brain/classification.ts";
+import { accountStatus, businessMotionForAccount, getBusinessMotionLabel, isCurrentBusinessAccount } from "../../brain/classification.ts";
 import type { AccountStatus, BusinessMotion, Company, Opportunity } from "../../engine/brain/entities.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import { setState } from "../../store/store.ts";
@@ -38,6 +39,14 @@ function money(n: number): string {
   return `$${(n / 1e6).toFixed(1)}M`;
 }
 
+function riskLine(risk: number, capacity: number): string {
+  if (risk === 0 && capacity === 0) return "No active risk signals";
+  const parts: string[] = [];
+  if (risk > 0) parts.push(`Risk ${risk}`);
+  if (capacity > 0) parts.push(`Capacity ${capacity}`);
+  return parts.join(" · ");
+}
+
 function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -73,6 +82,8 @@ function whyAccountMatters(world: World, company: Company): string {
 }
 
 export function CurrentBusiness({ world }: { world: World }) {
+  const [showAll, setShowAll] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const currentOpportunities = world.opportunities.filter(isCurrentOpportunity);
   const currentSignals = world.analysis.valid.filter(isCurrentSignal);
   const idsFromOpportunities = new Set(currentOpportunities.map((o) => o.company_id));
@@ -107,7 +118,7 @@ export function CurrentBusiness({ world }: { world: World }) {
         (openValue > 0 ? 15 : 0);
       return { company, score, rec, openValue, attention };
     })
-    .filter((row) => row.attention > 0)
+    .filter((row) => row.attention > 0 && row.company.name.trim().length > 0)
     .sort((a, b) => b.attention - a.attention || a.company.name.localeCompare(b.company.name))
     .slice(0, 8);
   const expansionOpportunities = currentCompanies
@@ -121,16 +132,26 @@ export function CurrentBusiness({ world }: { world: World }) {
     .slice(0, 6);
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
   const activeCustomerCount = currentCompanies.filter((c) => accountStatus(c) === "current_customer").length;
+  const headline = accountsNeedingAttention[0]
+    ? `${accountsNeedingAttention[0].company.name} needs the first look: risk ${accountsNeedingAttention[0].score?.dimensions.risk.score ?? 0}, capacity ${accountsNeedingAttention[0].score?.dimensions.capacityRisk.score ?? 0}${accountsNeedingAttention[0].openValue > 0 ? `, and ${money(accountsNeedingAttention[0].openValue)} open pipeline` : ""}.`
+    : "No current-business account needs immediate attention in the active market.";
+  const selectedRow = useMemo(
+    () => accountsNeedingAttention.find((row) => row.company.id === (selectedCompanyId ?? accountsNeedingAttention[0]?.company.id)) ?? accountsNeedingAttention[0],
+    [accountsNeedingAttention, selectedCompanyId],
+  );
+  const visibleAttentionRows = showAll ? accountsNeedingAttention : accountsNeedingAttention.slice(0, 5);
+
+  function selectCompany(companyId: string) {
+    setSelectedCompanyId(companyId);
+    setState({ activeCompanyId: companyId });
+  }
 
   return (
     <div className="current-workspace">
       <section className="current-head">
         <p className="eyebrow">Current business</p>
         <h1>What existing business needs attention?</h1>
-        <p>
-          Existing accounts, active pipeline, current contracts, and delivery risks are grouped here so the CRO can separate
-          account management from new-logo prospecting.
-        </p>
+        <p>{headline}</p>
       </section>
 
       <section className="current-summary">
@@ -161,18 +182,21 @@ export function CurrentBusiness({ world }: { world: World }) {
           <div className="panel-head">
             <h2>Accounts Needing Attention</h2>
           </div>
-          {accountsNeedingAttention.map(({ company, score, rec, openValue }, index) => (
-            <button key={company.id} className="current-account-row" onClick={() => setState({ activeCompanyId: company.id })}>
+          {visibleAttentionRows.map(({ company, score, rec, openValue }) => (
+            <button
+              key={company.id}
+              className={selectedRow?.company.id === company.id ? "current-account-row active" : "current-account-row"}
+              onClick={() => selectCompany(company.id)}
+            >
               <span>
                 <strong>{company.name}</strong>
                 <em>{titleCase(accountStatus(company))} · {getBusinessMotionLabel(businessMotionForAccount(company))}</em>
               </span>
               <span>
                 {whyAccountMatters(world, company)}
-                <RankingWhy explanation={rankingExplanation(world, company, { rank: index + 1, dimension: "risk" })} />
               </span>
               <span className="current-score">
-                Risk {score?.dimensions.risk.score ?? 0} · Capacity {score?.dimensions.capacityRisk.score ?? 0}
+                {riskLine(score?.dimensions.risk.score ?? 0, score?.dimensions.capacityRisk.score ?? 0)}
                 {openValue > 0 ? ` · ${money(openValue)} open` : ""}
                 {rec ? ` · ${actionLabel(rec.action)}` : ""}
               </span>
@@ -182,9 +206,29 @@ export function CurrentBusiness({ world }: { world: World }) {
               />
             </button>
           ))}
+          {accountsNeedingAttention.length > 5 && (
+            <button className="quiet-expander" onClick={() => setShowAll((value) => !value)}>
+              {showAll ? "Show top 5" : `View all ${accountsNeedingAttention.length}`}
+            </button>
+          )}
         </div>
 
-        <div className="current-panel">
+        {selectedRow && (
+          <div className="current-panel current-detail-card">
+            <div className="panel-head">
+              <h2>{selectedRow.company.name}</h2>
+            </div>
+            <p>{whyAccountMatters(world, selectedRow.company)}</p>
+            <RankingWhy explanation={rankingExplanation(world, selectedRow.company, { rank: accountsNeedingAttention.findIndex((row) => row.company.id === selectedRow.company.id) + 1, dimension: "risk" })} />
+            <span className="current-score">
+              {riskLine(selectedRow.score?.dimensions.risk.score ?? 0, selectedRow.score?.dimensions.capacityRisk.score ?? 0)}
+              {selectedRow.openValue > 0 ? ` · ${money(selectedRow.openValue)} open pipeline` : ""}
+              {selectedRow.rec ? ` · ${actionLabel(selectedRow.rec.action)}` : ""}
+            </span>
+          </div>
+        )}
+
+        {showAll && <div className="current-panel">
           <div className="panel-head">
             <h2>Recommended Actions</h2>
           </div>
@@ -201,9 +245,9 @@ export function CurrentBusiness({ world }: { world: World }) {
               />
             </button>
           ))}
-        </div>
+        </div>}
 
-        <div className="current-panel">
+        {showAll && <div className="current-panel">
           <div className="panel-head">
             <h2>Expansion Opportunities</h2>
           </div>
@@ -219,9 +263,9 @@ export function CurrentBusiness({ world }: { world: World }) {
               />
             </button>
           ))}
-        </div>
+        </div>}
 
-        <div className="current-panel">
+        {showAll && <div className="current-panel">
           <div className="panel-head">
             <h2>Current Pipeline / Contracts</h2>
           </div>
@@ -237,9 +281,9 @@ export function CurrentBusiness({ world }: { world: World }) {
               </span>
             </button>
           ))}
-        </div>
+        </div>}
 
-        <div className="current-panel">
+        {showAll && <div className="current-panel">
           <div className="panel-head">
             <h2>Risk Signals</h2>
           </div>
@@ -255,7 +299,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(signal, nameOf(signal.subject_id))} />
             </button>
           ))}
-        </div>
+        </div>}
       </section>
     </div>
   );

@@ -2,6 +2,7 @@
 // deterministic engine. Opportunity score + its trace, fit to the client's
 // capabilities, recent buying signals, and who to call. Every number is traceable.
 
+import { useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { scoreFit } from "../../engine/decision/fit.ts";
 import { groupTrace, summarizeGroups } from "../../engine/decision/explain.ts";
@@ -11,14 +12,20 @@ import { getInsight } from "../../app/insights.ts";
 import { pipelineHealth } from "../../engine/decision/health.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { explainAccountPrompt, expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
-import { companyLinks, formatAddress } from "../../app/format.ts";
+import { companyLinks, formatAddress, plural } from "../../app/format.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
+import { runAgent, type AgentId } from "../../agents/runAgent.ts";
+import { saveDeliverable } from "../../memory/localMemory.ts";
+import { setState } from "../../store/store.ts";
 
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
+  const [busyDeliverable, setBusyDeliverable] = useState<AgentId | null>(null);
   const company = world.companies.find((c) => c.id === companyId);
   if (!company) return null;
+  const activeCompany = company;
 
   const score = world.analysis.byId.get(companyId);
   const fit = scoreFit(company.needs, PROFILE.capabilities);
@@ -41,12 +48,27 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const fmtM = (v: number) => `$${(v / 1e6).toFixed(1)}M`;
   const companyAddress = formatAddress(company.location);
   const links = companyLinks(company);
+  async function createDeliverable(agentId: AgentId) {
+    setBusyDeliverable(agentId);
+    try {
+      const inputs = agentId === "board_deck"
+        ? { quarter: "Q2 2026", audience: "board" }
+        : agentId === "outreach"
+          ? { accountId: activeCompany.id, instructions: "Keep it concise and tied to the strongest available evidence." }
+          : { accountId: activeCompany.id };
+      const deliverable = await runAgent(agentId, inputs, world);
+      saveDeliverable(deliverable);
+      setState({ activeDeliverable: deliverable, activeCompanyId: null, activeBrainArea: deliverable.brainArea, brainResponse: null, activeAnalysisSpec: null });
+    } finally {
+      setBusyDeliverable(null);
+    }
+  }
 
   return (
     <div className="dossier">
       <div className="dossier-head">
         <h3>{company.name}</h3>
-        <span className={`pill rel-${company.relationship}`}>{company.relationship}</span>
+        <span className={`pill rel-${company.relationship}`}>{displayLabel(company.relationship)}</span>
         <div className="muted">
           {company.location.city}
           {facilities.length > 0 && ` · ${facilities.length} ${facilities.length === 1 ? "facility" : "facilities"}`}
@@ -58,6 +80,16 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           </div>
         )}
       </div>
+
+      <section className="dossier-actions">
+        <h4>Create deliverable</h4>
+        <div className="dossier-action-row">
+          <button onClick={() => void createDeliverable("meeting_brief")} disabled={busyDeliverable !== null}>{busyDeliverable === "meeting_brief" ? "Creating..." : "Meeting brief"}</button>
+          <button onClick={() => void createDeliverable("outreach")} disabled={busyDeliverable !== null}>{busyDeliverable === "outreach" ? "Creating..." : "Outreach"}</button>
+          <button onClick={() => void createDeliverable("sales_pitch")} disabled={busyDeliverable !== null}>{busyDeliverable === "sales_pitch" ? "Creating..." : "Sales pitch"}</button>
+          <button onClick={() => void createDeliverable("capabilities_assessment")} disabled={busyDeliverable !== null}>{busyDeliverable === "capabilities_assessment" ? "Creating..." : "Capabilities assessment"}</button>
+        </div>
+      </section>
 
       {rec && (
         <div className={`rec rec-${rec.action}`}>
@@ -108,7 +140,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
 
       {openOpps.length > 0 && (
         <section>
-          <h4>Pipeline — {fmtM(pipelineValue)} open ({openOpps.length} deals)</h4>
+          <h4>Pipeline — {fmtM(pipelineValue)} open ({plural(openOpps.length, "deal")})</h4>
           <ul className="opps">
             {openOpps.slice(0, 6).map((o) => (
               <li key={o.id}>
@@ -157,7 +189,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
             const meaning = insight?.findings?.[s.id] ?? findingMeaning(s.event_type);
             return (
               <li key={s.id}>
-                <span className="ev">{s.event_type}</span>
+                <span className="ev">{displayLabel(s.event_type)}</span>
                 <span className="q">{s.source_quote}</span>
                 {meaning && <span className="meaning">{meaning}</span>}
                 <span className="conf">conf {s.confidence.toFixed(2)}</span>

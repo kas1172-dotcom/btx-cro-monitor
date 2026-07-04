@@ -1,0 +1,81 @@
+[
+  {
+    "id": "defense-signals",
+    "question": "What defense funding signals should BTX care about?",
+    "intent": "market_signals",
+    "activatedBrainAreas": [
+      "market",
+      "capability",
+      "revenue",
+      "customer"
+    ],
+    "deliverableType": null,
+    "deterministicFallback": "Structured response from generateBrainResponse using validated signals.",
+    "source_type": "demo",
+    "source_name": "Offline Demo Flow Cache",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "austin-trip",
+    "question": "I'm in Austin next week. Who should I talk to?",
+    "intent": "geographic_prospecting",
+    "activatedBrainAreas": [
+      "geographic",
+      "customer",
+      "market",
+      "capability",
+      "revenue"
+    ],
+    "deliverableType": "itinerary",
+    "deterministicFallback": "itineraryAgent selects scored nearby prospects and embeds meeting-prep sections.",
+    "source_type": "demo",
+    "source_name": "Offline Demo Flow Cache",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "at-risk-deals",
+    "question": "Which deals are at risk this quarter?",
+    "intent": "account_risk",
+    "activatedBrainAreas": [
+      "revenue",
+      "customer",
+      "decision"
+    ],
+    "deliverableType": null,
+    "deterministicFallback": "Structured response from risk scores and validated signal traces.",
+    "source_type": "demo",
+    "source_name": "Offline Demo Flow Cache",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "production-fit",
+    "question": "What should sales focus on based on what we can actually produce?",
+    "intent": "capabilities",
+    "activatedBrainAreas": [
+      "capability",
+      "revenue",
+      "market"
+    ],
+    "deliverableType": null,
+    "deterministicFallback": "Structured response from client-profile capabilities and ERP capacity snapshot.",
+    "source_type": "demo",
+    "source_name": "Offline Demo Flow Cache",
+    "source_mode": "static_snapshot"
+  },
+  {
+    "id": "weekly-brief",
+    "question": "What should I care about this week?",
+    "intent": "weekly_brief",
+    "activatedBrainAreas": [
+      "market",
+      "revenue",
+      "customer",
+      "capability"
+    ],
+    "deliverableType": "weekly_memo",
+    "deterministicFallback": "weeklyMemoAgent composes a validated memo from deterministic engine context.",
+    "source_type": "demo",
+    "source_name": "Offline Demo Flow Cache",
+    "source_mode": "static_snapshot"
+  }
+]

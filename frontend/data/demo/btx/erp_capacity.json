@@ -24,5 +24,18 @@
     "source_type": "demo",
     "source_name": "Simulated ERP Capacity",
     "source_mode": "static_snapshot"
+  },
+  {
+    "facility_id": "btx-san-antonio-partner",
+    "facility_name": "BTX San Antonio Partner Cell",
+    "city": "San Antonio",
+    "available_5_axis_hours_next_30d": 115,
+    "available_turning_hours_next_30d": 95,
+    "constraint": "programmer availability",
+    "quoted_lead_time_days": 21,
+    "capacity_status": "limited_capacity",
+    "source_type": "demo",
+    "source_name": "Simulated ERP Capacity",
+    "source_mode": "static_snapshot"
   }
 ]
