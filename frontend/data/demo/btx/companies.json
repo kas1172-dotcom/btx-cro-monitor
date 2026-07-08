@@ -14,6 +14,7 @@
       "postal_code": "78758",
       "country": "USA"
     },
+    "domain": "lonestar-aero-systems.example",
     "website_url": "https://lonestar-aero-systems.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/lonestar-aero-systems",
     "source_url": "https://demo.btx.example/crm/accounts/lonestar-aero-systems",
@@ -43,6 +44,7 @@
       "postal_code": "75247",
       "country": "USA"
     },
+    "domain": "trinity-defense-components.example",
     "website_url": "https://trinity-defense-components.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/trinity-defense-components",
     "source_url": "https://demo.btx.example/crm/accounts/trinity-defense-components",
@@ -71,6 +73,7 @@
       "postal_code": "78219",
       "country": "USA"
     },
+    "domain": "pecan-valley-machining.example",
     "website_url": "https://pecan-valley-machining.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/pecan-valley-machining",
     "source_url": "https://demo.btx.example/crm/accounts/pecan-valley-machining",
@@ -99,6 +102,7 @@
       "postal_code": "76106",
       "country": "USA"
     },
+    "domain": "clearfork-turbine-works.example",
     "website_url": "https://clearfork-turbine-works.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/clearfork-turbine-works",
     "source_url": "https://demo.btx.example/crm/accounts/clearfork-turbine-works",
@@ -127,6 +131,7 @@
       "postal_code": "78744",
       "country": "USA"
     },
+    "domain": "bluebonnet-avionics.example",
     "website_url": "https://bluebonnet-avionics.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/bluebonnet-avionics",
     "source_url": "https://demo.btx.example/crm/accounts/bluebonnet-avionics",
@@ -155,6 +160,7 @@
       "postal_code": "77034",
       "country": "USA"
     },
+    "domain": "gulf-coast-propulsion.example",
     "website_url": "https://gulf-coast-propulsion.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/gulf-coast-propulsion",
     "source_url": "https://demo.btx.example/crm/accounts/gulf-coast-propulsion",
@@ -183,6 +189,7 @@
       "postal_code": "76712",
       "country": "USA"
     },
+    "domain": "brazos-precision-castings.example",
     "website_url": "https://brazos-precision-castings.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/brazos-precision-castings",
     "source_url": "https://demo.btx.example/crm/accounts/brazos-precision-castings",
@@ -211,6 +218,7 @@
       "postal_code": "75212",
       "country": "USA"
     },
+    "domain": "red-river-assemblies.example",
     "website_url": "https://red-river-assemblies.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/red-river-assemblies",
     "source_url": "https://demo.btx.example/crm/accounts/red-river-assemblies",
@@ -239,6 +247,7 @@
       "postal_code": "79111",
       "country": "USA"
     },
+    "domain": "high-plains-actuation.example",
     "website_url": "https://high-plains-actuation.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/high-plains-actuation",
     "source_url": "https://demo.btx.example/crm/accounts/high-plains-actuation",
@@ -267,6 +276,7 @@
       "postal_code": "78216",
       "country": "USA"
     },
+    "domain": "alamo-composite-tooling.example",
     "website_url": "https://alamo-composite-tooling.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/alamo-composite-tooling",
     "source_url": "https://demo.btx.example/crm/accounts/alamo-composite-tooling",
@@ -295,6 +305,7 @@
       "postal_code": "78728",
       "country": "USA"
     },
+    "domain": "hill-country-aerostructures.example",
     "website_url": "https://hill-country-aerostructures.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/hill-country-aerostructures",
     "source_url": "https://demo.btx.example/crm/accounts/hill-country-aerostructures",
@@ -323,6 +334,7 @@
       "postal_code": "79404",
       "country": "USA"
     },
+    "domain": "caprock-guidance-systems.example",
     "website_url": "https://caprock-guidance-systems.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/caprock-guidance-systems",
     "source_url": "https://demo.btx.example/crm/accounts/caprock-guidance-systems",
@@ -351,6 +363,7 @@
       "postal_code": "77041",
       "country": "USA"
     },
+    "domain": "cypress-creek-fabrication.example",
     "website_url": "https://cypress-creek-fabrication.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/cypress-creek-fabrication",
     "source_url": "https://demo.btx.example/crm/accounts/cypress-creek-fabrication",
@@ -379,6 +392,7 @@
       "postal_code": "75150",
       "country": "USA"
     },
+    "domain": "mesquite-defense-manufacturing.example",
     "website_url": "https://mesquite-defense-manufacturing.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/mesquite-defense-manufacturing",
     "source_url": "https://demo.btx.example/crm/accounts/mesquite-defense-manufacturing",
@@ -407,6 +421,7 @@
       "postal_code": "78741",
       "country": "USA"
     },
+    "domain": "violet-crown-micro-precision.example",
     "website_url": "https://violet-crown-micro-precision.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/violet-crown-micro-precision",
     "source_url": "https://demo.btx.example/crm/accounts/violet-crown-micro-precision",
@@ -435,6 +450,7 @@
       "postal_code": "76177",
       "country": "USA"
     },
+    "domain": "ranger-landing-gear.example",
     "website_url": "https://ranger-landing-gear.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/ranger-landing-gear",
     "source_url": "https://demo.btx.example/crm/accounts/ranger-landing-gear",
@@ -463,6 +479,7 @@
       "postal_code": "78666",
       "country": "USA"
     },
+    "domain": "live-oak-sensor-housings.example",
     "website_url": "https://live-oak-sensor-housings.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/live-oak-sensor-housings",
     "source_url": "https://demo.btx.example/crm/accounts/live-oak-sensor-housings",
@@ -491,6 +508,7 @@
       "postal_code": "76705",
       "country": "USA"
     },
+    "domain": "blackland-hydraulics.example",
     "website_url": "https://blackland-hydraulics.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/blackland-hydraulics",
     "source_url": "https://demo.btx.example/crm/accounts/blackland-hydraulics",
@@ -519,6 +537,7 @@
       "postal_code": "85034",
       "country": "USA"
     },
+    "domain": "mesa-verde-aerosystems.example",
     "website_url": "https://mesa-verde-aerosystems.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/mesa-verde-aerosystems",
     "source_url": "https://demo.btx.example/crm/accounts/mesa-verde-aerosystems",
@@ -547,6 +566,7 @@
       "postal_code": "80216",
       "country": "USA"
     },
+    "domain": "rocky-mountain-flight-controls.example",
     "website_url": "https://rocky-mountain-flight-controls.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/rocky-mountain-flight-controls",
     "source_url": "https://demo.btx.example/crm/accounts/rocky-mountain-flight-controls",
@@ -575,6 +595,7 @@
       "postal_code": "29605",
       "country": "USA"
     },
+    "domain": "carolina-nacelle-works.example",
     "website_url": "https://carolina-nacelle-works.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/carolina-nacelle-works",
     "source_url": "https://demo.btx.example/crm/accounts/carolina-nacelle-works",
@@ -603,6 +624,7 @@
       "postal_code": "21224",
       "country": "USA"
     },
+    "domain": "chesapeake-rotor-systems.example",
     "website_url": "https://chesapeake-rotor-systems.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/chesapeake-rotor-systems",
     "source_url": "https://demo.btx.example/crm/accounts/chesapeake-rotor-systems",
@@ -631,6 +653,7 @@
       "postal_code": "45246",
       "country": "USA"
     },
+    "domain": "great-lakes-engine-cases.example",
     "website_url": "https://great-lakes-engine-cases.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/great-lakes-engine-cases",
     "source_url": "https://demo.btx.example/crm/accounts/great-lakes-engine-cases",
@@ -659,6 +682,7 @@
       "postal_code": "98108",
       "country": "USA"
     },
+    "domain": "cascade-actuator-products.example",
     "website_url": "https://cascade-actuator-products.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/cascade-actuator-products",
     "source_url": "https://demo.btx.example/crm/accounts/cascade-actuator-products",
@@ -687,6 +711,7 @@
       "postal_code": "85756",
       "country": "USA"
     },
+    "domain": "desert-sky-machining.example",
     "website_url": "https://desert-sky-machining.example",
     "linkedin_url": "https://demo.btx.example/linkedin/company/desert-sky-machining",
     "source_url": "https://demo.btx.example/crm/accounts/desert-sky-machining",

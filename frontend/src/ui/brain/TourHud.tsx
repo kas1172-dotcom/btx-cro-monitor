@@ -29,7 +29,7 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
   useEffect(() => {
     if (autoStart) {
       goHome();
-      setState({ brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null, activeBrainArea: "revenue", askDraftPrompt: "" });
+      setState({ brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null, askDraftPrompt: "" });
     }
   }, [autoStart]);
 
@@ -118,7 +118,7 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
 
   function restart() {
     goHome();
-    setState({ brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null, activeBrainArea: "revenue", askDraftPrompt: "" });
+    setState({ brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null, askDraftPrompt: "" });
     setTourStep(0);
     setPlaying(true);
     setPaused(false);

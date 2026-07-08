@@ -4,7 +4,7 @@
     "company_id": "lonestar-aero-systems",
     "name": "Hannah Price",
     "title": "Sourcing Lead",
-    "email": "lonestar-aero-systems.1@demo.btx.example",
+    "email": "hannah.price@lonestar-aero-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -14,7 +14,7 @@
     "company_id": "lonestar-aero-systems",
     "name": "Kara Cooper",
     "title": "Sourcing Lead",
-    "email": "lonestar-aero-systems.2@demo.btx.example",
+    "email": "kara.cooper@lonestar-aero-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -24,7 +24,7 @@
     "company_id": "lonestar-aero-systems",
     "name": "Miles Sato",
     "title": "VP Supply Chain",
-    "email": "lonestar-aero-systems.3@demo.btx.example",
+    "email": "miles.sato@lonestar-aero-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -34,7 +34,7 @@
     "company_id": "trinity-defense-components",
     "name": "Kevin Carter",
     "title": "Director of Procurement",
-    "email": "trinity-defense-components.4@demo.btx.example",
+    "email": "kevin.carter@trinity-defense-components.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -44,7 +44,7 @@
     "company_id": "trinity-defense-components",
     "name": "Victor Diaz",
     "title": "VP Supply Chain",
-    "email": "trinity-defense-components.5@demo.btx.example",
+    "email": "victor.diaz@trinity-defense-components.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -54,7 +54,7 @@
     "company_id": "trinity-defense-components",
     "name": "Priya Price",
     "title": "Director of Operations",
-    "email": "trinity-defense-components.6@demo.btx.example",
+    "email": "priya.price@trinity-defense-components.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -64,7 +64,7 @@
     "company_id": "pecan-valley-machining",
     "name": "Omar Sato",
     "title": "Director of Procurement",
-    "email": "pecan-valley-machining.7@demo.btx.example",
+    "email": "omar.sato@pecan-valley-machining.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -74,7 +74,7 @@
     "company_id": "pecan-valley-machining",
     "name": "Samuel Nguyen",
     "title": "Quality Director",
-    "email": "pecan-valley-machining.8@demo.btx.example",
+    "email": "samuel.nguyen@pecan-valley-machining.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -84,7 +84,7 @@
     "company_id": "pecan-valley-machining",
     "name": "Samuel Morales",
     "title": "VP Supply Chain",
-    "email": "pecan-valley-machining.9@demo.btx.example",
+    "email": "samuel.morales@pecan-valley-machining.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -94,7 +94,7 @@
     "company_id": "clearfork-turbine-works",
     "name": "Jamal Alvarez",
     "title": "VP Supply Chain",
-    "email": "clearfork-turbine-works.10@demo.btx.example",
+    "email": "jamal.alvarez@clearfork-turbine-works.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -104,7 +104,7 @@
     "company_id": "clearfork-turbine-works",
     "name": "Reid Chen",
     "title": "Sourcing Lead",
-    "email": "clearfork-turbine-works.11@demo.btx.example",
+    "email": "reid.chen@clearfork-turbine-works.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -114,7 +114,7 @@
     "company_id": "clearfork-turbine-works",
     "name": "Victor Foster",
     "title": "Commodity Manager",
-    "email": "clearfork-turbine-works.12@demo.btx.example",
+    "email": "victor.foster@clearfork-turbine-works.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -124,7 +124,7 @@
     "company_id": "bluebonnet-avionics",
     "name": "Priya Alvarez",
     "title": "Quality Director",
-    "email": "bluebonnet-avionics.13@demo.btx.example",
+    "email": "priya.alvarez@bluebonnet-avionics.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -134,7 +134,7 @@
     "company_id": "bluebonnet-avionics",
     "name": "Noah Bishop",
     "title": "Quality Director",
-    "email": "bluebonnet-avionics.14@demo.btx.example",
+    "email": "noah.bishop@bluebonnet-avionics.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -144,7 +144,7 @@
     "company_id": "gulf-coast-propulsion",
     "name": "Alyssa Wright",
     "title": "Program Manager",
-    "email": "gulf-coast-propulsion.15@demo.btx.example",
+    "email": "alyssa.wright@gulf-coast-propulsion.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -154,7 +154,7 @@
     "company_id": "gulf-coast-propulsion",
     "name": "Ravi Chen",
     "title": "Commodity Manager",
-    "email": "gulf-coast-propulsion.16@demo.btx.example",
+    "email": "ravi.chen@gulf-coast-propulsion.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -164,7 +164,7 @@
     "company_id": "brazos-precision-castings",
     "name": "Grace Sato",
     "title": "Director of Procurement",
-    "email": "brazos-precision-castings.17@demo.btx.example",
+    "email": "grace.sato@brazos-precision-castings.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -174,7 +174,7 @@
     "company_id": "brazos-precision-castings",
     "name": "Samuel Alvarez",
     "title": "VP Supply Chain",
-    "email": "brazos-precision-castings.18@demo.btx.example",
+    "email": "samuel.alvarez@brazos-precision-castings.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -184,7 +184,7 @@
     "company_id": "red-river-assemblies",
     "name": "Noah Foster",
     "title": "Director of Procurement",
-    "email": "red-river-assemblies.19@demo.btx.example",
+    "email": "noah.foster@red-river-assemblies.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -194,7 +194,7 @@
     "company_id": "red-river-assemblies",
     "name": "Andre Malik",
     "title": "Director of Operations",
-    "email": "red-river-assemblies.20@demo.btx.example",
+    "email": "andre.malik@red-river-assemblies.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -204,7 +204,7 @@
     "company_id": "red-river-assemblies",
     "name": "Diana Hayes",
     "title": "Quality Director",
-    "email": "red-river-assemblies.21@demo.btx.example",
+    "email": "diana.hayes@red-river-assemblies.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -214,7 +214,7 @@
     "company_id": "high-plains-actuation",
     "name": "Ethan Diaz",
     "title": "Program Manager",
-    "email": "high-plains-actuation.22@demo.btx.example",
+    "email": "ethan.diaz@high-plains-actuation.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -224,7 +224,7 @@
     "company_id": "high-plains-actuation",
     "name": "Teresa Flores",
     "title": "Program Manager",
-    "email": "high-plains-actuation.23@demo.btx.example",
+    "email": "teresa.flores@high-plains-actuation.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -234,7 +234,7 @@
     "company_id": "high-plains-actuation",
     "name": "Teresa Kim",
     "title": "Quality Director",
-    "email": "high-plains-actuation.24@demo.btx.example",
+    "email": "teresa.kim@high-plains-actuation.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -244,7 +244,7 @@
     "company_id": "alamo-composite-tooling",
     "name": "Kevin Nguyen",
     "title": "Sourcing Lead",
-    "email": "alamo-composite-tooling.25@demo.btx.example",
+    "email": "kevin.nguyen@alamo-composite-tooling.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -254,7 +254,7 @@
     "company_id": "alamo-composite-tooling",
     "name": "Elena Bishop",
     "title": "Director of Procurement",
-    "email": "alamo-composite-tooling.26@demo.btx.example",
+    "email": "elena.bishop@alamo-composite-tooling.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -264,7 +264,7 @@
     "company_id": "hill-country-aerostructures",
     "name": "Linda Bennett",
     "title": "Quality Director",
-    "email": "hill-country-aerostructures.27@demo.btx.example",
+    "email": "linda.bennett@hill-country-aerostructures.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -274,7 +274,7 @@
     "company_id": "hill-country-aerostructures",
     "name": "Jamal Sato",
     "title": "Program Manager",
-    "email": "hill-country-aerostructures.28@demo.btx.example",
+    "email": "jamal.sato@hill-country-aerostructures.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -284,7 +284,7 @@
     "company_id": "hill-country-aerostructures",
     "name": "Ravi Brooks",
     "title": "Quality Director",
-    "email": "hill-country-aerostructures.29@demo.btx.example",
+    "email": "ravi.brooks@hill-country-aerostructures.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -294,7 +294,7 @@
     "company_id": "caprock-guidance-systems",
     "name": "David Hayes",
     "title": "VP Supply Chain",
-    "email": "caprock-guidance-systems.30@demo.btx.example",
+    "email": "david.hayes@caprock-guidance-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -304,7 +304,7 @@
     "company_id": "caprock-guidance-systems",
     "name": "Diana Cooper",
     "title": "Sourcing Lead",
-    "email": "caprock-guidance-systems.31@demo.btx.example",
+    "email": "diana.cooper@caprock-guidance-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -314,7 +314,7 @@
     "company_id": "caprock-guidance-systems",
     "name": "Kara Bishop",
     "title": "Sourcing Lead",
-    "email": "caprock-guidance-systems.32@demo.btx.example",
+    "email": "kara.bishop@caprock-guidance-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -324,7 +324,7 @@
     "company_id": "cypress-creek-fabrication",
     "name": "Camila Sato",
     "title": "VP Supply Chain",
-    "email": "cypress-creek-fabrication.33@demo.btx.example",
+    "email": "camila.sato@cypress-creek-fabrication.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -334,7 +334,7 @@
     "company_id": "cypress-creek-fabrication",
     "name": "Wei Bishop",
     "title": "VP Supply Chain",
-    "email": "cypress-creek-fabrication.34@demo.btx.example",
+    "email": "wei.bishop@cypress-creek-fabrication.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -344,7 +344,7 @@
     "company_id": "mesquite-defense-manufacturing",
     "name": "Samuel Vargas",
     "title": "Director of Procurement",
-    "email": "mesquite-defense-manufacturing.35@demo.btx.example",
+    "email": "samuel.vargas@mesquite-defense-manufacturing.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -354,7 +354,7 @@
     "company_id": "mesquite-defense-manufacturing",
     "name": "Kevin Diaz",
     "title": "Director of Procurement",
-    "email": "mesquite-defense-manufacturing.36@demo.btx.example",
+    "email": "kevin.diaz@mesquite-defense-manufacturing.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -364,7 +364,7 @@
     "company_id": "mesquite-defense-manufacturing",
     "name": "Andre Ellis",
     "title": "VP Supply Chain",
-    "email": "mesquite-defense-manufacturing.37@demo.btx.example",
+    "email": "andre.ellis@mesquite-defense-manufacturing.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -374,7 +374,7 @@
     "company_id": "violet-crown-micro-precision",
     "name": "Elena Wright",
     "title": "Commodity Manager",
-    "email": "violet-crown-micro-precision.38@demo.btx.example",
+    "email": "elena.wright@violet-crown-micro-precision.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -384,7 +384,7 @@
     "company_id": "violet-crown-micro-precision",
     "name": "Sofia Cooper",
     "title": "Quality Director",
-    "email": "violet-crown-micro-precision.39@demo.btx.example",
+    "email": "sofia.cooper@violet-crown-micro-precision.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -394,7 +394,7 @@
     "company_id": "ranger-landing-gear",
     "name": "Miles Flores",
     "title": "Director of Operations",
-    "email": "ranger-landing-gear.40@demo.btx.example",
+    "email": "miles.flores@ranger-landing-gear.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -404,7 +404,7 @@
     "company_id": "ranger-landing-gear",
     "name": "Sofia Kim",
     "title": "Quality Director",
-    "email": "ranger-landing-gear.41@demo.btx.example",
+    "email": "sofia.kim@ranger-landing-gear.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -414,7 +414,7 @@
     "company_id": "ranger-landing-gear",
     "name": "Elena Walker",
     "title": "VP Supply Chain",
-    "email": "ranger-landing-gear.42@demo.btx.example",
+    "email": "elena.walker@ranger-landing-gear.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -424,7 +424,7 @@
     "company_id": "live-oak-sensor-housings",
     "name": "Omar Walker",
     "title": "Program Manager",
-    "email": "live-oak-sensor-housings.43@demo.btx.example",
+    "email": "omar.walker@live-oak-sensor-housings.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -434,7 +434,7 @@
     "company_id": "live-oak-sensor-housings",
     "name": "Samuel Stone",
     "title": "Sourcing Lead",
-    "email": "live-oak-sensor-housings.44@demo.btx.example",
+    "email": "samuel.stone@live-oak-sensor-housings.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -444,7 +444,7 @@
     "company_id": "blackland-hydraulics",
     "name": "Reid Singh",
     "title": "VP Supply Chain",
-    "email": "blackland-hydraulics.45@demo.btx.example",
+    "email": "reid.singh@blackland-hydraulics.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -454,7 +454,7 @@
     "company_id": "blackland-hydraulics",
     "name": "Andre Nguyen",
     "title": "Director of Procurement",
-    "email": "blackland-hydraulics.46@demo.btx.example",
+    "email": "andre.nguyen@blackland-hydraulics.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -464,7 +464,7 @@
     "company_id": "blackland-hydraulics",
     "name": "Leah Chen",
     "title": "Sourcing Lead",
-    "email": "blackland-hydraulics.47@demo.btx.example",
+    "email": "leah.chen@blackland-hydraulics.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -474,7 +474,7 @@
     "company_id": "mesa-verde-aerosystems",
     "name": "Miles Raman",
     "title": "Program Manager",
-    "email": "mesa-verde-aerosystems.48@demo.btx.example",
+    "email": "miles.raman@mesa-verde-aerosystems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -484,7 +484,7 @@
     "company_id": "mesa-verde-aerosystems",
     "name": "Victor Carter",
     "title": "Director of Procurement",
-    "email": "mesa-verde-aerosystems.49@demo.btx.example",
+    "email": "victor.carter@mesa-verde-aerosystems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -494,7 +494,7 @@
     "company_id": "mesa-verde-aerosystems",
     "name": "Grace Fischer",
     "title": "Quality Director",
-    "email": "mesa-verde-aerosystems.50@demo.btx.example",
+    "email": "grace.fischer@mesa-verde-aerosystems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -504,7 +504,7 @@
     "company_id": "rocky-mountain-flight-controls",
     "name": "Maria Kim",
     "title": "Program Manager",
-    "email": "rocky-mountain-flight-controls.51@demo.btx.example",
+    "email": "maria.kim@rocky-mountain-flight-controls.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -514,7 +514,7 @@
     "company_id": "rocky-mountain-flight-controls",
     "name": "Camila Khan",
     "title": "Quality Director",
-    "email": "rocky-mountain-flight-controls.52@demo.btx.example",
+    "email": "camila.khan@rocky-mountain-flight-controls.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -524,7 +524,7 @@
     "company_id": "rocky-mountain-flight-controls",
     "name": "Jamal Bennett",
     "title": "Director of Operations",
-    "email": "rocky-mountain-flight-controls.53@demo.btx.example",
+    "email": "jamal.bennett@rocky-mountain-flight-controls.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -534,7 +534,7 @@
     "company_id": "carolina-nacelle-works",
     "name": "Sofia Bennett",
     "title": "VP Supply Chain",
-    "email": "carolina-nacelle-works.54@demo.btx.example",
+    "email": "sofia.bennett@carolina-nacelle-works.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -544,7 +544,7 @@
     "company_id": "carolina-nacelle-works",
     "name": "Ravi Diaz",
     "title": "VP Supply Chain",
-    "email": "carolina-nacelle-works.55@demo.btx.example",
+    "email": "ravi.diaz@carolina-nacelle-works.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -554,7 +554,7 @@
     "company_id": "chesapeake-rotor-systems",
     "name": "Sofia Hughes",
     "title": "Commodity Manager",
-    "email": "chesapeake-rotor-systems.56@demo.btx.example",
+    "email": "sofia.hughes@chesapeake-rotor-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -564,7 +564,7 @@
     "company_id": "chesapeake-rotor-systems",
     "name": "David Ellis",
     "title": "Sourcing Lead",
-    "email": "chesapeake-rotor-systems.57@demo.btx.example",
+    "email": "david.ellis@chesapeake-rotor-systems.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -574,7 +574,7 @@
     "company_id": "great-lakes-engine-cases",
     "name": "Maria Sato",
     "title": "Program Manager",
-    "email": "great-lakes-engine-cases.58@demo.btx.example",
+    "email": "maria.sato@great-lakes-engine-cases.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -584,7 +584,7 @@
     "company_id": "great-lakes-engine-cases",
     "name": "Hannah Singh",
     "title": "Sourcing Lead",
-    "email": "great-lakes-engine-cases.59@demo.btx.example",
+    "email": "hannah.singh@great-lakes-engine-cases.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -594,7 +594,7 @@
     "company_id": "great-lakes-engine-cases",
     "name": "Grace Morales",
     "title": "Program Manager",
-    "email": "great-lakes-engine-cases.60@demo.btx.example",
+    "email": "grace.morales@great-lakes-engine-cases.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -604,7 +604,7 @@
     "company_id": "cascade-actuator-products",
     "name": "Nadia Lin",
     "title": "VP Supply Chain",
-    "email": "cascade-actuator-products.61@demo.btx.example",
+    "email": "nadia.lin@cascade-actuator-products.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -614,7 +614,7 @@
     "company_id": "cascade-actuator-products",
     "name": "Nadia Vargas",
     "title": "Commodity Manager",
-    "email": "cascade-actuator-products.62@demo.btx.example",
+    "email": "nadia.vargas@cascade-actuator-products.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -624,7 +624,7 @@
     "company_id": "desert-sky-machining",
     "name": "David Mendez",
     "title": "VP Supply Chain",
-    "email": "desert-sky-machining.63@demo.btx.example",
+    "email": "david.mendez@desert-sky-machining.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"
@@ -634,7 +634,7 @@
     "company_id": "desert-sky-machining",
     "name": "Omar Patel",
     "title": "Quality Director",
-    "email": "desert-sky-machining.64@demo.btx.example",
+    "email": "omar.patel@desert-sky-machining.example.com",
     "source_type": "demo",
     "source_name": "Simulated CRM Contacts",
     "source_mode": "static_snapshot"

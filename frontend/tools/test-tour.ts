@@ -51,7 +51,7 @@ for (const [index, step] of TOUR_STEPS.entries()) {
   } else if (step.completion === "dossier" || step.completion === "hold") {
     assert(state.activeCompanyId !== null, `Step ${index + 1} did not open a dossier`);
   } else if (step.completion === "home") {
-    assert(state.activeBrainArea === "revenue" && !state.brainResponse && !state.activeDeliverable && !state.activeAnalysisSpec && !state.activeCompanyId, `Step ${index + 1} did not return home`);
+    assert(state.activeHome && !state.brainResponse && !state.activeDeliverable && !state.activeAnalysisSpec && !state.activeCompanyId, `Step ${index + 1} did not return home`);
   } else {
     assert(state.brainResponse !== null, `Step ${index + 1} did not produce a brain response`);
   }

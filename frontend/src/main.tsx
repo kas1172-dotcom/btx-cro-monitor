@@ -4,7 +4,9 @@ import { App } from "./App.tsx";
 import "./ui/styles.css";
 import { runOverflowAudit } from "./app/overflowAudit.ts";
 
-if (import.meta.env.DEV) {
+const env = (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env;
+
+if (env?.DEV) {
   (window as unknown as Record<string, unknown>).__btxAudit = runOverflowAudit;
 }
 

@@ -139,7 +139,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
       </section>
 
       {openOpps.length > 0 && (
-        <section>
+        <section id="dossier-pipeline">
           <h4>Pipeline — {fmtM(pipelineValue)} open ({plural(openOpps.length, "deal")})</h4>
           <ul className="opps">
             {openOpps.slice(0, 6).map((o) => (

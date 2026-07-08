@@ -90,7 +90,7 @@ function completionPredicate(step: TourStep): boolean {
   if (step.completion === "analysis") return current.activeAnalysisSpec !== null;
   if (step.completion === "dossier") return current.activeCompanyId !== null;
   if (step.completion === "hold") return current.activeCompanyId !== null;
-  if (step.completion === "home") return current.activeBrainArea === "revenue" && !current.brainResponse && !current.activeDeliverable && !current.activeAnalysisSpec && !current.activeCompanyId;
+  if (step.completion === "home") return current.activeHome && !current.brainResponse && !current.activeDeliverable && !current.activeAnalysisSpec && !current.activeCompanyId;
   return current.brainResponse !== null;
 }
 
@@ -149,7 +149,7 @@ export async function executeTourStep(step: TourStep, world: World, timeoutMs = 
     setState({ activeDeliverable: deliverable, activeCompanyId: null, activeAnalysisSpec: null, brainResponse: null, activeBrainArea: deliverable.brainArea });
   }
   if (step.execution === "home") {
-    setState({ activeBrainArea: "revenue", brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null });
+    setState({ activeHome: true, brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null });
   }
   await waitForState(() => completionPredicate(step), timeoutMs);
 }

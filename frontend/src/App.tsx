@@ -3,37 +3,34 @@ import type React from "react";
 import { useStore, setState, closeDemoAction, goHome, clearTourRequest } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES, PROFILE } from "./app/config.ts";
-import { CurrentBusiness } from "./ui/current/CurrentBusiness.tsx";
-import { Prospecting } from "./ui/prospecting/Prospecting.tsx";
 import { ProspectMap } from "./ui/map/ProspectMap.tsx";
-import { Dashboard } from "./ui/dashboard/Dashboard.tsx";
-import { SignalFeed } from "./ui/feed/SignalFeed.tsx";
-import { OperatingSnapshot } from "./ui/operating/OperatingSnapshot.tsx";
-import { Integrations } from "./ui/integrations/Integrations.tsx";
 import { Copilot } from "./ui/copilot/Copilot.tsx";
 import { Dossier } from "./ui/company/Dossier.tsx";
 import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
 import { BrainHome } from "./ui/brain/BrainHome.tsx";
+import { RailAreaView } from "./ui/brain/RailAreaView.tsx";
 import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
 import { AskBrainBar } from "./ui/brain/AskBrainBar.tsx";
 import { RightContextPanel } from "./ui/brain/RightContextPanel.tsx";
 import { TourHud } from "./ui/brain/TourHud.tsx";
 import { DocumentViewer } from "./ui/deliverables/DocumentViewer.tsx";
-import { MemoryPanel } from "./ui/brain/MemoryPanel.tsx";
 import { recordSimulatedAction, useMemory } from "./memory/localMemory.ts";
 import { AnalysisView } from "./ui/analysis/AnalysisView.tsx";
 import { isMarketScopedView } from "./app/viewScope.ts";
+import { buildRailView } from "./app/railViews.ts";
+import { SettingsWorkspace } from "./ui/settings/SettingsWorkspace.tsx";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 
 export function App() {
-  const { city, activeBrainArea, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
+  const { city, activeHome, activeSettings, activeBrainArea, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
-  const marketScoped = isMarketScopedView({ activeBrainArea, brainResponse, activeDeliverable, activeAnalysisSpec });
+  const settingsActive = activeSettings && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const homeActive = activeHome && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const marketScoped = !homeActive && !settingsActive && isMarketScopedView({ activeBrainArea, brainResponse, activeDeliverable, activeAnalysisSpec });
   const viewWorld = marketScoped ? marketWorld ?? world : world;
-  const homeActive = activeBrainArea === "revenue" && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
 
   // Right-panel: dossier takes priority over context panel, one at a time.
   const dossierOpen = !!activeCompanyId;
@@ -60,34 +57,31 @@ export function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [activeCompanyId, brainResponse]);
   const renderDefault = () => {
+    if (settingsActive) return <SettingsWorkspace />;
     if (!world) return <div className="loading">loading…</div>;
     if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
     if (activeDeliverable) return <DocumentViewer deliverable={activeDeliverable} world={world} />;
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
+    if (homeActive) return <BrainHome world={world} askBar={<AskBrainBar world={world} large />} />;
     switch (activeBrainArea) {
-      case "market": return <SignalFeed world={viewWorld ?? world} />;
-      case "customer": return <CurrentBusiness world={world} />;
-      case "capability": return <OperatingSnapshot />;
+      case "market": return <RailAreaView area="market" world={viewWorld ?? world} />;
+      case "customer": return <RailAreaView area="customer" world={world} />;
+      case "capability": return <RailAreaView area="capability" world={world} />;
       case "geographic": return viewWorld ? <ProspectMap world={viewWorld} /> : <div className="loading">loading map…</div>;
-      case "decision": return <MemoryPanel />;
-      case "workflow": return <Integrations />;
-      case "revenue":
-      default: return <BrainHome world={world} askBar={<AskBrainBar world={world} large />} />;
+      case "decision": return <RailAreaView area="decision" world={world} />;
+      case "workflow": return <RailAreaView area="workflow" world={world} />;
+      case "revenue": return <RailAreaView area="revenue" world={world} />;
+      default: return <RailAreaView area="revenue" world={world} />;
     }
   };
-  const memoryCounts = memory.activity.reduce<Partial<Record<typeof activeBrainArea, number>>>((acc, item) => {
-    acc[item.brainArea] = (acc[item.brainArea] ?? 0) + 1;
-    return acc;
-  }, {});
   const counts = world ? {
-    market: world.analysis.valid.length,
-    customer: world.companies.filter((c) => c.relationship === "customer").length,
-    capability: world.snapshot?.capacity.length ?? 0,
-    revenue: world.analysis.recommendations.filter((r) => r.priority !== "low").length,
-    geographic: world.prospects.filter((p) => !city || p.company.location.city === city).length,
-    decision: world.analysis.alerts.length,
-    workflow: 0,
-    ...memoryCounts,
+    market: buildRailView("market", viewWorld ?? world, memory).total,
+    customer: buildRailView("customer", world, memory).total,
+    capability: buildRailView("capability", world, memory).total,
+    revenue: buildRailView("revenue", world, memory).total,
+    geographic: buildRailView("geographic", viewWorld ?? world, memory).total,
+    decision: buildRailView("decision", world, memory).total,
+    workflow: buildRailView("workflow", world, memory).total,
   } : {};
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
@@ -97,7 +91,7 @@ export function App() {
       className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
       style={{ "--right-w": rightW } as React.CSSProperties}
     >
-      <BrainSidebar activeBrainArea={activeBrainArea} counts={counts} homeActive={homeActive} />
+      <BrainSidebar activeBrainArea={activeBrainArea} counts={counts} homeActive={homeActive} settingsActive={settingsActive} />
       <main className="quiet-main" onClickCapture={() => {
         if (activeCompanyId) setState({ activeCompanyId: null });
       }}>
@@ -121,7 +115,7 @@ export function App() {
           </label>}
         </header>
         <section className="quiet-stage">{renderDefault()}</section>
-        {world && !homeActive && <AskBrainBar world={viewWorld ?? world} />}
+        {world && !homeActive && !settingsActive && <AskBrainBar world={viewWorld ?? world} />}
         {world && <Copilot world={world} />}
       </main>
       <RightContextPanel response={brainResponse} />
