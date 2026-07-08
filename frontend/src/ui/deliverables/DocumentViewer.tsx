@@ -18,6 +18,10 @@ import {
   type DownloadFormat,
 } from "../../deliverables/export.ts";
 
+const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
+const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
+const copilotEndpoint = env?.VITE_COPILOT_ENDPOINT ?? processEnv?.VITE_COPILOT_ENDPOINT;
+
 function editableSections(sections: DeliverableSection[]): DeliverableSection[] {
   return sections.map((section) => ({
     ...section,
@@ -96,7 +100,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     if (!target) return;
     const firstText = target.blocks.find((block) => block.kind === "text");
     if (!firstText || firstText.kind !== "text") return;
-    const endpoint = import.meta.env.VITE_COPILOT_ENDPOINT as string | undefined;
+    const endpoint = copilotEndpoint;
     if (!endpoint) {
       setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text: firstText.text, warning: "Assistant needs the connection — manual editing still works." }]);
       setAssistantInput("");
@@ -236,7 +240,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       </aside>
       <aside className="editor-assistant">
         <h2>Chatpil Editor</h2>
-        <p>{import.meta.env.VITE_COPILOT_ENDPOINT ? "Ask for a focused rewrite of a section." : "Assistant needs the connection — manual editing still works."}</p>
+        <p>{copilotEndpoint ? "Ask for a focused rewrite of a section." : "Assistant needs the connection — manual editing still works."}</p>
         <textarea value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Tighten the subject line, make it more formal, cut it to 80 words..." />
         <button onClick={() => void requestSuggestion()}>Suggest Revision</button>
         <div className="suggestion-list">

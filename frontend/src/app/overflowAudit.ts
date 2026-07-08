@@ -37,7 +37,8 @@ const AUDIT_SELECTORS = [
 ];
 
 export function runOverflowAudit(): void {
-  if (import.meta.env.PROD) return;
+  const env = (import.meta as ImportMeta & { env?: { PROD?: boolean } }).env;
+  if (env?.PROD) return;
   let count = 0;
   for (const selector of AUDIT_SELECTORS) {
     const elements = document.querySelectorAll(selector);

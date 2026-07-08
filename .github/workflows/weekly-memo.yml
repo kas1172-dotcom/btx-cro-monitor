@@ -2,8 +2,9 @@ name: Weekly Revenue Brain Memo
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * 1"
+  # Cron intentionally disabled pending client validation of the memo cadence; re-enable after approval.
+  # schedule:
+  #   - cron: "0 12 * * 1"
 
 jobs:
   weekly-memo:

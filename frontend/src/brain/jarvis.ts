@@ -12,7 +12,9 @@ import { GROUNDING_CONTRACT, CURRENT_VS_PROSPECTING } from "../app/promptContrac
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { setState } from "../store/store.ts";
 
-const ENDPOINT = import.meta.env.VITE_COPILOT_ENDPOINT as string | undefined;
+const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
+const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
+const ENDPOINT = env?.VITE_COPILOT_ENDPOINT ?? processEnv?.VITE_COPILOT_ENDPOINT;
 
 // ── Live/offline state — driven by health-check results ──────────────────────
 

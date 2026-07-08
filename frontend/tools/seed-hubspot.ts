@@ -7,24 +7,38 @@ import opportunities from "../data/demo/btx/opportunities.json";
 
 const FRONTEND_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const REPO_DIR = join(FRONTEND_DIR, "..");
+const confirmed = process.argv.includes("--confirm");
 
-function readEnvTokenFromFile(path: string): string | undefined {
+interface TokenSource {
+  value: string;
+  name: "HUBSPOT_ACCESS_TOKEN" | "BTX_HUBSPOT_ACCESS_TOKEN";
+}
+
+function readEnvTokenFromFile(path: string): TokenSource | undefined {
   if (!existsSync(path)) return undefined;
   const lines = readFileSync(path, "utf8").split(/\r?\n/u);
   for (const line of lines) {
     const match = /^\s*(?:export\s+)?(HUBSPOT_ACCESS_TOKEN|BTX_HUBSPOT_ACCESS_TOKEN)\s*=\s*(.+?)\s*$/u.exec(line);
     if (!match) continue;
-    return match[2].replace(/^['"]|['"]$/g, "");
+    return {
+      name: match[1] as TokenSource["name"],
+      value: match[2].replace(/^['"]|['"]$/g, ""),
+    };
   }
   return undefined;
 }
 
-const token = process.env.HUBSPOT_ACCESS_TOKEN
-  ?? process.env.BTX_HUBSPOT_ACCESS_TOKEN
-  ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env.local"))
-  ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env"))
-  ?? readEnvTokenFromFile(join(REPO_DIR, ".env.local"))
-  ?? readEnvTokenFromFile(join(REPO_DIR, ".env"));
+function resolveToken(): TokenSource | undefined {
+  if (process.env.HUBSPOT_ACCESS_TOKEN) return { name: "HUBSPOT_ACCESS_TOKEN", value: process.env.HUBSPOT_ACCESS_TOKEN };
+  if (process.env.BTX_HUBSPOT_ACCESS_TOKEN) return { name: "BTX_HUBSPOT_ACCESS_TOKEN", value: process.env.BTX_HUBSPOT_ACCESS_TOKEN };
+  return readEnvTokenFromFile(join(FRONTEND_DIR, ".env.local"))
+    ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env"))
+    ?? readEnvTokenFromFile(join(REPO_DIR, ".env.local"))
+    ?? readEnvTokenFromFile(join(REPO_DIR, ".env"));
+}
+
+const tokenSource = resolveToken();
+const token = tokenSource?.value;
 
 type CrmObjectType = "companies" | "contacts" | "deals";
 type AssociationObjectType = "companies" | "contacts" | "deals";
@@ -373,6 +387,15 @@ function companyUpsertInputs(companyRows: CompanyRow[], idProperty: "domain" | "
   });
 }
 
+function printSeedDryRun(companyRows: CompanyRow[], contactRows: ContactRow[], opportunityRows: OpportunityRow[]): void {
+  console.log("HubSpot seed dry-run. Pass --confirm to write to HubSpot.");
+  console.log(`Would create/update ${companyRows.length} companies: ${companyRows.map((company) => company.name).join(", ")}`);
+  console.log(`Would create/update ${contactRows.length} contacts: ${contactRows.map((contact) => `${contact.name} <${deterministicEmail(contact)}>`).join(", ")}`);
+  console.log(`Would create/update ${opportunityRows.length} deals: ${opportunityRows.map((opportunity) => opportunity.name).join(", ")}`);
+  console.log(`Would create/update ${contactRows.length} contact->company associations and ${opportunityRows.length} deal->company associations.`);
+  console.log("Would archive 0 records.");
+}
+
 async function verifyHubSpotSeed(
   companyRows: CompanyRow[],
   contactRows: ContactRow[],
@@ -427,12 +450,16 @@ async function verifyHubSpotSeed(
   console.log(`Verification: ${worldCompanies.length} named demo companies (+${nonWorldCompanies.length} default/other), ${totalContactAssociations} contact-company associations, ${totalDealAssociations} deal-company associations.`);
 }
 
-if (!token) {
+const companyRows = companies as CompanyRow[];
+const contactRows = contacts as ContactRow[];
+const opportunityRows = opportunities as OpportunityRow[];
+
+if (!confirmed) {
+  printSeedDryRun(companyRows, contactRows, opportunityRows);
+} else if (!token) {
   logSkip();
 } else {
-  const companyRows = companies as CompanyRow[];
-  const contactRows = contacts as ContactRow[];
-  const opportunityRows = opportunities as OpportunityRow[];
+  console.log(`HubSpot token source: ${tokenSource?.name}`);
   const companyDomainById = new Map(companyRows.map((company) => [company.id, worldCompanyDomain(company)]));
 
   await ensureDealExternalIdProperty();

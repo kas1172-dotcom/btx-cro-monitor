@@ -7,6 +7,7 @@ import opportunities from "../data/demo/btx/opportunities.json";
 
 const FRONTEND_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const REPO_DIR = join(FRONTEND_DIR, "..");
+const confirmed = process.argv.includes("--confirm");
 
 type CrmObjectType = "companies" | "contacts" | "deals";
 type AssociationObjectType = "companies" | "contacts" | "deals";
@@ -69,23 +70,36 @@ class HubspotError extends Error {
   }
 }
 
-function readEnvTokenFromFile(path: string): string | undefined {
+interface TokenSource {
+  value: string;
+  name: "HUBSPOT_ACCESS_TOKEN" | "BTX_HUBSPOT_ACCESS_TOKEN";
+}
+
+function readEnvTokenFromFile(path: string): TokenSource | undefined {
   if (!existsSync(path)) return undefined;
   const lines = readFileSync(path, "utf8").split(/\r?\n/u);
   for (const line of lines) {
     const match = /^\s*(?:export\s+)?(HUBSPOT_ACCESS_TOKEN|BTX_HUBSPOT_ACCESS_TOKEN)\s*=\s*(.+?)\s*$/u.exec(line);
     if (!match) continue;
-    return match[2].replace(/^['"]|['"]$/g, "");
+    return {
+      name: match[1] as TokenSource["name"],
+      value: match[2].replace(/^['"]|['"]$/g, ""),
+    };
   }
   return undefined;
 }
 
-const token = process.env.HUBSPOT_ACCESS_TOKEN
-  ?? process.env.BTX_HUBSPOT_ACCESS_TOKEN
-  ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env.local"))
-  ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env"))
-  ?? readEnvTokenFromFile(join(REPO_DIR, ".env.local"))
-  ?? readEnvTokenFromFile(join(REPO_DIR, ".env"));
+function resolveToken(): TokenSource | undefined {
+  if (process.env.HUBSPOT_ACCESS_TOKEN) return { name: "HUBSPOT_ACCESS_TOKEN", value: process.env.HUBSPOT_ACCESS_TOKEN };
+  if (process.env.BTX_HUBSPOT_ACCESS_TOKEN) return { name: "BTX_HUBSPOT_ACCESS_TOKEN", value: process.env.BTX_HUBSPOT_ACCESS_TOKEN };
+  return readEnvTokenFromFile(join(FRONTEND_DIR, ".env.local"))
+    ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env"))
+    ?? readEnvTokenFromFile(join(REPO_DIR, ".env.local"))
+    ?? readEnvTokenFromFile(join(REPO_DIR, ".env"));
+}
+
+const tokenSource = resolveToken();
+const token = tokenSource?.value;
 
 function cleanProperties(properties: Record<string, PropertyValue | undefined>): Record<string, PropertyValue> {
   return Object.fromEntries(Object.entries(properties).filter((entry): entry is [string, PropertyValue] => entry[1] !== undefined));
@@ -229,12 +243,24 @@ function requireRecord<T>(value: T | undefined, message: string): T {
   return value;
 }
 
-if (!token) {
+function printCleanupDryRun(companyRows: CompanyRow[], contactRows: ContactRow[], opportunityRows: OpportunityRow[]): void {
+  console.log("HubSpot cleanup dry-run. Pass --confirm to write to HubSpot.");
+  console.log(`Would update/backfill ${companyRows.length} canonical companies: ${companyRows.map((company) => company.name).join(", ")}`);
+  console.log(`Would verify/repoint ${contactRows.length} contact->company associations for: ${contactRows.map((contact) => contact.name).join(", ")}`);
+  console.log(`Would verify/repoint ${opportunityRows.length} deal->company associations for: ${opportunityRows.map((opportunity) => opportunity.name).join(", ")}`);
+  console.log(`Would archive up to ${companyRows.length} nameless duplicate companies matching: ${companyRows.map((company) => `${worldCompanyDomain(company)}.com`).join(", ")}`);
+}
+
+const companyRows = companies as CompanyRow[];
+const contactRows = contacts as ContactRow[];
+const opportunityRows = opportunities as OpportunityRow[];
+
+if (!confirmed) {
+  printCleanupDryRun(companyRows, contactRows, opportunityRows);
+} else if (!token) {
   console.log("HubSpot cleanup skipped: set HUBSPOT_ACCESS_TOKEN or BTX_HUBSPOT_ACCESS_TOKEN.");
 } else {
-  const companyRows = companies as CompanyRow[];
-  const contactRows = contacts as ContactRow[];
-  const opportunityRows = opportunities as OpportunityRow[];
+  console.log(`HubSpot token source: ${tokenSource?.name}`);
   const companyById = new Map(companyRows.map((company) => [company.id, company]));
   const worldDomains = new Set(companyRows.map(worldCompanyDomain));
   const autoCompanyDomainByWorldDomain = new Map(companyRows.map((company) => [worldCompanyDomain(company), `${worldCompanyDomain(company)}.com`]));

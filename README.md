@@ -204,8 +204,9 @@ inputs:
 
 ### 5 — (Optional) enable a schedule
 
-The pipeline is **manual-dispatch only** by default — nothing runs on its own.
-To add weekly runs later, uncomment the `schedule:` block in the workflow.
+All workflows are **manual-dispatch only** by default — nothing runs on its own.
+The weekly-memo schedule is deliberately commented out pending client validation
+of the cadence; re-enable it by uncommenting that workflow's `schedule:` block.
 
 ### 6 — Set the `ANTHROPIC_API_KEY` secret
 
