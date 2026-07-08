@@ -10,6 +10,7 @@ import type { Deliverable } from "../deliverables/types.ts";
 import type { ChartSpec } from "../metrics/types.ts";
 
 export type View = "home" | "current" | "prospecting" | "map" | "dashboard" | "graph" | "feed" | "operating" | "integrations";
+export type SettingsSection = "general" | "engine" | "prompts" | "connections";
 
 export interface UiState {
   city: string | null;
@@ -18,6 +19,9 @@ export interface UiState {
   copilotPrompt: string | null;
   copilotPromptId: number;
   demoAction: DemoActionNotice | null;
+  activeHome: boolean;
+  activeSettings: boolean;
+  activeSettingsSection: SettingsSection;
   activeBrainArea: BrainArea;
   brainResponse: BrainResponse | null;
   activeDeliverable: Deliverable | null;
@@ -40,6 +44,9 @@ let state: UiState = {
   copilotPrompt: null,
   copilotPromptId: 0,
   demoAction: null,
+  activeHome: true,
+  activeSettings: false,
+  activeSettingsSection: "general",
   activeBrainArea: "revenue",
   brainResponse: null,
   activeDeliverable: null,
@@ -50,7 +57,14 @@ let state: UiState = {
 const listeners = new Set<() => void>();
 
 export function setState(patch: Partial<UiState>): void {
-  state = { ...state, ...patch };
+  const nextPatch = { ...patch };
+  if (patch.activeBrainArea !== undefined && patch.activeHome === undefined) {
+    nextPatch.activeHome = false;
+  }
+  if ((patch.activeBrainArea !== undefined || patch.activeHome) && patch.activeSettings === undefined) {
+    nextPatch.activeSettings = false;
+  }
+  state = { ...state, ...nextPatch };
   listeners.forEach((l) => l());
 }
 
@@ -92,7 +106,8 @@ export function closeDemoAction(): void {
 
 export function goHome(): void {
   setState({
-    activeBrainArea: "revenue",
+    activeHome: true,
+    activeSettings: false,
     brainResponse: null,
     activeDeliverable: null,
     activeAnalysisSpec: null,
@@ -112,6 +127,9 @@ export function resetUiState(): void {
     copilotPrompt: null,
     copilotPromptId: 0,
     demoAction: null,
+    activeHome: true,
+    activeSettings: false,
+    activeSettingsSection: "general",
     activeBrainArea: "revenue",
     brainResponse: null,
     activeDeliverable: null,

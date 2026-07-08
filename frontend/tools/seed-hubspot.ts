@@ -1,8 +1,34 @@
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import companies from "../data/demo/btx/companies.json";
 import contacts from "../data/demo/btx/contacts.json";
 import opportunities from "../data/demo/btx/opportunities.json";
 
-const token = process.env.HUBSPOT_ACCESS_TOKEN ?? process.env.BTX_HUBSPOT_ACCESS_TOKEN;
+const FRONTEND_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
+const REPO_DIR = join(FRONTEND_DIR, "..");
+
+function readEnvTokenFromFile(path: string): string | undefined {
+  if (!existsSync(path)) return undefined;
+  const lines = readFileSync(path, "utf8").split(/\r?\n/u);
+  for (const line of lines) {
+    const match = /^\s*(?:export\s+)?(HUBSPOT_ACCESS_TOKEN|BTX_HUBSPOT_ACCESS_TOKEN)\s*=\s*(.+?)\s*$/u.exec(line);
+    if (!match) continue;
+    return match[2].replace(/^['"]|['"]$/g, "");
+  }
+  return undefined;
+}
+
+const token = process.env.HUBSPOT_ACCESS_TOKEN
+  ?? process.env.BTX_HUBSPOT_ACCESS_TOKEN
+  ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env.local"))
+  ?? readEnvTokenFromFile(join(FRONTEND_DIR, ".env"))
+  ?? readEnvTokenFromFile(join(REPO_DIR, ".env.local"))
+  ?? readEnvTokenFromFile(join(REPO_DIR, ".env"));
+
+type CrmObjectType = "companies" | "contacts" | "deals";
+type AssociationObjectType = "companies" | "contacts" | "deals";
+type PropertyValue = string | number | boolean;
 
 interface CompanyRow {
   id: string;
@@ -10,6 +36,7 @@ interface CompanyRow {
   relationship: string;
   account_status?: string;
   location: { city: string; state?: string; address?: string; postal_code?: string };
+  domain?: string;
   website_url?: string;
 }
 
@@ -30,12 +57,82 @@ interface OpportunityRow {
   close_date: string;
 }
 
+interface BatchUpsertInput {
+  id: string;
+  idProperty?: string;
+  objectWriteTraceId: string;
+  properties: Record<string, PropertyValue>;
+}
+
+interface BatchUpsertResult {
+  id: string;
+  new?: boolean;
+  objectWriteTraceId?: string;
+}
+
+interface BatchUpsertResponse {
+  results?: BatchUpsertResult[];
+  errors?: Array<{ message?: string; context?: Record<string, unknown> }>;
+  numErrors?: number;
+}
+
+interface UpsertSummary {
+  created: number;
+  updated: number;
+  idByTraceId: Map<string, string>;
+}
+
+interface AssociationPair {
+  fromId: string;
+  toId: string;
+}
+
+interface AssociationReadResponse {
+  results?: Array<{
+    from: { id: string };
+    to?: Array<{ toObjectId: string | number }>;
+  }>;
+}
+
+interface CrmObject {
+  id: string;
+  properties: Record<string, string | null | undefined>;
+}
+
+interface SearchResponse {
+  results?: CrmObject[];
+  paging?: { next?: { after?: string } };
+}
+
+interface DealPipelineResponse {
+  results?: Array<{
+    id: string;
+    stages?: Array<{
+      id: string;
+      metadata?: {
+        probability?: string;
+        isClosed?: string;
+      };
+    }>;
+  }>;
+}
+
+class HubspotError extends Error {
+  constructor(
+    public readonly path: string,
+    public readonly status: number,
+    public readonly body: string,
+  ) {
+    super(`HubSpot ${path} failed ${status}: ${body}`);
+  }
+}
+
 function logSkip(): void {
   console.log("HubSpot seed skipped: set HUBSPOT_ACCESS_TOKEN or BTX_HUBSPOT_ACCESS_TOKEN to seed the sandbox portal.");
 }
 
-async function hubspot(path: string, body: unknown): Promise<void> {
-  if (!token) return;
+async function hubspot<T>(path: string, body: unknown, options: { allowConflict?: boolean } = {}): Promise<T | undefined> {
+  if (!token) return undefined;
   const response = await fetch(`https://api.hubapi.com${path}`, {
     method: "POST",
     headers: {
@@ -44,19 +141,290 @@ async function hubspot(path: string, body: unknown): Promise<void> {
     },
     body: JSON.stringify(body),
   });
+  const text = await response.text();
+  if (response.status === 409 && options.allowConflict) return undefined;
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HubSpot ${path} failed ${response.status}: ${text}`);
+    throw new HubspotError(path, response.status, text);
+  }
+  return text ? (JSON.parse(text) as T) : undefined;
+}
+
+async function hubspotGet<T>(path: string): Promise<T | undefined> {
+  if (!token) return undefined;
+  const response = await fetch(`https://api.hubapi.com${path}`, {
+    method: "GET",
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  });
+  const text = await response.text();
+  if (!response.ok) {
+    throw new HubspotError(path, response.status, text);
+  }
+  return text ? (JSON.parse(text) as T) : undefined;
+}
+
+async function searchAll(objectType: CrmObjectType, properties: string[]): Promise<CrmObject[]> {
+  const rows: CrmObject[] = [];
+  let after: string | undefined;
+  do {
+    const response = await hubspot<SearchResponse>(`/crm/v3/objects/${objectType}/search`, {
+      limit: 100,
+      properties,
+      sorts: [{ propertyName: "createdate", direction: "ASCENDING" }],
+      ...(after ? { after } : {}),
+    });
+    rows.push(...(response?.results ?? []));
+    after = response?.paging?.next?.after;
+  } while (after);
+  return rows;
+}
+
+function cleanProperties(properties: Record<string, PropertyValue | undefined>): Record<string, PropertyValue> {
+  return Object.fromEntries(Object.entries(properties).filter((entry): entry is [string, PropertyValue] => entry[1] !== undefined));
+}
+
+function traceId(objectType: CrmObjectType, id: string): string {
+  return `btx-${objectType}-${id}`;
+}
+
+function worldCompanyDomain(company: CompanyRow): string {
+  const domain = company.domain ?? company.website_url?.replace(/^https?:\/\//, "").replace(/\/$/u, "") ?? `${company.id}.example`;
+  if (!domain.endsWith(".example")) {
+    throw new Error(`Company ${company.id} must use a fictional .example domain, received ${domain}`);
+  }
+  return domain;
+}
+
+function splitName(name: string): { firstname: string; lastname: string } {
+  const [firstname, ...rest] = name.trim().split(/\s+/u);
+  return { firstname: firstname ?? "", lastname: rest.join(" ") };
+}
+
+function emailLocalPart(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "");
+}
+
+function deterministicEmail(contact: ContactRow): string {
+  return contact.email ?? `${emailLocalPart(contact.name)}@${contact.company_id}.example.com`;
+}
+
+async function ensureDealExternalIdProperty(): Promise<void> {
+  await ensureUniqueStringProperty("deals", "dealinformation", "btx_external_id", "BTX External ID", "Stable external ID used by the BTX demo HubSpot seed script.");
+}
+
+async function ensureUniqueStringProperty(objectType: CrmObjectType, groupName: string, name: string, label: string, description: string): Promise<void> {
+  try {
+    await hubspot(`/crm/v3/properties/${objectType}`, {
+      groupName,
+      name,
+      label,
+      description,
+      hasUniqueValue: true,
+      type: "string",
+      fieldType: "text",
+    }, { allowConflict: true });
+  } catch (error) {
+    if (!(error instanceof HubspotError) || error.status !== 403) throw error;
+
+    try {
+      await hubspotGet(`/crm/v3/properties/${objectType}/${name}`);
+      return;
+    } catch (getError) {
+      if (getError instanceof HubspotError && getError.status === 404) {
+        throw new Error(`HubSpot ${objectType} property ${name} does not exist, and this token cannot create it. Grant a private app token with CRM schema write scope for ${objectType} and rerun.`);
+      }
+      throw getError;
+    }
   }
 }
 
-async function batchUpsert(objectType: "companies" | "contacts" | "deals", idProperty: string, inputs: Array<{ id: string; properties: Record<string, unknown> }>): Promise<void> {
+async function batchUpsert(objectType: CrmObjectType, idProperty: string, inputs: BatchUpsertInput[]): Promise<UpsertSummary> {
+  const summary: UpsertSummary = { created: 0, updated: 0, idByTraceId: new Map() };
+
   for (let i = 0; i < inputs.length; i += 100) {
-    await hubspot(`/crm/v3/objects/${objectType}/batch/upsert`, {
+    const chunk = inputs.slice(i, i + 100).map((input) => ({ ...input, idProperty }));
+    const response = await hubspot<BatchUpsertResponse>(`/crm/v3/objects/${objectType}/batch/upsert`, {
       idProperty,
-      inputs: inputs.slice(i, i + 100),
+      inputs: chunk,
+    });
+    if ((response?.numErrors ?? 0) > 0 || (response?.errors?.length ?? 0) > 0) {
+      throw new Error(`HubSpot ${objectType} upsert returned errors: ${JSON.stringify(response?.errors ?? [])}`);
+    }
+
+    for (const [index, result] of (response?.results ?? []).entries()) {
+      const resultTraceId = result.objectWriteTraceId ?? chunk[index]?.objectWriteTraceId;
+      if (resultTraceId) summary.idByTraceId.set(resultTraceId, result.id);
+      if (result.new) {
+        summary.created += 1;
+      } else {
+        summary.updated += 1;
+      }
+    }
+  }
+
+  if (summary.idByTraceId.size !== inputs.length) {
+    throw new Error(`HubSpot ${objectType} upsert returned ${summary.idByTraceId.size} IDs for ${inputs.length} inputs.`);
+  }
+
+  return summary;
+}
+
+function isNonUniqueIdPropertyError(error: unknown, idProperty: string): boolean {
+  return error instanceof HubspotError
+    && error.status === 400
+    && error.body.includes("Unable to perform update/upsert by non-unique")
+    && error.body.includes(`property ${idProperty}`);
+}
+
+function uniquePairs(pairs: AssociationPair[]): AssociationPair[] {
+  const seen = new Set<string>();
+  return pairs.filter((pair) => {
+    const key = `${pair.fromId}:${pair.toId}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+async function readExistingAssociations(fromObjectType: AssociationObjectType, toObjectType: AssociationObjectType, fromIds: string[]): Promise<Set<string>> {
+  const existing = new Set<string>();
+
+  for (let i = 0; i < fromIds.length; i += 1000) {
+    const chunk = fromIds.slice(i, i + 1000);
+    const response = await hubspot<AssociationReadResponse>(`/crm/v4/associations/${fromObjectType}/${toObjectType}/batch/read`, {
+      inputs: chunk.map((id) => ({ id })),
+    });
+
+    for (const result of response?.results ?? []) {
+      for (const to of result.to ?? []) {
+        existing.add(`${result.from.id}:${to.toObjectId}`);
+      }
+    }
+  }
+
+  return existing;
+}
+
+async function createMissingAssociations(fromObjectType: AssociationObjectType, toObjectType: AssociationObjectType, pairs: AssociationPair[]): Promise<{ created: number; alreadyPresent: number }> {
+  const dedupedPairs = uniquePairs(pairs);
+  const existing = await readExistingAssociations(fromObjectType, toObjectType, dedupedPairs.map((pair) => pair.fromId));
+  const missingPairs = dedupedPairs.filter((pair) => !existing.has(`${pair.fromId}:${pair.toId}`));
+
+  for (let i = 0; i < missingPairs.length; i += 100) {
+    await hubspot(`/crm/v4/associations/${fromObjectType}/${toObjectType}/batch/associate/default`, {
+      inputs: missingPairs.slice(i, i + 100).map((pair) => ({
+        from: { id: pair.fromId },
+        to: { id: pair.toId },
+      })),
     });
   }
+
+  return { created: missingPairs.length, alreadyPresent: dedupedPairs.length - missingPairs.length };
+}
+
+function idFromSummary(summary: UpsertSummary, objectType: CrmObjectType, id: string): string {
+  const hubspotId = summary.idByTraceId.get(traceId(objectType, id));
+  if (!hubspotId) throw new Error(`Missing HubSpot ${objectType} ID for ${id}.`);
+  return hubspotId;
+}
+
+function printObjectSummary(label: string, summary: UpsertSummary): void {
+  console.log(`${label}: ${summary.created} created, ${summary.updated} updated`);
+}
+
+async function dealStageIdByDemoStage(): Promise<Record<string, string>> {
+  const response = await hubspotGet<DealPipelineResponse>("/crm/v3/pipelines/deals");
+  const pipeline = response?.results?.find((candidate) => candidate.id === "default") ?? response?.results?.[0];
+  const stages = pipeline?.stages ?? [];
+  if (stages.length === 0) throw new Error("HubSpot portal has no deal pipeline stages.");
+
+  const fallbackStage = stages[0];
+  const openStages = stages.filter((stage) => stage.metadata?.isClosed !== "true");
+  const wonStageId = (stages.find((stage) => stage.metadata?.isClosed === "true" && stage.metadata?.probability === "1.0") ?? stages.at(-2) ?? stages.at(-1) ?? fallbackStage).id;
+  const lostStageId = (stages.find((stage) => stage.metadata?.isClosed === "true" && stage.metadata?.probability === "0.0") ?? stages.at(-1) ?? fallbackStage).id;
+  const stageAt = (index: number): string => (openStages[Math.min(index, Math.max(openStages.length - 1, 0))] ?? fallbackStage).id;
+
+  return {
+    prospecting: stageAt(0),
+    qualified: stageAt(1),
+    proposal: stageAt(2),
+    won: wonStageId,
+    lost: lostStageId,
+  };
+}
+
+function companyUpsertInputs(companyRows: CompanyRow[], idProperty: "domain" | "btx_company_domain"): BatchUpsertInput[] {
+  return companyRows.map((company) => {
+    const domain = worldCompanyDomain(company);
+    return {
+      id: domain,
+      objectWriteTraceId: traceId("companies", company.id),
+      properties: cleanProperties({
+        name: company.name,
+        domain,
+        btx_company_domain: idProperty === "btx_company_domain" ? domain : undefined,
+        city: company.location.city,
+        state: company.location.state,
+        address: company.location.address,
+        zip: company.location.postal_code,
+      }),
+    };
+  });
+}
+
+async function verifyHubSpotSeed(
+  companyRows: CompanyRow[],
+  contactRows: ContactRow[],
+  opportunityRows: OpportunityRow[],
+  companySummary: UpsertSummary,
+  contactSummary: UpsertSummary,
+  dealSummary: UpsertSummary,
+): Promise<void> {
+  const worldDomains = new Set(companyRows.map(worldCompanyDomain));
+  const allCompanies = await searchAll("companies", ["name", "domain", "btx_company_domain"]);
+  const namelessCompanies = allCompanies.filter((company) => !company.properties.name);
+  const worldCompanies = allCompanies.filter((company) => worldDomains.has(company.properties.domain ?? ""));
+  const nonWorldCompanies = allCompanies.filter((company) => !worldDomains.has(company.properties.domain ?? ""));
+
+  if (namelessCompanies.length > 0) {
+    throw new Error(`HubSpot verification failed: ${namelessCompanies.length} companies lack a name.`);
+  }
+  if (worldCompanies.length !== companyRows.length || allCompanies.length !== companyRows.length + 1) {
+    throw new Error(`HubSpot verification failed: expected ${companyRows.length} named demo companies plus 1 default company; found ${allCompanies.length} total (${worldCompanies.length} demo, ${nonWorldCompanies.length} other).`);
+  }
+
+  const expectedCompanyByContactId = new Map(contactRows.map((contact) => [
+    idFromSummary(contactSummary, "contacts", contact.id),
+    idFromSummary(companySummary, "companies", contact.company_id),
+  ]));
+  const expectedCompanyByDealId = new Map(opportunityRows.map((opportunity) => [
+    idFromSummary(dealSummary, "deals", opportunity.id),
+    idFromSummary(companySummary, "companies", opportunity.company_id),
+  ]));
+
+  const contactAssociations = await readExistingAssociations("contacts", "companies", [...expectedCompanyByContactId.keys()]);
+  const dealAssociations = await readExistingAssociations("deals", "companies", [...expectedCompanyByDealId.keys()]);
+
+  let totalContactAssociations = 0;
+  for (const [contactId, companyId] of expectedCompanyByContactId) {
+    const associatedCompanyIds = [...contactAssociations].filter((key) => key.startsWith(`${contactId}:`)).map((key) => key.split(":")[1]);
+    totalContactAssociations += associatedCompanyIds.length;
+    if (associatedCompanyIds.length !== 1 || associatedCompanyIds[0] !== companyId) {
+      throw new Error(`HubSpot verification failed: contact ${contactId} is associated to ${associatedCompanyIds.length ? associatedCompanyIds.join(", ") : "no companies"} instead of named company ${companyId}.`);
+    }
+  }
+
+  let totalDealAssociations = 0;
+  for (const [dealId, companyId] of expectedCompanyByDealId) {
+    const associatedCompanyIds = [...dealAssociations].filter((key) => key.startsWith(`${dealId}:`)).map((key) => key.split(":")[1]);
+    totalDealAssociations += associatedCompanyIds.length;
+    if (associatedCompanyIds.length !== 1 || associatedCompanyIds[0] !== companyId) {
+      throw new Error(`HubSpot verification failed: deal ${dealId} is associated to ${associatedCompanyIds.length ? associatedCompanyIds.join(", ") : "no companies"} instead of named company ${companyId}.`);
+    }
+  }
+
+  console.log(`Verification: ${worldCompanies.length} named demo companies (+${nonWorldCompanies.length} default/other), ${totalContactAssociations} contact-company associations, ${totalDealAssociations} deal-company associations.`);
 }
 
 if (!token) {
@@ -65,48 +433,70 @@ if (!token) {
   const companyRows = companies as CompanyRow[];
   const contactRows = contacts as ContactRow[];
   const opportunityRows = opportunities as OpportunityRow[];
+  const companyDomainById = new Map(companyRows.map((company) => [company.id, worldCompanyDomain(company)]));
 
-  await batchUpsert("companies", "btx_demo_id", companyRows.map((company) => ({
-    id: company.id,
-    properties: {
-        name: company.name,
-        domain: company.website_url?.replace(/^https?:\/\//, "") ?? `${company.id}.example`,
-        city: company.location.city,
-        state: company.location.state,
-        address: company.location.address,
-        zip: company.location.postal_code,
-        btx_demo_id: company.id,
-        btx_relationship: company.relationship,
-        btx_account_status: company.account_status,
-      },
-  })));
+  await ensureDealExternalIdProperty();
 
-  await batchUpsert("contacts", "btx_demo_id", contactRows.map((contact) => {
-    const [firstname, ...rest] = contact.name.split(" ");
+  let companySummary: UpsertSummary;
+  try {
+    companySummary = await batchUpsert("companies", "domain", companyUpsertInputs(companyRows, "domain"));
+  } catch (error) {
+    if (!isNonUniqueIdPropertyError(error, "domain")) throw error;
+    console.log("HubSpot portal does not allow company upsert by built-in domain; using unique btx_company_domain fallback.");
+    await ensureUniqueStringProperty("companies", "companyinformation", "btx_company_domain", "BTX Company Domain", "Stable fictional company domain used by the BTX demo HubSpot seed script.");
+    companySummary = await batchUpsert("companies", "btx_company_domain", companyUpsertInputs(companyRows, "btx_company_domain"));
+  }
+
+  const contactSummary = await batchUpsert("contacts", "email", contactRows.map((contact) => {
+    const { firstname, lastname } = splitName(contact.name);
+    const email = deterministicEmail(contact);
+    const expectedDomain = companyDomainById.get(contact.company_id);
+    if (!expectedDomain) throw new Error(`Contact ${contact.id} references unknown company ${contact.company_id}.`);
+    const expectedEmailDomain = expectedDomain.endsWith(".example")
+      ? `${expectedDomain}.com`
+      : expectedDomain;
+    if (!email.endsWith(`@${expectedEmailDomain}`)) {
+      throw new Error(`Contact ${contact.id} must use first.last@${expectedEmailDomain}, received ${email}.`);
+    }
     return {
-      id: contact.id,
-      properties: {
+      id: email,
+      objectWriteTraceId: traceId("contacts", contact.id),
+      properties: cleanProperties({
         firstname,
-        lastname: rest.join(" "),
-        email: contact.email ?? `${contact.id}@demo.btx.example`,
+        lastname,
+        email,
         jobtitle: contact.title,
-        btx_demo_id: contact.id,
-        btx_company_demo_id: contact.company_id,
-      },
+      }),
     };
   }));
 
-  await batchUpsert("deals", "btx_demo_id", opportunityRows.map((opportunity) => ({
+  const dealStageIds = await dealStageIdByDemoStage();
+  const dealSummary = await batchUpsert("deals", "btx_external_id", opportunityRows.map((opportunity) => ({
     id: opportunity.id,
-      properties: {
-        dealname: opportunity.name,
-        amount: opportunity.value,
-        closedate: opportunity.close_date,
-        dealstage: opportunity.stage,
-        btx_demo_id: opportunity.id,
-        btx_company_demo_id: opportunity.company_id,
-      },
+    objectWriteTraceId: traceId("deals", opportunity.id),
+    properties: cleanProperties({
+      dealname: opportunity.name,
+      amount: opportunity.value,
+      closedate: opportunity.close_date,
+      dealstage: dealStageIds[opportunity.stage],
+      btx_external_id: opportunity.id,
+    }),
   })));
 
-  console.log(`HubSpot seed submitted ${companyRows.length} companies, ${contactRows.length} contacts, ${opportunityRows.length} deals.`);
+  const contactCompanyAssociations = await createMissingAssociations("contacts", "companies", contactRows.map((contact) => ({
+    fromId: idFromSummary(contactSummary, "contacts", contact.id),
+    toId: idFromSummary(companySummary, "companies", contact.company_id),
+  })));
+
+  const dealCompanyAssociations = await createMissingAssociations("deals", "companies", opportunityRows.map((opportunity) => ({
+    fromId: idFromSummary(dealSummary, "deals", opportunity.id),
+    toId: idFromSummary(companySummary, "companies", opportunity.company_id),
+  })));
+
+  printObjectSummary("Companies", companySummary);
+  printObjectSummary("Contacts", contactSummary);
+  printObjectSummary("Deals", dealSummary);
+  console.log(`Associations: ${contactCompanyAssociations.created} contacts->companies created (${contactCompanyAssociations.alreadyPresent} already present), ${dealCompanyAssociations.created} deals->companies created (${dealCompanyAssociations.alreadyPresent} already present).`);
+  await verifyHubSpotSeed(companyRows, contactRows, opportunityRows, companySummary, contactSummary, dealSummary);
+  console.log("HubSpot seed complete.");
 }

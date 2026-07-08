@@ -56,6 +56,9 @@ const monthKey = (offsetFromAsOf: number): string => {
 };
 const provenance = (source_name: string) => ({ source_type: "demo", source_name, source_mode: "static_snapshot" });
 const demoUrl = (path: string): string => `https://demo.btx.example/${path}`;
+const fictionalDomain = (slug: string): string => `${slug}.example`;
+const emailLocalPart = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "");
+const contactEmail = (name: string, companySlug: string): string => `${emailLocalPart(name)}@${companySlug}.example.com`;
 
 const ACCOUNTS: AccountSeed[] = [
   { id: "btx-precision", name: "BTX Precision", relationship: "self", account_status: "current_customer", business_motion: "manage_current_business", city: "Dallas", state: "TX", postal_code: "75201", lat: 32.7767, lon: -96.797, address: "1200 Precision Way", needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "ITAR", "titanium", "aluminum"], tier: "Strategic" },
@@ -155,6 +158,7 @@ const companies = ACCOUNT_ROWS.map((a) => ({
     postal_code: a.postal_code,
     country: "USA",
   },
+  domain: fictionalDomain(a.id),
   website_url: `https://${a.id}.example`,
   linkedin_url: demoUrl(`linkedin/company/${a.id}`),
   source_url: demoUrl(`crm/accounts/${a.id}`),
@@ -199,12 +203,13 @@ for (const account of ACCOUNT_ROWS) {
 
   for (let i = 0; i < contactCount; i += 1) {
     contactSeq += 1;
+    const name = contactName();
     contacts.push({
       id: `con-${String(contactSeq).padStart(4, "0")}`,
       company_id: account.id,
-      name: contactName(),
+      name,
       title: pick(TITLES),
-      email: `${account.id}.${contactSeq}@demo.btx.example`,
+      email: contactEmail(name, account.id),
       ...provenance("Simulated CRM Contacts"),
     });
   }
