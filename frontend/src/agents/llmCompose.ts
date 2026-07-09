@@ -1,6 +1,7 @@
 import type { Deliverable, DeliverableSection, ValidationResult } from "../deliverables/types.ts";
 import type { AgentContext, SectionSpec } from "./contract.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
+import { backendHeaders } from "../app/backendApi.ts";
 
 interface LlmSection {
   id: string;
@@ -111,7 +112,7 @@ async function callJson(system: string, content: string): Promise<LlmComposeResu
   try {
     const response = await fetch(ENDPOINT as string, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: backendHeaders({ "content-type": "application/json" }),
       body: JSON.stringify({ model: LLM_MODELS.composition, system, messages: [{ role: "user", content }] }),
       signal: controller.signal,
     });

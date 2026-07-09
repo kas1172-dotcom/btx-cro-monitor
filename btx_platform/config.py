@@ -27,9 +27,29 @@ class Settings(BaseSettings):
     signature_header: str = "X-BTX-Signature"
     idempotency_header: str = "X-Idempotency-Key"
     frontend_origin: str = "http://localhost:5173"
+    frontend_origins: str | None = None
+    backend_auth_token: str | None = None
     anthropic_api_key: str | None = None
+    anthropic_base_url: str = "https://api.anthropic.com/v1/messages"
+    anthropic_version: str = "2023-06-01"
+    llm_timeout_seconds: float = 45.0
+    llm_max_body_bytes: int = 524_288
     hubspot_access_token: str | None = None
     gmail_allowlist: str = ""
+    pipeline_mechanism: str = "subprocess"
+    pipeline_output_dir: str = "clients/btx/artifacts"
+    pipeline_generated_dir: str = ".btx_platform/generated"
+    pipeline_timeout_seconds: float = 900.0
+    pipeline_min_interval_seconds: int = 600
+    github_pat: str | None = None
+    github_repo: str = "kas1172-dotcom/btx-cro-monitor"
+    github_workflow: str = "monitor.yml"
+    github_ref: str = "main"
+
+    @property
+    def cors_origins(self) -> list[str]:
+        raw = self.frontend_origins or self.frontend_origin
+        return [item.strip() for item in raw.split(",") if item.strip()]
 
 
 @lru_cache

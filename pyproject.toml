@@ -25,6 +25,7 @@ platform = [
     "fastapi>=0.111",
     "uvicorn[standard]>=0.30",
     "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.2",
     "alembic>=1.13",
     "pydantic-settings>=2.0",
     "celery>=5.3",            # background workers (Phase 2)

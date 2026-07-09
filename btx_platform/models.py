@@ -104,3 +104,30 @@ class DeadLetter(Base):
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     moved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     replayed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class EngineConfig(Base):
+    """Versioned JSON configuration edited from the frontend."""
+    __tablename__ = "engine_configs"
+    __table_args__ = (UniqueConstraint("name", "version", name="uq_engine_config_version"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    name: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    document: Mapped[dict] = mapped_column(JSON)
+    change_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+
+
+class PipelineRun(Base):
+    """Audit row for a manually triggered monitor-engine pipeline run."""
+    __tablename__ = "pipeline_runs"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    triggered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    mechanism: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    item_counts: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+    config_path: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -1,6 +1,7 @@
 import type { DataAdapter, RegionFilter } from "../../engine/brain/ports.ts";
 import type { Company, Contact, Facility, Opportunity } from "../../engine/brain/entities.ts";
 import type { OperatingSnapshot } from "../../engine/brain/operatingSnapshot.ts";
+import { backendHeaders } from "../../app/backendApi.ts";
 
 const ENDPOINT = (import.meta as ImportMeta & { env?: { VITE_BACKEND_ENDPOINT?: string } }).env?.VITE_BACKEND_ENDPOINT;
 const MESSAGE = "Live API mode requires VITE_BACKEND_ENDPOINT. Use VITE_DATA_MODE=demo when the backend is unavailable.";
@@ -8,7 +9,7 @@ const MESSAGE = "Live API mode requires VITE_BACKEND_ENDPOINT. Use VITE_DATA_MOD
 export class LiveDataAdapter implements DataAdapter {
   private async getJson<T>(path: string): Promise<T> {
     if (!ENDPOINT) throw new Error(MESSAGE);
-    const response = await fetch(`${ENDPOINT}${path}`);
+    const response = await fetch(`${ENDPOINT}${path}`, { headers: backendHeaders() });
     if (!response.ok) {
       const body = await response.text();
       throw new Error(`Live adapter ${path} failed (${response.status}): ${body}`);

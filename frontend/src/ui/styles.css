@@ -344,6 +344,143 @@ p { line-height: 1.55; }
 .settings-actions button:hover {
   border-color: var(--accent);
 }
+.settings-live-panel {
+  display: grid;
+  gap: 12px;
+  max-width: 1040px;
+}
+.settings-status {
+  display: grid;
+  grid-template-columns: minmax(180px, max-content) minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+.settings-status span, .settings-status em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.35;
+}
+.settings-status em {
+  grid-column: 1 / -1;
+}
+.settings-weight-table {
+  display: grid;
+  gap: 6px;
+  overflow-x: auto;
+}
+.settings-weight-head, .settings-weight-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) repeat(4, minmax(118px, 1fr));
+  gap: 6px;
+  min-width: 720px;
+  align-items: center;
+}
+.settings-weight-head {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.settings-weight-row {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .02);
+}
+.settings-weight-row strong {
+  font-size: 12px;
+}
+.settings-weight-row input, .settings-source-row input, .settings-source-row select, .settings-request textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px;
+}
+.settings-primary {
+  border-color: var(--accent) !important;
+  background: rgba(133, 173, 105, .16) !important;
+}
+.settings-source-list {
+  display: grid;
+  gap: 8px;
+}
+.settings-source-row {
+  display: grid;
+  grid-template-columns: minmax(92px, .7fr) minmax(110px, .8fr) minmax(150px, 1fr) minmax(220px, 1.6fr) minmax(140px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .02);
+}
+.settings-source-row label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+.settings-source-row label input {
+  width: auto;
+}
+.settings-source-row button, .settings-inline-actions button, .settings-primary {
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+}
+.settings-source-row button:hover, .settings-inline-actions button:hover, .settings-primary:hover {
+  border-color: var(--accent);
+}
+.settings-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.settings-request {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.settings-request textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+.settings-runs {
+  display: grid;
+  gap: 6px;
+}
+.settings-runs div {
+  display: grid;
+  grid-template-columns: minmax(90px, max-content) minmax(160px, 1fr);
+  gap: 4px 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.settings-runs span, .settings-runs em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+.settings-runs em {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .settings-placeholder {
   max-width: 640px;
   padding: 12px;
@@ -855,6 +992,8 @@ p { line-height: 1.55; }
   .rail-quiet-row, .pipeline-table-row { grid-template-columns: 1fr; }
   .pipeline-table-head { display: none; }
   .settings-layout { grid-template-columns: 1fr; }
+  .settings-status, .settings-source-row, .settings-runs div { grid-template-columns: 1fr; }
+  .settings-weight-head, .settings-weight-row { min-width: 620px; }
   .current-account-row, .current-pipeline-row, .current-signal-row, .prospect-card, .visit-plan-card { grid-template-columns: 1fr; }
   .current-score, .prospect-card-score, .visit-plan-meta { white-space: normal; align-items: flex-start; }
   .visit-plan-head { flex-direction: column; }

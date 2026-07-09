@@ -24,6 +24,7 @@ from btx_platform.schemas import WebhookEnvelope  # noqa: E402
 from btx_platform.security import compute_signature, verify_signature  # noqa: E402
 
 SECRET = "topsecret"
+AUTH = "test-token"
 VALID = {"event_type": "contact.created", "data": {"id": 1, "name": "ACME"}, "external_id": "ext-1"}
 
 
@@ -37,7 +38,7 @@ def _build(settings: Settings | None = None):
         s.add(models.Connection(id="off", name="Disabled", signing_secret=None, active=False))
         s.commit()
     queue = InMemoryQueue()
-    app = create_app(settings=settings or Settings(env="test"), session_factory=sf, queue=queue)
+    app = create_app(settings=settings or Settings(env="test", backend_auth_token=AUTH), session_factory=sf, queue=queue)
     return TestClient(app), sf, queue
 
 
@@ -46,8 +47,10 @@ def _signed(body: dict, secret: str = SECRET) -> tuple[bytes, str]:
     return raw, compute_signature(secret, raw)
 
 
-def _post(client, conn, raw, sig=None, idem=None):
+def _post(client, conn, raw, sig=None, idem=None, auth: bool = True):
     headers = {"Content-Type": "application/json"}
+    if auth:
+        headers["Authorization"] = f"Bearer {AUTH}"
     if sig is not None:
         headers["X-BTX-Signature"] = sig
     if idem is not None:
@@ -97,6 +100,12 @@ def test_valid_signed_payload_accepted_and_enqueued():
 def test_health():
     client, _sf, _q = _build()
     assert client.get("/health").json()["status"] == "ok"
+
+
+def test_protected_routes_require_static_bearer_token():
+    client, _sf, _q = _build()
+    raw, sig = _signed(VALID)
+    assert _post(client, "appA", raw, sig, auth=False).status_code == 401
 
 
 # ─── auth ───────────────────────────────────────────────────────────────────
@@ -159,7 +168,7 @@ def test_schema_violation_422():
 
 
 def test_payload_too_large_413():
-    client, _sf, _q = _build(settings=Settings(env="test", max_body_bytes=10))
+    client, _sf, _q = _build(settings=Settings(env="test", max_body_bytes=10, backend_auth_token=AUTH))
     raw, sig = _signed(VALID)
     assert _post(client, "appA", raw, sig).status_code == 413
 

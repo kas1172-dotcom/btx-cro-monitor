@@ -4,6 +4,7 @@ import { classifyQuestion } from "./classifyQuestion.ts";
 import type { Classification } from "./classifyQuestion.ts";
 import type { BrainArea, QuestionIntent } from "./types.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
+import { backendHeaders } from "../app/backendApi.ts";
 
 const ENDPOINT = (import.meta as ImportMeta & { env?: { VITE_COPILOT_ENDPOINT?: string } }).env?.VITE_COPILOT_ENDPOINT;
 const INTENTS: QuestionIntent[] = [
@@ -50,7 +51,7 @@ async function withTimeout(url: string, body: unknown): Promise<unknown> {
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: backendHeaders({ "content-type": "application/json" }),
       body: JSON.stringify(body),
       signal: controller.signal,
     });

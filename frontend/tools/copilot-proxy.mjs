@@ -1,5 +1,7 @@
-// Local Jarvis proxy — holds ANTHROPIC_API_KEY server-side so the browser never
-// sees it. Plain Node, no deps. Run it, then point the app at it:
+// Deprecated local Jarvis proxy. Production LLM traffic now belongs in
+// btx_platform /llm; this file remains only as a lightweight local fallback that
+// holds ANTHROPIC_API_KEY server-side so the browser never sees it. Plain Node,
+// no deps. Run it, then point the app at it:
 //
 //   ANTHROPIC_API_KEY=sk-ant-... node tools/copilot-proxy.mjs
 //   echo 'VITE_COPILOT_ENDPOINT=http://localhost:8787' > .env.local

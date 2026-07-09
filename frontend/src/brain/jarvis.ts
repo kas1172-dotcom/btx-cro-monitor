@@ -11,6 +11,7 @@ import { actionLabel } from "../app/actionLabels.ts";
 import { GROUNDING_CONTRACT, CURRENT_VS_PROSPECTING } from "../app/promptContract.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { setState } from "../store/store.ts";
+import { backendHeaders } from "../app/backendApi.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -48,7 +49,7 @@ async function healthCheck(): Promise<boolean> {
     const timer = setTimeout(() => ctrl.abort(), 5000);
     const res = await fetch(ENDPOINT, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: backendHeaders({ "content-type": "application/json" }),
       signal: ctrl.signal,
       body: JSON.stringify({
         model: LLM_MODELS.chatpil,
@@ -283,7 +284,7 @@ export async function askJarvis(
 
     const res = await fetch(ENDPOINT, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: backendHeaders({ "content-type": "application/json" }),
       signal: ctrl.signal,
       body: JSON.stringify({
         model: LLM_MODELS.chatpil,

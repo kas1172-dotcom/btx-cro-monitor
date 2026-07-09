@@ -7,23 +7,35 @@ inject SQLite + an in-memory queue and production injects Postgres + Celery.
 """
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
+from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from btx_platform import models
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import init_db, make_engine, make_session_factory
+from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
 from btx_platform.ingest import IngestError, ingest
+from btx_platform.llm import LlmProviderError, call_anthropic
+from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
 from btx_platform.queue import InMemoryQueue, JobQueue
 from btx_platform.schemas import (
     CalendarEventRequest,
     CrmTaskRequest,
     EmailSendRequest,
+    EngineConfigPut,
+    EngineConfigResponse,
     IngestAccepted,
     LlmProxyRequest,
+    PipelineRunResponse,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(
@@ -42,22 +54,44 @@ def create_app(
     app = FastAPI(title="BTX Engine — Integration Platform", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.frontend_origin],
+        allow_origins=settings.cors_origins,
         allow_credentials=False,
-        allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "OPTIONS"],
+        allow_headers=["authorization", "content-type", "x-idempotency-key", settings.signature_header],
     )
     app.state.settings = settings
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else InMemoryQueue()
+    seed_engine_configs(session_factory)
+
+    @app.middleware("http")
+    async def require_bearer_auth(request: Request, call_next):
+        if request.url.path == "/health" or request.method == "OPTIONS":
+            return await call_next(request)
+        if not settings.backend_auth_token:
+            return JSONResponse({"code": "auth_not_configured", "detail": "BTX_BACKEND_AUTH_TOKEN is required."}, status_code=503)
+        expected = f"Bearer {settings.backend_auth_token}"
+        if request.headers.get("authorization") != expected:
+            return JSONResponse({"code": "unauthorized", "detail": "Missing or invalid bearer token."}, status_code=401)
+        return await call_next(request)
 
     @app.get("/health")
     def health() -> dict:
+        db_ok = True
+        try:
+            with session_factory() as session:
+                session.execute(text("select 1"))
+        except Exception:
+            logger.exception("health.db_failed")
+            db_ok = False
         return {
             "status": "ok",
             "env": settings.env,
+            "version": app.version,
+            "db": db_ok,
             "live": bool(settings.hubspot_access_token),
             "llm": bool(settings.anthropic_api_key),
+            "auth": bool(settings.backend_auth_token),
         }
 
     def not_configured(service: str) -> JSONResponse:
@@ -70,20 +104,26 @@ def create_app(
         )
 
     @app.post("/llm")
-    async def llm_proxy(payload: LlmProxyRequest) -> Response:
-        if not settings.anthropic_api_key:
-            return not_configured("LLM proxy")
-        # Token custody belongs here, but this thin Phase 10 route deliberately
-        # avoids adding provider SDKs. Wire the provider call once credentials and
-        # deployment policy are available.
-        return JSONResponse(
-            {
-                "code": "provider_not_wired",
-                "detail": "LLM key is present, but provider wiring is intentionally deferred in this thin backend pass.",
-                "messages": [m.model_dump() for m in payload.messages],
-            },
-            status_code=501,
-        )
+    async def llm_proxy(request: Request) -> Response:
+        content_length = request.headers.get("content-length")
+        if content_length:
+            try:
+                if int(content_length) > settings.llm_max_body_bytes:
+                    return JSONResponse({"code": "payload_too_large", "detail": "LLM request too large."}, status_code=413)
+            except ValueError:
+                return JSONResponse({"code": "invalid_request", "detail": "Invalid content-length."}, status_code=400)
+        raw = await request.body()
+        if len(raw) > settings.llm_max_body_bytes:
+            return JSONResponse({"code": "payload_too_large", "detail": "LLM request too large."}, status_code=413)
+        try:
+            payload = LlmProxyRequest.model_validate_json(raw)
+        except ValidationError as exc:
+            return JSONResponse({"code": "invalid_request", "detail": exc.errors()}, status_code=422)
+        try:
+            text_out = await call_anthropic(payload, settings)
+        except LlmProviderError as exc:
+            return JSONResponse({"code": "llm_provider_error", "detail": exc.detail}, status_code=exc.status_code)
+        return JSONResponse({"text": text_out})
 
     @app.get("/crm/accounts")
     def crm_accounts() -> Response:
@@ -122,6 +162,83 @@ def create_app(
     @app.post("/calendar/event")
     def create_calendar_event(payload: CalendarEventRequest) -> Response:
         return not_configured("Calendar event creation")
+
+    def config_response(row: models.EngineConfig) -> dict:
+        return EngineConfigResponse(
+            name=row.name,
+            version=row.version,
+            document=row.document,
+            change_note=row.change_note,
+            updated_at=row.updated_at.isoformat(),
+        ).model_dump()
+
+    def run_response(row: models.PipelineRun) -> dict:
+        return PipelineRunResponse(
+            id=row.id,
+            triggered_at=row.triggered_at.isoformat(),
+            mechanism=row.mechanism,
+            status=row.status,
+            completed_at=row.completed_at.isoformat() if row.completed_at else None,
+            item_counts=row.item_counts,
+            detail=row.detail,
+            config_path=row.config_path,
+        ).model_dump()
+
+    @app.get("/engine-config/{name}")
+    def get_engine_config(name: str) -> Response:
+        session = session_factory()
+        try:
+            row = latest_config(session, name)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No config named {name}."}, status_code=404)
+            return JSONResponse(config_response(row))
+        finally:
+            session.close()
+
+    @app.put("/engine-config/{name}")
+    def update_engine_config(name: str, payload: EngineConfigPut) -> Response:
+        session = session_factory()
+        try:
+            row = put_config(session, name, payload.document, payload.change_note)
+            logger.info("mutation.engine_config", extra={"config_name": name, "version": row.version})
+            return JSONResponse(config_response(row))
+        except KeyError as exc:
+            return JSONResponse({"code": "not_found", "detail": str(exc)}, status_code=404)
+        except ValidationError as exc:
+            return JSONResponse({"code": "validation_error", "detail": exc.errors()}, status_code=422)
+        finally:
+            session.close()
+
+    @app.get("/engine-config/{name}/history")
+    def get_engine_config_history(name: str) -> Response:
+        session = session_factory()
+        try:
+            rows = config_history(session, name)
+            return JSONResponse({"records": [config_response(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.post("/pipeline/run")
+    def run_pipeline_now() -> Response:
+        session = session_factory()
+        try:
+            row = trigger_pipeline(session, settings)
+            logger.info("mutation.pipeline_run", extra={"run_id": row.id, "mechanism": row.mechanism, "status": row.status})
+            return JSONResponse(run_response(row))
+        except PipelineRateLimit as exc:
+            return JSONResponse({"code": "rate_limited", "detail": str(exc)}, status_code=429)
+        except PipelineConfigError as exc:
+            return JSONResponse({"code": "pipeline_config_error", "detail": str(exc)}, status_code=422)
+        finally:
+            session.close()
+
+    @app.get("/pipeline/runs")
+    def get_pipeline_runs() -> Response:
+        session = session_factory()
+        try:
+            return JSONResponse({"records": [run_response(row) for row in list_runs(session)]})
+        finally:
+            session.close()
 
     @app.post("/webhooks/{connection_id}")
     async def receive_webhook(connection_id: str, request: Request) -> Response:

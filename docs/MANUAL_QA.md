@@ -30,6 +30,15 @@ Artifact mode uses Vite-bundled JSON imports from `clients/btx/artifacts/run_out
 4. Generate a meeting brief from an account with a signal. In "Live Signals", confirm the evidence includes a real source/date citation inline.
 5. Temporarily break the artifact JSON shape in a local throwaway copy, rebuild, and confirm artifact mode falls back to demo signals with a visible "Artifact fallback" notice. Restore the artifact before committing.
 
+## Backend live-mode Settings smoke test
+
+1. Start `btx_platform` with `BTX_BACKEND_AUTH_TOKEN`, `BTX_ANTHROPIC_API_KEY`, and either `BTX_PIPELINE_MECHANISM=subprocess` locally or `github` in production.
+2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_BACKEND_AUTH_TOKEN`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, and `VITE_DATA_MODE=live`.
+3. Open Settings → Engine tuning. Confirm the panel shows `Backend scoring_weights`, a version number, and editable scoring rows. Change one weight, save, and confirm the version/status updates.
+4. Open Settings → Sources. Toggle a source, save, reload, and confirm the saved enabled state returns from the backend.
+5. Click `Run collection now`. Confirm the button reports the run status, recent runs populate, and a second click inside the rate-limit window is refused with a visible message.
+6. Ask Chatpil a simple question while pointed at `/llm`. Confirm the LIVE badge recovers and no local `copilot-proxy.mjs` process is required.
+
 ## Chatpil smoke tests (run in both proxy-on and proxy-off states)
 
 **Proxy-off (no VITE_COPILOT_ENDPOINT set):**
