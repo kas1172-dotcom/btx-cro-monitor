@@ -12,6 +12,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
+import monitor_engine.collectors.html_list as html_list_module
+import monitor_engine.collectors.json_api as json_api_module
+import monitor_engine.collectors.rss as rss_module
 from monitor_engine.collectors.base import (
     CollectResult,
     check_env_vars,
@@ -38,9 +41,23 @@ from monitor_engine.models import (
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURE_NOW = datetime(2026, 6, 12, 12, 0, tzinfo=timezone.utc)
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
+
+
+class FrozenDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return FIXTURE_NOW if tz is not None else FIXTURE_NOW.replace(tzinfo=None)
+
+
+@pytest.fixture(autouse=True)
+def _freeze_collector_now(monkeypatch):
+    monkeypatch.setattr(rss_module, "datetime", FrozenDatetime)
+    monkeypatch.setattr(json_api_module, "datetime", FrozenDatetime)
+    monkeypatch.setattr(html_list_module, "datetime", FrozenDatetime)
 
 
 def _mock_session(*, text: str = "", content: bytes | None = None) -> MagicMock:
