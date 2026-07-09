@@ -3,6 +3,7 @@ import type { World } from "../../app/useWorld.ts";
 import { setState, requestTour } from "../../store/store.ts";
 import { processBrainQuestion } from "../../brain/brainEngine.ts";
 import { saveBrainMemoryNote, useMemory } from "../../memory/localMemory.ts";
+import { signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import sampleLibraryData from "../../../data/demo/btx/sample_library.json";
 import type { Deliverable } from "../../deliverables/types.ts";
 import type { ChartSpec } from "../../metrics/types.ts";
@@ -28,7 +29,7 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
   const topSignalCompany = topSignal ? nameOf(topSignal.subject_id) : "None";
   const topSignalValue = money(topSignal?.value);
   const topSignalLabel = topSignal
-    ? `${topSignalCompany} ${topSignal.event_type === "contract_win" ? "books" : topSignal.event_type === "government_contract_award" ? "wins" : "signals"} ${topSignalValue ?? conciseQuote(topSignal.source_quote)}`
+    ? `${topSignalCompany} ${topSignal.event_type === "contract_win" ? "books" : topSignal.event_type === "government_contract_award" ? "wins" : "signals"} ${topSignalValue ?? conciseQuote(topSignal.source_quote)} · ${signalSourceName(topSignal)} ${signalSourceDate(topSignal)}`
     : "No validated signal";
   const topOpportunityLabel = topOpportunity
     ? `${topOpportunity.company.name}: opp ${topOpportunity.opportunity}, fit ${topOpportunity.fit.score}%`

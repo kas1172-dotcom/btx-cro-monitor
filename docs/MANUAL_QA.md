@@ -20,6 +20,16 @@ Use this checklist for UI behaviors that are not covered by the deterministic Ty
 - Overflow auditor (DEV only): in the browser console run `window.__btxAudit?.()` after navigating to each tab. No red warnings should appear. If any appear, record the selector and report.
 - Width sweep: at 1512, 1280, and 1024px — verify no column is squished to zero, no button label is cut mid-word, no table overflows its container, and no rail badge overlaps the nav icon.
 
+## Artifact mode smoke test
+
+Artifact mode uses Vite-bundled JSON imports from `clients/btx/artifacts/run_output.json` and `archive.json`. This works on GitHub Pages because the artifacts are compiled into the static JS bundle; there is no backend route or absolute asset path to configure.
+
+1. Start the frontend with `VITE_DATA_MODE=artifact npm run dev` or build with `VITE_DATA_MODE=artifact npm run build`.
+2. Confirm the topbar shows "Monitor run" with the artifact run timestamp. If the run is older than 7 days, confirm the visible "stale data" state appears.
+3. Open Signals. Confirm rows show real source names/dates such as `SpaceNews` or `Federal Register`, and CRM/capacity/pipeline panes still identify simulated operating data.
+4. Generate a meeting brief from an account with a signal. In "Live Signals", confirm the evidence includes a real source/date citation inline.
+5. Temporarily break the artifact JSON shape in a local throwaway copy, rebuild, and confirm artifact mode falls back to demo signals with a visible "Artifact fallback" notice. Restore the artifact before committing.
+
 ## Chatpil smoke tests (run in both proxy-on and proxy-off states)
 
 **Proxy-off (no VITE_COPILOT_ENDPOINT set):**

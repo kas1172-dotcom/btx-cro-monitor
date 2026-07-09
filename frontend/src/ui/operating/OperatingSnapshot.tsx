@@ -28,6 +28,7 @@ export function OperatingSnapshot() {
 
   const connected = snapshot.integrations.filter((i) => i.status === "demo_connected");
   const available = snapshot.integrations.filter((i) => i.status === "available");
+  const usingArtifacts = snapshot.publicSignals.source_mode === "artifact";
 
   return (
     <div className="operating">
@@ -35,8 +36,9 @@ export function OperatingSnapshot() {
         <p className="eyebrow">Operating snapshot</p>
         <h1>What data is the brain using right now?</h1>
         <p>
-          This page shows the simulated, API-shaped data currently feeding the demo brain. In production, authenticated
-          adapters would replace these static snapshots while preserving the same operating contract.
+          {usingArtifacts
+            ? "Market signals are real monitor-engine artifacts. CRM, capacity, pipeline, contacts, and accounts remain simulated demo snapshots until a client provides authenticated operating data."
+            : "This page shows the simulated, API-shaped data currently feeding the demo brain. In production, authenticated adapters would replace these static snapshots while preserving the same operating contract."}
         </p>
       </section>
 
@@ -54,7 +56,7 @@ export function OperatingSnapshot() {
         <div>
           <span>Public signals</span>
           <strong>{snapshot.publicSignals.signal_count}</strong>
-          <em>{snapshot.publicSignals.news_count} public news events</em>
+          <em>{usingArtifacts ? "real monitor-engine artifacts" : `${snapshot.publicSignals.news_count} public news events`}</em>
         </div>
         <div>
           <span>Demo as of</span>
@@ -116,11 +118,13 @@ export function OperatingSnapshot() {
           </div>
           <div className="operating-callout">
             <strong>{snapshot.publicSignals.signal_count} scored market signals</strong>
-            <span>{snapshot.publicSignals.news_count} public events shaped for extraction</span>
+            <span>{usingArtifacts ? `Run ${dateLabel(snapshot.publicSignals.run_at ?? null)} · ${snapshot.publicSignals.archive_run_count ?? 0} archived runs` : `${snapshot.publicSignals.news_count} public events shaped for extraction`}</span>
             <em>Latest signal {dateLabel(snapshot.publicSignals.latest_signal_at)} · latest news {dateLabel(snapshot.publicSignals.latest_news_date)}</em>
           </div>
           <p className="operating-copy">
-            These static public market and contract signals are validated before they affect scores, alerts, recommendations, and Chatpil explanations.
+            {usingArtifacts
+              ? `These real monitor-engine artifact signals are validated before they affect scores, alerts, recommendations, and Chatpil explanations. Source artifact: ${snapshot.publicSignals.artifact_path}.`
+              : "These static public market and contract signals are validated before they affect scores, alerts, recommendations, and Chatpil explanations."}
           </p>
         </div>
 
@@ -147,6 +151,18 @@ export function OperatingSnapshot() {
           <div className="panel-head">
             <h2>Data Freshness / Demo Disclosure</h2>
           </div>
+          {snapshot.publicSignals.source_mode === "artifact" && (
+            <div className={snapshot.publicSignals.stale ? "operating-callout warn" : "operating-callout"}>
+              <strong>Monitor-engine run: {dateLabel(snapshot.publicSignals.run_at ?? null)}</strong>
+              <span>{snapshot.publicSignals.stale ? "Artifact data is older than 7 days." : "Artifact signal data is fresh."}</span>
+            </div>
+          )}
+          {snapshot.publicSignals.source_mode === "artifact_fallback" && (
+            <div className="operating-callout warn">
+              <strong>Artifact fallback active</strong>
+              <span>{snapshot.publicSignals.notice}</span>
+            </div>
+          )}
           <div className="operating-callout warn">
             <strong>{snapshot.assumptions.summary}</strong>
             <span>Source mode: {titleCase(snapshot.assumptions.source_mode)}</span>

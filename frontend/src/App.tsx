@@ -22,6 +22,11 @@ import { SettingsWorkspace } from "./ui/settings/SettingsWorkspace.tsx";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 
+function formatRunDate(value: string | null | undefined): string {
+  if (!value) return "not available";
+  return new Date(value).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
 export function App() {
   const { city, activeHome, activeSettings, activeBrainArea, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
   const memory = useMemory();
@@ -97,6 +102,19 @@ export function App() {
       }}>
         <header className="quiet-topbar">
           <button className="quiet-brand" onClick={goHome}>{PROFILE.name} Revenue Brain</button>
+          {world?.snapshot?.publicSignals.source_mode === "artifact" && (
+            <div className={world.snapshot.publicSignals.stale ? "artifact-status stale" : "artifact-status"}>
+              <span>Monitor run</span>
+              <strong>{formatRunDate(world.snapshot.publicSignals.run_at)}</strong>
+              {world.snapshot.publicSignals.stale && <em>stale data</em>}
+            </div>
+          )}
+          {world?.snapshot?.publicSignals.source_mode === "artifact_fallback" && (
+            <div className="artifact-status fallback">
+              <span>Artifact fallback</span>
+              <strong>{world.snapshot.publicSignals.notice ?? "Using demo signals"}</strong>
+            </div>
+          )}
           {marketScoped && <label className="cockpit-city-picker">
             <span>Market</span>
             <select

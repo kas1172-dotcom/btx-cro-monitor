@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import { PROFILE } from "../app/config.ts";
+import { signalEvidenceForCompany, signalFigureContext } from "../app/signalProvenance.ts";
 import { scoreFit } from "../engine/decision/fit.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
@@ -69,7 +70,8 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
         city: company.location.city,
         relationship: company.relationship,
         needs: company.needs.join(", "),
-        programNeed: inputs.programNeed ?? topSignal?.source_quote ?? opportunities[0]?.name ?? "Need inferred from account profile and recent evidence",
+        programNeed: inputs.programNeed ?? signalEvidenceForCompany(company.name, topSignal, opportunities[0]?.name ?? "Need inferred from account profile and recent evidence"),
+        artifactSignalFigures: signalFigureContext(signals),
         fitScore: fit.score,
         matchedCapabilities: fit.matched.join(", ") || "No direct match recorded",
         missingCapabilities: fit.missing.join(", ") || "No major gaps recorded",
@@ -94,7 +96,7 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
       entityIds: [company.id],
       sources: [
         { source: "companies.json", records: [company.id], reason: "Account needs, segment, and relationship." },
-        { source: "signals.json + news.json", records: signals.map((item) => item.id), reason: "Recent evidence used to infer need." },
+        { source: signals.some((signal) => signal.artifact) ? "monitor-engine artifacts" : "signals.json + news.json", records: signals.map((item) => item.id), reason: signals.some((signal) => signal.artifact) ? "Real monitor-engine evidence used to infer need, with source dates and artifact provenance." : "Recent evidence used to infer need." },
         { source: "opportunities.json", records: opportunities.map((item) => item.id), reason: "Program and pipeline context." },
         { source: "erp_capacity.json", records: relevantCapacity.map((item) => item.facility_id), reason: "Capacity availability, lead time, and constraints." },
       ],

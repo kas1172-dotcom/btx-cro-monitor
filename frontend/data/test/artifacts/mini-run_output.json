@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "run_id": "20260708T120000-mini",
+    "run_at": "2026-07-08T12:00:00Z",
+    "items_collected": 1,
+    "items_after_prefilter": 1,
+    "items_analyzed": 1,
+    "estimated_cost_usd": 0.01,
+    "engine_version": "0.1.0-test"
+  },
+  "items": [
+    {
+      "item_id": "mini-muos-boeing",
+      "title": "Boeing receives MUOS spacecraft platform work",
+      "raw_title": "Boeing receives MUOS spacecraft platform work",
+      "url": "https://example.com/boeing-muos",
+      "source_id": "SpaceNews Mini",
+      "published_at": "2026-07-08T10:30:00Z",
+      "collected_at": "2026-07-08T12:00:00Z",
+      "tier": 2,
+      "per_edition": {
+        "bd": {
+          "relevance_score": 88,
+          "so_what": "Boeing spacecraft platform work may create subcontracting openings for AS9100 precision-machined satellite components.",
+          "now_what": "Prepare outreach to Boeing supply-chain teams and monitor RFQ timing for MUOS component packages.",
+          "categories": ["Contract Award", "Subcontracting Opportunity"]
+        }
+      },
+      "dollar_amount": null,
+      "affected_population": null,
+      "action_deadline": null,
+      "confidence_note": "Miniature fixture for artifact adapter tests.",
+      "unverified_claims": [],
+      "deep_analysis": {
+        "sections": {
+          "background": "The article names Boeing and MUOS spacecraft platform work.",
+          "recommended_actions": ["Watch for AS9100 and 5-axis CNC subcontract RFQs."]
+        }
+      },
+      "also_covered_by": [],
+      "entities": [
+        { "name": "Boeing", "type": "organization" },
+        { "name": "MUOS", "type": "program" }
+      ],
+      "enrichment": {
+        "facts": [
+          {
+            "enricher_id": "usaspending-awards",
+            "entity": "Boeing",
+            "label": "Top recent award",
+            "value": "250000000",
+            "kind": "money",
+            "number": 250000000,
+            "url": null
+          }
+        ],
+        "queried_entities": ["Boeing"]
+      },
+      "related": [],
+      "importance_score": 88
+    }
+  ],
+  "whats_new": [],
+  "editorial": {},
+  "site_config": {},
+  "source_health": [],
+  "entity_index": {}
+}

@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import { PROFILE } from "../app/config.ts";
+import { signalEvidence, signalFigureContext } from "../app/signalProvenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -29,7 +30,13 @@ function chooseVariant(accountName: string): number {
 
 function publicHook(accountName: string, hook: string): string {
   if (!hook || hook === "No public hook available") return `${accountName} appears to be adding production work`;
-  return cleanSentence(hook).replace(/^A customer /, "Your customer ");
+  return cleanSentence(hook)
+    .replace(/^A customer /, "Your customer ")
+    .replace(/\bvalidated\b/gi, "public")
+    .replace(/\bsignals?\b/gi, "shows")
+    .replace(/\bopportunity score\b/gi, "timing")
+    .replace(/\bfit %\b/gi, "fit")
+    .replace(/\brisk score\b/gi, "risk");
 }
 
 function emailBody(input: {
@@ -92,7 +99,8 @@ export const outreachAgent: DeliverableAgent<Inputs> = {
         contactTitle: contact?.title ?? "No named contact",
         contact: contact ? `${contact.name}, ${contact.title}` : "Operations team",
         contactNote,
-        hook: prospect.topSignal?.source_quote ?? "No public hook available",
+        hook: signalEvidence(prospect.topSignal, "No public hook available"),
+        artifactSignalFigures: signalFigureContext(prospect.topSignal ? [prospect.topSignal] : []),
         capability: prospect.fit.matched[0] ?? "certified production support",
         sourceCount: [prospect.company.id, prospect.topSignal?.id, contact?.id].filter(Boolean).length,
         senderName: PROFILE.sender_name,
@@ -104,7 +112,7 @@ export const outreachAgent: DeliverableAgent<Inputs> = {
       entityIds: [prospect.company.id],
       sources: [
         { source: "companies.json", records: [prospect.company.id], reason: "Account and location context." },
-        { source: "signals.json + news.json", records: prospect.topSignal ? [prospect.topSignal.id] : [], reason: "Specific outreach hook." },
+        { source: prospect.topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json", records: prospect.topSignal ? [prospect.topSignal.id] : [], reason: prospect.topSignal?.artifact ? `Specific outreach hook from ${prospect.topSignal.artifact.source_name} on ${prospect.topSignal.artifact.source_date.slice(0, 10)}.` : "Specific outreach hook." },
         { source: "contacts.json", records: contact ? [contact.id] : [], reason: "Recipient context." },
       ],
     };

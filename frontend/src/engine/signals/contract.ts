@@ -43,4 +43,19 @@ export interface Signal {
   document_url?: string;
   /** ISO-8601 timestamp the signal was detected (recency / decay / audit). */
   detected_at: string;
+  /** Present when the signal came from monitor-engine artifacts. */
+  artifact?: {
+    item_id: string;
+    headline: string;
+    source_name: string;
+    source_date: string;
+    run_at: string;
+    signal_type: string;
+    relevance_score: number;
+    analysis_text: string;
+    source_url?: string;
+    dollar_figures: number[];
+    affected_entities: string[];
+    provenance: unknown;
+  };
 }

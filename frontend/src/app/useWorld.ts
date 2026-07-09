@@ -2,7 +2,7 @@
 // literal "run the brain for the selected area". Re-runs when the city changes.
 
 import { useEffect, useState } from "react";
-import { createDataAdapter } from "../adapters/createDataAdapter.ts";
+import { createDataAdapter, getDataMode } from "../adapters/createDataAdapter.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
 import { deriveNewsSignals } from "./newsIngest.ts";
 import newsData from "../../data/demo/btx/news.json";
@@ -13,6 +13,7 @@ import type { Company, Contact, Facility, Opportunity, MarketEvent } from "../en
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 
 const adapter = createDataAdapter();
+const DATA_MODE = getDataMode();
 const NEWS = newsData as unknown as MarketEvent[];
 const EXTRACTED = extractedData as unknown as ExtractedRow[];
 
@@ -43,7 +44,8 @@ export function useWorld(city: string | null): World | null {
       adapter.getOperatingSnapshot().catch(() => null),
     ]).then(([companies, signals, contacts, facilities, opportunities, snapshot]) => {
       if (!alive) return;
-      const newsSignals = deriveNewsSignals(companies, NEWS, EXTRACTED);
+      const usesArtifactSignals = DATA_MODE === "artifact" && snapshot?.publicSignals.source_mode === "artifact";
+      const newsSignals = usesArtifactSignals ? [] : deriveNewsSignals(companies, NEWS, EXTRACTED);
       const analysis = analyze(companies, [...signals, ...newsSignals]);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
       setWorld({ city, companies, contacts, facilities, opportunities, analysis, prospects, snapshot });

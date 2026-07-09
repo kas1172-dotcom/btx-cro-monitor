@@ -32,7 +32,11 @@ export function retrieveContext(question: string, intent: QuestionIntent, activa
     .slice(0, 8);
   const openDeals = world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost");
   const contextUsed: ContextSource[] = [];
-  if (activatedBrainAreas.includes("market")) contextUsed.push({ source: "signals.json + news.json", reason: "Validated market signals and source quotes." });
+  const signalSource = world.snapshot?.publicSignals.source_mode === "artifact" ? "monitor-engine artifacts" : "signals.json + news.json";
+  const signalReason = world.snapshot?.publicSignals.source_mode === "artifact"
+    ? `Real monitor-engine signals from ${world.snapshot.publicSignals.artifact_path}, run ${world.snapshot.publicSignals.run_at}.`
+    : "Validated market signals and source quotes.";
+  if (activatedBrainAreas.includes("market")) contextUsed.push({ source: signalSource, reason: signalReason });
   if (activatedBrainAreas.includes("customer")) contextUsed.push({ source: "companies.json + contacts.json", reason: "Account roster, relationships, and contacts." });
   if (activatedBrainAreas.includes("revenue")) contextUsed.push({ source: "opportunities.json + scoring trace", reason: "Pipeline, opportunity scores, risk scores, and recommendations." });
   if (activatedBrainAreas.includes("capability")) contextUsed.push({ source: "client-profile.json + erp_capacity.json", reason: "BTX capabilities and demo capacity snapshot." });

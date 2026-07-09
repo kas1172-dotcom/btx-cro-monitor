@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import type { Deliverable, DeliverableSection } from "../deliverables/types.ts";
+import { signalEvidenceForCompany } from "../app/signalProvenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -149,8 +150,8 @@ export const itineraryAgent: DeliverableAgent<Inputs> = {
       opportunity: p.opportunity,
       fit: p.fit.score,
       contact: p.contact ? `${p.contact.name}, ${p.contact.title}` : "No contact available",
-      trigger: p.topSignal?.source_quote ?? "No validated trigger attached",
-      talkingPoint: fullTalkingPoint(p.fit.matched[0] ?? "BTX production fit", p.topSignal?.source_quote ?? "No validated trigger attached"),
+      trigger: signalEvidenceForCompany(p.company.name, p.topSignal, "No validated trigger attached"),
+      talkingPoint: fullTalkingPoint(p.fit.matched[0] ?? "BTX production fit", signalEvidenceForCompany(p.company.name, p.topSignal, "No validated trigger attached")),
       day,
       legMiles,
       legMinutes: legMiles === null ? null : driveMinutes(legMiles),
@@ -167,7 +168,7 @@ export const itineraryAgent: DeliverableAgent<Inputs> = {
       stops: itineraryStops,
       sources: [
         { source: "companies.json", records: clusteredStops.map((p) => p.prospect.company.id), reason: "Addresses, coordinates, relationship status, and market clustering." },
-        { source: "signals.json + news.json", records: clusteredStops.flatMap((p) => p.prospect.topSignal ? [p.prospect.topSignal.id] : []), reason: "Trigger signals and why-now evidence for each stop." },
+        { source: clusteredStops.some((p) => p.prospect.topSignal?.artifact) ? "monitor-engine artifacts" : "signals.json + news.json", records: clusteredStops.flatMap((p) => p.prospect.topSignal ? [p.prospect.topSignal.id] : []), reason: clusteredStops.some((p) => p.prospect.topSignal?.artifact) ? "Real monitor-engine trigger evidence with source names, dates, and artifact provenance." : "Trigger signals and why-now evidence for each stop." },
         { source: "contacts.json", records: clusteredStops.flatMap((p) => p.prospect.contact ? [p.prospect.contact.id] : []), reason: "Recommended contacts for meeting prep." },
       ],
     } as ItineraryContext;

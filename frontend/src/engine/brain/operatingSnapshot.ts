@@ -73,6 +73,11 @@ export interface OperatingSnapshot {
     latest_signal_at: string | null;
     latest_news_date: string | null;
     source_name: string;
-    source_mode: "static_snapshot";
+    source_mode: "static_snapshot" | "artifact" | "artifact_fallback";
+    run_at?: string | null;
+    archive_run_count?: number;
+    artifact_path?: string;
+    stale?: boolean;
+    notice?: string | null;
   };
 }

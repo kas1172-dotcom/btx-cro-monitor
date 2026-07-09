@@ -4,6 +4,7 @@ import type { World } from "../app/useWorld.ts";
 import { PROFILE } from "../app/config.ts";
 import { actionLabel } from "../app/actionLabels.ts";
 import { displayLabel } from "../app/displayLabels.ts";
+import { signalEvidenceForCompany, signalFigureContext } from "../app/signalProvenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -56,6 +57,9 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
       .filter((o) => o.stage !== "won" && o.stage !== "lost")
       .reduce((sum, o) => sum + o.value, 0);
     const nameOf = (id?: string | null) => world.companies.find((c) => c.id === id)?.name ?? "No account available";
+    const topSignalAccount = nameOf(topSignal?.subject_id);
+    const topRiskAccount = nameOf(topRisk?.subject_id);
+    const evidenceSignals = [topSignal, topRiskSignal].filter((signal): signal is NonNullable<typeof topSignal> => Boolean(signal));
 
     return {
       facts: {
@@ -63,20 +67,21 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
         topOpportunityName: topOpportunity?.company.name ?? "No opportunity available",
         topOpportunityScore: topOpportunity?.opportunity ?? 0,
         topOpportunityFit: topOpportunity?.fit.score ?? 0,
-        topRiskName: nameOf(topRisk?.subject_id),
+        topRiskName: topRiskAccount,
         topRiskScore: topRisk?.dimensions.risk.score ?? 0,
         topSignalType: topSignal ? displayLabel(topSignal.event_type) : "No signal available",
-        topSignalQuote: topSignal?.source_quote ?? "",
-        topRiskQuote: topRiskSignal?.source_quote ?? "",
+        topSignalQuote: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal, "") : "",
+        topRiskQuote: topRiskSignal ? signalEvidenceForCompany(topRiskAccount, topRiskSignal, "") : "",
+        artifactSignalFigures: signalFigureContext(evidenceSignals),
         openPipelineValue: pipelineValue,
         pipelineScope: "All markets",
         recommendedAction: topAction ? `${actionLabel(topAction.action)}: ${topAction.reason}` : "Monitor the portfolio for new evidence.",
-        ...(topRisk?.subject_id ? { [`${topRisk.subject_id}:evidence`]: `${nameOf(topRisk.subject_id)}::${topRiskSignal?.source_quote ?? nameOf(topRisk.subject_id)}` } : {}),
+        ...(topRisk?.subject_id ? { [`${topRisk.subject_id}:evidence`]: `${topRiskAccount}::${signalEvidenceForCompany(topRiskAccount, topRiskSignal, topRiskAccount)}` } : {}),
       },
       entityIds: [topOpportunity?.company.id, topRisk?.subject_id, topSignal?.subject_id].filter((id): id is string => Boolean(id)),
       sources: [
         { source: "companies.json", records: world.companies.map((c) => c.id), reason: "Account names, markets, and relationship status." },
-        { source: "signals.json + news.json", records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: "Validated market and risk evidence used in scores." },
+        { source: topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json", records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: topSignal?.artifact ? `Real monitor-engine signal evidence from ${topSignal.artifact.source_name}, run ${topSignal.artifact.run_at}.` : "Validated market and risk evidence used in scores." },
         { source: "opportunities.json", records: world.opportunities.map((o) => o.id).slice(0, 12), reason: "Open pipeline value and opportunity context." },
       ],
     };

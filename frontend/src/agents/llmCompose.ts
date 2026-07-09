@@ -152,10 +152,14 @@ function applySection(section: DeliverableSection, text: string | undefined): De
 }
 
 function passesGrounding(deliverable: Deliverable, ctx: AgentContext): boolean {
-  const allowedNumbers = new Set(
-    Object.values(ctx.facts)
+  const groundingText = [
+    ...Object.values(ctx.facts)
       .filter((value): value is string | number => typeof value === "number" || typeof value === "string")
-      .flatMap((value) => numberTokens(String(value))),
+      .map(String),
+    ...ctx.sources.flatMap((source) => [source.source, source.reason, ...source.records]),
+  ];
+  const allowedNumbers = new Set(
+    groundingText.flatMap((value) => numberTokens(String(value))),
   );
   const text = deliverable.sections
     .flatMap((section) => section.blocks)
@@ -166,9 +170,7 @@ function passesGrounding(deliverable: Deliverable, ctx: AgentContext): boolean {
     if (!allowedNumbers.has(token)) return false;
   }
   const allowedNames = new Set(
-    Object.values(ctx.facts)
-      .filter((value): value is string => typeof value === "string")
-      .flatMap((value) => candidateNames(value)),
+    groundingText.flatMap((value) => candidateNames(value)),
   );
   for (const name of candidateNames(text)) {
     if (!allowedNames.has(name) && !["Revenue Brain", "Executive Summary"].includes(name)) return false;

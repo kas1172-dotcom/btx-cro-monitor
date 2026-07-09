@@ -9,6 +9,7 @@ import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
 import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { formatAddress } from "../../app/format.ts";
+import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 
@@ -131,10 +132,10 @@ export function SignalFeed({ world }: { world: World }) {
         companyName: nameOf(signal.subject_id),
         companyRelationship: company?.relationship ?? "unknown",
         address: company ? formatAddress(company.location) : null,
-        headline: article?.headline ?? titleCase(signal.event_type),
-        source: article?.source ?? "Simulated Market Signal Feed",
-        sourceDate: article?.published_date ?? signal.detected_at.slice(0, 10),
-        sourceUrl: article?.source_url ?? signal.source_url,
+        headline: signal.artifact ? signalHeadline(signal) : article?.headline ?? titleCase(signal.event_type),
+        source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Simulated Market Signal Feed",
+        sourceDate: signal.artifact ? signalSourceDate(signal) : article?.published_date ?? signal.detected_at.slice(0, 10),
+        sourceUrl: signal.artifact?.source_url ?? article?.source_url ?? signal.source_url,
         documentUrl: article?.document_url ?? signal.document_url,
         motion: motionForSignal(world, signal),
         impact,
@@ -222,7 +223,7 @@ export function SignalFeed({ world }: { world: World }) {
                 <ExternalLink href={row.sourceUrl} label="Open source" />
                 <ExternalLink href={row.documentUrl} label="Document" />
               </div>
-              {!row.sourceUrl && !row.documentUrl && <em>No source link in static demo snapshot</em>}
+              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor-engine artifact" : "No source link in static demo snapshot"}</em>}
             </div>
 
             <div className="signal-actions">

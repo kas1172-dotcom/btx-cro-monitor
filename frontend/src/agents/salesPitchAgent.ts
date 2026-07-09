@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import { PROFILE } from "../app/config.ts";
+import { signalEvidence, signalFigureContext } from "../app/signalProvenance.ts";
 import { scoreFit } from "../engine/decision/fit.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
@@ -25,6 +26,16 @@ const sectionSpec = [
 
 function clean(text: string): string {
   return text.replace(/\s+/g, " ").replace(/[.?!]\s*$/u, "").trim();
+}
+
+function publicHook(text: string): string {
+  return clean(text)
+    .replace(/\bvalidated\b/gi, "public")
+    .replace(/\bsignals?\b/gi, "shows")
+    .replace(/\bopportunity score\b/gi, "timing")
+    .replace(/\bfit %\b/gi, "fit")
+    .replace(/\brisk score\b/gi, "risk")
+    .replace(/\bpipeline\b/gi, "program");
 }
 
 function firstAccount(world: World, accountId?: string): World["prospects"][number] {
@@ -53,8 +64,9 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
         accountName: prospect.company.name,
         segment: inputs.segment ?? prospect.company.account_status ?? prospect.company.relationship,
         city: prospect.company.location.city,
-        hook: topSignal?.source_quote ?? `${prospect.company.name} appears to be evaluating outside production support`,
-        publicTrigger: topSignal ? clean(topSignal.source_quote) : "a visible production need",
+        hook: signalEvidence(topSignal, `${prospect.company.name} appears to be evaluating outside production support`),
+        publicTrigger: topSignal ? clean(signalEvidence(topSignal)) : "a visible production need",
+        artifactSignalFigures: signalFigureContext(topSignal ? [topSignal] : []),
         matchedCapabilities: fit.matched.slice(0, 3).join(", ") || "certified precision machining",
         capacityLine: capacity ? `${capacity.facility_name} has available 5-axis capacity with quoted lead time of ${capacity.quoted_lead_time_days} days` : "BTX can qualify capacity after the first conversation",
         contactName: contact?.name ?? "their operations leader",
@@ -64,14 +76,14 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
       entityIds: [prospect.company.id],
       sources: [
         { source: "companies.json", records: [prospect.company.id], reason: "Account profile, market, and stated needs." },
-        { source: "signals.json + news.json", records: topSignal ? [topSignal.id] : [], reason: "Account-specific public trigger." },
+        { source: topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json", records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? `Account-specific public trigger from ${topSignal.artifact.source_name} on ${topSignal.artifact.source_date.slice(0, 10)}.` : "Account-specific public trigger." },
         { source: "erp_capacity.json", records: capacity ? [capacity.facility_id] : [], reason: "Capacity context used for the pitch." },
       ],
     };
   },
   async compose(ctx): Promise<Deliverable> {
     const f = ctx.facts;
-    const hook = clean(String(f.hook));
+    const hook = publicHook(String(f.hook));
     return {
       id: `deliv-${Date.now()}-sales-pitch`,
       type: "sales_pitch",

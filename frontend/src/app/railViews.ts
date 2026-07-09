@@ -5,6 +5,7 @@ import type { BrainArea } from "../brain/types.ts";
 import type { MemoryState } from "../memory/types.ts";
 import type { Opportunity } from "../engine/brain/entities.ts";
 import type { Recommendation } from "../engine/decision/recommend.ts";
+import { signalSourceDate, signalSourceName } from "./signalProvenance.ts";
 
 export const RAIL_AREAS: BrainArea[] = ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"];
 
@@ -114,7 +115,7 @@ function buildSignalsView(world: World): RailViewModel {
       id: signal.id,
       primary: nameOf(world, signal.subject_id),
       secondary: signal.source_quote,
-      meta: `${titleCase(signal.event_type)} · confidence ${(signal.confidence * 100).toFixed(0)}%`,
+      meta: `${titleCase(signal.event_type)} · ${signalSourceName(signal)} ${signalSourceDate(signal)} · confidence ${(signal.confidence * 100).toFixed(0)}%`,
       badge: signal.value ? money(signal.value) : signal.detected_at.slice(0, 10),
       companyId: signal.subject_id,
       detailTarget: "dossier",

@@ -36,7 +36,7 @@ const SignalSchema = z.object({
   source_url: z.string().optional(),
   document_url: z.string().optional(),
   detected_at: z.string().min(1),
-});
+}).passthrough();
 
 export interface Rejection {
   id: string;

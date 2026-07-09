@@ -5,12 +5,14 @@ import { processBrainQuestion } from "../src/brain/brainEngine.ts";
 import { runAgent } from "../src/agents/runAgent.ts";
 import newsData from "../data/demo/btx/news.json";
 import extractedData from "../data/demo/btx/extracted-signals.json";
+import miniRunOutput from "../data/test/artifacts/mini-run_output.json";
 import type { World } from "../src/app/useWorld.ts";
 import type { ExtractedRow } from "../src/app/newsIngest.ts";
 import type { MarketEvent } from "../src/engine/brain/entities.ts";
 import { PROFILE } from "../src/app/config.ts";
 import { DELIVERABLE_DOWNLOAD_FORMATS } from "../src/deliverables/export.ts";
 import { AREA_MARKET_SCOPING, isMarketScopedView } from "../src/app/viewScope.ts";
+import { buildArtifactSignals } from "../src/adapters/artifact/artifactSignals.ts";
 
 function assert(condition: unknown, message: string): void {
   if (!condition) throw new Error(message);
@@ -41,7 +43,52 @@ async function loadWorld(city: string | null = null): Promise<World> {
   };
 }
 
+async function loadArtifactFixtureWorld(): Promise<World> {
+  const adapter = new DemoDataAdapter();
+  const [companies, contacts, facilities, opportunities, snapshot] = await Promise.all([
+    adapter.getCompanies(),
+    adapter.getContacts(),
+    adapter.getFacilities(),
+    adapter.getOpportunities(),
+    adapter.getOperatingSnapshot(),
+  ]);
+  const artifact = buildArtifactSignals(miniRunOutput, companies);
+  assert(artifact.signals.length === 1, `Expected 1 artifact signal, got ${artifact.signals.length}`);
+  const signal = artifact.signals[0];
+  assert(signal.artifact?.source_name === "SpaceNews Mini", "Artifact source name was not preserved");
+  assert(signal.artifact?.source_date.startsWith("2026-07-08"), "Artifact source date was not preserved");
+  assert(signal.artifact?.dollar_figures.includes(250000000), "Artifact dollar figure was not preserved");
+  assert(signal.source_url === "https://example.com/boeing-muos", "Artifact source URL was not mapped");
+  const analysis = analyze(companies, artifact.signals);
+  return {
+    city: null,
+    companies,
+    contacts,
+    facilities,
+    opportunities,
+    analysis,
+    prospects: buildProspects(companies, contacts, analysis.valid, analysis.byId),
+    snapshot: {
+      ...snapshot,
+      publicSignals: {
+        signal_count: artifact.signals.length,
+        news_count: artifact.signals.length,
+        latest_signal_at: artifact.latestPublishedAt,
+        latest_news_date: artifact.latestPublishedAt,
+        source_name: "Monitor engine artifacts (fixture)",
+        source_mode: "artifact",
+        run_at: artifact.runAt,
+        archive_run_count: 0,
+        artifact_path: "frontend/data/test/artifacts/mini-run_output.json",
+        stale: false,
+        notice: null,
+      },
+    },
+  };
+}
+
 const world = await loadWorld();
+const artifactWorld = await loadArtifactFixtureWorld();
 
 assert(!world.companies.some((company) => company.name === PROFILE.name), "Client company must not appear as a scored account");
 assert(AREA_MARKET_SCOPING.geographic && AREA_MARKET_SCOPING.market, "Map and signal views must be market-scoped");
@@ -93,6 +140,18 @@ assert(mapStops.every((stop) => !/^\d+\.\s/.test(stop.label)), "Itinerary map la
 const memo = await runAgent("weekly_memo", { title: "Weekly CRO Memo" }, world);
 assert(memo.sections.length >= 4, "Weekly memo missing sections");
 
+const artifactSignal = artifactWorld.analysis.valid[0];
+const artifactBrief = await runAgent("meeting_brief", { accountId: artifactSignal.subject_id }, artifactWorld);
+const artifactBriefText = artifactBrief.sections
+  .flatMap((section) => section.blocks)
+  .map((block) => {
+    if (block.kind === "text") return block.text;
+    if (block.kind === "table") return block.rows.flat().join(" ");
+    return block.title;
+  })
+  .join(" ");
+assert(artifactBriefText.includes("SpaceNews Mini") && artifactBriefText.includes("2026-07-08"), "Artifact meeting brief missing real-signal source/date citation");
+
 const outreach = await runAgent("outreach", {}, world);
 const instructedOutreach = await runAgent("outreach", { instructions: "Lead with ITAR angle" }, world);
 const outreachHeadings = outreach.sections.map((section) => section.heading);
@@ -115,4 +174,4 @@ const deliverableText = [itinerary, memo, outreach]
   .join(" ");
 assert(!/\b[a-z]+_[a-z_]+\b/.test(deliverableText), `Rendered deliverables leaked snake_case: ${deliverableText.match(/\b[a-z]+_[a-z_]+\b/)?.[0]}`);
 
-console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, outreach ${outreach.sections.length} sections`);
+console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, outreach ${outreach.sections.length} sections`);

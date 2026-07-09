@@ -70,6 +70,18 @@ p { line-height: 1.55; }
 .cockpit-city-picker select {
   background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px;
 }
+.artifact-status {
+  min-width: 0;
+  max-width: min(520px, 44vw);
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px;
+  background: rgba(183, 196, 106, .08); color: var(--muted); font-size: 12px;
+}
+.artifact-status span { text-transform: uppercase; letter-spacing: .4px; font-size: 10px; color: var(--accent); white-space: nowrap; }
+.artifact-status strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: 12px; }
+.artifact-status em { flex: 0 0 auto; color: #171b12; background: var(--warn); border-radius: 999px; padding: 2px 7px; font-style: normal; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.artifact-status.fallback { border-color: rgba(217, 122, 103, .65); background: rgba(217, 122, 103, .12); }
+.artifact-status.fallback span { color: var(--bad); }
 .quiet-stage { flex: 1 1 auto; min-height: 0; position: relative; overflow-y: auto; }
 .quiet-home {
   min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;

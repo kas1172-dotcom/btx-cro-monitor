@@ -5,6 +5,7 @@ import { PROFILE } from "../app/config.ts";
 import { scoreFit } from "../engine/decision/fit.ts";
 import { healthLabel, pipelineHealth } from "../engine/decision/health.ts";
 import { actionLabel } from "../app/actionLabels.ts";
+import { signalEvidenceForCompany, signalFigureContext } from "../app/signalProvenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -62,7 +63,8 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       openPipelineValue,
       pipelineHealth: healthLabel(health),
       contact: contacts[0] ? `${contacts[0].name}, ${contacts[0].title}` : "No contact available",
-      topSignal: topSignal?.source_quote ?? "No validated signal attached",
+      topSignal: signalEvidenceForCompany(company.name, topSignal),
+      artifactSignalFigures: signalFigureContext(signals),
       recommendedAction: rec ? `${actionLabel(rec.action)}: ${rec.reason}` : "Monitor until a stronger signal appears.",
     },
     entityIds: [accountId],
@@ -70,7 +72,7 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       { source: "companies.json", records: [accountId], reason: "Account profile, market, relationship, and capability needs." },
       { source: "contacts.json", records: contacts.map((c) => c.id), reason: "Recommended stakeholder coverage." },
       { source: "opportunities.json", records: opportunities.map((o) => o.id), reason: "Open pipeline, stages, close dates, and values." },
-      { source: "signals.json + news.json", records: signals.map((s) => s.id), reason: "Validated evidence and timing." },
+      { source: signals.some((signal) => signal.artifact) ? "monitor-engine artifacts" : "signals.json + news.json", records: signals.map((s) => s.id), reason: signals.some((signal) => signal.artifact) ? "Real monitor-engine evidence with source names, dates, and artifact provenance." : "Validated evidence and timing." },
     ],
   };
 }
