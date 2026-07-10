@@ -4,7 +4,7 @@ import os
 import string
 from datetime import datetime, timedelta, timezone
 from typing import Any
-from urllib.parse import urljoin
+from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
 from dateutil import parser as dateutil_parser
 
@@ -45,6 +45,47 @@ def _resolve_path(data: Any, path: str) -> Any:
     return data
 
 
+def _record_value(raw: dict, path: str, default: Any = None) -> Any:
+    """Read a top-level or dot-path field from one API record."""
+    try:
+        return _resolve_path(raw, path)
+    except (KeyError, IndexError, TypeError, ValueError):
+        return default
+
+
+def _date_tokens(days_back: int) -> dict[str, str]:
+    now = datetime.now(timezone.utc)
+    start = now - timedelta(days=days_back)
+    return {
+        "start_date": start.strftime("%Y-%m-%d"),
+        "end_date": now.strftime("%Y-%m-%d"),
+        "start_datetime": start.strftime("%Y-%m-%dT00:00:00Z"),
+        "end_datetime": now.strftime("%Y-%m-%dT23:59:59Z"),
+        "start_mmddyyyy": start.strftime("%m/%d/%Y"),
+        "end_mmddyyyy": now.strftime("%m/%d/%Y"),
+    }
+
+
+def _substitute_tokens(value: Any, tokens: dict[str, str]) -> Any:
+    if isinstance(value, str):
+        out = value
+        for key, replacement in tokens.items():
+            out = out.replace("{" + key + "}", replacement)
+        return out
+    if isinstance(value, list):
+        return [_substitute_tokens(v, tokens) for v in value]
+    if isinstance(value, dict):
+        return {k: _substitute_tokens(v, tokens) for k, v in value.items()}
+    return value
+
+
+def _append_query_param(url: str, key: str, value: str) -> str:
+    parts = urlsplit(url)
+    query = parse_qsl(parts.query, keep_blank_values=True)
+    query.append((key, value))
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+
+
 def _build_item_url(raw: dict, source: JsonApiSource) -> str:
     """
     Determine the item URL, in priority order:
@@ -68,7 +109,7 @@ def _build_item_url(raw: dict, source: JsonApiSource) -> str:
         except (KeyError, IndexError):
             return ""
 
-    raw_url = raw.get(source.field_map.get("url", "url"), "") or ""
+    raw_url = _record_value(raw, source.field_map.get("url", "url"), "") or ""
     if raw_url and source.base_url and raw_url.startswith("/"):
         return urljoin(source.base_url, raw_url)
     return raw_url
@@ -111,18 +152,24 @@ class JsonApiHandler(SourceHandler):
         if source.auth_env_var and source.auth_header:
             headers[source.auth_header] = os.environ[source.auth_env_var]
 
+        tokens = _date_tokens(effective_days_back)
+        url = _substitute_tokens(str(source.url), tokens)
+        request_body = _substitute_tokens(source.request_body or {}, tokens)
+        if source.auth_env_var and source.auth_query_param:
+            url = _append_query_param(url, source.auth_query_param, os.environ[source.auth_env_var])
+
         # method is constrained to GET|POST by the schema. POST sends request_body
         # as a JSON payload (the shape most search APIs expect); note make_session
         # only retries GET, so a POST source is not auto-retried on 5xx/429.
         if source.method == "POST":
             resp = self.session.post(
-                str(source.url),
+                url,
                 headers=headers,
-                json=source.request_body or {},
+                json=request_body,
                 timeout=effective_timeout,
             )
         else:
-            resp = self.session.get(str(source.url), headers=headers, timeout=effective_timeout)
+            resp = self.session.get(url, headers=headers, timeout=effective_timeout)
         resp.raise_for_status()
         data = resp.json()
 
@@ -146,11 +193,13 @@ class JsonApiHandler(SourceHandler):
             if not url:
                 continue
 
-            title: str = str(raw.get(fm.get("title", "title"), "(no title)")).strip()
-            summary_raw = raw.get(fm.get("body", "body")) or raw.get(fm.get("summary", "summary"))
+            title: str = str(_record_value(raw, fm.get("title", "title"), "(no title)")).strip()
+            summary_raw = _record_value(raw, fm.get("body", "body")) or _record_value(
+                raw, fm.get("summary", "summary")
+            )
             summary = str(summary_raw).strip() if summary_raw else None
 
-            pub_raw = raw.get(fm.get("published_at", "published_at"))
+            pub_raw = _record_value(raw, fm.get("published_at", "published_at"))
             pub, failed = _parse_date(pub_raw)
             if failed:
                 date_parse_failures += 1

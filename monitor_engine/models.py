@@ -101,6 +101,7 @@ class JsonApiSource(BaseModel):
                                             # A field value absent from its map skips the item.
     base_url: str | None = None             # resolve relative item URLs (e.g. "/opinion/1/") against this
     auth_header: str | None = None
+    auth_query_param: str | None = None
     auth_env_var: str | None = None
     method: Literal["GET", "POST"] = Field(
         default="GET",

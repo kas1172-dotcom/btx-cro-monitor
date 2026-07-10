@@ -113,9 +113,8 @@ jobs:
             --archive "clients/${{ matrix.client }}/artifacts/archive.json"
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Add any source/enricher/account-map auth keys here, matching the
-          # auth_env_var values declared in clients/<name>/config.json. The BTX
-          # config uses only public APIs, so none are required today.
+          SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+          CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
 
       # ── Build the account map ───────────────────────────────────────
       # Pulls target accounts (CSV + any configured APIs), scores fit, and

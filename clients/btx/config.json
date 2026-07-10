@@ -57,7 +57,7 @@
       "type": "json_api",
       "id": "federal-register-dod",
       "name": "Federal Register – Dept. of Defense",
-      "url": "https://www.federalregister.gov/api/v1/articles.json?agencies[]=defense-department&order=newest&per_page=20",
+      "url": "https://www.federalregister.gov/api/v1/articles.json?conditions[agencies][]=defense-department&order=newest&per_page=20",
       "item_path": "$.results",
       "field_map": {
         "title": "title",
@@ -70,7 +70,59 @@
       "type": "json_api",
       "id": "federal-register-usaf",
       "name": "Federal Register – Dept. of the Air Force",
-      "url": "https://www.federalregister.gov/api/v1/articles.json?agencies[]=air-force-department&order=newest&per_page=10",
+      "url": "https://www.federalregister.gov/api/v1/articles.json?conditions[agencies][]=air-force-department&order=newest&per_page=10",
+      "item_path": "$.results",
+      "field_map": {
+        "title": "title",
+        "url": "html_url",
+        "published_at": "publication_date",
+        "summary": "abstract"
+      }
+    },
+    {
+      "type": "json_api",
+      "id": "federal-register-navy",
+      "name": "Federal Register – Dept. of the Navy",
+      "url": "https://www.federalregister.gov/api/v1/articles.json?conditions[agencies][]=navy-department&order=newest&per_page=10",
+      "item_path": "$.results",
+      "field_map": {
+        "title": "title",
+        "url": "html_url",
+        "published_at": "publication_date",
+        "summary": "abstract"
+      }
+    },
+    {
+      "type": "json_api",
+      "id": "federal-register-army",
+      "name": "Federal Register – Dept. of the Army",
+      "url": "https://www.federalregister.gov/api/v1/articles.json?conditions[agencies][]=army-department&order=newest&per_page=10",
+      "item_path": "$.results",
+      "field_map": {
+        "title": "title",
+        "url": "html_url",
+        "published_at": "publication_date",
+        "summary": "abstract"
+      }
+    },
+    {
+      "type": "json_api",
+      "id": "federal-register-bis",
+      "name": "Federal Register – Bureau of Industry and Security",
+      "url": "https://www.federalregister.gov/api/v1/articles.json?conditions[agencies][]=industry-and-security-bureau&order=newest&per_page=10",
+      "item_path": "$.results",
+      "field_map": {
+        "title": "title",
+        "url": "html_url",
+        "published_at": "publication_date",
+        "summary": "abstract"
+      }
+    },
+    {
+      "type": "json_api",
+      "id": "federal-register-ddtc",
+      "name": "Federal Register – State DDTC / ITAR",
+      "url": "https://www.federalregister.gov/api/v1/articles.json?conditions[agencies][]=state-department&conditions[term]=Directorate%20of%20Defense%20Trade%20Controls&order=newest&per_page=10",
       "item_path": "$.results",
       "field_map": {
         "title": "title",
@@ -81,20 +133,88 @@
     },
     {
       "type": "rss",
+      "id": "dod-contract-announcements",
+      "name": "Department of War Contract Announcements",
+      "url": "https://www.war.gov/DesktopModules/ArticleCS/RSS.ashx?ContentType=400&Site=945"
+    },
+    {
+      "type": "json_api",
+      "id": "sam-gov-opportunities",
+      "name": "SAM.gov Contract Opportunities – Aerospace & Defense NAICS",
+      "url": "https://api.sam.gov/opportunities/v2/search?limit=20&ptype=o&postedFrom={start_mmddyyyy}&postedTo={end_mmddyyyy}&ncode=332710,336412,336413,336414,336415",
+      "item_path": "$.opportunitiesData",
+      "field_map": {
+        "title": "title",
+        "url": "uiLink",
+        "published_at": "postedDate",
+        "summary": "description"
+      },
+      "auth_query_param": "api_key",
+      "auth_env_var": "SAM_API_KEY"
+    },
+    {
+      "type": "json_api",
+      "id": "congress-defense-activity",
+      "name": "Congress.gov Recent Defense Legislative Activity",
+      "url": "https://api.congress.gov/v3/bill/119?format=json&limit=20&fromDateTime={start_datetime}&toDateTime={end_datetime}&sort=updateDate+desc",
+      "item_path": "$.bills",
+      "field_map": {
+        "title": "title",
+        "url": "url",
+        "published_at": "updateDate",
+        "summary": "latestAction.text"
+      },
+      "auth_header": "X-Api-Key",
+      "auth_env_var": "CONGRESS_API_KEY"
+    },
+    {
+      "type": "rss",
       "id": "spacenews-rss",
       "name": "SpaceNews",
       "url": "https://spacenews.com/feed/"
+    },
+    {
+      "type": "rss",
+      "id": "breaking-defense-rss",
+      "name": "Breaking Defense",
+      "url": "https://breakingdefense.com/feed/"
+    },
+    {
+      "type": "rss",
+      "id": "defense-news-rss",
+      "name": "Defense News",
+      "url": "https://www.defensenews.com/arc/outboundfeeds/rss/?outputType=xml"
+    },
+    {
+      "type": "rss",
+      "id": "defensescoop-rss",
+      "name": "DefenseScoop",
+      "url": "https://defensescoop.com/feed/"
     }
   ],
   "keyword_prefilter": {
     "include": [
       "contract",
+      "contracts",
       "award",
+      "awarded",
       "solicitation",
+      "RFP",
+      "RFQ",
+      "sources sought",
       "procurement",
+      "opportunity",
       "subcontract",
+      "supplier",
+      "supply chain",
       "sole source",
       "set-aside",
+      "NAICS",
+      "332710",
+      "336412",
+      "336413",
+      "336414",
+      "336415",
       "defense",
       "military",
       "aerospace",
@@ -102,13 +222,21 @@
       "Pentagon",
       "NDAA",
       "budget",
+      "appropriation",
       "acquisition",
       "Air Force",
       "Navy",
       "Army",
+      "DLA",
+      "BIS",
+      "DDTC",
       "missile",
       "munition",
+      "hypersonic",
+      "hypersonics",
       "propulsion",
+      "aircraft parts",
+      "space parts",
       "Lockheed Martin",
       "Lockheed",
       "RTX",
@@ -117,9 +245,12 @@
       "Boeing",
       "F-35",
       "B-21",
+      "NGAD",
       "build-to-print",
       "precision machining",
       "machining",
+      "machine shop",
+      "machine shops",
       "5-axis",
       "CNC",
       "AS9100",
@@ -127,11 +258,12 @@
       "titanium",
       "forging",
       "casting",
-      "supply chain",
       "export control",
+      "export controls",
       "ITAR",
       "EAR",
       "DFARS",
+      "CMMC",
       "debarment",
       "suspension",
       "protest",
@@ -143,6 +275,14 @@
     ],
     "exclude": [
       "obituary",
+      "memorial service",
+      "retirement ceremony",
+      "change of command",
+      "promotion ceremony",
+      "assumption of command",
+      "relinquishment of command",
+      "performance review board",
+      "names of members",
       "sports",
       "entertainment"
     ]
@@ -253,7 +393,7 @@
     "timezone": "America/New_York"
   },
   "cost_caps": {
-    "max_items_per_run": 60,
+    "max_items_per_run": 50,
     "max_output_tokens_per_run": 40000
   },
   "profile": {
