@@ -8,6 +8,7 @@ inject SQLite + an in-memory queue and production injects Postgres + Celery.
 from __future__ import annotations
 
 import logging
+import hmac
 import time
 from datetime import UTC, datetime, timedelta
 
@@ -106,7 +107,7 @@ def create_app(
         if not settings.backend_auth_token:
             return JSONResponse({"code": "auth_not_configured", "detail": "BTX_BACKEND_AUTH_TOKEN is required."}, status_code=503)
         expected = f"Bearer {settings.backend_auth_token}"
-        if request.headers.get("authorization") != expected:
+        if not hmac.compare_digest(request.headers.get("authorization") or "", expected):
             return JSONResponse({"code": "unauthorized", "detail": "Missing or invalid bearer token."}, status_code=401)
         return await call_next(request)
 

@@ -45,6 +45,22 @@ def test_auth_rejects_protected_routes(tmp_path: Path):
     assert client.get("/engine-config/scoring_weights").status_code == 401
 
 
+def test_auth_uses_constant_time_compare(monkeypatch, tmp_path: Path):
+    calls: list[tuple[str, str]] = []
+
+    def fake_compare(candidate: str, expected: str) -> bool:
+        calls.append((candidate, expected))
+        return False
+
+    monkeypatch.setattr("btx_platform.api.hmac.compare_digest", fake_compare)
+    client, _sf, _settings = _build(tmp_path)
+
+    response = client.get("/engine-config/scoring_weights", headers={"Authorization": "Bearer wrong-token"})
+
+    assert response.status_code == 401
+    assert calls == [("Bearer wrong-token", f"Bearer {AUTH}")]
+
+
 def test_llm_route_matches_proxy_contract(monkeypatch, tmp_path: Path):
     captured: dict = {}
 
