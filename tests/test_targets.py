@@ -27,7 +27,7 @@ from monitor_engine.models import (
     ScoringRubric,
     TierThresholds,
 )
-from monitor_engine.targets.build import build_map_data, write_map_site
+from monitor_engine.targets.build import build_map_data, write_map_data
 from monitor_engine.targets.fit import score_fit
 from monitor_engine.targets.sources import load_source
 from monitor_engine.targets.states import normalize_state, state_centroid
@@ -206,10 +206,10 @@ def test_build_dedups_and_merges_geo(tmp_path):
     assert dupe.geo is not None
 
 
-def test_write_map_site_emits_json_contract_only(tmp_path):
+def test_write_map_data_emits_json_contract_only(tmp_path):
     md = build_map_data(_config(tmp_path), base_dir=tmp_path, session=MagicMock())
     out = tmp_path / "out"
-    write_map_site(md, out)
+    write_map_data(md, out)
     data = json.loads((out / "map_targets.json").read_text())
     assert data["config"]["name"] == "BTX"
     assert len(data["targets"]) == 3

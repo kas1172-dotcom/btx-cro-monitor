@@ -7,7 +7,8 @@ This flow proves the cockpit can write one real action back to the connected Hub
 - Fly backend is deployed and healthy at `https://btx-platform.fly.dev/health`.
 - `BTX_HUBSPOT_ACCESS_TOKEN` is set on Fly with CRM task write scope.
 - The GitHub Pages cockpit is deployed in `hybrid` or `live` data mode.
-- `VITE_BACKEND_ENDPOINT` and `VITE_BACKEND_AUTH_TOKEN` are set in the frontend deploy secrets.
+- `VITE_BACKEND_ENDPOINT` is set in the frontend deploy secrets.
+- Until browser/backend auth is redesigned, real task creation should be rehearsed in a controlled local/dev build that can provide a backend bearer token at runtime. The public Pages build does not bake `VITE_BACKEND_AUTH_TOKEN`.
 
 ## Demo Flow
 

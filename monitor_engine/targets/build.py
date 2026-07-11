@@ -92,7 +92,7 @@ def build_map_data(
     return MapData(generated_at=datetime.now(timezone.utc), config=info, targets=targets)
 
 
-def write_map_site(
+def write_map_data(
     map_data: MapData, output_dir: Path, *, data_filename: str = "map_targets.json"
 ) -> None:
     """Write the map_targets.json data contract into output_dir."""

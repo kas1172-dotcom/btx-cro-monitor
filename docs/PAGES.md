@@ -1,31 +1,16 @@
 # GitHub Pages Publishing
 
-The BTX brief is deployed by GitHub Actions after the manual Monitor Pipeline
-finishes. The workflow publishes the static files generated in:
+GitHub Pages publishes the React cockpit and the monitor JSON artifacts. The retired Python static brief/map HTML is no longer published.
+
+Public URLs for this repository:
 
 ```text
-clients/btx/artifacts/
-```
-
-The direct public URL for the current BTX defense monitor is:
-
-```text
-https://<owner>.github.io/<repo>/btx/
-```
-
-For this repository, the expected URL is:
-
-```text
-https://kas1172-dotcom.github.io/btx-cro-monitor/btx/
-```
-
-The backend-connected cockpit is deployed beside the brief under:
-
-```text
+https://kas1172-dotcom.github.io/btx-cro-monitor/
 https://kas1172-dotcom.github.io/btx-cro-monitor/cockpit/
+https://kas1172-dotcom.github.io/btx-cro-monitor/btx/run_output.json
+https://kas1172-dotcom.github.io/btx-cro-monitor/btx/archive.json
+https://kas1172-dotcom.github.io/btx-cro-monitor/btx/map_targets.json
 ```
-
-The Pages root is a lightweight index that links to both public entry points.
 
 ## Required Repo Setting
 
@@ -37,35 +22,37 @@ GitHub Pages must be enabled from the repository UI:
 4. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 5. Save the setting if GitHub shows a save button.
 
-The workflow cannot reliably toggle this setting from code. Once enabled, the
-manual **Monitor Pipeline** workflow publishes the latest generated BTX brief
-through the reusable **Deploy Pages** workflow.
-
 ## Required Repo Secrets
 
-The cockpit is built by GitHub Actions, so production Vite values come from
-repository secrets:
+The cockpit is built by GitHub Actions, so production Vite values come from repository secrets:
 
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
-VITE_BACKEND_AUTH_TOKEN=<same value as BTX_BACKEND_AUTH_TOKEN on Fly>
 VITE_COCKPIT_PASSWORD=<demo access password>
 ```
 
-`VITE_COCKPIT_PASSWORD` is hashed during the workflow and only the SHA-256
-digest is bundled into the static frontend. This is a light demo-safety gate,
-not real authentication. Because the backend bearer token is still bundled into
-the browser build, do not treat this as customer-grade access control.
+`VITE_COCKPIT_PASSWORD` is hashed during the workflow and only the SHA-256 digest is bundled into the static frontend. This is a light demo-safety gate, not real authentication.
+
+`VITE_BACKEND_AUTH_TOKEN` is intentionally not bundled into the Pages build. Backend-authenticated browser calls need a safer runtime auth design before public deployment.
 
 ## Workflow Behavior
 
 - `.github/workflows/monitor.yml` remains manual-dispatch only.
-- `.github/workflows/deploy-frontend.yml` manually republishes the cockpit
-  without rerunning the monitor.
-- The monitor pipeline writes the BTX static site into `clients/btx/artifacts/`.
-- `.github/workflows/pages.yml` assembles the Pages artifact in `_site/`.
+- The monitor pipeline writes JSON artifacts into `clients/btx/artifacts/`.
+- `.github/workflows/pages.yml` builds `frontend/` and assembles the Pages artifact in `_site/`.
 - The cockpit is copied to `_site/cockpit/`.
-- The BTX brief is copied to `_site/btx/` for the direct public URL.
-- Artifact mode fetches monitor JSON at `../btx/run_output.json` and
-  `../btx/archive.json` from the cockpit page.
+- `run_output.json`, `archive.json`, and `map_targets.json` are copied to `_site/btx/`.
 - Pages deployments are serialized by the `pages` concurrency group.
+
+## Frontend Build Values
+
+The Pages workflow sets:
+
+```text
+VITE_DATA_MODE=hybrid
+VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
+VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
+VITE_ARTIFACT_BASE_URL=../btx
+```
+
+Run **Deploy Pages** from the Actions tab to republish without re-running the monitor pipeline.

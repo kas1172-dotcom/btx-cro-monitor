@@ -203,7 +203,7 @@ Changed:
 
 - `monitor_engine.pipeline.run_pipeline` now writes `run_output.json` directly and no longer calls `monitor_engine.site.builder.build_site`.
 - `run_output.json` still embeds `site_config`; `account_map_url` is now `null` because `map.html` is retired.
-- `monitor_engine.targets.write_map_site` now writes only `map_targets.json`.
+- `monitor_engine.targets.write_map_data` now writes only `map_targets.json`.
 - Pipeline/target tests were updated to assert JSON outputs remain and retired HTML files are not produced.
 
 Verification:
@@ -300,6 +300,27 @@ cd frontend && npm run test:settings
 ```
 
 Result: all listed checks passed. Follow-up: backend-authenticated frontend calls will need a safer runtime auth design; the build no longer bakes `VITE_BACKEND_AUTH_TOKEN`.
+
+### After Docs/API Name Cleanup
+
+Changed:
+
+- Rewrote `README.md` and `ARCHITECTURE.md` around the backend-canonical architecture.
+- Updated Pages/backend/manual-QA/HubSpot-task docs to remove stale static-site and build-time backend token guidance.
+- Renamed `monitor_engine.targets.write_map_site` to `write_map_data` after grep showed only internal/test references.
+
+Verification:
+
+```text
+python3 -m pytest -q tests/test_targets.py
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+test -f /tmp/btxmap/map_targets.json
+test ! -f /tmp/btxmap/map.html
+cd frontend && npm run typecheck && npm run build && npm run test:metrics && npm run test:rail && npm run test:settings
+python3 -m pytest -q
+```
+
+Result: all listed checks passed.
 
 ### After Task 3.3: Removed Committed Static HTML Artifacts
 

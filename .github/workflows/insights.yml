@@ -2,7 +2,7 @@
 # them. The key never leaves CI. Two artifacts:
 #   - insights.json         : dossier narration (explains the deterministic output)
 #   - extracted-signals.json: signals pulled from news text (the extraction layer)
-# The static site reads both. Manual trigger.
+# The React cockpit reads both. Manual trigger.
 name: Bake LLM artifacts
 
 on:
