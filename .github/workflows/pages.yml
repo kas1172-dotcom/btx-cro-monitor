@@ -9,8 +9,6 @@ on:
     secrets:
       VITE_BACKEND_ENDPOINT:
         required: true
-      VITE_BACKEND_AUTH_TOKEN:
-        required: true
       VITE_COCKPIT_PASSWORD:
         required: true
   workflow_dispatch:
@@ -55,27 +53,29 @@ jobs:
         env:
           VITE_DATA_MODE: hybrid
           VITE_BACKEND_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}
-          VITE_BACKEND_AUTH_TOKEN: ${{ secrets.VITE_BACKEND_AUTH_TOKEN }}
           VITE_COPILOT_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}/llm
           VITE_ARTIFACT_BASE_URL: ../btx
           COCKPIT_PASSWORD: ${{ secrets.VITE_COCKPIT_PASSWORD }}
         run: |
-          if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$VITE_BACKEND_AUTH_TOKEN" ] || [ -z "$COCKPIT_PASSWORD" ]; then
-            echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_BACKEND_AUTH_TOKEN, VITE_COCKPIT_PASSWORD"
+          if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$COCKPIT_PASSWORD" ]; then
+            echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_COCKPIT_PASSWORD"
             exit 1
           fi
           export VITE_COCKPIT_PASSWORD_HASH="$(printf '%s' "$COCKPIT_PASSWORD" | sha256sum | awk '{print $1}')"
           npm ci
           npm run build
 
-      # Assemble _site/: the cockpit under /cockpit/ and BTX artifacts under
-      # /btx/ so hybrid/artifact modes can fetch monitor output at runtime.
+      # Assemble _site/: the cockpit under /cockpit/ and selected BTX JSON
+      # artifacts under /btx/ so hybrid/artifact modes can fetch monitor output
+      # at runtime. The retired Python static brief/map HTML is not published.
       - name: Assemble site
         run: |
           rm -rf _site && mkdir -p _site/cockpit _site/btx
           cp -r frontend/dist/. _site/cockpit/
-          mkdir -p _site/btx
-          cp -r clients/btx/artifacts/. _site/btx/
+          for artifact in run_output.json archive.json map_targets.json; do
+            test -f "clients/btx/artifacts/$artifact"
+            cp "clients/btx/artifacts/$artifact" "_site/btx/$artifact"
+          done
           cat > _site/index.html <<'HTML'
           <!doctype html>
           <html lang="en">
@@ -96,10 +96,10 @@ jobs:
             <body>
               <main>
                 <h1>BTX CRO Monitor</h1>
-                <p>The current defense monitor brief and the live backend-connected cockpit are published from this repository.</p>
+                <p>The live backend-connected cockpit is published from this repository. Monitor JSON artifacts are available under <code>/btx/</code> for the cockpit.</p>
                 <nav aria-label="BTX pages">
                   <a href="./cockpit/">Open cockpit</a>
-                  <a href="./btx/">Open brief</a>
+                  <a href="./btx/run_output.json">View monitor JSON</a>
                 </nav>
               </main>
             </body>

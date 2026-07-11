@@ -275,6 +275,32 @@ cd frontend && npm run test:settings
 
 Result: all listed checks passed.
 
+### After Task 3.4: Updated CI And Pages Publishing
+
+Changed:
+
+- `.github/workflows/monitor.yml` now describes and validates JSON artifacts, with `map_targets.json` as the account-map output.
+- `.github/workflows/pages.yml` publishes the cockpit under `/cockpit/` and only selected JSON artifacts under `/btx/`: `run_output.json`, `archive.json`, `map_targets.json`.
+- Removed `VITE_BACKEND_AUTH_TOKEN` from the Pages workflow `workflow_call` secrets and frontend build environment per the auth follow-up instruction.
+
+Verification:
+
+```text
+VITE_DATA_MODE=hybrid VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm VITE_ARTIFACT_BASE_URL=../btx VITE_COCKPIT_PASSWORD_HASH=0000000000000000000000000000000000000000000000000000000000000000 npm run build
+python3 -m pytest -q
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); print('OK')"
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+test -f /tmp/btxmap/map_targets.json
+test ! -f /tmp/btxmap/map.html
+cd frontend && npm run typecheck
+cd frontend && npm run test:metrics
+cd frontend && npm run test:rail
+cd frontend && npm run test:settings
+```
+
+Result: all listed checks passed. Follow-up: backend-authenticated frontend calls will need a safer runtime auth design; the build no longer bakes `VITE_BACKEND_AUTH_TOKEN`.
+
 ### After Task 3.3: Removed Committed Static HTML Artifacts
 
 Deletion evidence:

@@ -120,9 +120,9 @@ jobs:
           SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
           CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
 
-      # ── Build the account map ───────────────────────────────────────
+      # ── Build the account map data ──────────────────────────────────
       # Pulls target accounts (CSV + any configured APIs), scores fit, and
-      # writes map.html + map_targets.json alongside the brief. No LLM spend.
+      # writes map_targets.json alongside the monitor artifacts. No LLM spend.
       - name: Build account map – ${{ matrix.client }}
         run: |
           python -m monitor_engine.targets \
@@ -182,9 +182,9 @@ jobs:
           PY
 
       # ── Commit artifacts back to the repo ───────────────────────────
-      # The static site (index.html + run_output.json) is the output
-      # contract.  archive.json is the rolling history that powers
-      # what's-new diffs on future runs.  All three are committed.
+      # JSON artifacts are the output contract. run_output.json powers the
+      # cockpit signal feed, archive.json is the rolling history, and
+      # map_targets.json powers the account map. These are committed.
       - name: Commit artifacts – ${{ matrix.client }}
         run: |
           git config user.name  "github-actions[bot]"
