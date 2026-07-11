@@ -2,13 +2,11 @@ const env = (import.meta as ImportMeta & { env?: Record<string, string | undefin
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 
 export const BACKEND_ENDPOINT = env?.VITE_BACKEND_ENDPOINT ?? processEnv?.VITE_BACKEND_ENDPOINT;
-export const BACKEND_AUTH_TOKEN = env?.VITE_BACKEND_AUTH_TOKEN ?? processEnv?.VITE_BACKEND_AUTH_TOKEN;
 
 export function backendHeaders(extra: Record<string, string> = {}): Record<string, string> {
-  return {
-    ...extra,
-    ...(BACKEND_AUTH_TOKEN ? { authorization: `Bearer ${BACKEND_AUTH_TOKEN}` } : {}),
-  };
+  // TODO(WP10): replace shared backend bearer tokens with browser-safe auth.
+  // Until then the cockpit must not hold or send a shared backend secret.
+  return { ...extra };
 }
 
 export async function backendJson<T>(path: string, init: RequestInit = {}): Promise<T> {
