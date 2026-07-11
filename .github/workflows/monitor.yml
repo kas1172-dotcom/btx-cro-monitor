@@ -218,3 +218,4 @@ jobs:
     # run. Skipped if the test gate blocked the run or the run was cancelled.
     if: ${{ !cancelled() && github.ref_name == 'main' && (needs.run.result == 'success' || needs.run.result == 'failure') }}
     uses: ./.github/workflows/pages.yml
+    secrets: inherit

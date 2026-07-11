@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_COPILOT_ENDPOINT?: string;
   readonly VITE_BACKEND_ENDPOINT?: string;
   readonly VITE_BACKEND_AUTH_TOKEN?: string;
+  readonly VITE_COCKPIT_PASSWORD_HASH?: string;
+  readonly VITE_ARTIFACT_BASE_URL?: string;
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv;

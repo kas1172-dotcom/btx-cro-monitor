@@ -41,8 +41,14 @@ BTX_HUBSPOT_ACCESS_TOKEN     HubSpot private-app token
 BTX_GITHUB_PAT               GitHub token with permission to dispatch Actions
 ```
 
-`BTX_FRONTEND_ORIGINS` should be the deployed frontend origin. For the current
-GitHub Pages deployment, use this unless Phase 3 moves the frontend elsewhere:
+`BTX_FRONTEND_ORIGINS` should be the deployed frontend origin. The Phase 3
+cockpit URL is:
+
+```text
+https://kas1172-dotcom.github.io/btx-cro-monitor/cockpit/
+```
+
+CORS origins do not include paths, so set the Fly secret to:
 
 ```text
 https://kas1172-dotcom.github.io
@@ -195,6 +201,29 @@ When Phase 3 deploys or rebuilds the frontend against this backend, use:
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
 VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
+VITE_DATA_MODE=artifact
+VITE_ARTIFACT_BASE_URL=../btx
+```
+
+Add these repository secrets for the GitHub Pages frontend workflow:
+
+```text
+VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
+VITE_BACKEND_AUTH_TOKEN=<same value as BTX_BACKEND_AUTH_TOKEN on Fly>
+VITE_COCKPIT_PASSWORD=<demo access password>
+```
+
+After those secrets are set, run the **Deploy Frontend Cockpit** workflow from
+the Actions tab. The cockpit will publish at:
+
+```text
+https://kas1172-dotcom.github.io/btx-cro-monitor/cockpit/
+```
+
+If you need to update the allowed frontend origin on Fly later, run:
+
+```bash
+fly secrets set --app btx-platform BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io"
 ```
 
 Do not expose `BTX_BACKEND_AUTH_TOKEN` as a long-term public frontend secret.

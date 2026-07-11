@@ -25,6 +25,46 @@ body {
 h1, h2, h3, h4, p { overflow-wrap: normal; word-break: normal; }
 p { line-height: 1.55; }
 
+.access-shell {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+.access-panel {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 24px 70px var(--shadow);
+}
+.access-panel h1 { margin: 0; font-size: 24px; }
+.access-panel label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; }
+.access-panel input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 11px 12px;
+  font: inherit;
+}
+.access-panel button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #171b12;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.access-panel button:disabled { opacity: .65; cursor: wait; }
+.access-panel small { color: var(--bad); }
+
 /* Quiet Revenue Brain cockpit */
 .quiet-cockpit {
   display: grid;
