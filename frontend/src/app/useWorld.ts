@@ -1,9 +1,10 @@
 // Loads + analyzes the world for a given region (city) through the adapter — the
 // literal "run the brain for the selected area". Re-runs when the city changes.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { createDataAdapter, getDataMode } from "../adapters/createDataAdapter.ts";
 import { liveAdapterStatus } from "../adapters/live/LiveDataAdapter.ts";
+import { getScoringConfigVersion, subscribeScoringConfig } from "./config.ts";
 import { provenanceCounts, provenanceSummary, type ProvenanceLabel } from "./provenance.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
 import { deriveNewsSignals } from "./newsIngest.ts";
@@ -38,6 +39,7 @@ export interface World {
 
 export function useWorld(city: string | null): World | null {
   const [world, setWorld] = useState<World | null>(null);
+  const configVersion = useSyncExternalStore(subscribeScoringConfig, getScoringConfigVersion, getScoringConfigVersion);
 
   useEffect(() => {
     let alive = true;
@@ -80,7 +82,7 @@ export function useWorld(city: string | null): World | null {
     return () => {
       alive = false;
     };
-  }, [city]);
+  }, [city, configVersion]);
 
   return world;
 }

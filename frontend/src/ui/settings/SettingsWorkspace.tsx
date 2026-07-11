@@ -3,7 +3,7 @@ import defaultWeights from "../../../data/config/scoring-weights.v1.json";
 import clientConfig from "../../../../clients/btx/config.json";
 import { SETTINGS_SECTIONS } from "../../app/settingsSections.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
-import { CONFIG } from "../../app/config.ts";
+import { applyScoringConfig } from "../../app/config.ts";
 import { clearMemory } from "../../memory/localMemory.ts";
 import { resetUiState, setState, useStore, type SettingsSection } from "../../store/store.ts";
 import type { WeightsConfig } from "../../engine/decision/weights.ts";
@@ -92,7 +92,7 @@ function readLocal<T>(key: string, fallback: T): T {
 }
 
 function applyWeights(document: WeightsConfig): void {
-  Object.assign(CONFIG, document);
+  applyScoringConfig(document);
 }
 
 function updatedLabel(response?: EngineConfigResponse<unknown> | null): string {
