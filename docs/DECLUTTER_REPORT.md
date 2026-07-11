@@ -484,7 +484,7 @@ Changed:
 
 - `.github/workflows/monitor.yml` now describes and validates JSON artifacts, with `map_targets.json` as the account-map output.
 - `.github/workflows/pages.yml` publishes the cockpit under `/cockpit/` and only selected JSON artifacts under `/btx/`: `run_output.json`, `archive.json`, `map_targets.json`.
-- Removed `VITE_BACKEND_AUTH_TOKEN` from the Pages workflow `workflow_call` secrets and frontend build environment per the auth follow-up instruction.
+- Removed the browser-exposed backend token from the Pages workflow `workflow_call` secrets and frontend build environment per the auth follow-up instruction.
 
 Verification:
 
@@ -502,7 +502,7 @@ cd frontend && npm run test:rail
 cd frontend && npm run test:settings
 ```
 
-Result: all listed checks passed. Follow-up: backend-authenticated frontend calls will need a safer runtime auth design; the build no longer bakes `VITE_BACKEND_AUTH_TOKEN`.
+Result: all listed checks passed. Follow-up: backend-authenticated frontend calls will need a safer runtime auth design; the build no longer bakes a shared backend bearer token.
 
 ### After Docs/API Name Cleanup
 

@@ -33,7 +33,7 @@ VITE_COCKPIT_PASSWORD=<demo access password>
 
 `VITE_COCKPIT_PASSWORD` is hashed during the workflow and only the SHA-256 digest is bundled into the static frontend. This is a light demo-safety gate, not real authentication.
 
-`VITE_BACKEND_AUTH_TOKEN` is intentionally not bundled into the Pages build. Backend-authenticated browser calls need a safer runtime auth design before public deployment.
+The Pages build intentionally does not bundle a shared backend bearer token. Browser-safe backend auth is deferred to WP10; protected backend calls may reject public cockpit requests until then.
 
 ## Workflow Behavior
 

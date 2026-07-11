@@ -60,7 +60,9 @@ VITE_ARTIFACT_BASE_URL=../btx \
 npm run build
 ```
 
-`VITE_BACKEND_AUTH_TOKEN` is not baked into the Pages build. Backend-authenticated browser calls need a safer runtime auth design.
+The browser build does not receive or send the shared backend bearer token. Protected backend browser auth is deferred to WP10; until then, public cockpit calls are made without an authorization header and protected routes may report an auth error.
+
+In `hybrid` mode, monitor artifacts are treated as real market/portfolio signals unless the interim text-fit guard can link them strongly to an account. Weak matches stay unlinked and do not change account scores.
 
 ## Local Backend
 

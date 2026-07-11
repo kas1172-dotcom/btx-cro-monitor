@@ -110,7 +110,7 @@ It is not responsible for rendering the product UI.
 
 `VITE_DATA_MODE` selects the frontend adapter:
 
-- `hybrid`: intended production demo default. HubSpot CRM reads are real, monitor signals are real artifacts, non-integrated operating context uses labeled demo fallback.
+- `hybrid`: intended production demo default. HubSpot CRM reads are real, monitor signals are real artifacts, non-integrated operating context uses labeled demo fallback. Monitor artifacts remain market/portfolio-level unless the interim fit guard links them strongly to an account; unlinked artifacts do not affect account scores.
 - `live`: live backend-backed mode. It should surface backend issues clearly.
 - `artifact`: monitor-artifact mode for signal consumption without live CRM.
 - `demo`: deterministic dev/test scaffolding from `frontend/data/demo/btx/`.
@@ -135,7 +135,7 @@ GitHub Actions are manual-dispatch by default.
 - `Deploy Pages` publishes the cockpit under `/cockpit/` and selected JSON artifacts under `/btx/`.
 - Fly.io hosts `btx_platform`.
 
-The Pages build does not bake `VITE_BACKEND_AUTH_TOKEN`; browser/backend auth needs a safer runtime pattern before protected backend calls can be fully public.
+The Pages build does not bake any shared backend bearer token. Browser-safe backend auth is deferred to WP10; until then, protected backend routes may reject public cockpit calls.
 
 ## Architecture Rules
 
