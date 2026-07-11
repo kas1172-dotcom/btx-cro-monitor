@@ -1,85 +1,103 @@
-# Deploy Backend
+# Deploy `btx_platform` on Fly.io
 
-`btx_platform` is the single production backend for authenticated settings, LLM composition, and monitor pipeline triggers. It is single-tenant and uses one static bearer token.
+`btx_platform` is the production backend for authenticated settings, LLM
+composition, monitor-pipeline dispatch, and future CRM/HubSpot integration. The
+frontend and public monitor stay static; this service holds server-side secrets
+and calls private APIs.
 
-Primary target: Fly.io. Railway notes are included after the Fly runbook.
+The Fly app name is:
 
-## Required Env
-
-Generate secrets locally:
-
-```bash
-openssl rand -base64 32
+```text
+btx-platform
 ```
 
-Set these values in production:
+The public backend URL will be:
 
-```bash
-BTX_ENV=prod
-BTX_DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:PORT/DBNAME
-BTX_BACKEND_AUTH_TOKEN=<openssl-output>
-BTX_FRONTEND_ORIGINS=https://<your-github-pages-host>
-BTX_ANTHROPIC_API_KEY=<anthropic-key>
-BTX_PIPELINE_MECHANISM=github
-BTX_GITHUB_PAT=<github-token-with-actions-write>
-BTX_GITHUB_REPO=kas1172-dotcom/btx-cro-monitor
-BTX_GITHUB_WORKFLOW=monitor.yml
-BTX_GITHUB_REF=main
-BTX_PIPELINE_MIN_INTERVAL_SECONDS=600
+```text
+https://btx-platform.fly.dev
 ```
 
-Local/dev defaults:
+## Prerequisites
 
-```bash
-BTX_DATABASE_URL=sqlite:///./btx_platform.db
-BTX_PIPELINE_MECHANISM=subprocess
-BTX_PIPELINE_OUTPUT_DIR=clients/btx/artifacts
-BTX_PIPELINE_GENERATED_DIR=.btx_platform/generated
-```
-
-Optional integration env:
-
-```bash
-BTX_HUBSPOT_ACCESS_TOKEN=
-BTX_GMAIL_ALLOWLIST=
-BTX_LLM_TIMEOUT_SECONDS=45
-BTX_LLM_MAX_BODY_BYTES=524288
-```
-
-Frontend live env:
-
-```bash
-VITE_DATA_MODE=live
-VITE_BACKEND_ENDPOINT=https://<backend-host>
-VITE_BACKEND_AUTH_TOKEN=<same-token-as-BTX_BACKEND_AUTH_TOKEN>
-VITE_COPILOT_ENDPOINT=https://<backend-host>/llm
-```
-
-## Fly.io
-
-1. Install the Fly CLI and log in:
+Install and log in to the Fly CLI:
 
 ```bash
 brew install flyctl
 fly auth login
 ```
 
-2. Create the app and Postgres database:
+Generate the backend bearer token locally:
 
 ```bash
-fly apps create btx-platform
+openssl rand -base64 32
+```
+
+Create or gather these secrets before deploy:
+
+```text
+BTX_BACKEND_AUTH_TOKEN       generated with openssl above
+BTX_ANTHROPIC_API_KEY        Anthropic API key for /llm
+BTX_HUBSPOT_ACCESS_TOKEN     HubSpot private-app token
+BTX_GITHUB_PAT               GitHub token with permission to dispatch Actions
+```
+
+`BTX_FRONTEND_ORIGINS` should be the deployed frontend origin. For the current
+GitHub Pages deployment, use this unless Phase 3 moves the frontend elsewhere:
+
+```text
+https://kas1172-dotcom.github.io
+```
+
+If the frontend later gets a custom domain, replace that value with the exact
+custom origin.
+
+## First Deploy
+
+Run these commands from the repository root.
+
+1. Create/confirm the Fly app without deploying yet.
+
+```bash
+fly launch --no-deploy
+```
+
+When prompted:
+
+- App name: `btx-platform`
+- Region: `iad`
+- Use the existing `fly.toml` in this repo if Fly asks.
+- Decline Dockerfile generation if Fly asks; this repo already has one.
+- Do not deploy from `fly launch`; deploy happens after Postgres and secrets.
+
+2. Create a managed Postgres database in the same region.
+
+```bash
 fly postgres create --name btx-platform-db --region iad
+```
+
+3. Attach Postgres to the backend app.
+
+```bash
 fly postgres attach --app btx-platform btx-platform-db
 ```
 
-3. Set secrets:
+Fly usually injects a `DATABASE_URL` secret during attach. The backend accepts
+that value directly. If your Fly CLI instead prints a database URL and does not
+set it automatically, set it explicitly as `BTX_DATABASE_URL`:
+
+```bash
+fly secrets set BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@HOST:PORT/DBNAME"
+```
+
+4. Set production secrets.
 
 ```bash
 fly secrets set \
   BTX_ENV=prod \
-  BTX_BACKEND_AUTH_TOKEN="$(openssl rand -base64 32)" \
-  BTX_FRONTEND_ORIGINS="https://<your-github-pages-host>" \
+  BTX_BACKEND_AUTH_TOKEN="<openssl-output>" \
+  BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io" \
   BTX_ANTHROPIC_API_KEY="<anthropic-key>" \
+  BTX_HUBSPOT_ACCESS_TOKEN="<hubspot-private-app-token>" \
   BTX_PIPELINE_MECHANISM=github \
   BTX_GITHUB_PAT="<github-token>" \
   BTX_GITHUB_REPO="kas1172-dotcom/btx-cro-monitor" \
@@ -87,49 +105,22 @@ fly secrets set \
   BTX_GITHUB_REF="main"
 ```
 
-Fly sets `DATABASE_URL` when Postgres is attached. Map it into the app env if needed:
+5. Deploy.
 
 ```bash
-fly secrets set BTX_DATABASE_URL="$DATABASE_URL"
+fly deploy
 ```
 
-4. Deploy with this start command:
-
-```bash
-uvicorn btx_platform.asgi:app --host 0.0.0.0 --port 8080
-```
-
-5. Initialize or migrate the database. The current platform pattern is model-driven `create_all`; the app also runs this on boot for dev/test convenience.
-
-```bash
-python - <<'PY'
-from btx_platform.config import get_settings
-from btx_platform.db import init_db, make_engine
-init_db(make_engine(get_settings().database_url))
-PY
-```
-
-## Railway
-
-1. Create a Railway project from this repository.
-2. Add the Postgres plugin.
-3. Set `BTX_DATABASE_URL` to Railway's Postgres URL using the `postgresql+psycopg://` driver prefix.
-4. Set the same env values listed above.
-5. Use the start command:
-
-```bash
-uvicorn btx_platform.asgi:app --host 0.0.0.0 --port $PORT
-```
-
-Run the same database initialization command in a Railway shell before the first smoke test.
+The app creates its SQLAlchemy tables on startup if they do not already exist.
+There are no Alembic migrations in this repo today.
 
 ## Smoke Tests
 
-Replace `TOKEN` and `BASE`:
+Set local shell variables for the smoke tests:
 
 ```bash
-export BASE=https://<backend-host>
-export TOKEN=<BTX_BACKEND_AUTH_TOKEN>
+export BASE="https://btx-platform.fly.dev"
+export TOKEN="<same-value-as-BTX_BACKEND_AUTH_TOKEN>"
 ```
 
 Health is public:
@@ -138,47 +129,74 @@ Health is public:
 curl -s "$BASE/health"
 ```
 
-Protected routes reject missing auth:
-
-```bash
-curl -i "$BASE/engine-config/scoring_weights"
-```
-
-Config read:
+Protected config read:
 
 ```bash
 curl -s "$BASE/engine-config/scoring_weights" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-LLM proxy contract:
+LLM proxy:
 
 ```bash
 curl -s "$BASE/llm" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"system":"Reply in one short sentence.","messages":[{"role":"user","content":"Say BTX backend is live."}]}'
+  -d '{
+    "system": "Reply in one short sentence.",
+    "messages": [{"role": "user", "content": "Say BTX backend is live."}]
+  }'
 ```
 
-Pipeline run:
+Trigger a monitor pipeline run through GitHub Actions:
 
 ```bash
 curl -s -X POST "$BASE/pipeline/run" \
   -H "Authorization: Bearer $TOKEN"
+```
 
+List recent pipeline runs:
+
+```bash
 curl -s "$BASE/pipeline/runs" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-## Frontend Cutover
+## Operations
 
-Set these in the frontend build environment:
+View logs:
 
 ```bash
-VITE_DATA_MODE=live
-VITE_BACKEND_ENDPOINT=$BASE
-VITE_BACKEND_AUTH_TOKEN=$TOKEN
-VITE_COPILOT_ENDPOINT=$BASE/llm
+fly logs --app btx-platform
 ```
 
-`copilot-proxy.mjs` remains in the repo for local fallback only; production LLM calls should go to `btx_platform /llm`.
+Restart the app:
+
+```bash
+fly apps restart btx-platform
+```
+
+Open the Fly dashboard:
+
+```bash
+fly dashboard --app btx-platform
+```
+
+Check configured secrets:
+
+```bash
+fly secrets list --app btx-platform
+```
+
+## Frontend Cutover
+
+When Phase 3 deploys or rebuilds the frontend against this backend, use:
+
+```text
+VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
+VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
+```
+
+Do not expose `BTX_BACKEND_AUTH_TOKEN` as a long-term public frontend secret.
+For a real customer deployment, put the cockpit behind an access-control layer
+or add user authentication before showing private HubSpot data.

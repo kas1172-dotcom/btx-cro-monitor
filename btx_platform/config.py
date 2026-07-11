@@ -4,17 +4,25 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="BTX_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
+        env_prefix="BTX_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        populate_by_name=True,
     )
 
     env: str = "dev"
     # SQLite by default so the service runs with zero infra locally; Postgres in prod.
-    database_url: str = "sqlite:///./btx_platform.db"
+    database_url: str = Field(
+        default="sqlite:///./btx_platform.db",
+        validation_alias=AliasChoices("BTX_DATABASE_URL", "DATABASE_URL"),
+    )
     redis_url: str = "redis://localhost:6379/0"
 
     # Reliability knobs (Phase 2 forwarder honors these).
