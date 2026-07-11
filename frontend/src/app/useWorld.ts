@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { createDataAdapter, getDataMode } from "../adapters/createDataAdapter.ts";
+import { liveAdapterStatus } from "../adapters/live/LiveDataAdapter.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
 import { deriveNewsSignals } from "./newsIngest.ts";
 import newsData from "../../data/demo/btx/news.json";
@@ -27,6 +28,8 @@ export interface World {
   prospects: Prospect[];
   /** Simulated CRM / ERP-capacity / pipeline / assumptions context (demo snapshot). */
   snapshot: OperatingSnapshot | null;
+  dataSource: string | null;
+  loadErrors: string[];
 }
 
 export function useWorld(city: string | null): World | null {
@@ -48,7 +51,19 @@ export function useWorld(city: string | null): World | null {
       const newsSignals = usesArtifactSignals ? [] : deriveNewsSignals(companies, NEWS, EXTRACTED);
       const analysis = analyze(companies, [...signals, ...newsSignals]);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
-      setWorld({ city, companies, contacts, facilities, opportunities, analysis, prospects, snapshot });
+      const liveStatus = DATA_MODE === "live" ? liveAdapterStatus() : { errors: [], provenance: null };
+      setWorld({
+        city,
+        companies,
+        contacts,
+        facilities,
+        opportunities,
+        analysis,
+        prospects,
+        snapshot,
+        dataSource: DATA_MODE === "live" ? liveStatus.provenance ?? "HubSpot" : null,
+        loadErrors: liveStatus.errors,
+      });
     });
     return () => {
       alive = false;

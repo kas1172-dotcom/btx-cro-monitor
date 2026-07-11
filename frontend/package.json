@@ -15,6 +15,7 @@
     "test:rail": "tsx tools/test-rail-tabs.ts",
     "test:settings": "tsx tools/test-settings-shell.ts",
     "test:tour": "tsx tools/test-tour.ts",
+    "test:live-adapter": "tsx tools/test-live-adapter.ts",
     "seed:hubspot": "tsx tools/seed-hubspot.ts",
     "cleanup:hubspot": "tsx tools/cleanup-hubspot.ts",
     "weekly:memo": "tsx tools/run-weekly-memo.ts"

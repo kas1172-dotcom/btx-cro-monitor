@@ -8,6 +8,7 @@ inject SQLite + an in-memory queue and production injects Postgres + Celery.
 from __future__ import annotations
 
 import logging
+import time
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +21,7 @@ from btx_platform import models
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import init_db, make_engine, make_session_factory
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
+from btx_platform.hubspot import HubSpotClient, HubSpotError, hubspot_payload
 from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
@@ -36,6 +38,7 @@ from btx_platform.schemas import (
 )
 
 logger = logging.getLogger(__name__)
+CRM_CACHE_TTL_SECONDS = 300
 
 
 def create_app(
@@ -62,6 +65,7 @@ def create_app(
     app.state.settings = settings
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else InMemoryQueue()
+    app.state.crm_cache = {}
     seed_engine_configs(session_factory)
 
     @app.middleware("http")
@@ -103,6 +107,22 @@ def create_app(
             status_code=501,
         )
 
+    def cached_hubspot_response(kind: str) -> Response:
+        if not settings.hubspot_access_token:
+            return not_configured(f"HubSpot {kind}")
+        now = time.monotonic()
+        cache: dict[str, tuple[float, dict]] = app.state.crm_cache
+        cached = cache.get(kind)
+        if cached and cached[0] > now:
+            return JSONResponse(cached[1])
+        try:
+            payload = hubspot_payload(HubSpotClient(settings.hubspot_access_token), kind)  # type: ignore[arg-type]
+        except HubSpotError as exc:
+            logger.warning("hubspot.read_failed", extra={"kind": kind, "status_code": exc.status_code})
+            return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
+        cache[kind] = (now + CRM_CACHE_TTL_SECONDS, payload)
+        return JSONResponse(payload)
+
     @app.post("/llm")
     async def llm_proxy(request: Request) -> Response:
         content_length = request.headers.get("content-length")
@@ -127,21 +147,15 @@ def create_app(
 
     @app.get("/crm/accounts")
     def crm_accounts() -> Response:
-        if not settings.hubspot_access_token:
-            return not_configured("HubSpot accounts")
-        return JSONResponse({"records": []})
+        return cached_hubspot_response("accounts")
 
     @app.get("/crm/deals")
     def crm_deals() -> Response:
-        if not settings.hubspot_access_token:
-            return not_configured("HubSpot deals")
-        return JSONResponse({"records": []})
+        return cached_hubspot_response("deals")
 
     @app.get("/crm/contacts")
     def crm_contacts() -> Response:
-        if not settings.hubspot_access_token:
-            return not_configured("HubSpot contacts")
-        return JSONResponse({"records": []})
+        return cached_hubspot_response("contacts")
 
     @app.post("/crm/task")
     def create_crm_task(payload: CrmTaskRequest) -> Response:

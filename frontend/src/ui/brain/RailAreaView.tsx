@@ -57,6 +57,12 @@ export function RailAreaView({ area, world }: { area: BrainArea; world: World })
         <p className="eyebrow">{model.eyebrow}</p>
         <h1>{model.headline}</h1>
       </div>
+      {world.dataSource && !world.loadErrors.length && (
+        <div className="live-inline-status">Live: {world.dataSource}</div>
+      )}
+      {world.loadErrors.length > 0 && (
+        <div className="live-inline-status error" role="status">{world.loadErrors[0]}</div>
+      )}
       <div className="rail-quiet-list">
         {topRows.map((row) => (
           <button

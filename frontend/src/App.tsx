@@ -102,6 +102,18 @@ export function App() {
       }}>
         <header className="quiet-topbar">
           <button className="quiet-brand" onClick={goHome}>{PROFILE.name} Revenue Brain</button>
+          {world?.dataSource && !world.loadErrors.length && (
+            <div className="live-source-status">
+              <span>Live</span>
+              <strong>{world.dataSource}</strong>
+            </div>
+          )}
+          {world?.loadErrors.length ? (
+            <div className="live-source-status error" role="status">
+              <span>Live data issue</span>
+              <strong>{world.loadErrors[0]}</strong>
+            </div>
+          ) : null}
           {world?.snapshot?.publicSignals.source_mode === "artifact" && (
             <div className={world.snapshot.publicSignals.stale ? "artifact-status stale" : "artifact-status"}>
               <span>Monitor run</span>

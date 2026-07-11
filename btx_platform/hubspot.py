@@ -1,0 +1,374 @@
+"""HubSpot CRM read client and BTX frontend-shape mappers."""
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
+from typing import Any, Callable, Iterable, Literal
+
+import httpx
+
+SOURCE_NAME = "HubSpot"
+BASE_URL = "https://api.hubapi.com"
+TIMEOUT_SECONDS = 10.0
+
+ObjectType = Literal["companies", "contacts", "deals"]
+AssociationType = Literal["companies", "contacts", "deals"]
+
+
+class HubSpotError(RuntimeError):
+    def __init__(self, *, method: str, url: str, status_code: int, body: str):
+        super().__init__(f"HubSpot {method} {url} failed {status_code}: {body}")
+        self.method = method
+        self.url = url
+        self.status_code = status_code
+        self.body = body
+
+
+@dataclass(frozen=True)
+class HubSpotObject:
+    id: str
+    properties: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class HubSpotOwner:
+    id: str
+    name: str
+    email: str | None = None
+
+
+class HubSpotClient:
+    def __init__(
+        self,
+        access_token: str,
+        *,
+        base_url: str = BASE_URL,
+        timeout: float = TIMEOUT_SECONDS,
+        sleep: Callable[[float], None] = time.sleep,
+    ):
+        self.access_token = access_token
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+        self.sleep = sleep
+
+    def _headers(self) -> dict[str, str]:
+        return {"authorization": f"Bearer {self.access_token}"}
+
+    def _request(self, method: str, url: str, **kwargs: Any) -> dict[str, Any]:
+        attempts = 0
+        while True:
+            attempts += 1
+            with httpx.Client(timeout=self.timeout) as client:
+                response = client.request(method, url, headers=self._headers(), **kwargs)
+            if response.status_code != 429:
+                break
+            if attempts >= 3:
+                break
+            retry_after = response.headers.get("retry-after")
+            try:
+                delay = float(retry_after) if retry_after else 1.0
+            except ValueError:
+                delay = 1.0
+            self.sleep(max(delay, 0.0))
+
+        if not response.is_success:
+            raise HubSpotError(method=method, url=url, status_code=response.status_code, body=response.text)
+        if not response.text:
+            return {}
+        return response.json()
+
+    def _get(self, path_or_url: str, *, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        url = path_or_url if path_or_url.startswith("https://") else f"{self.base_url}{path_or_url}"
+        return self._request("GET", url, params=params)
+
+    def _post(self, path: str, *, json: dict[str, Any]) -> dict[str, Any]:
+        return self._request("POST", f"{self.base_url}{path}", json=json)
+
+    def list_objects(self, object_type: ObjectType, properties: Iterable[str]) -> list[HubSpotObject]:
+        records: list[HubSpotObject] = []
+        next_url: str | None = None
+        after: str | None = None
+        params: dict[str, Any] | None = {
+            "limit": 100,
+            "properties": ",".join(properties),
+            "archived": "false",
+        }
+
+        while True:
+            if after and params is not None:
+                params["after"] = after
+            payload = self._get(next_url or f"/crm/v3/objects/{object_type}", params=params)
+            records.extend(
+                HubSpotObject(id=str(item["id"]), properties=item.get("properties") or {})
+                for item in payload.get("results", [])
+            )
+            next_page = (payload.get("paging") or {}).get("next") or {}
+            next_url = next_page.get("link")
+            after = next_page.get("after")
+            if not next_url and not after:
+                return records
+            if next_url:
+                params = None
+
+    def list_companies(self) -> list[HubSpotObject]:
+        return self.list_objects(
+            "companies",
+            [
+                "name",
+                "domain",
+                "website",
+                "city",
+                "state",
+                "address",
+                "zip",
+                "country",
+                "description",
+                "industry",
+                "hubspot_owner_id",
+                "btx_needs",
+            ],
+        )
+
+    def list_contacts(self) -> list[HubSpotObject]:
+        return self.list_objects(
+            "contacts",
+            ["firstname", "lastname", "email", "jobtitle", "phone", "associatedcompanyid", "hubspot_owner_id"],
+        )
+
+    def list_deals(self) -> list[HubSpotObject]:
+        return self.list_objects(
+            "deals",
+            ["dealname", "amount", "closedate", "dealstage", "pipeline", "hubspot_owner_id", "btx_external_id"],
+        )
+
+    def list_owners(self) -> list[HubSpotOwner]:
+        owners: list[HubSpotOwner] = []
+        next_url: str | None = None
+        after: str | None = None
+        params: dict[str, Any] | None = {"limit": 100, "archived": "false"}
+        while True:
+            if after and params is not None:
+                params["after"] = after
+            payload = self._get(next_url or "/crm/v3/owners", params=params)
+            for item in payload.get("results", []):
+                first = item.get("firstName") or ""
+                last = item.get("lastName") or ""
+                name = f"{first} {last}".strip() or item.get("email") or str(item.get("id"))
+                owners.append(HubSpotOwner(id=str(item.get("id")), name=name, email=item.get("email")))
+            next_page = (payload.get("paging") or {}).get("next") or {}
+            next_url = next_page.get("link")
+            after = next_page.get("after")
+            if not next_url and not after:
+                return owners
+            if next_url:
+                params = None
+
+    def read_associations(
+        self,
+        from_object_type: AssociationType,
+        to_object_type: AssociationType,
+        from_ids: Iterable[str],
+    ) -> dict[str, list[str]]:
+        result: dict[str, list[str]] = {}
+        ids = [str(item) for item in from_ids]
+        for index in range(0, len(ids), 1000):
+            chunk = ids[index:index + 1000]
+            if not chunk:
+                continue
+            payload = self._post(
+                f"/crm/v4/associations/{from_object_type}/{to_object_type}/batch/read",
+                json={"inputs": [{"id": item} for item in chunk]},
+            )
+            for row in payload.get("results", []):
+                from_id = str((row.get("from") or {}).get("id"))
+                result[from_id] = [str(item.get("toObjectId")) for item in row.get("to", []) if item.get("toObjectId") is not None]
+        return result
+
+
+def _clean(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _number(value: Any) -> float:
+    if value is None or value == "":
+        return 0.0
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _iso_date(value: Any) -> str:
+    text = _clean(value)
+    if not text:
+        return (datetime.now(UTC) + timedelta(days=90)).date().isoformat()
+    return text[:10]
+
+
+def _owner_name(owner_id: Any, owners: dict[str, HubSpotOwner]) -> str | None:
+    if owner_id is None:
+        return None
+    owner = owners.get(str(owner_id))
+    return owner.name if owner else None
+
+
+def _needs(properties: dict[str, Any]) -> list[str]:
+    raw = _clean(properties.get("btx_needs")) or _clean(properties.get("industry")) or _clean(properties.get("description"))
+    if not raw:
+        return []
+    return [item.strip() for item in raw.replace(";", ",").split(",") if item.strip()][:8]
+
+
+def _stage(value: Any) -> str:
+    text = (_clean(value) or "").lower()
+    if "closedwon" in text or text == "won" or "won" in text:
+        return "won"
+    if "closedlost" in text or text == "lost" or "lost" in text:
+        return "lost"
+    if "contract" in text or "proposal" in text or "presentation" in text:
+        return "proposal"
+    if "qualified" in text or "decision" in text:
+        return "qualified"
+    return "prospecting"
+
+
+def map_companies(
+    companies: list[HubSpotObject],
+    owners: dict[str, HubSpotOwner],
+    contact_associations: dict[str, list[str]],
+    deal_associations: dict[str, list[str]],
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for company in companies:
+        props = company.properties
+        name = _clean(props.get("name")) or _clean(props.get("domain")) or f"HubSpot Company {company.id}"
+        deal_ids = deal_associations.get(company.id, [])
+        account_status = "active_pipeline" if deal_ids else "target_prospect"
+        records.append({
+            "id": f"hubspot-company-{company.id}",
+            "hubspot_id": company.id,
+            "name": name,
+            "relationship": "customer" if deal_ids else "target",
+            "account_status": account_status,
+            "business_motion": "grow_existing_business" if deal_ids else "prospect_new_business",
+            "location": {
+                "city": _clean(props.get("city")) or "Unknown",
+                "lat": 0,
+                "lon": 0,
+                "address": _clean(props.get("address")),
+                "state": _clean(props.get("state")),
+                "postal_code": _clean(props.get("zip")),
+                "country": _clean(props.get("country")) or "USA",
+            },
+            "website_url": _clean(props.get("website")) or (f"https://{props.get('domain')}" if _clean(props.get("domain")) else None),
+            "source_url": f"https://app.hubspot.com/contacts/company/{company.id}",
+            "needs": _needs(props),
+            "contact_ids": [f"hubspot-contact-{item}" for item in contact_associations.get(company.id, [])],
+            "deal_ids": [f"hubspot-deal-{item}" for item in deal_ids],
+            "owner": _owner_name(props.get("hubspot_owner_id"), owners),
+            "data_provenance": SOURCE_NAME,
+            "source_type": "crm",
+            "source_name": SOURCE_NAME,
+            "source_mode": "live",
+        })
+    return records
+
+
+def map_contacts(
+    contacts: list[HubSpotObject],
+    owners: dict[str, HubSpotOwner],
+    company_associations: dict[str, list[str]],
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for contact in contacts:
+        props = contact.properties
+        first = _clean(props.get("firstname")) or ""
+        last = _clean(props.get("lastname")) or ""
+        email = _clean(props.get("email"))
+        name = f"{first} {last}".strip() or email or f"HubSpot Contact {contact.id}"
+        company_id = (company_associations.get(contact.id) or [_clean(props.get("associatedcompanyid")) or "unknown"])[0]
+        records.append({
+            "id": f"hubspot-contact-{contact.id}",
+            "hubspot_id": contact.id,
+            "company_id": f"hubspot-company-{company_id}",
+            "name": name,
+            "title": _clean(props.get("jobtitle")) or "Contact",
+            "email": email,
+            "phone": _clean(props.get("phone")),
+            "owner": _owner_name(props.get("hubspot_owner_id"), owners),
+            "data_provenance": SOURCE_NAME,
+            "source_type": "crm",
+            "source_name": SOURCE_NAME,
+            "source_mode": "live",
+        })
+    return records
+
+
+def map_deals(
+    deals: list[HubSpotObject],
+    owners: dict[str, HubSpotOwner],
+    company_associations: dict[str, list[str]],
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for deal in deals:
+        props = deal.properties
+        company_id = (company_associations.get(deal.id) or ["unknown"])[0]
+        stage = _stage(props.get("dealstage"))
+        records.append({
+            "id": f"hubspot-deal-{deal.id}",
+            "hubspot_id": deal.id,
+            "company_id": f"hubspot-company-{company_id}",
+            "name": _clean(props.get("dealname")) or f"HubSpot Deal {deal.id}",
+            "account_status": "active_pipeline" if stage not in {"won", "lost"} else "past_customer",
+            "business_motion": "grow_existing_business" if stage != "lost" else "manage_current_business",
+            "value": _number(props.get("amount")),
+            "stage": stage,
+            "source_url": f"https://app.hubspot.com/contacts/deal/{deal.id}",
+            "close_date": _iso_date(props.get("closedate")),
+            "owner": _owner_name(props.get("hubspot_owner_id"), owners),
+            "pipeline": _clean(props.get("pipeline")),
+            "data_provenance": SOURCE_NAME,
+            "source_type": "crm",
+            "source_name": SOURCE_NAME,
+            "source_mode": "live",
+        })
+    return records
+
+
+def hubspot_payload(client: HubSpotClient, kind: Literal["accounts", "contacts", "deals"]) -> dict[str, Any]:
+    owners = {owner.id: owner for owner in client.list_owners()}
+    if kind == "accounts":
+        companies = client.list_companies()
+        company_ids = [company.id for company in companies]
+        return {
+            "data_provenance": SOURCE_NAME,
+            "records": map_companies(
+                companies,
+                owners,
+                client.read_associations("companies", "contacts", company_ids),
+                client.read_associations("companies", "deals", company_ids),
+            ),
+        }
+    if kind == "contacts":
+        contacts = client.list_contacts()
+        return {
+            "data_provenance": SOURCE_NAME,
+            "records": map_contacts(
+                contacts,
+                owners,
+                client.read_associations("contacts", "companies", [contact.id for contact in contacts]),
+            ),
+        }
+    deals = client.list_deals()
+    return {
+        "data_provenance": SOURCE_NAME,
+        "records": map_deals(
+            deals,
+            owners,
+            client.read_associations("deals", "companies", [deal.id for deal in deals]),
+        ),
+    }
