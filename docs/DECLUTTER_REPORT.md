@@ -159,3 +159,40 @@ Finding: no frontend tool is safe to remove in the first pass.
 
 Verification will be appended after each cleanup commit.
 
+### After Task 2: Removed `frontend/data/mock/`
+
+Removal evidence:
+
+```text
+rg -n "frontend/data/mock|data/mock" . --glob '!frontend/node_modules/**' --glob '!frontend/dist/**' --glob '!**/__pycache__/**'
+# matches only docs/DECLUTTER_REPORT.md
+```
+
+Removed files:
+
+```text
+frontend/data/mock/companies.json
+frontend/data/mock/contacts.json
+frontend/data/mock/extracted-signals.json
+frontend/data/mock/facilities.json
+frontend/data/mock/insights.json
+frontend/data/mock/news.json
+frontend/data/mock/opportunities.json
+frontend/data/mock/signals.json
+```
+
+Verification:
+
+```text
+cd frontend && npm ci
+cd frontend && npm run typecheck
+cd frontend && npm run build
+cd frontend && npm run test:metrics
+cd frontend && npm run test:rail
+cd frontend && npm run test:settings
+python3 -m pytest -q
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); print('OK')"
+```
+
+Result: all listed checks passed. The exact no-env smoke command stopped on missing local `ANTHROPIC_API_KEY`; the local smoke was rerun with `--skip-analysis` and dummy `SAM_API_KEY`/`CONGRESS_API_KEY`, producing valid `run_output.json` and `archive.json`. SAM.gov and Congress.gov emitted expected auth/API source alerts with dummy keys.
