@@ -14,6 +14,7 @@ TIMEOUT_SECONDS = 10.0
 
 ObjectType = Literal["companies", "contacts", "deals"]
 AssociationType = Literal["companies", "contacts", "deals"]
+TaskAssociationType = Literal["companies", "contacts", "deals"]
 
 
 class HubSpotError(RuntimeError):
@@ -36,6 +37,12 @@ class HubSpotOwner:
     id: str
     name: str
     email: str | None = None
+
+
+@dataclass(frozen=True)
+class HubSpotTaskAssociation:
+    object_type: TaskAssociationType
+    object_id: str
 
 
 class HubSpotClient:
@@ -184,6 +191,51 @@ class HubSpotClient:
                 from_id = str((row.get("from") or {}).get("id"))
                 result[from_id] = [str(item.get("toObjectId")) for item in row.get("to", []) if item.get("toObjectId") is not None]
         return result
+
+    def default_association_type_id(self, from_object_type: str, to_object_type: str) -> int:
+        payload = self._get(f"/crm/v4/associations/{from_object_type}/{to_object_type}/labels")
+        for item in payload.get("results", []):
+            if item.get("category") == "HUBSPOT_DEFINED" and item.get("label") is None:
+                return int(item["typeId"])
+        for item in payload.get("results", []):
+            if item.get("category") == "HUBSPOT_DEFINED":
+                return int(item["typeId"])
+        raise HubSpotError(
+            method="GET",
+            url=f"{self.base_url}/crm/v4/associations/{from_object_type}/{to_object_type}/labels",
+            status_code=502,
+            body=f"No default HubSpot association type for {from_object_type}->{to_object_type}",
+        )
+
+    def create_task(
+        self,
+        *,
+        subject: str,
+        body: str,
+        timestamp: str,
+        associations: Iterable[HubSpotTaskAssociation] = (),
+    ) -> dict[str, Any]:
+        association_inputs = []
+        for association in associations:
+            type_id = self.default_association_type_id("tasks", association.object_type)
+            association_inputs.append({
+                "to": {"id": association.object_id},
+                "types": [{
+                    "associationCategory": "HUBSPOT_DEFINED",
+                    "associationTypeId": type_id,
+                }],
+            })
+        payload: dict[str, Any] = {
+            "properties": {
+                "hs_task_subject": subject,
+                "hs_task_body": body,
+                "hs_timestamp": timestamp,
+                "hs_task_status": "NOT_STARTED",
+            },
+        }
+        if association_inputs:
+            payload["associations"] = association_inputs
+        return self._post("/crm/v3/objects/tasks", json=payload)
 
 
 def _clean(value: Any) -> str | None:

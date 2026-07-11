@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import time
+from datetime import UTC, datetime, timedelta
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,7 +22,7 @@ from btx_platform import models
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import init_db, make_engine, make_session_factory
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
-from btx_platform.hubspot import HubSpotClient, HubSpotError, hubspot_payload
+from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload
 from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
@@ -39,6 +40,36 @@ from btx_platform.schemas import (
 
 logger = logging.getLogger(__name__)
 CRM_CACHE_TTL_SECONDS = 300
+
+
+def _three_business_days_from_now() -> str:
+    current = datetime.now(UTC)
+    remaining = 3
+    while remaining:
+        current += timedelta(days=1)
+        if current.weekday() < 5:
+            remaining -= 1
+    return current.isoformat().replace("+00:00", "Z")
+
+
+def _hubspot_id(value: str | None, prefix: str) -> str | None:
+    if not value:
+        return None
+    return value.removeprefix(prefix)
+
+
+def _task_associations(payload: CrmTaskRequest) -> list[HubSpotTaskAssociation]:
+    company_id = _hubspot_id(payload.company_id or payload.account_id, "hubspot-company-")
+    contact_id = _hubspot_id(payload.contact_id, "hubspot-contact-")
+    deal_id = _hubspot_id(payload.deal_id, "hubspot-deal-")
+    associations: list[HubSpotTaskAssociation] = []
+    if company_id:
+        associations.append(HubSpotTaskAssociation("companies", company_id))
+    if contact_id:
+        associations.append(HubSpotTaskAssociation("contacts", contact_id))
+    if deal_id:
+        associations.append(HubSpotTaskAssociation("deals", deal_id))
+    return associations
 
 
 def create_app(
@@ -161,7 +192,47 @@ def create_app(
     def create_crm_task(payload: CrmTaskRequest) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot task creation")
-        return JSONResponse({"status": "accepted", "record_url": None, "title": payload.title})
+        body = payload.body or payload.evidence or ""
+        associations = _task_associations(payload)
+        try:
+            result = HubSpotClient(settings.hubspot_access_token).create_task(
+                subject=payload.title,
+                body=body,
+                timestamp=payload.due_at or _three_business_days_from_now(),
+                associations=associations,
+            )
+        except HubSpotError as exc:
+            logger.warning("hubspot.task_failed", extra={"status_code": exc.status_code, "subject": payload.title})
+            return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
+        task_id = str(result.get("id"))
+        record_url = f"https://app.hubspot.com/tasks/{task_id}"
+        audit_associations = [association.__dict__ for association in associations]
+        session = session_factory()
+        try:
+            session.add(models.HubSpotTaskAudit(
+                subject=payload.title,
+                hubspot_task_id=task_id,
+                record_url=record_url,
+                associations={"records": audit_associations},
+            ))
+            session.commit()
+        finally:
+            session.close()
+        logger.info(
+            "hubspot.task_created",
+            extra={
+                "timestamp": datetime.now(UTC).isoformat(),
+                "subject": payload.title,
+                "task_id": task_id,
+                "associations": audit_associations,
+            },
+        )
+        return JSONResponse({
+            "status": "created",
+            "id": task_id,
+            "record_url": record_url,
+            "title": payload.title,
+        })
 
     @app.post("/email/send")
     def send_email(payload: EmailSendRequest) -> Response:

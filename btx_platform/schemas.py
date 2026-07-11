@@ -57,9 +57,15 @@ class IntegrationError(BaseModel):
 
 class CrmTaskRequest(BaseModel):
     account_id: str | None = None
+    company_id: str | None = None
+    contact_id: str | None = None
+    deal_id: str | None = None
+    deliverable_id: str | None = None
     title: str
+    body: str | None = None
     evidence: str | None = None
     owner: str | None = None
+    due_at: str | None = None
 
 
 class EmailSendRequest(BaseModel):

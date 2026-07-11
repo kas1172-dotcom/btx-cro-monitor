@@ -3,9 +3,11 @@ import L from "leaflet";
 import { MapContainer, Marker, Polyline, TileLayer, Tooltip, ZoomControl } from "react-leaflet";
 import type { Deliverable, DeliverableSection } from "../../deliverables/types.ts";
 import type { World } from "../../app/useWorld.ts";
+import type { Company, Contact, Opportunity } from "../../engine/brain/entities.ts";
 import { deliverableToMarkdown } from "../../deliverables/markdown.ts";
 import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
+import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { downloadBoardDeck } from "../../deliverables/deck/pptx.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
@@ -22,6 +24,18 @@ const env = (import.meta as ImportMeta & { env?: Record<string, string | undefin
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const copilotEndpoint = env?.VITE_COPILOT_ENDPOINT ?? processEnv?.VITE_COPILOT_ENDPOINT;
 
+interface TaskTarget {
+  company?: Company;
+  contact?: Contact;
+  deal?: Opportunity;
+}
+
+type TaskDialog =
+  | { status: "confirm"; subject: string; body: string; target: TaskTarget }
+  | { status: "creating"; subject: string; body: string; target: TaskTarget }
+  | { status: "created"; subject: string; body: string; target: TaskTarget; id: string; recordUrl: string }
+  | { status: "error"; subject: string; body: string; target: TaskTarget; error: string };
+
 function editableSections(sections: DeliverableSection[]): DeliverableSection[] {
   return sections.map((section) => ({
     ...section,
@@ -36,6 +50,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
   const [menuOpen, setMenuOpen] = useState(false);
   const [assistantInput, setAssistantInput] = useState("");
   const [suggestions, setSuggestions] = useState<Array<{ id: string; sectionId: string; text: string; warning?: string }>>([]);
+  const [taskDialog, setTaskDialog] = useState<TaskDialog | null>(null);
   const current = useMemo(() => ({ ...deliverable, title, sections }), [deliverable, sections, title]);
   const markdown = useMemo(() => deliverableToMarkdown(current), [current]);
 
@@ -125,6 +140,60 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     }
   }
 
+  function taskTarget(): TaskTarget {
+    const entityId = current.entityIds[0];
+    const company = world?.companies.find((item) => item.id === entityId)
+      ?? world?.companies.find((item) => current.entityIds.includes(item.id));
+    const contact = company ? world?.contacts.find((item) => item.company_id === company.id) : undefined;
+    const deal = company ? world?.opportunities.find((item) => item.company_id === company.id && item.stage !== "won" && item.stage !== "lost") : undefined;
+    return { company, contact, deal };
+  }
+
+  function createTaskDraft(): Omit<Extract<TaskDialog, { status: "confirm" }>, "status"> {
+    const subject = `Follow up: ${current.title}`.slice(0, 250);
+    const body = [
+      `Created from BTX cockpit deliverable: ${current.title}`,
+      "",
+      markdown.slice(0, 3500),
+    ].join("\n");
+    return { subject, body, target: taskTarget() };
+  }
+
+  function openTaskFlow() {
+    const draft = createTaskDraft();
+    if ((world?.dataMode === "hybrid" || world?.dataMode === "live")) {
+      if (!BACKEND_ENDPOINT) {
+        setTaskDialog({ ...draft, status: "error", error: "Backend is not configured; live HubSpot task creation is unavailable." });
+        return;
+      }
+      setTaskDialog({ ...draft, status: "confirm" });
+      return;
+    }
+    openDemoAction({ title: "Create CRM task", action: "crm_task", evidence: deliverable.title });
+  }
+
+  async function confirmTask() {
+    if (!taskDialog || taskDialog.status === "created" || taskDialog.status === "creating") return;
+    const draft = { subject: taskDialog.subject, body: taskDialog.body, target: taskDialog.target };
+    setTaskDialog({ ...draft, status: "creating" });
+    try {
+      const result = await backendJson<{ id: string; record_url: string }>("/crm/task", {
+        method: "POST",
+        body: JSON.stringify({
+          title: draft.subject,
+          body: draft.body,
+          deliverable_id: current.id,
+          company_id: draft.target.company?.id,
+          contact_id: draft.target.contact?.id,
+          deal_id: draft.target.deal?.id,
+        }),
+      });
+      setTaskDialog({ ...draft, status: "created", id: result.id, recordUrl: result.record_url });
+    } catch (error) {
+      setTaskDialog({ ...draft, status: "error", error: error instanceof Error ? error.message : "HubSpot task creation failed." });
+    }
+  }
+
   function applySuggestion(id: string) {
     const suggestion = suggestions.find((item) => item.id === id);
     if (!suggestion || suggestion.warning) return;
@@ -163,9 +232,46 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
             )}
           </div>
           <button onClick={() => openDemoAction({ title: "Send via Outlook", action: "follow_up", evidence: "Demo mode - no external writes." })}>Send</button>
-          <button onClick={() => openDemoAction({ title: "Create CRM task", action: "crm_task", evidence: deliverable.title })}>Create task</button>
+          <button onClick={openTaskFlow}>Create task</button>
         </div>
       </header>
+
+      {taskDialog && (
+        <div className="task-confirmation" role="dialog" aria-modal="true" aria-labelledby="task-confirm-title">
+          <div className="task-confirmation-panel">
+            <p className="eyebrow">HubSpot task</p>
+            <h2 id="task-confirm-title">{taskDialog.status === "created" ? "Task created" : "Create task?"}</h2>
+            <div className="task-preview">
+              <span>Subject</span>
+              <strong>{taskDialog.subject}</strong>
+            </div>
+            <div className="task-preview">
+              <span>Target</span>
+              <strong>{taskDialog.target.company?.name ?? "No company association"}</strong>
+              {taskDialog.target.contact && <em>Contact: {taskDialog.target.contact.name}</em>}
+              {taskDialog.target.deal && <em>Deal: {taskDialog.target.deal.name}</em>}
+            </div>
+            <div className="task-preview">
+              <span>Body preview</span>
+              <p>{taskDialog.body.slice(0, 420)}{taskDialog.body.length > 420 ? "..." : ""}</p>
+            </div>
+            {taskDialog.status === "error" && <div className="task-error" role="status">{taskDialog.error}</div>}
+            {taskDialog.status === "created" && (
+              <a className="task-success-link" href={taskDialog.recordUrl} target="_blank" rel="noreferrer">
+                Open in HubSpot
+              </a>
+            )}
+            <div className="task-confirmation-actions">
+              {taskDialog.status !== "created" && (
+                <button onClick={() => void confirmTask()} disabled={taskDialog.status === "creating"}>
+                  {taskDialog.status === "creating" ? "Creating..." : "Confirm"}
+                </button>
+              )}
+              <button onClick={() => setTaskDialog(null)}>{taskDialog.status === "created" ? "Done" : "Cancel"}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="editor-document">
         {sections.map((section) => (

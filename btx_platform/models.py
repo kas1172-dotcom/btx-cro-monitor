@@ -131,3 +131,15 @@ class PipelineRun(Base):
     item_counts: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     detail: Mapped[str | None] = mapped_column(Text, nullable=True)
     config_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class HubSpotTaskAudit(Base):
+    """Durable audit trail for task writes made from the cockpit."""
+    __tablename__ = "hubspot_task_audits"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    subject: Mapped[str] = mapped_column(String(300))
+    hubspot_task_id: Mapped[str] = mapped_column(String(80), index=True)
+    record_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    associations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
