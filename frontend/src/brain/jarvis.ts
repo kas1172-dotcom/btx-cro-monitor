@@ -37,11 +37,6 @@ export function getLiveStatus(): LiveStatus {
   return _liveStatus;
 }
 
-// True only after a successful health-check round trip.
-export function jarvisLive(): boolean {
-  return _liveStatus === "live";
-}
-
 async function healthCheck(): Promise<boolean> {
   if (!ENDPOINT) return false;
   try {

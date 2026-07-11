@@ -275,6 +275,181 @@ cd frontend && npm run test:settings
 
 Result: all listed checks passed.
 
+## Task 4 Demo Data Mode Findings
+
+Default mode is now backend-canonical hybrid when neither URL nor build/runtime env chooses a mode.
+
+Command evidence:
+
+```text
+rg -n "getDataMode|VITE_DATA_MODE|Falling back" frontend/src/adapters/createDataAdapter.ts
+frontend/src/adapters/createDataAdapter.ts:16:export function getDataMode(): DataMode {
+frontend/src/adapters/createDataAdapter.ts:19:  const mode = urlDataMode() ?? env?.VITE_DATA_MODE ?? processEnv?.VITE_DATA_MODE ?? "hybrid";
+frontend/src/adapters/createDataAdapter.ts:21:  console.warn(`Unknown data mode "${mode}". Falling back to hybrid.`);
+```
+
+Explicit demo mode remains available for development and tests through `?dataMode=demo`, `?mode=demo`, or `VITE_DATA_MODE=demo`.
+
+User-facing or shipped demo fallback wiring that remains intentionally:
+
+```text
+frontend/src/adapters/createDataAdapter.ts:11:  return new URLSearchParams(window.location.search).get("dataMode")
+frontend/src/adapters/createDataAdapter.ts:20:  if (mode === "artifact" || mode === "live" || mode === "demo" || mode === "hybrid") return mode;
+frontend/src/adapters/hybrid/HybridDataAdapter.ts:26:  private demo = new DemoDataAdapter();
+frontend/src/adapters/hybrid/HybridDataAdapter.ts:41:    return this.demo.getFacilities(filter);
+frontend/src/adapters/hybrid/HybridDataAdapter.ts:49:    const [demoSnapshot, artifactSnapshot] = await Promise.all([
+frontend/src/adapters/hybrid/HybridDataAdapter.ts:77:          id: "demo-fallback",
+frontend/src/adapters/artifact/ArtifactDataAdapter.ts:35:  private demo = new DemoDataAdapter();
+frontend/src/adapters/artifact/ArtifactDataAdapter.ts:83:    const companies = await this.demo.getCompanies();
+frontend/src/adapters/artifact/ArtifactDataAdapter.ts:111:    if (!artifact || !artifact.signals.length) return this.demo.getSignals(filter);
+frontend/src/adapters/artifact/ArtifactDataAdapter.ts:143:          notice: `Artifact mode requested, but ${this.artifactError ?? "artifact signals were unavailable"}. Falling back to demo signals.`,
+frontend/src/ui/deliverables/DocumentViewer.tsx:164:    if ((world?.dataMode === "hybrid" || world?.dataMode === "live")) {
+frontend/src/ui/deliverables/DocumentViewer.tsx:172:    openDemoAction({ title: "Create CRM task", action: "crm_task", evidence: deliverable.title });
+frontend/src/ui/deliverables/DocumentViewer.tsx:234:          <button onClick={() => openDemoAction({ title: "Send via Outlook", action: "follow_up", evidence: "Demo mode - no external writes." })}>Send</button>
+frontend/src/App.tsx:203:                Confirm Demo Action
+frontend/src/ui/brain/RightContextPanel.tsx:28:          <button key={action} onClick={() => openDemoAction({ title: action, action: "crm_task" })}>{action}</button>
+frontend/src/ui/brain/OpportunityCards.tsx:21:              openDemoAction({ title: card.recommendedAction, accountName: card.companyName, action: "crm_task", evidence: card.topSignal });
+frontend/src/ui/actions/DemoActionButton.tsx:9:    openDemoAction(action);
+frontend/src/ui/settings/SettingsWorkspace.tsx:78:  if (!window.confirm("Reset demo and clear all local state?")) return;
+```
+
+Recommendation: keep `DemoDataAdapter` and `frontend/data/demo/btx/` until live backend adapters cover capacity, ERP, operating snapshot, non-deliverable CRM actions, and local settings drafts. The remaining demo action modal is acceptable for non-deliverable actions, but should be replaced with backend write routes one action family at a time.
+
+## Task 5 Assistant Module Inventory
+
+Responsibilities and call graph:
+
+- `frontend/src/brain/jarvis.ts`: Chatpil live/offline assistant. It owns `/llm` health checks, LLM request construction, deterministic fallback, and action dispatch offers.
+- `frontend/src/brain/copilot.ts`: deterministic fallback narrator and suggestion generator. `jarvis.ts` imports `answer`; `Copilot.tsx` imports `worldSuggestions`.
+- `frontend/src/brain/brainEngine.ts`: classic Ask Brain engine. It classifies a question, retrieves context, and calls `generateBrainResponse`.
+- `frontend/src/brain/generateBrainResponse.ts`: pure response composer for the Ask Brain surface.
+
+Command evidence:
+
+```text
+rg -n "jarvis|copilot|brainEngine|generateBrainResponse|retrieveContext|processBrainQuestion|askJarvis|openingBrief|runHealthCheck|dispatchChatpilAction|worldSuggestions" frontend/src frontend/tools -g '*.{ts,tsx,js,mjs}'
+frontend/src/brain/jarvis.ts:8:import { answer as deterministicAnswer } from "./copilot.ts";
+frontend/src/brain/brainEngine.ts:3:import { retrieveContext } from "./retrieveContext.ts";
+frontend/src/brain/brainEngine.ts:4:import { generateBrainResponse } from "./generateBrainResponse.ts";
+frontend/src/ui/copilot/Copilot.tsx:7:import { askJarvis, openingBrief, runHealthCheck, subscribeToLiveStatus, getLiveStatus, dispatchChatpilAction } from "../../brain/jarvis.ts";
+frontend/src/ui/copilot/Copilot.tsx:9:import { worldSuggestions } from "../../brain/copilot.ts";
+frontend/src/ui/brain/BrainHome.tsx:4:import { processBrainQuestion } from "../../brain/brainEngine.ts";
+frontend/src/app/brainActions.ts:2:import { processBrainQuestionAsync } from "../brain/brainEngine.ts";
+frontend/tools/test-demo-flows.ts:4:import { processBrainQuestion } from "../src/brain/brainEngine.ts";
+frontend/src/brain/generateBrainResponse.ts:46:export function generateBrainResponse(ctx: RetrievedContext, world: World): BrainResponse {
+```
+
+Provably dead exports/files removed:
+
+```text
+rg -n "scoreOpportunities" . --glob '!frontend/node_modules/**' --glob '!frontend/dist/**' --glob '!**/__pycache__/**'
+# before deletion: only frontend/src/brain/scoreOpportunities.ts exported it
+# after deletion: no matches
+
+rg -n "saveBrainNote" frontend/src frontend/tools -g '*.{ts,tsx,js,mjs}'
+# before deletion: only frontend/src/brain/saveBrainNote.ts exported it
+# after deletion: no matches
+
+rg -n "jarvisLive" frontend/src frontend/tools -g '*.{ts,tsx,js,mjs}'
+# before deletion: only frontend/src/brain/jarvis.ts exported it
+# after deletion: no matches
+```
+
+Recommendation: consolidate toward two assistant surfaces: `jarvis.ts` as the live Chatpil orchestration layer, and a renamed `askBrainEngine.ts` for deterministic analysis workspace behavior. `copilot.ts` should eventually become a fallback helper under `jarvis/` once the UI no longer treats "Copilot" and "Chatpil" as separate concepts.
+
+## Task 6 Dead Code And Packaging Hygiene
+
+Removed provably unreachable assistant helpers:
+
+```text
+frontend/src/brain/scoreOpportunities.ts
+frontend/src/brain/saveBrainNote.ts
+frontend/src/brain/jarvis.ts: removed unreferenced jarvisLive export
+```
+
+Updated `.gitignore` to cover local DB patterns broadly:
+
+```text
+.venv/
+node_modules/
+dist/
+btx_platform.db
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+!.env.production.example
+```
+
+Tracked ignored-file check:
+
+```text
+git ls-files -ci --exclude-standard
+# no output
+```
+
+Frontend tool sweep:
+
+```text
+rg -n "extract-signals|generate-insights|copilot-worker|copilot-proxy|tools/" .github frontend/package.json frontend/wrangler.toml docs README.md ARCHITECTURE.md --glob '!frontend/node_modules/**' --glob '!frontend/dist/**'
+frontend/package.json:10:    "gen": "tsx tools/generate-demo.ts && tsx tools/generate-sample-library.ts",
+frontend/package.json:13:    "test:metrics": "tsx tools/test-metrics.ts",
+frontend/package.json:14:    "test:flows": "tsx tools/test-demo-flows.ts",
+frontend/package.json:15:    "test:rail": "tsx tools/test-rail-tabs.ts",
+frontend/package.json:16:    "test:settings": "tsx tools/test-settings-shell.ts",
+frontend/package.json:17:    "test:tour": "tsx tools/test-tour.ts",
+frontend/package.json:18:    "test:live-adapter": "tsx tools/test-live-adapter.ts",
+frontend/package.json:19:    "seed:hubspot": "tsx tools/seed-hubspot.ts",
+frontend/package.json:20:    "cleanup:hubspot": "tsx tools/cleanup-hubspot.ts",
+frontend/package.json:21:    "weekly:memo": "tsx tools/run-weekly-memo.ts"
+.github/workflows/insights.yml:34:        run: node tools/generate-insights.ts
+.github/workflows/insights.yml:40:        run: node tools/extract-signals.ts
+frontend/wrangler.toml:5:main = "tools/copilot-worker.js"
+docs/MANUAL_QA.md:40:6. Ask Chatpil a simple question while pointed at `/llm`. Confirm the LIVE badge recovers and no local `copilot-proxy.mjs` process is required.
+```
+
+Finding: no additional `frontend/tools/*` file is safe to remove in this pass.
+
+## Final Verification
+
+Commands run after the final cleanup pass:
+
+```text
+cd frontend && npm ci
+cd frontend && npm run typecheck
+cd frontend && npm run build
+cd frontend && npm run test:metrics
+cd frontend && npm run test:rail
+cd frontend && npm run test:settings
+python3 -m pytest -q
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); assert Path('/tmp/btxout/archive.json').exists(); assert not Path('/tmp/btxout/index.html').exists(); print('OK')"
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+test -f /tmp/btxmap/map_targets.json
+test ! -f /tmp/btxmap/map.html
+```
+
+Results:
+
+- `npm ci`: passed; npm reported existing dependency deprecation/audit warnings.
+- `npm run typecheck`: passed.
+- `npm run build`: passed; Vite reported the existing large chunk warning.
+- `npm run test:metrics`: passed.
+- `npm run test:rail`: passed.
+- `npm run test:settings`: passed.
+- `python3 -m pytest -q`: `354 passed, 1 warning`.
+- Monitor smoke: valid `run_output.json` and `archive.json`; no `index.html`. SAM.gov and Congress.gov raised expected source alerts with dummy local keys.
+- Target smoke: valid `map_targets.json`; no `map.html`.
+
+Known pre-existing failures from the task prompt, not rerun as part of the required suite: `npm run test:flows` and `npm run test:tour` may crash on `import.meta.env` in `frontend/src/app/llmConfig.ts`.
+
+Follow-ups:
+
+- `clients/btx/artifacts/run_output.json` is a kept committed JSON artifact from before static HTML retirement and may still contain an old `account_map_url` value. The next monitor run will refresh the JSON contract with `account_map_url: null`.
+- The cockpit still has intentional demo scaffolding for non-deliverable actions, capacity/ERP/operating fallback data, local settings drafts, and dev/test fixture mode.
+
 ### After Task 3.4: Updated CI And Pages Publishing
 
 Changed:
