@@ -53,7 +53,7 @@ jobs:
       - name: Build Enterprise Brain cockpit
         working-directory: frontend
         env:
-          VITE_DATA_MODE: artifact
+          VITE_DATA_MODE: hybrid
           VITE_BACKEND_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}
           VITE_BACKEND_AUTH_TOKEN: ${{ secrets.VITE_BACKEND_AUTH_TOKEN }}
           VITE_COPILOT_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}/llm
@@ -69,7 +69,7 @@ jobs:
           npm run build
 
       # Assemble _site/: the cockpit under /cockpit/ and BTX artifacts under
-      # /btx/ so artifact mode can fetch the current monitor output at runtime.
+      # /btx/ so hybrid/artifact modes can fetch monitor output at runtime.
       - name: Assemble site
         run: |
           rm -rf _site && mkdir -p _site/cockpit _site/btx

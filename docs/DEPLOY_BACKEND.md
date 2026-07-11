@@ -201,7 +201,7 @@ When Phase 3 deploys or rebuilds the frontend against this backend, use:
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
 VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
-VITE_DATA_MODE=artifact
+VITE_DATA_MODE=hybrid
 VITE_ARTIFACT_BASE_URL=../btx
 ```
 
