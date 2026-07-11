@@ -134,6 +134,14 @@ class HubSpotClient:
                 "industry",
                 "hubspot_owner_id",
                 "btx_needs",
+                "btx_aliases",
+                "btx_facility_names",
+                "btx_parent_id",
+                "btx_subsidiary_ids",
+                "btx_cage_code",
+                "btx_uei",
+                "btx_known_programs",
+                "btx_known_customers",
             ],
         )
 
@@ -275,6 +283,25 @@ def _needs(properties: dict[str, Any]) -> list[str]:
     return [item.strip() for item in raw.replace(";", ",").split(",") if item.strip()][:8]
 
 
+def _list_property(value: Any) -> list[str]:
+    raw = _clean(value)
+    if not raw:
+        return []
+    return [item.strip() for item in raw.replace(";", ",").replace("|", ",").split(",") if item.strip()]
+
+
+def _company_domains(properties: dict[str, Any]) -> list[str]:
+    domains = []
+    for key in ("domain", "website"):
+        value = _clean(properties.get(key))
+        if not value:
+            continue
+        domain = value.removeprefix("https://").removeprefix("http://").removeprefix("www.").split("/")[0]
+        if domain:
+            domains.append(domain.lower())
+    return list(dict.fromkeys(domains))
+
+
 def _stage(value: Any) -> str:
     text = (_clean(value) or "").lower()
     if "closedwon" in text or text == "won" or "won" in text:
@@ -300,9 +327,12 @@ def map_companies(
         name = _clean(props.get("name")) or _clean(props.get("domain")) or f"HubSpot Company {company.id}"
         deal_ids = deal_associations.get(company.id, [])
         account_status = "active_pipeline" if deal_ids else "target_prospect"
+        canonical_id = f"hubspot-company-{company.id}"
         records.append({
-            "id": f"hubspot-company-{company.id}",
+            "id": canonical_id,
+            "canonical_account_id": canonical_id,
             "hubspot_id": company.id,
+            "hubspot_company_id": company.id,
             "name": name,
             "relationship": "customer" if deal_ids else "target",
             "account_status": account_status,
@@ -319,6 +349,15 @@ def map_companies(
             "website_url": _clean(props.get("website")) or (f"https://{props.get('domain')}" if _clean(props.get("domain")) else None),
             "source_url": f"https://app.hubspot.com/contacts/company/{company.id}",
             "needs": _needs(props),
+            "domains": _company_domains(props),
+            "aliases": _list_property(props.get("btx_aliases")),
+            "facility_names": _list_property(props.get("btx_facility_names")),
+            "parent_id": _clean(props.get("btx_parent_id")),
+            "subsidiary_ids": _list_property(props.get("btx_subsidiary_ids")),
+            "cage_code": _clean(props.get("btx_cage_code")),
+            "uei": _clean(props.get("btx_uei")),
+            "known_programs": _list_property(props.get("btx_known_programs")),
+            "known_customers": _list_property(props.get("btx_known_customers")),
             "contact_ids": [f"hubspot-contact-{item}" for item in contact_associations.get(company.id, [])],
             "deal_ids": [f"hubspot-deal-{item}" for item in deal_ids],
             "owner": _owner_name(props.get("hubspot_owner_id"), owners),

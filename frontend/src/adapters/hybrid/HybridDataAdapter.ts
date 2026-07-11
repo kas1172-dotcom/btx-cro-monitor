@@ -22,7 +22,7 @@ function demoFallbackSnapshot(snapshot: OperatingSnapshot): OperatingSnapshot {
 
 export class HybridDataAdapter implements DataAdapter {
   private live = new LiveDataAdapter();
-  private artifact = new ArtifactDataAdapter();
+  private artifact = new ArtifactDataAdapter(this.live);
   private demo = new DemoDataAdapter();
 
   getCompanies(filter?: RegionFilter): Promise<Company[]> {

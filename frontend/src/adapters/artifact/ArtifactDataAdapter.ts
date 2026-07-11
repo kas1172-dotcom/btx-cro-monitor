@@ -38,6 +38,8 @@ export class ArtifactDataAdapter implements DataAdapter {
   private artifacts: Promise<LoadedArtifacts[]> | undefined;
   private activeArtifacts: LoadedArtifacts | null = null;
 
+  constructor(private accountProvider: Pick<DataAdapter, "getCompanies"> = new DemoDataAdapter()) {}
+
   private async publishedArtifacts(): Promise<LoadedArtifacts | null> {
     try {
       const [runOutputResponse, archiveResponse] = await Promise.all([
@@ -80,7 +82,7 @@ export class ArtifactDataAdapter implements DataAdapter {
   private async artifactState(): Promise<ArtifactMappingResult | null> {
     if (this.artifact !== undefined) return this.artifact;
     const errors: string[] = [];
-    const companies = await this.demo.getCompanies();
+    const companies = await this.accountProvider.getCompanies();
     for (const candidate of await this.artifactCandidates()) {
       try {
         const artifact = buildArtifactSignals(candidate.runOutput, companies);
@@ -103,7 +105,7 @@ export class ArtifactDataAdapter implements DataAdapter {
   }
 
   async getCompanies(filter?: RegionFilter): Promise<Company[]> {
-    return this.demo.getCompanies(filter);
+    return this.accountProvider.getCompanies(filter);
   }
 
   async getSignals(filter?: RegionFilter): Promise<unknown[]> {

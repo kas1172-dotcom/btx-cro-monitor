@@ -119,6 +119,29 @@ class EngineConfig(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
 
+class CanonicalAccount(Base):
+    """Stable account identity derived from HubSpot company records.
+
+    The HubSpot company id is the source-of-truth join key; enrichment columns
+    are optional because most portals will not have BTX custom properties yet.
+    """
+    __tablename__ = "canonical_accounts"
+    __table_args__ = (UniqueConstraint("hubspot_company_id", name="uq_canonical_hubspot_company"),)
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    hubspot_company_id: Mapped[str] = mapped_column(String(80), nullable=False, index=True)
+    domains: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    aliases: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    facility_names: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    parent_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    subsidiary_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    cage_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    uei: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    known_programs: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    known_customers: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
 class PipelineRun(Base):
     """Audit row for a manually triggered monitor-engine pipeline run."""
     __tablename__ = "pipeline_runs"

@@ -1,7 +1,7 @@
 import type { Signal } from "../engine/signals/contract.ts";
 
 export function signalAccountLabel(companyName: string, signal: Signal): string {
-  return signal.scope === "unlinked" || signal.scope === "portfolio" ? "Portfolio monitor" : companyName;
+  return signal.scope !== undefined && signal.scope !== "specific_account" ? "Portfolio monitor" : companyName;
 }
 
 export function signalSourceName(signal: Signal): string {

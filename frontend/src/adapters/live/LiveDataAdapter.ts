@@ -40,6 +40,8 @@ export function normalizeCompanies(response: LiveResponse<Company>): Company[] {
   state.provenance = response.data_provenance ?? state.provenance;
   return response.records.map((company) => ({
     ...company,
+    canonical_account_id: company.canonical_account_id ?? company.id,
+    hubspot_company_id: company.hubspot_company_id ?? (company as { hubspot_id?: string }).hubspot_id,
     relationship: company.relationship ?? "target",
     location: {
       city: company.location?.city ?? "Unknown",

@@ -38,6 +38,7 @@ const companies: Company[] = [
     business_motion: "prospect_new_business",
     location: { city: "Pittsburgh", state: "PA", lat: 40, lon: -80, country: "USA" },
     website_url: "https://boeing.example",
+    aliases: ["Boeing"],
     needs: ["AS9100", "spacecraft platform"],
   },
   {
@@ -66,7 +67,8 @@ try {
     entities: [{ name: "Boeing" }],
   }), companies).signals[0];
   assert(related.subject_id === "boeing", `related artifact linked to ${related.subject_id}`);
-  assert(related.scope === "account", "related artifact should be account-scoped");
+  assert(related.scope === "specific_account", "related artifact should be specific-account scoped");
+  assert(related.relationships?.[0]?.canonical_account_id === "boeing", "related artifact should carry canonical relationship evidence");
 
   const unrelated = buildArtifactSignals(artifactRun({
     item_id: "unrelated",
@@ -90,7 +92,17 @@ try {
     event_type: "government_contract_award",
     entities: ["Boeing"],
     subject_id: "boeing",
-    scope: "account" as const,
+    scope: "specific_account" as const,
+    relationships: [{
+      canonical_account_id: "boeing",
+      source_entity_name: "Boeing",
+      match_method: "alias" as const,
+      evidence: "alias:boeing",
+      confidence: 0.9,
+      review_status: "accepted" as const,
+      creation_source: "resolver" as const,
+      last_validated_at: "2026-07-08T10:00:00Z",
+    }],
     confidence: 0.95,
     source_quote: "Boeing award",
     detected_at: "2026-07-08T10:00:00Z",

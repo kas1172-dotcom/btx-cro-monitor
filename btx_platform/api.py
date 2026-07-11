@@ -73,6 +73,36 @@ def _task_associations(payload: CrmTaskRequest) -> list[HubSpotTaskAssociation]:
     return associations
 
 
+def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict) -> None:
+    records = payload.get("records")
+    if not isinstance(records, list):
+        return
+    with session_factory() as session:
+        for record in records:
+            if not isinstance(record, dict):
+                continue
+            canonical_id = record.get("canonical_account_id")
+            hubspot_company_id = record.get("hubspot_company_id") or record.get("hubspot_id")
+            if not isinstance(canonical_id, str) or not canonical_id:
+                continue
+            if not isinstance(hubspot_company_id, str) or not hubspot_company_id:
+                continue
+            session.merge(models.CanonicalAccount(
+                id=canonical_id,
+                hubspot_company_id=hubspot_company_id,
+                domains=record.get("domains") if isinstance(record.get("domains"), list) else [],
+                aliases=record.get("aliases") if isinstance(record.get("aliases"), list) else [],
+                facility_names=record.get("facility_names") if isinstance(record.get("facility_names"), list) else [],
+                parent_id=record.get("parent_id") if isinstance(record.get("parent_id"), str) else None,
+                subsidiary_ids=record.get("subsidiary_ids") if isinstance(record.get("subsidiary_ids"), list) else [],
+                cage_code=record.get("cage_code") if isinstance(record.get("cage_code"), str) else None,
+                uei=record.get("uei") if isinstance(record.get("uei"), str) else None,
+                known_programs=record.get("known_programs") if isinstance(record.get("known_programs"), list) else [],
+                known_customers=record.get("known_customers") if isinstance(record.get("known_customers"), list) else [],
+            ))
+        session.commit()
+
+
 def create_app(
     *,
     settings: Settings | None = None,
@@ -152,6 +182,8 @@ def create_app(
         except HubSpotError as exc:
             logger.warning("hubspot.read_failed", extra={"kind": kind, "status_code": exc.status_code})
             return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
+        if kind == "accounts":
+            _sync_canonical_accounts(session_factory, payload)
         cache[kind] = (now + CRM_CACHE_TTL_SECONDS, payload)
         return JSONResponse(payload)
 

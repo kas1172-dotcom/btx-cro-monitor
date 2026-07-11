@@ -1,0 +1,318 @@
+{
+  "_meta": {
+    "purpose": "Real-world defense/aerospace entity enrichment fixture for BTX canonical entity resolution (WP3). Provides genuine identifiers (domains, aliases, parent/subsidiary, CAGE codes, UEIs, programs) so the resolver's domain / cage_uei / alias / program match methods are exercised against reality, not '.example' placeholders.",
+    "not_for": "This is NOT BTX customer data and NOT an account list. These are public prime contractors and tier-1 aerospace suppliers used as a realistic MATCH-TARGET / REFERENCE set (the prime + program universe that signals resolve against) and as seed data for the Program/Contract tracker. Accounts come from HubSpot, never from this file.",
+    "verification_policy": "CAGE codes and UEIs are marked verified:true ONLY where confirmed against public SAM.gov / DLA CAGE / cage.report records during research. verified:false or null means the value was NOT independently confirmed and MUST be validated on SAM.gov before it is used for production matching. Do not treat unverified identifiers as ground truth.",
+    "generated": "2026-07-11",
+    "sources": [
+      "https://cage.report/SAM/0L1E5",
+      "https://cage.report/SAM/76823",
+      "https://cage.report/SAM/96214",
+      "https://www.dla.mil/Working-With-DLA/Applications/Details/Article/2920893/cage-code-commercial-and-government-entity-code/",
+      "https://fed-spend.com/blog/top-25-defense-contractors-by-revenue-2026"
+    ],
+    "schema": {
+      "id": "stable internal fixture id",
+      "name": "legal/common entity name",
+      "tier": "prime | tier1_supplier",
+      "relationship_hint": "how BTX would typically relate: customer_oem | prospect | peer_supplier",
+      "aliases": "known name variants for alias matching",
+      "domains": "primary + known domains for domain matching",
+      "hq": "headquarters city/state",
+      "ticker": "public stock ticker or null",
+      "parent": "parent entity name or null",
+      "subsidiaries": "notable subsidiaries/divisions",
+      "cage_codes": "[{code, facility, verified, source}] — code is 5-char DLA CAGE",
+      "uei": "[{value, entity, verified, source}] — 12-char SAM.gov UEI",
+      "known_programs": "public defense programs for program matching + Program/Contract tracker"
+    }
+  },
+  "accounts": [
+    {
+      "id": "prime-lockheed-martin",
+      "name": "Lockheed Martin Corporation",
+      "tier": "prime",
+      "relationship_hint": "customer_oem",
+      "aliases": ["Lockheed", "Lockheed Martin", "LM", "Lockheed Martin Aeronautics", "Skunk Works", "LMT"],
+      "domains": ["lockheedmartin.com"],
+      "hq": "Bethesda, MD",
+      "ticker": "LMT",
+      "parent": null,
+      "subsidiaries": ["Lockheed Martin Aeronautics", "Sikorsky Aircraft", "Lockheed Martin Missiles and Fire Control", "Lockheed Martin Space"],
+      "cage_codes": [
+        {"code": "06887", "facility": "Lockheed Martin Corp (corporate)", "verified": true, "source": "cage.report / SAM"},
+        {"code": "81755", "facility": "Lockheed Martin Aeronautics, Fort Worth TX", "verified": true, "source": "govcagecodes / SAM"}
+      ],
+      "uei": [
+        {"value": "CQWLW9XRQTH5", "entity": "Lockheed Martin Corp", "verified": true, "source": "SAM.gov"}
+      ],
+      "known_programs": ["F-35 Lightning II", "F-22 Raptor", "C-130J Super Hercules", "THAAD", "PAC-3 Missile", "Aegis Combat System", "Orion (NASA)"]
+    },
+    {
+      "id": "prime-boeing",
+      "name": "The Boeing Company",
+      "tier": "prime",
+      "relationship_hint": "customer_oem",
+      "aliases": ["Boeing", "Boeing Defense", "Boeing Defense, Space & Security", "BDS", "BA"],
+      "domains": ["boeing.com"],
+      "hq": "Arlington, VA",
+      "ticker": "BA",
+      "parent": null,
+      "subsidiaries": ["Boeing Defense, Space & Security", "Boeing Global Services", "Insitu", "Aurora Flight Sciences"],
+      "cage_codes": [
+        {"code": "81205", "facility": "The Boeing Company (primary defense)", "verified": true, "source": "DLA / multiple SAM records"}
+      ],
+      "uei": [
+        {"value": null, "entity": "The Boeing Company", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "known_programs": ["F-15EX Eagle II", "F/A-18 Super Hornet", "KC-46 Pegasus", "AH-64 Apache", "T-7A Red Hawk", "MQ-25 Stingray", "B-52 CERP re-engine"]
+    },
+    {
+      "id": "prime-rtx",
+      "name": "RTX Corporation",
+      "tier": "prime",
+      "relationship_hint": "customer_oem",
+      "aliases": ["RTX", "Raytheon", "Raytheon Technologies", "Raytheon Company"],
+      "domains": ["rtx.com"],
+      "hq": "Arlington, VA",
+      "ticker": "RTX",
+      "parent": null,
+      "subsidiaries": ["Raytheon", "Collins Aerospace", "Pratt & Whitney"],
+      "cage_codes": [
+        {"code": "96214", "facility": "Raytheon Company", "verified": true, "source": "cage.report / SAM"}
+      ],
+      "uei": [
+        {"value": null, "entity": "RTX Corporation", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "known_programs": ["Patriot Air Defense", "AMRAAM", "Tomahawk", "SM-3 / SM-6 Standard Missile", "F135 engine (Pratt & Whitney, F-35)", "LTAMDS radar"]
+    },
+    {
+      "id": "sub-collins-aerospace",
+      "name": "Collins Aerospace",
+      "tier": "tier1_supplier",
+      "relationship_hint": "customer_oem",
+      "aliases": ["Collins", "Collins Aerospace", "Rockwell Collins", "UTC Aerospace Systems"],
+      "domains": ["collinsaerospace.com"],
+      "hq": "Charlotte, NC",
+      "ticker": null,
+      "parent": "RTX Corporation",
+      "subsidiaries": [],
+      "cage_codes": [
+        {"code": null, "facility": "Collins Aerospace", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "uei": [
+        {"value": null, "entity": "Collins Aerospace", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "known_programs": ["Avionics (multiple platforms)", "Actuation systems", "Landing systems", "Ejection seats (ACES 5)"]
+    },
+    {
+      "id": "sub-pratt-whitney",
+      "name": "Pratt & Whitney",
+      "tier": "tier1_supplier",
+      "relationship_hint": "customer_oem",
+      "aliases": ["Pratt", "Pratt and Whitney", "Pratt & Whitney", "P&W"],
+      "domains": ["prattwhitney.com"],
+      "hq": "East Hartford, CT",
+      "ticker": null,
+      "parent": "RTX Corporation",
+      "subsidiaries": [],
+      "cage_codes": [
+        {"code": null, "facility": "Pratt & Whitney", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "uei": [
+        {"value": null, "entity": "Pratt & Whitney", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "known_programs": ["F135 engine (F-35)", "F119 engine (F-22)", "F100 engine (F-15/F-16)", "GTF commercial engines"]
+    },
+    {
+      "id": "prime-northrop-grumman",
+      "name": "Northrop Grumman Corporation",
+      "tier": "prime",
+      "relationship_hint": "customer_oem",
+      "aliases": ["Northrop", "Northrop Grumman", "NGC", "Northrop Grumman Systems Corporation", "Northrop Grumman Innovation Systems", "NOC"],
+      "domains": ["northropgrumman.com"],
+      "hq": "Falls Church, VA",
+      "ticker": "NOC",
+      "parent": null,
+      "subsidiaries": ["Northrop Grumman Aeronautics Systems", "Northrop Grumman Space Systems", "Northrop Grumman Mission Systems"],
+      "cage_codes": [
+        {"code": "76823", "facility": "Northrop Grumman Systems Corporation", "verified": true, "source": "cage.report / SAM"},
+        {"code": "8X374", "facility": "Northrop Grumman (division)", "verified": false, "source": "confirm on SAM.gov"},
+        {"code": "06481", "facility": "Northrop Grumman (division)", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "uei": [
+        {"value": null, "entity": "Northrop Grumman Systems Corporation", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "known_programs": ["B-21 Raider", "LGM-35A Sentinel (GBSD)", "E-2D Advanced Hawkeye", "Global Hawk / Triton", "IBCS"]
+    },
+    {
+      "id": "prime-general-dynamics",
+      "name": "General Dynamics Corporation",
+      "tier": "prime",
+      "relationship_hint": "customer_oem",
+      "aliases": ["General Dynamics", "GD", "GDMS", "GDLS", "General Dynamics Mission Systems", "General Dynamics Land Systems"],
+      "domains": ["gd.com"],
+      "hq": "Reston, VA",
+      "ticker": "GD",
+      "parent": null,
+      "subsidiaries": ["Electric Boat", "General Dynamics Land Systems", "General Dynamics Mission Systems", "Bath Iron Works", "Gulfstream Aerospace"],
+      "cage_codes": [
+        {"code": null, "facility": "General Dynamics (confirm division)", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "uei": [
+        {"value": null, "entity": "General Dynamics Corporation", "verified": false, "source": "confirm on SAM.gov"}
+      ],
+      "known_programs": ["Columbia-class submarine", "Virginia-class submarine", "M1A2 Abrams", "Stryker", "MUOS / WGS ground systems"]
+    },
+    {
+      "id": "tier1-spirit-aerosystems",
+      "name": "Spirit AeroSystems",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Spirit", "Spirit AeroSystems", "SPR"],
+      "domains": ["spiritaero.com"],
+      "hq": "Wichita, KS",
+      "ticker": "SPR",
+      "parent": null,
+      "subsidiaries": [],
+      "cage_codes": [{"code": null, "facility": "Spirit AeroSystems, Wichita KS", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Spirit AeroSystems Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["737 fuselage", "787 sections", "B-21 (subassemblies)", "CH-53K structures"]
+    },
+    {
+      "id": "tier1-howmet-aerospace",
+      "name": "Howmet Aerospace",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Howmet", "Howmet Aerospace", "Arconic (legacy)", "HWM"],
+      "domains": ["howmet.com"],
+      "hq": "Pittsburgh, PA",
+      "ticker": "HWM",
+      "parent": null,
+      "subsidiaries": ["Howmet Fastening Systems", "Howmet Engine Products", "Howmet Wheel Systems"],
+      "cage_codes": [{"code": null, "facility": "Howmet Aerospace", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Howmet Aerospace Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Turbine engine castings", "Aerospace fasteners", "Structural forgings"]
+    },
+    {
+      "id": "tier1-woodward",
+      "name": "Woodward, Inc.",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Woodward", "Woodward Inc", "WWD"],
+      "domains": ["woodward.com"],
+      "hq": "Fort Collins, CO",
+      "ticker": "WWD",
+      "parent": null,
+      "subsidiaries": [],
+      "cage_codes": [{"code": null, "facility": "Woodward", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Woodward Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Fuel systems", "Actuation", "Motion control (aircraft/engines)"]
+    },
+    {
+      "id": "tier1-moog",
+      "name": "Moog Inc.",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Moog", "Moog Inc", "MOG.A"],
+      "domains": ["moog.com"],
+      "hq": "East Aurora, NY",
+      "ticker": "MOG.A",
+      "parent": null,
+      "subsidiaries": [],
+      "cage_codes": [{"code": null, "facility": "Moog Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Moog Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Flight control actuation", "Missile steering/actuation", "Precision motion control"]
+    },
+    {
+      "id": "tier1-parker-aerospace",
+      "name": "Parker Hannifin (Aerospace Group)",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Parker", "Parker Hannifin", "Parker Aerospace", "PH"],
+      "domains": ["parker.com"],
+      "hq": "Cleveland, OH",
+      "ticker": "PH",
+      "parent": null,
+      "subsidiaries": ["Parker Aerospace", "Meggitt (acquired)"],
+      "cage_codes": [{"code": null, "facility": "Parker Aerospace", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Parker-Hannifin Corporation", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Hydraulic systems", "Fuel systems", "Fluid conveyance (aircraft)"]
+    },
+    {
+      "id": "tier1-triumph-group",
+      "name": "Triumph Group",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Triumph", "Triumph Group", "TGI"],
+      "domains": ["triumphgroup.com"],
+      "hq": "Radnor, PA",
+      "ticker": "TGI",
+      "parent": null,
+      "subsidiaries": [],
+      "cage_codes": [{"code": null, "facility": "Triumph Group", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Triumph Group Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Structures", "Actuation & gearbox systems", "Thermal/mechanical components"]
+    },
+    {
+      "id": "tier1-ducommun",
+      "name": "Ducommun Incorporated",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Ducommun", "DCO"],
+      "domains": ["ducommun.com"],
+      "hq": "Santa Ana, CA",
+      "ticker": "DCO",
+      "parent": null,
+      "subsidiaries": [],
+      "cage_codes": [{"code": null, "facility": "Ducommun", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Ducommun Incorporated", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Precision machined structures", "Electronic assemblies", "Missile/rocket components"]
+    },
+    {
+      "id": "tier1-curtiss-wright",
+      "name": "Curtiss-Wright Corporation",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["Curtiss-Wright", "Curtiss Wright", "CW"],
+      "domains": ["curtisswright.com"],
+      "hq": "Davidson, NC",
+      "ticker": "CW",
+      "parent": null,
+      "subsidiaries": [],
+      "cage_codes": [{"code": null, "facility": "Curtiss-Wright", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "Curtiss-Wright Corporation", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Naval propulsion components", "Actuation", "Sensors & controls (defense)"]
+    },
+    {
+      "id": "tier1-transdigm",
+      "name": "TransDigm Group",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["TransDigm", "TransDigm Group", "TDG"],
+      "domains": ["transdigm.com"],
+      "hq": "Cleveland, OH",
+      "ticker": "TDG",
+      "parent": null,
+      "subsidiaries": ["Esterline (legacy units)"],
+      "cage_codes": [{"code": null, "facility": "TransDigm", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "TransDigm Group Inc", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["Proprietary aerospace components", "Actuators/pumps/valves", "Ignition systems"]
+    },
+    {
+      "id": "tier1-heico",
+      "name": "HEICO Corporation",
+      "tier": "tier1_supplier",
+      "relationship_hint": "peer_supplier",
+      "aliases": ["HEICO", "Heico", "HEI"],
+      "domains": ["heico.com"],
+      "hq": "Hollywood, FL",
+      "ticker": "HEI",
+      "parent": null,
+      "subsidiaries": ["HEICO Flight Support Group", "HEICO Electronic Technologies Group"],
+      "cage_codes": [{"code": null, "facility": "HEICO", "verified": false, "source": "confirm on SAM.gov"}],
+      "uei": [{"value": null, "entity": "HEICO Corporation", "verified": false, "source": "confirm on SAM.gov"}],
+      "known_programs": ["PMA replacement parts", "Electronic subsystems (defense/space)"]
+    }
+  ]
+}

@@ -1,5 +1,10 @@
 import type { Company } from "../../engine/brain/entities.ts";
 import { PORTFOLIO_SIGNAL_SUBJECT_ID, type Signal } from "../../engine/signals/contract.ts";
+import {
+  canonicalAccountsFromCompanies,
+  extractSignalEntities,
+  resolveSignalRelationships,
+} from "../../identity/canonicalAccounts.ts";
 
 interface ArtifactMeta {
   run_id?: unknown;
@@ -133,40 +138,6 @@ function eventType(item: ArtifactItem): string {
   return "regulatory_change";
 }
 
-function stableScore(seed: string): number {
-  let hash = 0;
-  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return hash / 0xffffffff;
-}
-
-export const ARTIFACT_ACCOUNT_FIT_THRESHOLD = 20;
-
-function companyRealFit(company: Company, item: ArtifactItem): number {
-  const body = artifactText(item).toLowerCase();
-  let score = 0;
-  if (body.includes(company.name.toLowerCase())) score += 200;
-  for (const need of company.needs) {
-    if (body.includes(need.toLowerCase())) score += 20;
-  }
-  return score;
-}
-
-function companySortFit(company: Company, item: ArtifactItem, type: string): number {
-  let score = companyRealFit(company, item);
-  if (["government_contract_award", "demand_spike", "competitor_expansion"].includes(type) && company.relationship === "target") score += 25;
-  if (["supplier_delay", "regulatory_change"].includes(type) && company.relationship === "customer") score += 20;
-  if (company.account_status === "active_pipeline" || company.account_status === "target_prospect") score += 8;
-  return score + stableScore(`${text(item.item_id)}:${company.id}`);
-}
-
-function subjectFor(item: ArtifactItem, companies: Company[], type: string): Company | undefined {
-  const ranked = [...companies]
-    .map((company) => ({ company, realFit: companyRealFit(company, item), sortFit: companySortFit(company, item, type) }))
-    .sort((a, b) => b.sortFit - a.sortFit || a.company.id.localeCompare(b.company.id));
-  const best = ranked[0];
-  return best && best.realFit >= ARTIFACT_ACCOUNT_FIT_THRESHOLD ? best.company : undefined;
-}
-
 function confidenceFromScore(score: number): number {
   return Math.max(0.72, Math.min(0.98, score / 100));
 }
@@ -201,6 +172,7 @@ export function buildArtifactSignals(runOutput: unknown, companies: Company[]): 
   assertArtifactRunOutput(runOutput);
   const runAt = text(runOutput.meta?.run_at);
   const signals: Signal[] = [];
+  const canonicalAccounts = canonicalAccountsFromCompanies(companies);
 
   for (const item of runOutput.items ?? []) {
     const itemId = text(item.item_id);
@@ -210,9 +182,6 @@ export function buildArtifactSignals(runOutput: unknown, companies: Company[]): 
     if (!itemId || !headline || !publishedAt) continue;
 
     const type = eventType(item);
-    const subject = subjectFor(item, companies, type);
-    const linked = Boolean(subject);
-
     const score = numberValue(item.per_edition?.bd?.relevance_score) ?? numberValue(item.importance_score) ?? 70;
     const figures = dollars(item);
     const affectedEntities = entityNames(item);
@@ -221,13 +190,23 @@ export function buildArtifactSignals(runOutput: unknown, companies: Company[]): 
       text(item.per_edition?.bd?.now_what),
       deepText(item.deep_analysis),
     ].filter(Boolean).join(" ");
+    const signalText = artifactText(item);
+    const extractedEntities = extractSignalEntities(signalText, affectedEntities);
+    const resolution = resolveSignalRelationships(extractedEntities, canonicalAccounts);
+    const relationship = resolution.relationships[0];
+    const subject = relationship
+      ? companies.find((company) => (company.canonical_account_id ?? company.id) === relationship.canonical_account_id)
+      : undefined;
 
     signals.push({
       id: `artifact-sig-${itemId}`,
       event_type: type,
-      entities: affectedEntities.length ? affectedEntities : subject ? [subject.name] : [sourceName],
-      subject_id: subject?.id ?? PORTFOLIO_SIGNAL_SUBJECT_ID,
-      scope: linked ? "account" : "unlinked",
+      entities: extractedEntities.length
+        ? extractedEntities.map((entity) => entity.name)
+        : affectedEntities.length ? affectedEntities : [sourceName],
+      subject_id: relationship?.canonical_account_id ?? PORTFOLIO_SIGNAL_SUBJECT_ID,
+      scope: resolution.scope,
+      ...(relationship ? { relationships: resolution.relationships } : {}),
       ...(subject?.account_status ? { account_status: subject.account_status } : {}),
       ...(subject?.business_motion ? { business_motion: subject.business_motion } : {}),
       ...(figures[0] !== undefined ? { value: figures[0] } : {}),

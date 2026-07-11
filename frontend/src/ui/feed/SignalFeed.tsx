@@ -54,7 +54,7 @@ function scoreImpact(eventType: string): { text: string; total: number; dimensio
 }
 
 function isPortfolioSignal(signal: Signal): boolean {
-  return signal.scope === "unlinked" || signal.scope === "portfolio" || signal.subject_id === PORTFOLIO_SIGNAL_SUBJECT_ID;
+  return (signal.scope !== undefined && signal.scope !== "specific_account") || signal.subject_id === PORTFOLIO_SIGNAL_SUBJECT_ID;
 }
 
 function motionForSignal(world: World, signal: Signal): MotionLabel {

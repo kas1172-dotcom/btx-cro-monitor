@@ -23,11 +23,34 @@ const BusinessMotionSchema = z.enum([
   "reduce_risk",
 ]);
 
+const SignalScopeSchema = z.enum([
+  "market",
+  "program",
+  "customer",
+  "supplier",
+  "competitor",
+  "specific_account",
+  "unlinked",
+]);
+
+const SignalRelationshipSchema = z.object({
+  canonical_account_id: z.string().min(1),
+  source_entity_name: z.string().min(1),
+  match_method: z.enum(["exact_domain", "cage_uei", "alias", "program", "name_fuzzy", "manual"]),
+  evidence: z.string().min(1),
+  confidence: z.number().min(0).max(1),
+  review_status: z.enum(["accepted", "needs_review", "unconfirmed"]),
+  creation_source: z.enum(["resolver", "manual"]),
+  last_validated_at: z.string().nullable(),
+});
+
 const SignalSchema = z.object({
   id: z.string().min(1),
   event_type: z.string().min(1),
   entities: z.array(z.string()),
   subject_id: z.string().min(1),
+  scope: SignalScopeSchema.optional(),
+  relationships: z.array(SignalRelationshipSchema).optional(),
   account_status: AccountStatusSchema.optional(),
   business_motion: BusinessMotionSchema.optional(),
   value: z.number().optional(),
