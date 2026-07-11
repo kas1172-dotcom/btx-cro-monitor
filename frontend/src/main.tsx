@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.tsx";
 import { CockpitAccessGate } from "./app/cockpitAccess.tsx";
+import "leaflet/dist/leaflet.css";
 import "./ui/styles.css";
 import { runOverflowAudit } from "./app/overflowAudit.ts";
 

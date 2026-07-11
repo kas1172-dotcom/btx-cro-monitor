@@ -71,7 +71,7 @@ function motionForSignal(world: World, signal: Signal): MotionLabel {
 }
 
 function whyItMatters(world: World, signal: Signal): string {
-  if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a HubSpot account until identity matching is available.";
+  if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a CRM account without canonical identity evidence.";
   const company = world.companies.find((c) => c.id === signal.subject_id);
   const rec = world.analysis.recById.get(signal.subject_id);
   const impact = scoreImpact(signal.event_type);

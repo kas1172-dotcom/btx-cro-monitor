@@ -16,6 +16,7 @@
     "test:settings": "tsx tools/test-settings-shell.ts",
     "test:phase0": "tsx tools/test-phase0-safe-honest.ts",
     "test:identity": "tsx tools/test-canonical-identity.ts",
+    "test:map": "tsx tools/test-map.ts",
     "test:tour": "tsx tools/test-tour.ts",
     "test:live-adapter": "tsx tools/test-live-adapter.ts",
     "seed:hubspot": "tsx tools/seed-hubspot.ts",

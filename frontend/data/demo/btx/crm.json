@@ -9,7 +9,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 1520000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -22,7 +22,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 0,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -35,7 +35,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 1870000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -48,7 +48,7 @@
     "relationship_health": "needs attention",
     "open_pipeline_value": 3400000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -61,7 +61,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 1030000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -74,7 +74,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 270000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -87,7 +87,7 @@
     "relationship_health": "needs attention",
     "open_pipeline_value": 1160000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -100,7 +100,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 1360000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -113,7 +113,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 750000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -126,7 +126,7 @@
     "relationship_health": "active",
     "open_pipeline_value": 1110000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -139,7 +139,7 @@
     "relationship_health": "new",
     "open_pipeline_value": 1820000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -152,7 +152,7 @@
     "relationship_health": "new",
     "open_pipeline_value": 1540000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -165,7 +165,7 @@
     "relationship_health": "new",
     "open_pipeline_value": 2930000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   },
   {
@@ -178,7 +178,7 @@
     "relationship_health": "new",
     "open_pipeline_value": 1440000,
     "source_type": "demo",
-    "source_name": "Simulated Salesforce",
+    "source_name": "Simulated CRM",
     "source_mode": "static_snapshot"
   }
 ]

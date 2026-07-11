@@ -174,8 +174,8 @@ export function App() {
             <h2 id="demo-action-title">{demoAction.title}</h2>
             {demoAction.accountName && <p className="demo-action-account">{demoAction.accountName}</p>}
             <p>
-              In production, this would create a Salesforce task or lead, assign an owner, attach source evidence,
-              and schedule follow-up. This demo does not send email, write to a CRM, or call an external API.
+              In production, this creates a CRM task, assigns an owner, attaches source evidence,
+              and schedules follow-up. Demo mode does not send email, write to a CRM, or call an external API.
             </p>
             {demoAction.evidence && (
               <div className="demo-action-evidence">

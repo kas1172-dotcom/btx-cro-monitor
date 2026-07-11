@@ -160,7 +160,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     const draft = createTaskDraft();
     if ((world?.dataMode === "hybrid" || world?.dataMode === "live")) {
       if (!BACKEND_ENDPOINT) {
-        setTaskDialog({ ...draft, status: "error", error: "Backend is not configured; live HubSpot task creation is unavailable." });
+        setTaskDialog({ ...draft, status: "error", error: "Backend is not configured; live CRM task creation is unavailable." });
         return;
       }
       setTaskDialog({ ...draft, status: "confirm" });
@@ -187,7 +187,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       });
       setTaskDialog({ ...draft, status: "created", id: result.id, recordUrl: result.record_url });
     } catch (error) {
-      setTaskDialog({ ...draft, status: "error", error: error instanceof Error ? error.message : "HubSpot task creation failed." });
+      setTaskDialog({ ...draft, status: "error", error: error instanceof Error ? error.message : "CRM task creation failed." });
     }
   }
 
@@ -236,7 +236,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       {taskDialog && (
         <div className="task-confirmation" role="dialog" aria-modal="true" aria-labelledby="task-confirm-title">
           <div className="task-confirmation-panel">
-            <p className="eyebrow">HubSpot task</p>
+            <p className="eyebrow">CRM task</p>
             <h2 id="task-confirm-title">{taskDialog.status === "created" ? "Task created" : "Create task?"}</h2>
             <div className="task-preview">
               <span>Subject</span>
@@ -255,7 +255,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
             {taskDialog.status === "error" && <div className="task-error" role="status">{taskDialog.error}</div>}
             {taskDialog.status === "created" && (
               <a className="task-success-link" href={taskDialog.recordUrl} target="_blank" rel="noreferrer">
-                Open in HubSpot
+                Open CRM record
               </a>
             )}
             <div className="task-confirmation-actions">

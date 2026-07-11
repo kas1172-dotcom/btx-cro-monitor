@@ -48,7 +48,7 @@ export function OperatingSnapshot() {
           <span>CRM accounts</span>
           <strong>{snapshot.crm.length}</strong>
           <em>{snapshot.crm[0]?.source_name ?? "CRM snapshot"}</em>
-          <ProvenanceBadge label={snapshot.crm[0]?.source_name === "Demo fallback" ? "Demo" : "HubSpot"} />
+          <ProvenanceBadge label={snapshot.crm[0]?.source_name === "Demo fallback" ? "Demo" : "CRM"} />
         </div>
         <div>
           <span>Capacity sources</span>

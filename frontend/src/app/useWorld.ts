@@ -67,7 +67,7 @@ export function useWorld(city: string | null): World | null {
         analysis,
         prospects,
         snapshot,
-        dataSource: DATA_MODE === "live" ? liveStatus.provenance ?? "HubSpot" : null,
+        dataSource: DATA_MODE === "live" ? liveStatus.provenance ?? "Live CRM" : null,
         loadErrors: DATA_MODE === "live" || DATA_MODE === "hybrid" ? liveAdapterStatus().errors : [],
         dataMode: DATA_MODE,
         provenanceSources: [] as Array<{ label: ProvenanceLabel; count: number; detail: string }>,

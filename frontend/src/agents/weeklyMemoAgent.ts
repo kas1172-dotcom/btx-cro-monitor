@@ -61,8 +61,8 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
     const topSignalAccount = nameOf(topSignal?.subject_id);
     const topRiskAccount = nameOf(topRisk?.subject_id);
     const evidenceSignals = [topSignal, topRiskSignal].filter((signal): signal is NonNullable<typeof topSignal> => Boolean(signal));
-    const accountSource = topOpportunity && provenanceForRecord(topOpportunity.company) === "HubSpot" ? "HubSpot CRM" : "companies.json";
-    const opportunitySource = world.opportunities.some((opportunity) => provenanceForRecord(opportunity) === "HubSpot") ? "HubSpot CRM" : "opportunities.json";
+    const accountSource = topOpportunity && provenanceForRecord(topOpportunity.company) === "CRM" ? "CRM" : "companies.json";
+    const opportunitySource = world.opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "CRM" : "opportunities.json";
     const signalSource = topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json";
     const signalDisplay = world.dataMode === "hybrid" ? (topSignal?.artifact ? "Monitor" : "Demo") : topSignal?.artifact ? "Monitor" : "Signals";
 
@@ -84,7 +84,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
         accountSource,
         opportunitySource,
         signalSource: signalDisplay,
-        fallbackDisclosure: world.dataMode === "hybrid" ? "Hybrid mode: internal account/deal facts are HubSpot when available; external facts are Monitor; capacity and operating context is Demo fallback." : "",
+        fallbackDisclosure: world.dataMode === "hybrid" ? "Hybrid mode: internal account/deal facts are CRM when available; external facts are Monitor; capacity and operating context is Demo fallback." : "",
         ...(topRisk?.subject_id ? { [`${topRisk.subject_id}:evidence`]: `${topRiskAccount}::${signalEvidenceForCompany(topRiskAccount, topRiskSignal, topRiskAccount)}` } : {}),
       },
       entityIds: [topOpportunity?.company.id, topRisk?.subject_id, topSignal?.subject_id].filter((id): id is string => Boolean(id)),

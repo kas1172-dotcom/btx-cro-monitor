@@ -45,6 +45,25 @@ def test_auth_rejects_protected_routes(tmp_path: Path):
     assert client.get("/engine-config/scoring_weights").status_code == 401
 
 
+def test_latest_artifacts_public_and_reads_pipeline_output(tmp_path: Path):
+    output_dir = tmp_path / "artifacts"
+    output_dir.mkdir()
+    (output_dir / "run_output.json").write_text(
+        '{"meta":{"run_at":"2026-07-11T12:00:00Z"},"items":[]}',
+        encoding="utf-8",
+    )
+    (output_dir / "archive.json").write_text('{"runs":[{"run_id":"r1"}],"pinned":[]}', encoding="utf-8")
+    client, _sf, _settings = _build(tmp_path, pipeline_output_dir=str(output_dir))
+
+    response = client.get("/artifacts/latest")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_provenance"] == "Monitor"
+    assert body["run_output"]["meta"]["run_at"] == "2026-07-11T12:00:00Z"
+    assert body["archive"]["runs"][0]["run_id"] == "r1"
+
+
 def test_auth_uses_constant_time_compare(monkeypatch, tmp_path: Path):
     calls: list[tuple[str, str]] = []
 

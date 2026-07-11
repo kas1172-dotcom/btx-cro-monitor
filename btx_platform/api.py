@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import logging
 import hmac
+import json
 import time
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +43,7 @@ from btx_platform.schemas import (
 
 logger = logging.getLogger(__name__)
 CRM_CACHE_TTL_SECONDS = 300
+PUBLIC_PATHS = {"/health", "/artifacts/latest"}
 
 
 def _three_business_days_from_now() -> str:
@@ -132,7 +135,7 @@ def create_app(
 
     @app.middleware("http")
     async def require_bearer_auth(request: Request, call_next):
-        if request.url.path == "/health" or request.method == "OPTIONS":
+        if request.url.path in PUBLIC_PATHS or request.method == "OPTIONS":
             return await call_next(request)
         if not settings.backend_auth_token:
             return JSONResponse({"code": "auth_not_configured", "detail": "BTX_BACKEND_AUTH_TOKEN is required."}, status_code=503)
@@ -159,6 +162,29 @@ def create_app(
             "llm": bool(settings.anthropic_api_key),
             "auth": bool(settings.backend_auth_token),
         }
+
+    @app.get("/artifacts/latest")
+    def latest_artifacts() -> Response:
+        output_dir = Path(settings.pipeline_output_dir)
+        run_output_path = output_dir / "run_output.json"
+        archive_path = output_dir / "archive.json"
+        if not run_output_path.exists():
+            return JSONResponse(
+                {"code": "artifact_not_found", "detail": f"Missing monitor artifact: {run_output_path}"},
+                status_code=404,
+            )
+        try:
+            run_output = json.loads(run_output_path.read_text(encoding="utf-8"))
+            archive = json.loads(archive_path.read_text(encoding="utf-8")) if archive_path.exists() else {"runs": [], "pinned": []}
+        except json.JSONDecodeError as exc:
+            return JSONResponse({"code": "artifact_invalid", "detail": str(exc)}, status_code=500)
+        return JSONResponse({
+            "data_provenance": "Monitor",
+            "artifact_path": str(run_output_path),
+            "archive_path": str(archive_path),
+            "run_output": run_output,
+            "archive": archive,
+        })
 
     def not_configured(service: str) -> JSONResponse:
         return JSONResponse(

@@ -3,47 +3,58 @@
 // activeCompanyId updates -> the dossier opens. The map is just a lens on engine
 // output; it computes nothing.
 
+import { useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet";
+import { useMap } from "react-leaflet";
 import type { World } from "../../app/useWorld.ts";
 import { setState, useStore } from "../../store/store.ts";
 import { explainRankingPrompt, outreachPrompt } from "../../app/copilotPrompts.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
-import { formatAddress } from "../../app/format.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { buildMapMarkers, mapCenter, mappableCompanies } from "./mapModel.ts";
 
-const avg = (ns: number[]): number => (ns.length ? ns.reduce((a, b) => a + b, 0) / ns.length : 0);
-
-function isProspect(rel: string): boolean {
-  return rel === "target" || rel === "customer";
+function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
+  const map = useMap();
+  useEffect(() => {
+    const invalidate = () => map.invalidateSize();
+    const frame = window.requestAnimationFrame(invalidate);
+    const timer = window.setTimeout(invalidate, 180);
+    window.addEventListener("resize", invalidate);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", invalidate);
+    };
+  }, [map, watchKey]);
+  return null;
 }
 
 export function ProspectMap({ world }: { world: World }) {
   const { activeCompanyId } = useStore();
-  const pts = world.companies;
-  const center: [number, number] = pts.length
-    ? [avg(pts.map((p) => p.location.lat)), avg(pts.map((p) => p.location.lon))]
-    : [31.5, -97];
+  const markers = buildMapMarkers(world.companies, world.analysis.byId);
+  const center = mapCenter(mappableCompanies(world.companies));
+  const omittedCount = world.companies.length - markers.length;
   const marketLabel = world.city ?? "All Markets";
   const initialZoom = world.city ? 11 : 4;
+  const watchKey = `${world.city ?? "all"}:${markers.length}:${activeCompanyId ?? "none"}`;
 
   return (
     <div className="map-shell">
       <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
+        <MapSizeInvalidator watchKey={watchKey} />
         <ZoomControl position="bottomright" />
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; OpenStreetMap &copy; CARTO'
         />
-        {pts.map((c) => {
-          const opp = world.analysis.byId.get(c.id)?.dimensions.opportunity.score ?? 0;
-          const prospect = isProspect(c.relationship);
+        {markers.map(({ company: c, center: markerCenter, opportunity: opp, prospect, radius }) => {
           const active = c.id === activeCompanyId;
           const color = prospect ? "#9ecf6a" : "#7b8467";
           return (
             <CircleMarker
               key={c.id}
-              center={[c.location.lat, c.location.lon]}
-              radius={prospect ? Math.min(16, 7 + opp / 12) : 5}
+              center={markerCenter}
+              radius={radius}
               pathOptions={{
                 color: active ? "#f4f1dc" : color,
                 weight: active ? 3 : 1,
@@ -64,8 +75,9 @@ export function ProspectMap({ world }: { world: World }) {
       <aside className="map-rail">
         <div className="map-rail-head">
           <span>{marketLabel}</span>
-          <strong>{world.prospects.length} prospects</strong>
+          <strong>{markers.length} mapped</strong>
         </div>
+        {omittedCount > 0 && <p className="map-rail-note">{omittedCount} account{omittedCount === 1 ? "" : "s"} omitted: missing coordinates</p>}
         <div className="map-prospect-list">
           {world.prospects.slice(0, 12).map((p, i) => (
             <button

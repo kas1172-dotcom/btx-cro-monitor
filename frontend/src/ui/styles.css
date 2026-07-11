@@ -155,7 +155,7 @@ p { line-height: 1.55; }
   line-height: 1.25;
   text-transform: uppercase;
 }
-.prov-hubspot { color: var(--good); border-color: rgba(158, 207, 106, .45); background: rgba(158, 207, 106, .08); }
+.prov-crm { color: var(--good); border-color: rgba(158, 207, 106, .45); background: rgba(158, 207, 106, .08); }
 .prov-monitor { color: var(--accent); border-color: rgba(183, 196, 106, .45); background: rgba(183, 196, 106, .08); }
 .prov-demo { color: var(--warn); border-color: rgba(214, 168, 79, .45); background: rgba(214, 168, 79, .08); }
 .card-badge-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
@@ -710,7 +710,7 @@ p { line-height: 1.55; }
 .tab.active { color: var(--text); background: var(--panel-2); border-color: var(--line); }
 
 .stage { grid-area: stage; position: relative; min-width: 0; }
-.map { position: absolute; inset: 0; height: 100%; width: 100%; background: var(--bg); }
+.map { position: absolute; inset: 0; height: 100%; min-height: calc(100dvh - 48px); width: 100%; background: var(--bg); }
 .loading, .placeholder {
   height: 100%; display: flex; flex-direction: column;
   align-items: center; justify-content: center; color: var(--muted); gap: 8px;
@@ -1008,7 +1008,7 @@ p { line-height: 1.55; }
 .operating-list li { margin: 7px 0; }
 
 /* Map */
-.map-shell { position: absolute; inset: 0; }
+.map-shell { position: absolute; inset: 0; height: 100%; min-height: calc(100dvh - 48px); overflow: hidden; }
 .map-rail {
   position: absolute; left: 14px; top: 14px; bottom: 14px; z-index: 500;
   width: min(360px, calc(100% - 28px)); display: flex; flex-direction: column; gap: 8px;
@@ -1023,6 +1023,10 @@ p { line-height: 1.55; }
 }
 .map-rail-head strong { font-size: 16px; }
 .map-rail-head span { color: var(--muted); font-size: 12px; }
+.map-rail-note {
+  pointer-events: auto; margin: 0; border: 1px solid rgba(214, 168, 79, .45); border-radius: 8px;
+  background: rgba(214, 168, 79, .10); color: var(--warn); padding: 8px 10px; font-size: 12px;
+}
 .map-prospect-list {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
   padding-right: 2px; pointer-events: auto;

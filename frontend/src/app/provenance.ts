@@ -2,7 +2,7 @@ import type { Company, Contact, Facility, Opportunity } from "../engine/brain/en
 import type { Signal } from "../engine/signals/contract.ts";
 import type { World } from "./useWorld.ts";
 
-export type ProvenanceLabel = "HubSpot" | "Monitor" | "Demo";
+export type ProvenanceLabel = "CRM" | "Monitor" | "Demo";
 
 type ProvenanceRecord = {
   data_provenance?: string;
@@ -20,16 +20,16 @@ export function provenanceForRecord(record: Company | Contact | Facility | Oppor
   const meta = record as ProvenanceRecord;
   if (meta.artifact) return "Monitor";
   const text = sourceName(meta);
-  if (text.includes("hubspot") || text.includes("live")) return "HubSpot";
+  if (text.includes("hubspot") || text.includes("crm") || text.includes("live")) return "CRM";
   if (text.includes("monitor") || text.includes("artifact")) return "Monitor";
   return "Demo";
 }
 
 export function provenanceCounts(world: World): Array<{ label: ProvenanceLabel; count: number; detail: string }> {
-  const hubspotIds = new Set([
-    ...world.companies.filter((item) => provenanceForRecord(item) === "HubSpot").map((item) => item.id),
-    ...world.contacts.filter((item) => provenanceForRecord(item) === "HubSpot").map((item) => item.id),
-    ...world.opportunities.filter((item) => provenanceForRecord(item) === "HubSpot").map((item) => item.id),
+  const crmIds = new Set([
+    ...world.companies.filter((item) => provenanceForRecord(item) === "CRM").map((item) => item.id),
+    ...world.contacts.filter((item) => provenanceForRecord(item) === "CRM").map((item) => item.id),
+    ...world.opportunities.filter((item) => provenanceForRecord(item) === "CRM").map((item) => item.id),
   ]);
   const monitorIds = new Set(world.analysis.valid.filter((item) => provenanceForRecord(item) === "Monitor").map((item) => item.id));
   const demoIds = new Set([
@@ -37,7 +37,7 @@ export function provenanceCounts(world: World): Array<{ label: ProvenanceLabel; 
     ...(world.snapshot?.capacity ?? []).map((item) => item.facility_id),
   ]);
   return [
-    { label: "HubSpot", count: hubspotIds.size, detail: "real CRM" },
+    { label: "CRM", count: crmIds.size, detail: "real CRM" },
     { label: "Monitor", count: monitorIds.size, detail: "real signals" },
     { label: "Demo", count: demoIds.size, detail: "fallback" },
   ];

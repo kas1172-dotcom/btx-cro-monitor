@@ -268,7 +268,7 @@ const hybridBriefText = hybridBrief.sections
     return block.title;
   })
   .join(" ");
-assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "HubSpot CRM"), "Hybrid meeting brief missing real HubSpot account grounding");
+assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "CRM"), "Hybrid meeting brief missing real CRM account grounding");
 assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "monitor-engine artifacts"), "Hybrid meeting brief missing real monitor signal grounding");
 assert(hybridBriefText.includes("Demo fallback") || hybridBrief.sources.some((source) => source.source === "Demo fallback"), "Hybrid meeting brief missing demo fallback disclosure");
 
@@ -294,4 +294,4 @@ const deliverableText = [itinerary, memo, outreach]
   .join(" ");
 assert(!/\b[a-z]+_[a-z_]+\b/.test(deliverableText), `Rendered deliverables leaked snake_case: ${deliverableText.match(/\b[a-z]+_[a-z_]+\b/)?.[0]}`);
 
-console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, hybrid brief cited HubSpot + monitor, outreach ${outreach.sections.length} sections`);
+console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, hybrid brief cited CRM + monitor, outreach ${outreach.sections.length} sections`);
