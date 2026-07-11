@@ -224,3 +224,53 @@ python3 -m pytest -q
 ```
 
 Result: all listed checks passed. The monitor smoke produced valid `run_output.json`/`archive.json`; target smoke produced `map_targets.json` and no `map.html`.
+
+### After Task 3.2/3.5: Deleted Dead Static Renderers And Tests
+
+Deletion evidence after Task 3.1:
+
+```text
+rg -n "monitor_engine.site|from monitor_engine.site|tooling.build_pages|site/_assets|site/_template|monitor_engine/targets/_assets" . --glob '!frontend/node_modules/**' --glob '!frontend/dist/**' --glob '!**/__pycache__/**'
+# remaining matches were only docs/DECLUTTER_REPORT.md plus retired tests/harness before deletion
+```
+
+Removed files:
+
+```text
+monitor_engine/site/__init__.py
+monitor_engine/site/_assets/app.js
+monitor_engine/site/_assets/style.css
+monitor_engine/site/_assets/sw.js
+monitor_engine/site/_template/index.html
+monitor_engine/site/builder.py
+monitor_engine/targets/_assets/map.css
+monitor_engine/targets/_assets/map.html
+monitor_engine/targets/_assets/map.js
+tooling/build_pages.py
+tests/test_site.py
+tests/test_build_pages.py
+tests/test_frontend.py
+tests/frontend/render.mjs
+tests/frontend/dom_harness.mjs
+tests/frontend/fixtures/sample_run_output.json
+```
+
+Also removed the obsolete `monitor_engine.site` package-data entry from `pyproject.toml`.
+
+Verification:
+
+```text
+python3 -m pytest -q
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); print('OK')"
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+test -f /tmp/btxmap/map_targets.json
+test ! -f /tmp/btxmap/map.html
+cd frontend && npm run typecheck
+cd frontend && npm run build
+cd frontend && npm run test:metrics
+cd frontend && npm run test:rail
+cd frontend && npm run test:settings
+```
+
+Result: all listed checks passed.
