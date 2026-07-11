@@ -8,6 +8,7 @@ import { deliverableToMarkdown } from "../../deliverables/markdown.ts";
 import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
+import { requestSectionRevision } from "../../deliverables/editorAssistant.ts";
 import { downloadBoardDeck } from "../../deliverables/deck/pptx.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
@@ -122,19 +123,15 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       return;
     }
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-5",
-          system: "Revise one deliverable section. Preserve facts and numbers. Respect audience/form rules and banned vocabulary. Return only revised prose.",
-          messages: [{ role: "user", content: JSON.stringify({ title: current.title, audience: current.audience, form: current.form, section: target, instruction }) }],
-        }),
-      });
-      const data = (await res.json()) as { text?: string };
-      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text: data.text ?? firstText.text }]);
-    } catch {
-      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text: firstText.text, warning: "Assistant needs the connection — manual editing still works." }]);
+      const text = await requestSectionRevision({ endpoint, deliverable: current, section: target, instruction });
+      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text }]);
+    } catch (error) {
+      setSuggestions((items) => [...items, {
+        id: `${Date.now()}`,
+        sectionId: target.id,
+        text: "No suggestion generated.",
+        warning: error instanceof Error ? error.message : "Assistant revision failed.",
+      }]);
     } finally {
       setAssistantInput("");
     }
