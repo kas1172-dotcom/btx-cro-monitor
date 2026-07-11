@@ -72,18 +72,18 @@ When prompted:
 2. Create a managed Postgres database in the same region.
 
 ```bash
-fly postgres create --name btx-platform-db --region iad
+fly mpg create --name btx-platform-db --region iad --plan Basic --pg-major-version 17
 ```
 
 3. Attach Postgres to the backend app.
 
 ```bash
-fly postgres attach --app btx-platform btx-platform-db
+fly mpg attach btx-platform-db --app btx-platform --variable-name DATABASE_URL
 ```
 
-Fly usually injects a `DATABASE_URL` secret during attach. The backend accepts
-that value directly. If your Fly CLI instead prints a database URL and does not
-set it automatically, set it explicitly as `BTX_DATABASE_URL`:
+Fly injects a `DATABASE_URL` secret during attach. The backend accepts that
+value directly. If your Fly CLI instead prints a database URL and does not set
+it automatically, set it explicitly as `BTX_DATABASE_URL`:
 
 ```bash
 fly secrets set BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@HOST:PORT/DBNAME"
