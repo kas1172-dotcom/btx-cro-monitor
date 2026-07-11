@@ -25,6 +25,10 @@ def make_engine(url: str) -> Engine:
                 url, connect_args=connect_args, poolclass=StaticPool, future=True
             )
         return create_engine(url, connect_args=connect_args, future=True)
+    if url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+    elif url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+psycopg://", 1)
     return create_engine(url, pool_pre_ping=True, future=True)
 
 

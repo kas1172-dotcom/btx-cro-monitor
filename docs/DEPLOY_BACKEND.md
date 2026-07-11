@@ -78,7 +78,7 @@ fly mpg create --name btx-platform-db --region iad --plan Basic --pg-major-versi
 3. Attach Postgres to the backend app.
 
 ```bash
-fly mpg attach btx-platform-db --app btx-platform --variable-name DATABASE_URL
+fly mpg attach <cluster-id-from-create-output> --app btx-platform --variable-name DATABASE_URL
 ```
 
 Fly injects a `DATABASE_URL` secret during attach. The backend accepts that
