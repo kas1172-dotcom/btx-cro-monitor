@@ -14,6 +14,7 @@
     "test:flows": "tsx tools/test-demo-flows.ts",
     "test:rail": "tsx tools/test-rail-tabs.ts",
     "test:settings": "tsx tools/test-settings-shell.ts",
+    "test:phase0": "tsx tools/test-phase0-safe-honest.ts",
     "test:tour": "tsx tools/test-tour.ts",
     "test:live-adapter": "tsx tools/test-live-adapter.ts",
     "seed:hubspot": "tsx tools/seed-hubspot.ts",
