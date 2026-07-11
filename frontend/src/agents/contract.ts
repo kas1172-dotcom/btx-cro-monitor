@@ -45,6 +45,7 @@ const PROSPECT_BANNED = [
 ];
 
 const INTERNAL_BANNED = ["demo", "snapshot", "simulated", "deterministic", "Revenue Brain"];
+const HYBRID_INTERNAL_BANNED = ["simulated", "deterministic", "Revenue Brain"];
 
 function blockText(section: DeliverableSection): string {
   return section.blocks.map((block) => {
@@ -74,7 +75,9 @@ export function validateAudienceAndForm(
   const errors: string[] = [];
   const visibleText = publicSections(deliverable).map(blockText).join(" ");
   const allText = deliverable.sections.map(blockText).join(" ");
-  const banned = audience === "prospect" ? includesBanned(visibleText, PROSPECT_BANNED) : includesBanned(allText, INTERNAL_BANNED);
+  const hybridGrounding = ctx.sources.some((source) => ["HubSpot CRM", "monitor-engine artifacts", "Demo fallback"].includes(source.source));
+  const internalBanned = hybridGrounding ? HYBRID_INTERNAL_BANNED : INTERNAL_BANNED;
+  const banned = audience === "prospect" ? includesBanned(visibleText, PROSPECT_BANNED) : includesBanned(allText, internalBanned);
   if (banned) errors.push(`${audience} ${form} includes banned term "${banned}"`);
 
   if (form === "email") {

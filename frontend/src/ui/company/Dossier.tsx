@@ -13,10 +13,12 @@ import { pipelineHealth } from "../../engine/decision/health.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { explainAccountPrompt, expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { companyLinks, formatAddress, plural } from "../../app/format.ts";
+import { provenanceForRecord } from "../../app/provenance.ts";
 import { displayLabel } from "../../app/displayLabels.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
+import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
@@ -69,6 +71,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
       <div className="dossier-head">
         <h3>{company.name}</h3>
         <span className={`pill rel-${company.relationship}`}>{displayLabel(company.relationship)}</span>
+        {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(company)} />}
         <div className="muted">
           {company.location.city}
           {facilities.length > 0 && ` · ${facilities.length} ${facilities.length === 1 ? "facility" : "facilities"}`}
@@ -147,6 +150,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
                 <span className={`opp-stage stage-${o.stage}`}>{o.stage}</span>
                 <span className="opp-name">{o.name}</span>
                 <span className="opp-val">{fmtM(o.value)}</span>
+                {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(o)} />}
                 <ExternalLink href={o.contract_url} label="Contract" />
                 <ExternalLink href={o.document_url} label="Document" />
                 <ExternalLink href={o.source_url} label="Source" />
@@ -163,6 +167,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
             {facilities.map((f) => (
               <li key={f.id}>
                 <strong>{f.kind}</strong> — {formatAddress(f) ?? f.city}
+                {world.dataMode === "hybrid" && <ProvenanceBadge label="Demo" />}
                 <div className="link-row"><ExternalLink href={f.source_url} label="ERP source" /></div>
               </li>
             ))}
@@ -190,6 +195,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
             return (
               <li key={s.id}>
                 <span className="ev">{displayLabel(s.event_type)}</span>
+                {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(s)} />}
                 <span className="q">{s.source_quote}</span>
                 {meaning && <span className="meaning">{meaning}</span>}
                 <span className="conf">conf {s.confidence.toFixed(2)}</span>
@@ -210,6 +216,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           {contacts.map((k) => (
             <li key={k.id}>
               <strong>{k.name}</strong> — {k.title}
+              {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(k)} />}
             </li>
           ))}
           {contacts.length === 0 && <li className="muted">No contacts on file.</li>}

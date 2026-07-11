@@ -10,6 +10,7 @@ import { SignalFeed } from "../feed/SignalFeed.tsx";
 import { OperatingSnapshot } from "../operating/OperatingSnapshot.tsx";
 import { MemoryPanel } from "./MemoryPanel.tsx";
 import { Integrations } from "../integrations/Integrations.tsx";
+import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 
 function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -25,6 +26,12 @@ function detailFor(area: BrainArea, world: World): ReactNode {
     case "workflow": return <Integrations />;
     case "geographic": return null;
   }
+}
+
+function areaProvenance(area: BrainArea): "HubSpot" | "Monitor" | "Demo" {
+  if (area === "market") return "Monitor";
+  if (area === "capability" || area === "workflow" || area === "decision") return "Demo";
+  return "HubSpot";
 }
 
 function openRow(companyId: string | undefined, target: "dossier" | "pipeline" | "detail" | undefined): void {
@@ -60,6 +67,12 @@ export function RailAreaView({ area, world }: { area: BrainArea; world: World })
       {world.dataSource && !world.loadErrors.length && (
         <div className="live-inline-status">Live: {world.dataSource}</div>
       )}
+      {world.dataMode === "hybrid" && (
+        <div className="hybrid-inline-status">
+          <span>{world.provenanceSources.length} sources</span>
+          <strong>{world.provenanceSummary}</strong>
+        </div>
+      )}
       {world.loadErrors.length > 0 && (
         <div className="live-inline-status error" role="status">{world.loadErrors[0]}</div>
       )}
@@ -76,6 +89,7 @@ export function RailAreaView({ area, world }: { area: BrainArea; world: World })
             </span>
             <span>{row.meta}</span>
             {row.badge && <b>{row.badge}</b>}
+            {world.dataMode === "hybrid" && <ProvenanceBadge label={areaProvenance(area)} />}
           </button>
         ))}
         {topRows.length === 0 && (
@@ -116,6 +130,7 @@ function RevenuePipelineTable({ world }: { world: World }) {
               <span>{value ?? money(0)}</span>
               <span>{score?.replace("score ", "") ?? "0"}</span>
               <em>{row.meta}</em>
+              {world.dataMode === "hybrid" && <ProvenanceBadge label="HubSpot" />}
             </button>
           );
         })}

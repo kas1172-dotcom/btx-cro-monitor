@@ -1,5 +1,6 @@
 import { useOperatingSnapshot } from "../../app/useOperatingSnapshot.ts";
 import type { IntegrationRecord } from "../../engine/brain/operatingSnapshot.ts";
+import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 
 const STATUS_LABEL: Record<IntegrationRecord["status"], string> = {
   demo_connected: "Demo connected",
@@ -47,16 +48,19 @@ export function OperatingSnapshot() {
           <span>CRM accounts</span>
           <strong>{snapshot.crm.length}</strong>
           <em>{snapshot.crm[0]?.source_name ?? "CRM snapshot"}</em>
+          <ProvenanceBadge label={snapshot.crm[0]?.source_name === "Demo fallback" ? "Demo" : "HubSpot"} />
         </div>
         <div>
           <span>Capacity sources</span>
           <strong>{snapshot.capacity.length}</strong>
           <em>{snapshot.capacity[0]?.source_name ?? "ERP snapshot"}</em>
+          <ProvenanceBadge label="Demo" />
         </div>
         <div>
           <span>Public signals</span>
           <strong>{snapshot.publicSignals.signal_count}</strong>
           <em>{usingArtifacts ? "real monitor-engine artifacts" : `${snapshot.publicSignals.news_count} public news events`}</em>
+          <ProvenanceBadge label={usingArtifacts ? "Monitor" : "Demo"} />
         </div>
         <div>
           <span>Demo as of</span>

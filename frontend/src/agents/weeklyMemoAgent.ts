@@ -5,6 +5,7 @@ import { PROFILE } from "../app/config.ts";
 import { actionLabel } from "../app/actionLabels.ts";
 import { displayLabel } from "../app/displayLabels.ts";
 import { signalEvidenceForCompany, signalFigureContext } from "../app/signalProvenance.ts";
+import { provenanceForRecord } from "../app/provenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -60,6 +61,10 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
     const topSignalAccount = nameOf(topSignal?.subject_id);
     const topRiskAccount = nameOf(topRisk?.subject_id);
     const evidenceSignals = [topSignal, topRiskSignal].filter((signal): signal is NonNullable<typeof topSignal> => Boolean(signal));
+    const accountSource = topOpportunity && provenanceForRecord(topOpportunity.company) === "HubSpot" ? "HubSpot CRM" : "companies.json";
+    const opportunitySource = world.opportunities.some((opportunity) => provenanceForRecord(opportunity) === "HubSpot") ? "HubSpot CRM" : "opportunities.json";
+    const signalSource = topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json";
+    const signalDisplay = world.dataMode === "hybrid" ? (topSignal?.artifact ? "Monitor" : "Demo") : topSignal?.artifact ? "Monitor" : "Signals";
 
     return {
       facts: {
@@ -76,13 +81,18 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
         openPipelineValue: pipelineValue,
         pipelineScope: "All markets",
         recommendedAction: topAction ? `${actionLabel(topAction.action)}: ${topAction.reason}` : "Monitor the portfolio for new evidence.",
+        accountSource,
+        opportunitySource,
+        signalSource: signalDisplay,
+        fallbackDisclosure: world.dataMode === "hybrid" ? "Hybrid mode: internal account/deal facts are HubSpot when available; external facts are Monitor; capacity and operating context is Demo fallback." : "",
         ...(topRisk?.subject_id ? { [`${topRisk.subject_id}:evidence`]: `${topRiskAccount}::${signalEvidenceForCompany(topRiskAccount, topRiskSignal, topRiskAccount)}` } : {}),
       },
       entityIds: [topOpportunity?.company.id, topRisk?.subject_id, topSignal?.subject_id].filter((id): id is string => Boolean(id)),
       sources: [
-        { source: "companies.json", records: world.companies.map((c) => c.id), reason: "Account names, markets, and relationship status." },
-        { source: topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json", records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: topSignal?.artifact ? `Real monitor-engine signal evidence from ${topSignal.artifact.source_name}, run ${topSignal.artifact.run_at}.` : "Validated market and risk evidence used in scores." },
-        { source: "opportunities.json", records: world.opportunities.map((o) => o.id).slice(0, 12), reason: "Open pipeline value and opportunity context." },
+        { source: accountSource, records: world.companies.map((c) => c.id), reason: "Account names, markets, and relationship status." },
+        { source: signalSource, records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: topSignal?.artifact ? `Real monitor-engine signal evidence from ${topSignal.artifact.source_name}, run ${topSignal.artifact.run_at}.` : "Validated market and risk evidence used in scores." },
+        { source: opportunitySource, records: world.opportunities.map((o) => o.id).slice(0, 12), reason: "Open pipeline value and opportunity context." },
+        ...(world.dataMode === "hybrid" ? [{ source: "Demo fallback", records: ["capacity", "operating_snapshot"], reason: "Capacity and operating context not yet integrated." }] : []),
       ],
     };
   },
@@ -104,14 +114,14 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
           id: "answer",
           heading: "This Week's Answer",
           blocks: [
-            { kind: "text", text: `Verdict: ${PROFILE.name} should focus this week on ${f.topOpportunityName} while protecting ${f.topRiskName} from delivery or account risk. ${f.pipelineScope}: ${money(Number(f.openPipelineValue))} remains open, and the strongest current evidence is ${String(f.topSignalType).toLowerCase()} tied to ${f.topOpportunityName}.` },
+            { kind: "text", text: `${f.fallbackDisclosure ? `${f.fallbackDisclosure} ` : ""}Verdict: ${PROFILE.name} should focus this week on ${f.topOpportunityName} while protecting ${f.topRiskName} from delivery or account risk. ${f.pipelineScope}: ${money(Number(f.openPipelineValue))} remains open, and the strongest current evidence is [${f.signalSource}] ${String(f.topSignalType).toLowerCase()} tied to ${f.topOpportunityName}.` },
           ],
         },
         {
           id: "opportunity",
           heading: "Top Opportunity",
           blocks: [
-            { kind: "table", columns: ["Account", "Opportunity score", "Fit", "Why now"], rows: [[String(f.topOpportunityName), String(f.topOpportunityScore), `${f.topOpportunityFit}%`, stripPeriod(String(f.topSignalQuote))]] },
+            { kind: "table", columns: ["Account", "Opportunity score", "Fit", "Why now", "Source"], rows: [[String(f.topOpportunityName), String(f.topOpportunityScore), `${f.topOpportunityFit}%`, stripPeriod(String(f.topSignalQuote)), String(f.accountSource)]] },
           ],
         },
         {

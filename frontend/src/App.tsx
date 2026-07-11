@@ -102,6 +102,12 @@ export function App() {
       }}>
         <header className="quiet-topbar">
           <button className="quiet-brand" onClick={goHome}>{PROFILE.name} Revenue Brain</button>
+          {world?.dataMode === "hybrid" && world.provenanceSummary && (
+            <div className="data-provenance-status">
+              <span>Data provenance</span>
+              <strong>{world.provenanceSources.length} sources: {world.provenanceSummary}</strong>
+            </div>
+          )}
           {world?.dataSource && !world.loadErrors.length && (
             <div className="live-source-status">
               <span>Live</span>

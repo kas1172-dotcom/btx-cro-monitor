@@ -32,6 +32,11 @@ async function loadWorld(): Promise<World> {
     analysis,
     prospects: buildProspects(companies, contacts, analysis.valid, analysis.byId),
     snapshot,
+    dataSource: null,
+    loadErrors: [],
+    dataMode: "demo",
+    provenanceSources: [],
+    provenanceSummary: null,
   };
 }
 

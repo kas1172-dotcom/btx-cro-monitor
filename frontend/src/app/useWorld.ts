@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { createDataAdapter, getDataMode } from "../adapters/createDataAdapter.ts";
 import { liveAdapterStatus } from "../adapters/live/LiveDataAdapter.ts";
+import { provenanceCounts, provenanceSummary, type ProvenanceLabel } from "./provenance.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
 import { deriveNewsSignals } from "./newsIngest.ts";
 import newsData from "../../data/demo/btx/news.json";
@@ -30,6 +31,9 @@ export interface World {
   snapshot: OperatingSnapshot | null;
   dataSource: string | null;
   loadErrors: string[];
+  dataMode: "demo" | "artifact" | "live" | "hybrid";
+  provenanceSources: Array<{ label: ProvenanceLabel; count: number; detail: string }>;
+  provenanceSummary: string | null;
 }
 
 export function useWorld(city: string | null): World | null {
@@ -52,7 +56,7 @@ export function useWorld(city: string | null): World | null {
       const analysis = analyze(companies, [...signals, ...newsSignals]);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
       const liveStatus = DATA_MODE === "live" ? liveAdapterStatus() : { errors: [], provenance: null };
-      setWorld({
+      const draft = {
         city,
         companies,
         contacts,
@@ -62,7 +66,15 @@ export function useWorld(city: string | null): World | null {
         prospects,
         snapshot,
         dataSource: DATA_MODE === "live" ? liveStatus.provenance ?? "HubSpot" : null,
-        loadErrors: liveStatus.errors,
+        loadErrors: DATA_MODE === "live" || DATA_MODE === "hybrid" ? liveAdapterStatus().errors : [],
+        dataMode: DATA_MODE,
+        provenanceSources: [] as Array<{ label: ProvenanceLabel; count: number; detail: string }>,
+        provenanceSummary: null as string | null,
+      };
+      draft.provenanceSources = DATA_MODE === "hybrid" ? provenanceCounts(draft) : [];
+      draft.provenanceSummary = DATA_MODE === "hybrid" ? provenanceSummary(draft) : null;
+      setWorld({
+        ...draft,
       });
     });
     return () => {

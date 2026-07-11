@@ -13,6 +13,7 @@ import { PROFILE } from "../src/app/config.ts";
 import { DELIVERABLE_DOWNLOAD_FORMATS } from "../src/deliverables/export.ts";
 import { AREA_MARKET_SCOPING, isMarketScopedView } from "../src/app/viewScope.ts";
 import { buildArtifactSignals } from "../src/adapters/artifact/artifactSignals.ts";
+import { provenanceCounts, provenanceSummary } from "../src/app/provenance.ts";
 
 function assert(condition: unknown, message: string): void {
   if (!condition) throw new Error(message);
@@ -40,6 +41,11 @@ async function loadWorld(city: string | null = null): Promise<World> {
     analysis,
     prospects: buildProspects(companies, contacts, analysis.valid, analysis.byId),
     snapshot,
+    dataSource: null,
+    loadErrors: [],
+    dataMode: "demo",
+    provenanceSources: [],
+    provenanceSummary: null,
   };
 }
 
@@ -60,7 +66,7 @@ async function loadArtifactFixtureWorld(): Promise<World> {
   assert(signal.artifact?.dollar_figures.includes(250000000), "Artifact dollar figure was not preserved");
   assert(signal.source_url === "https://example.com/boeing-muos", "Artifact source URL was not mapped");
   const analysis = analyze(companies, artifact.signals);
-  return {
+  const world: World = {
     city: null,
     companies,
     contacts,
@@ -84,11 +90,95 @@ async function loadArtifactFixtureWorld(): Promise<World> {
         notice: null,
       },
     },
+    dataSource: null,
+    loadErrors: [],
+    dataMode: "artifact",
+    provenanceSources: [],
+    provenanceSummary: null,
   };
+  return world;
+}
+
+async function loadHybridFixtureWorld(): Promise<World> {
+  const demo = new DemoDataAdapter();
+  const [demoCompanies, facilities, demoSnapshot] = await Promise.all([
+    demo.getCompanies(),
+    demo.getFacilities(),
+    demo.getOperatingSnapshot(),
+  ]);
+  const artifact = buildArtifactSignals(miniRunOutput, demoCompanies);
+  const companies = [{
+    id: "hubspot-company-9001",
+    name: "Acme HubSpot Components",
+    relationship: "customer" as const,
+    account_status: "active_pipeline" as const,
+    business_motion: "grow_existing_business" as const,
+    location: { city: "Pittsburgh", state: "PA", lat: 40.44, lon: -79.99, country: "USA" },
+    website_url: "https://acme.example",
+    needs: ["ITAR", "precision machining"],
+    data_provenance: "HubSpot",
+    source_name: "HubSpot",
+    source_mode: "live",
+  }];
+  const contacts = [{
+    id: "hubspot-contact-9002",
+    company_id: "hubspot-company-9001",
+    name: "Riley Buyer",
+    title: "Procurement Director",
+    data_provenance: "HubSpot",
+    source_name: "HubSpot",
+    source_mode: "live",
+  }];
+  const opportunities = [{
+    id: "hubspot-deal-9003",
+    company_id: "hubspot-company-9001",
+    name: "Prototype machining package",
+    value: 250000,
+    stage: "qualified" as const,
+    close_date: "2026-09-30",
+    data_provenance: "HubSpot",
+    source_name: "HubSpot",
+    source_mode: "live",
+  }];
+  const analysis = analyze(companies, artifact.signals);
+  const world: World = {
+    city: null,
+    companies,
+    contacts,
+    facilities,
+    opportunities,
+    analysis,
+    prospects: buildProspects(companies, contacts, analysis.valid, analysis.byId),
+    snapshot: {
+      ...demoSnapshot,
+      publicSignals: {
+        signal_count: artifact.signals.length,
+        news_count: artifact.signals.length,
+        latest_signal_at: artifact.latestPublishedAt,
+        latest_news_date: artifact.latestPublishedAt,
+        source_name: "Monitor engine artifacts (fixture)",
+        source_mode: "artifact",
+        run_at: artifact.runAt,
+        archive_run_count: 0,
+        artifact_path: "frontend/data/test/artifacts/mini-run_output.json",
+        stale: false,
+        notice: null,
+      },
+    },
+    dataSource: null,
+    loadErrors: [],
+    dataMode: "hybrid",
+    provenanceSources: [],
+    provenanceSummary: null,
+  };
+  world.provenanceSources = provenanceCounts(world);
+  world.provenanceSummary = provenanceSummary(world);
+  return world;
 }
 
 const world = await loadWorld();
 const artifactWorld = await loadArtifactFixtureWorld();
+const hybridWorld = await loadHybridFixtureWorld();
 
 assert(!world.companies.some((company) => company.name === PROFILE.name), "Client company must not appear as a scored account");
 assert(AREA_MARKET_SCOPING.geographic && AREA_MARKET_SCOPING.market, "Map and signal views must be market-scoped");
@@ -152,6 +242,19 @@ const artifactBriefText = artifactBrief.sections
   .join(" ");
 assert(artifactBriefText.includes("SpaceNews Mini") && artifactBriefText.includes("2026-07-08"), "Artifact meeting brief missing real-signal source/date citation");
 
+const hybridBrief = await runAgent("meeting_brief", { accountId: "hubspot-company-9001" }, hybridWorld);
+const hybridBriefText = hybridBrief.sections
+  .flatMap((section) => section.blocks)
+  .map((block) => {
+    if (block.kind === "text") return block.text;
+    if (block.kind === "table") return block.rows.flat().join(" ");
+    return block.title;
+  })
+  .join(" ");
+assert(hybridBriefText.includes("Acme HubSpot Components") && hybridBrief.sources.some((source) => source.source === "HubSpot CRM"), "Hybrid meeting brief missing real HubSpot account grounding");
+assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "monitor-engine artifacts"), "Hybrid meeting brief missing real monitor signal grounding");
+assert(hybridBriefText.includes("Demo fallback") || hybridBrief.sources.some((source) => source.source === "Demo fallback"), "Hybrid meeting brief missing demo fallback disclosure");
+
 const outreach = await runAgent("outreach", {}, world);
 const instructedOutreach = await runAgent("outreach", { instructions: "Lead with ITAR angle" }, world);
 const outreachHeadings = outreach.sections.map((section) => section.heading);
@@ -174,4 +277,4 @@ const deliverableText = [itinerary, memo, outreach]
   .join(" ");
 assert(!/\b[a-z]+_[a-z_]+\b/.test(deliverableText), `Rendered deliverables leaked snake_case: ${deliverableText.match(/\b[a-z]+_[a-z_]+\b/)?.[0]}`);
 
-console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, outreach ${outreach.sections.length} sections`);
+console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, hybrid brief cited HubSpot + monitor, outreach ${outreach.sections.length} sections`);

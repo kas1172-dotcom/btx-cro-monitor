@@ -6,6 +6,7 @@ import { scoreFit } from "../engine/decision/fit.ts";
 import { healthLabel, pipelineHealth } from "../engine/decision/health.ts";
 import { actionLabel } from "../app/actionLabels.ts";
 import { signalEvidenceForCompany, signalFigureContext } from "../app/signalProvenance.ts";
+import { provenanceForRecord } from "../app/provenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -39,6 +40,9 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const company = world.companies.find((c) => c.id === accountId);
   if (!company) throw new Error(`Unknown account ${accountId}`);
   const signals = world.analysis.valid.filter((s) => s.subject_id === accountId);
+  const fallbackSignal = world.dataMode === "hybrid"
+    ? [...world.analysis.valid].filter((signal) => signal.artifact).sort((a, b) => b.confidence - a.confidence)[0]
+    : undefined;
   const opportunities = world.opportunities.filter((o) => o.company_id === accountId);
   const contacts = world.contacts.filter((c) => c.company_id === accountId);
   const fit = scoreFit(company.needs, PROFILE.capabilities);
@@ -46,7 +50,13 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const rec = world.analysis.recById.get(accountId);
   const score = world.analysis.byId.get(accountId);
   const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + o.value, 0);
-  const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
+  const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0] ?? fallbackSignal;
+  const topSignalAccount = world.companies.find((c) => c.id === topSignal?.subject_id)?.name ?? "Portfolio monitor";
+  const accountSource = provenanceForRecord(company) === "HubSpot" ? "HubSpot CRM" : "companies.json";
+  const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "HubSpot") ? "HubSpot CRM" : "contacts.json";
+  const opportunitySource = opportunities.some((opportunity) => provenanceForRecord(opportunity) === "HubSpot") ? "HubSpot CRM" : "opportunities.json";
+  const signalSource = topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json";
+  const signalDisplay = world.dataMode === "hybrid" ? (topSignal?.artifact ? "Monitor" : "Demo") : topSignal?.artifact ? "Monitor" : "Signals";
 
   return {
     facts: {
@@ -63,16 +73,22 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       openPipelineValue,
       pipelineHealth: healthLabel(health),
       contact: contacts[0] ? `${contacts[0].name}, ${contacts[0].title}` : "No contact available",
-      topSignal: signalEvidenceForCompany(company.name, topSignal),
-      artifactSignalFigures: signalFigureContext(signals),
+      accountSource,
+      contactSource,
+      opportunitySource,
+      signalSource: signalDisplay,
+      fallbackDisclosure: world.dataMode === "hybrid" ? "Hybrid mode: account, contact, and deal facts are HubSpot; external market facts are Monitor; capacity/operating context is Demo fallback." : "",
+      topSignal: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal) : "No monitor signal available.",
+      artifactSignalFigures: signalFigureContext(topSignal ? [topSignal, ...signals] : signals),
       recommendedAction: rec ? `${actionLabel(rec.action)}: ${rec.reason}` : "Monitor until a stronger signal appears.",
     },
     entityIds: [accountId],
     sources: [
-      { source: "companies.json", records: [accountId], reason: "Account profile, market, relationship, and capability needs." },
-      { source: "contacts.json", records: contacts.map((c) => c.id), reason: "Recommended stakeholder coverage." },
-      { source: "opportunities.json", records: opportunities.map((o) => o.id), reason: "Open pipeline, stages, close dates, and values." },
-      { source: signals.some((signal) => signal.artifact) ? "monitor-engine artifacts" : "signals.json + news.json", records: signals.map((s) => s.id), reason: signals.some((signal) => signal.artifact) ? "Real monitor-engine evidence with source names, dates, and artifact provenance." : "Validated evidence and timing." },
+      { source: accountSource, records: [accountId], reason: "Account profile, market, relationship, and capability needs." },
+      { source: contactSource, records: contacts.map((c) => c.id), reason: "Recommended stakeholder coverage." },
+      { source: opportunitySource, records: opportunities.map((o) => o.id), reason: "Open pipeline, stages, close dates, and values." },
+      { source: signalSource, records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? "Real monitor-engine evidence with source names, dates, and artifact provenance." : "Validated evidence and timing." },
+      ...(world.dataMode === "hybrid" ? [{ source: "Demo fallback", records: ["capacity", "operating_snapshot"], reason: "Capacity and operating context not yet integrated." }] : []),
     ],
   };
 }
@@ -92,21 +108,21 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
         id: "overview",
         heading: "Overview",
         blocks: [
-          { kind: "text", text: `${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} fit is ${f.fitScore}%.` },
+          { kind: "text", text: `${f.fallbackDisclosure ? `${f.fallbackDisclosure} ` : ""}[${f.accountSource}] ${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} fit is ${f.fitScore}%.` },
         ],
       },
       {
         id: "relationship",
         heading: "Relationship & History",
         blocks: [
-          { kind: "table", columns: ["Status", "Contact", "Open pipeline", "Pipeline health"], rows: [[String(f.accountStatus), String(f.contact), money(Number(f.openPipelineValue)), String(f.pipelineHealth)]] },
+          { kind: "table", columns: ["Status", "Contact", "Open pipeline", "Pipeline health", "Source"], rows: [[String(f.accountStatus), String(f.contact), money(Number(f.openPipelineValue)), String(f.pipelineHealth), `${f.contactSource} / ${f.opportunitySource}`]] },
         ],
       },
       {
         id: "signals",
         heading: "Live Signals",
         blocks: [
-          { kind: "text", text: String(f.topSignal) },
+          { kind: "text", text: `[${f.signalSource}] ${String(f.topSignal)}` },
         ],
       },
       {

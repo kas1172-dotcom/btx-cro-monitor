@@ -10,8 +10,10 @@ import { actionLabel } from "../../app/actionLabels.ts";
 import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
+import { provenanceForRecord } from "../../app/provenance.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
+import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 
 const NEWS = news as unknown as MarketEvent[];
 
@@ -191,7 +193,10 @@ export function SignalFeed({ world }: { world: World }) {
                 <h2>{row.headline}</h2>
                 <p>{row.source} · {row.sourceDate}</p>
               </div>
-              <span className={`motion-pill motion-${row.motion.replace(/\s+/g, "-").toLowerCase()}`}>{row.motion}</span>
+              <div className="card-badge-row">
+                {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(row.signal)} />}
+                <span className={`motion-pill motion-${row.motion.replace(/\s+/g, "-").toLowerCase()}`}>{row.motion}</span>
+              </div>
             </div>
 
             <div className="signal-card-grid">
