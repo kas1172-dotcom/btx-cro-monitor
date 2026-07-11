@@ -102,7 +102,6 @@ class TestAnalysisFailureGuard:
         """Pre-write sentinel artifacts simulating a previous successful run."""
         output_dir.mkdir(parents=True, exist_ok=True)
         sentinels = {
-            "index.html": "<!-- previous site -->",
             "run_output.json": '{"previous": true}',
             "archive.json": '{"runs": [], "pinned": []}',
         }
@@ -136,9 +135,9 @@ class TestAnalysisFailureGuard:
 
         assert result.meta.items_after_prefilter == 1
         assert result.meta.items_analyzed == 0
-        assert (output_dir / "index.html").exists()
         assert (output_dir / "run_output.json").exists()
         assert (output_dir / "archive.json").exists()
+        assert not (output_dir / "index.html").exists()
 
     def test_guard_does_not_fire_on_quiet_news_week(self, config_path, tmp_path, monkeypatch):
         # Prefilter legitimately produces zero items; no analysis, no error.
@@ -155,8 +154,8 @@ class TestAnalysisFailureGuard:
         scorer_cls.assert_not_called()  # analysis never invoked on empty input
         assert result.meta.items_after_prefilter == 0
         assert result.meta.items_analyzed == 0
-        assert (output_dir / "index.html").exists()
         assert (output_dir / "run_output.json").exists()
+        assert not (output_dir / "index.html").exists()
 
     def test_successful_analysis_still_publishes(self, config_path, tmp_path, monkeypatch):
         # Control case: guard must not block a normal run.
@@ -186,7 +185,8 @@ class TestAnalysisFailureGuard:
             result = run_pipeline(config_path, output_dir)
 
         assert result.meta.items_analyzed == 1
-        assert (output_dir / "index.html").exists()
+        assert (output_dir / "run_output.json").exists()
+        assert not (output_dir / "index.html").exists()
 
 
 # ─── Enrichment + entity graph wiring ──────────────────────────────────────

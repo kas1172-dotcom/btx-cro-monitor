@@ -1,8 +1,8 @@
 """python -m monitor_engine.targets --config PATH --output DIR
 
-Build the account-map artifact + interactive page for one client config. Reads
-the config's ``account_map`` block; CSV sources resolve relative to the config's
-directory. Fails fast if a configured API source needs an env var that is unset.
+Build the account-map JSON artifact for one client config. Reads the config's
+``account_map`` block; CSV sources resolve relative to the config's directory.
+Fails fast if a configured API source needs an env var that is unset.
 """
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ def main() -> None:
     write_map_site(map_data, args.output)
     print(
         f"Account map: {len(map_data.targets)} account(s), "
-        f"{map_data.placed_count} placed → {args.output / 'map.html'}"
+        f"{map_data.placed_count} placed → {args.output / 'map_targets.json'}"
     )
 
 

@@ -1,10 +1,8 @@
-"""Build the account-map artifact + page.
+"""Build the account-map artifact.
 
 Pulls accounts from every configured source, scores each for fit against the
 client profile, and writes:
   map_targets.json  — MapData artifact (the contract the page reads)
-  map.html          — self-contained interactive map (CSS+JS inlined; Leaflet
-                      from CDN; tiles from OpenStreetMap)
 """
 from __future__ import annotations
 
@@ -27,12 +25,6 @@ from monitor_engine.targets.sources import RawTarget, load_source
 from monitor_engine.targets.states import normalize_state
 
 logger = logging.getLogger(__name__)
-
-_ASSETS = Path(__file__).parent / "_assets"
-_STYLE_MARKER = "/* STYLE_PLACEHOLDER */"
-_SCRIPT_MARKER = "/* SCRIPT_PLACEHOLDER */"
-_DATA_MARKER = "DATA_FILENAME_PLACEHOLDER"
-
 
 def _account_id(name: str, state: str | None) -> str:
     return hashlib.sha256(f"{name.lower()}:{(state or '').lower()}".encode()).hexdigest()[:12]
@@ -103,16 +95,6 @@ def build_map_data(
 def write_map_site(
     map_data: MapData, output_dir: Path, *, data_filename: str = "map_targets.json"
 ) -> None:
-    """Write map_targets.json + a self-contained map.html into output_dir."""
+    """Write the map_targets.json data contract into output_dir."""
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / data_filename).write_text(map_data.model_dump_json(indent=2), encoding="utf-8")
-
-    css = (_ASSETS / "map.css").read_text(encoding="utf-8")
-    js = (_ASSETS / "map.js").read_text(encoding="utf-8")
-    html = (
-        (_ASSETS / "map.html").read_text(encoding="utf-8")
-        .replace(_STYLE_MARKER, css, 1)
-        .replace(_SCRIPT_MARKER, js, 1)
-        .replace(_DATA_MARKER, data_filename, 1)
-    )
-    (output_dir / "map.html").write_text(html, encoding="utf-8")

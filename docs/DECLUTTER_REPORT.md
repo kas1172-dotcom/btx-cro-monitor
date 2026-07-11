@@ -196,3 +196,31 @@ python3 -c "from monitor_engine.models import RunOutput; from pathlib import Pat
 ```
 
 Result: all listed checks passed. The exact no-env smoke command stopped on missing local `ANTHROPIC_API_KEY`; the local smoke was rerun with `--skip-analysis` and dummy `SAM_API_KEY`/`CONGRESS_API_KEY`, producing valid `run_output.json` and `archive.json`. SAM.gov and Congress.gov emitted expected auth/API source alerts with dummy keys.
+
+### After Task 3.1: Stopped Static HTML Generation
+
+Changed:
+
+- `monitor_engine.pipeline.run_pipeline` now writes `run_output.json` directly and no longer calls `monitor_engine.site.builder.build_site`.
+- `run_output.json` still embeds `site_config`; `account_map_url` is now `null` because `map.html` is retired.
+- `monitor_engine.targets.write_map_site` now writes only `map_targets.json`.
+- Pipeline/target tests were updated to assert JSON outputs remain and retired HTML files are not produced.
+
+Verification:
+
+```text
+python3 -m pytest -q tests/test_pipeline.py tests/test_targets.py
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); print('OK')"
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+test -f /tmp/btxmap/map_targets.json
+test ! -f /tmp/btxmap/map.html
+cd frontend && npm run typecheck
+cd frontend && npm run build
+cd frontend && npm run test:metrics
+cd frontend && npm run test:rail
+cd frontend && npm run test:settings
+python3 -m pytest -q
+```
+
+Result: all listed checks passed. The monitor smoke produced valid `run_output.json`/`archive.json`; target smoke produced `map_targets.json` and no `map.html`.

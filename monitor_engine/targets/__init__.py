@@ -1,6 +1,7 @@
-"""Account map: place potential accounts on an interactive map and score each
-for fit against the client profile. Build-time + static, like the rest of the
-engine; the map page reads the committed map_targets.json artifact.
+"""Account map: score and place potential accounts for the cockpit map.
+
+The engine writes the committed map_targets.json artifact; the React cockpit is
+the renderer.
 """
 from monitor_engine.targets.build import build_map_data, write_map_site
 from monitor_engine.targets.fit import score_fit
