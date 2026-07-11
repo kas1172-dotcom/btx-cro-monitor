@@ -275,6 +275,35 @@ cd frontend && npm run test:settings
 
 Result: all listed checks passed.
 
+## Re-Audit After Checklist Review
+
+Additional double-check findings:
+
+- The tracked static renderer/code deletions were complete; local ignored `__pycache__` residue under retired directories was removed from the working filesystem.
+- `monitor_engine/__main__.py` still described the output directory as "site artifacts"; updated to "JSON artifacts."
+- The kept committed `clients/btx/artifacts/run_output.json` still had the old `site_config.account_map_url: "map.html"` value; updated it to `null` to match the current pipeline output and avoid publishing a stale link to the retired map HTML.
+- `monitor_engine.models.SiteConfig` comments were updated so they describe cockpit JSON consumers instead of the retired site builder.
+
+Verification rerun:
+
+```text
+cd frontend && npm ci
+cd frontend && npm run typecheck
+cd frontend && npm run build
+cd frontend && npm run test:metrics
+cd frontend && npm run test:rail
+cd frontend && npm run test:settings
+python3 -m pytest -q
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); assert Path('/tmp/btxout/archive.json').exists(); assert not Path('/tmp/btxout/index.html').exists(); print('OK')"
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxout
+test -f /tmp/btxout/map_targets.json
+test ! -f /tmp/btxout/map.html
+test ! -f /tmp/btxout/index.html
+```
+
+Result: all listed checks passed. `python3 -m pytest -q` reported `354 passed, 1 warning`. The monitor smoke emitted expected SAM.gov/Congress.gov source alerts with dummy local keys.
+
 ## Task 4 Demo Data Mode Findings
 
 Default mode is now backend-canonical hybrid when neither URL nor build/runtime env chooses a mode.
@@ -447,7 +476,6 @@ Known pre-existing failures from the task prompt, not rerun as part of the requi
 
 Follow-ups:
 
-- `clients/btx/artifacts/run_output.json` is a kept committed JSON artifact from before static HTML retirement and may still contain an old `account_map_url` value. The next monitor run will refresh the JSON contract with `account_map_url: null`.
 - The cockpit still has intentional demo scaffolding for non-deliverable actions, capacity/ERP/operating fallback data, local settings drafts, and dev/test fixture mode.
 
 ### After Task 3.4: Updated CI And Pages Publishing
@@ -521,6 +549,8 @@ clients/btx/artifacts/run_output.json
 clients/btx/artifacts/archive.json
 clients/btx/artifacts/map_targets.json
 ```
+
+The kept `run_output.json` artifact was updated so `site_config.account_map_url` is `null`, matching the current pipeline output and avoiding a stale link to retired `map.html`.
 
 Verification:
 

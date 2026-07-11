@@ -522,7 +522,7 @@ class SiteConfig(BaseModel):
     editions: list[EditionInfo]
     deep_analysis_sections: list[DeepAnalysisSectionInfo] | None = None  # ordered; null if disabled
     enrichers: list[EnricherInfo] = []   # active cross-API integrations; [] if none configured
-    account_map_url: str | None = None   # link to the account-map page; null if not configured
+    account_map_url: str | None = None   # retired static map link; null for cockpit JSON consumers
 
 
 class RunOutput(BaseModel):
@@ -530,7 +530,7 @@ class RunOutput(BaseModel):
     items: list[AnalyzedItem]
     whats_new: WhatsDiff
     editorial: EditorialSynthesis | None = None
-    site_config: SiteConfig | None = None          # embedded by the site builder from ClientConfig
+    site_config: SiteConfig | None = None          # embedded from ClientConfig for cockpit artifact consumers
     source_health: dict[str, SourceHealth] | None = None  # per-source collection stats
     entity_index: list[EntityIndexEntry] = []      # run-level entity graph nodes
 
