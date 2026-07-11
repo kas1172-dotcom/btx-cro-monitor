@@ -23,6 +23,10 @@ permissions:
   pages: write          # deploy job publishes the dashboards to Pages
   id-token: write
 
+concurrency:
+  group: monitor-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   # ── Select client(s) ───────────────────────────────────────────────────
   # Turn the `client` dispatch input into the run matrix: "all" runs both test

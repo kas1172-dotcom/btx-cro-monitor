@@ -54,12 +54,15 @@ jobs:
           npm run build
 
       # Assemble _site/: the demo at the root URL, the Python cockpit dashboards
-      # under /cockpit/. build_pages is stdlib only — no install step needed.
+      # under /cockpit/, and the BTX monitor at a direct /btx/ URL.
+      # build_pages is stdlib only — no install step needed.
       - name: Assemble site
         run: |
           rm -rf _site && mkdir -p _site
           cp -r frontend/dist/. _site/
           python -m tooling.build_pages --clients-dir clients --out _site/cockpit
+          mkdir -p _site/btx
+          cp -r clients/btx/artifacts/. _site/btx/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
