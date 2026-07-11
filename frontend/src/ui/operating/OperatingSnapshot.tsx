@@ -127,7 +127,7 @@ export function OperatingSnapshot() {
           </div>
           <p className="operating-copy">
             {usingArtifacts
-              ? `These real monitor-engine artifact signals are validated before they affect scores, alerts, recommendations, and Chatpil explanations. Source artifact: ${snapshot.publicSignals.artifact_path}.`
+              ? `These real monitor-engine artifact signals are validated as market context. Until identity matching is canonical, weak account matches stay portfolio-level and do not affect account scores. Source artifact: ${snapshot.publicSignals.artifact_path}.`
               : "These static public market and contract signals are validated before they affect scores, alerts, recommendations, and Chatpil explanations."}
           </p>
         </div>

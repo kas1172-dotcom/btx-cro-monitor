@@ -1,5 +1,5 @@
 import type { Company } from "../../engine/brain/entities.ts";
-import type { Signal } from "../../engine/signals/contract.ts";
+import { PORTFOLIO_SIGNAL_SUBJECT_ID, type Signal } from "../../engine/signals/contract.ts";
 
 interface ArtifactMeta {
   run_id?: unknown;
@@ -139,13 +139,20 @@ function stableScore(seed: string): number {
   return hash / 0xffffffff;
 }
 
-function companyFit(company: Company, item: ArtifactItem, type: string): number {
+export const ARTIFACT_ACCOUNT_FIT_THRESHOLD = 20;
+
+function companyRealFit(company: Company, item: ArtifactItem): number {
   const body = artifactText(item).toLowerCase();
   let score = 0;
   if (body.includes(company.name.toLowerCase())) score += 200;
   for (const need of company.needs) {
     if (body.includes(need.toLowerCase())) score += 20;
   }
+  return score;
+}
+
+function companySortFit(company: Company, item: ArtifactItem, type: string): number {
+  let score = companyRealFit(company, item);
   if (["government_contract_award", "demand_spike", "competitor_expansion"].includes(type) && company.relationship === "target") score += 25;
   if (["supplier_delay", "regulatory_change"].includes(type) && company.relationship === "customer") score += 20;
   if (company.account_status === "active_pipeline" || company.account_status === "target_prospect") score += 8;
@@ -153,7 +160,11 @@ function companyFit(company: Company, item: ArtifactItem, type: string): number 
 }
 
 function subjectFor(item: ArtifactItem, companies: Company[], type: string): Company | undefined {
-  return [...companies].sort((a, b) => companyFit(b, item, type) - companyFit(a, item, type) || a.id.localeCompare(b.id))[0];
+  const ranked = [...companies]
+    .map((company) => ({ company, realFit: companyRealFit(company, item), sortFit: companySortFit(company, item, type) }))
+    .sort((a, b) => b.sortFit - a.sortFit || a.company.id.localeCompare(b.company.id));
+  const best = ranked[0];
+  return best && best.realFit >= ARTIFACT_ACCOUNT_FIT_THRESHOLD ? best.company : undefined;
 }
 
 function confidenceFromScore(score: number): number {
@@ -200,7 +211,7 @@ export function buildArtifactSignals(runOutput: unknown, companies: Company[]): 
 
     const type = eventType(item);
     const subject = subjectFor(item, companies, type);
-    if (!subject) continue;
+    const linked = Boolean(subject);
 
     const score = numberValue(item.per_edition?.bd?.relevance_score) ?? numberValue(item.importance_score) ?? 70;
     const figures = dollars(item);
@@ -214,10 +225,11 @@ export function buildArtifactSignals(runOutput: unknown, companies: Company[]): 
     signals.push({
       id: `artifact-sig-${itemId}`,
       event_type: type,
-      entities: affectedEntities.length ? affectedEntities : [subject.name],
-      subject_id: subject.id,
-      account_status: subject.account_status,
-      business_motion: subject.business_motion,
+      entities: affectedEntities.length ? affectedEntities : subject ? [subject.name] : [sourceName],
+      subject_id: subject?.id ?? PORTFOLIO_SIGNAL_SUBJECT_ID,
+      scope: linked ? "account" : "unlinked",
+      ...(subject?.account_status ? { account_status: subject.account_status } : {}),
+      ...(subject?.business_motion ? { business_motion: subject.business_motion } : {}),
       ...(figures[0] !== undefined ? { value: figures[0] } : {}),
       confidence: confidenceFromScore(score),
       source_quote: sourceQuote(item),

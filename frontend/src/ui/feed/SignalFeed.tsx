@@ -4,7 +4,7 @@ import { CONFIG } from "../../app/config.ts";
 import type { World } from "../../app/useWorld.ts";
 import type { MarketEvent } from "../../engine/brain/entities.ts";
 import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
-import { SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
+import { PORTFOLIO_SIGNAL_SUBJECT_ID, SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
 import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
 import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
@@ -53,7 +53,12 @@ function scoreImpact(eventType: string): { text: string; total: number; dimensio
   };
 }
 
+function isPortfolioSignal(signal: Signal): boolean {
+  return signal.scope === "unlinked" || signal.scope === "portfolio" || signal.subject_id === PORTFOLIO_SIGNAL_SUBJECT_ID;
+}
+
 function motionForSignal(world: World, signal: Signal): MotionLabel {
+  if (isPortfolioSignal(signal)) return "Monitor";
   const company = world.companies.find((c) => c.id === signal.subject_id);
   if (!company) return "Monitor";
   const motion = signal.business_motion ?? businessMotionForAccount(company);
@@ -66,6 +71,7 @@ function motionForSignal(world: World, signal: Signal): MotionLabel {
 }
 
 function whyItMatters(world: World, signal: Signal): string {
+  if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a HubSpot account until identity matching is available.";
   const company = world.companies.find((c) => c.id === signal.subject_id);
   const rec = world.analysis.recById.get(signal.subject_id);
   const impact = scoreImpact(signal.event_type);
@@ -125,14 +131,15 @@ export function SignalFeed({ world }: { world: World }) {
 
   const rows = useMemo<SignalRow[]>(() => {
     return world.analysis.valid.map((signal) => {
+      const portfolio = isPortfolioSignal(signal);
       const company = world.companies.find((c) => c.id === signal.subject_id);
       const rec = world.analysis.recById.get(signal.subject_id);
       const article = newsById.get(signal.id);
-      const impact = scoreImpact(signal.event_type);
+      const impact = portfolio ? { text: "Market-level only; not account-scored", total: 0, dimensions: [] } : scoreImpact(signal.event_type);
       return {
         signal,
-        companyName: nameOf(signal.subject_id),
-        companyRelationship: company?.relationship ?? "unknown",
+        companyName: portfolio ? "Market / portfolio" : nameOf(signal.subject_id),
+        companyRelationship: portfolio ? "unlinked" : company?.relationship ?? "unknown",
         address: company ? formatAddress(company.location) : null,
         headline: signal.artifact ? signalHeadline(signal) : article?.headline ?? titleCase(signal.event_type),
         source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Simulated Market Signal Feed",
@@ -141,8 +148,8 @@ export function SignalFeed({ world }: { world: World }) {
         documentUrl: article?.document_url ?? signal.document_url,
         motion: motionForSignal(world, signal),
         impact,
-        priority: rec?.priority ?? "none",
-        actionText: rec ? `${actionLabel(rec.action)} - ${rec.reason}` : "Monitor this account; no immediate action is recommended.",
+        priority: portfolio ? "none" : rec?.priority ?? "none",
+        actionText: portfolio ? "Review as market context; no account task is recommended." : rec ? `${actionLabel(rec.action)} - ${rec.reason}` : "Monitor this account; no immediate action is recommended.",
         why: whyItMatters(world, signal),
       };
     });

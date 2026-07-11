@@ -5,6 +5,8 @@
 
 import type { AccountStatus, BusinessMotion } from "../brain/entities.ts";
 
+export const PORTFOLIO_SIGNAL_SUBJECT_ID = "__portfolio__";
+
 /**
  * The dimensions the decision engine scores. To introduce a new score, add it
  * here and add a weight row in the weights config — no engine code changes.
@@ -31,6 +33,8 @@ export interface Signal {
   entities: string[];
   /** The entity (company) this signal is scored against. Required for scoring. */
   subject_id: string;
+  /** Whether this signal is account-scored or portfolio/market-level only. */
+  scope?: "account" | "unlinked" | "portfolio";
   account_status?: AccountStatus;
   business_motion?: BusinessMotion;
   /** Optional. Present ONLY when a number was explicitly stated in the source. */

@@ -1,5 +1,9 @@
 import type { Signal } from "../engine/signals/contract.ts";
 
+export function signalAccountLabel(companyName: string, signal: Signal): string {
+  return signal.scope === "unlinked" || signal.scope === "portfolio" ? "Portfolio monitor" : companyName;
+}
+
 export function signalSourceName(signal: Signal): string {
   return signal.artifact?.source_name ?? "Simulated Market Signal Feed";
 }
@@ -24,7 +28,7 @@ export function signalEvidence(signal: Signal | undefined, fallback = "No valida
 
 export function signalEvidenceForCompany(companyName: string, signal: Signal | undefined, fallback = "No validated signal attached"): string {
   if (!signal) return fallback;
-  return `${companyName}: ${signalEvidence(signal)}`;
+  return `${signalAccountLabel(companyName, signal)}: ${signalEvidence(signal)}`;
 }
 
 export function signalFigureContext(signals: Signal[]): string {
