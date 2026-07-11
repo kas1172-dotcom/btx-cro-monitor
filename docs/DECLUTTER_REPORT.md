@@ -274,3 +274,42 @@ cd frontend && npm run test:settings
 ```
 
 Result: all listed checks passed.
+
+### After Task 3.3: Removed Committed Static HTML Artifacts
+
+Deletion evidence:
+
+```text
+rg -n "clients/btx/artifacts/index.html|clients/btx/artifacts/map.html|clients/btx/artifacts/sw.js" . --glob '!frontend/node_modules/**' --glob '!frontend/dist/**' --glob '!**/__pycache__/**'
+# matches only historical evidence in docs/DECLUTTER_REPORT.md
+```
+
+Removed files:
+
+```text
+clients/btx/artifacts/index.html
+clients/btx/artifacts/map.html
+clients/btx/artifacts/sw.js
+```
+
+Kept JSON artifacts:
+
+```text
+clients/btx/artifacts/run_output.json
+clients/btx/artifacts/archive.json
+clients/btx/artifacts/map_targets.json
+```
+
+Verification:
+
+```text
+python3 -m pytest -q
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); print('OK')"
+SAM_API_KEY=dummy CONGRESS_API_KEY=dummy python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+test -f /tmp/btxmap/map_targets.json
+test ! -f /tmp/btxmap/map.html
+cd frontend && npm run typecheck && npm run build && npm run test:metrics && npm run test:rail && npm run test:settings
+```
+
+Result: all listed checks passed.
