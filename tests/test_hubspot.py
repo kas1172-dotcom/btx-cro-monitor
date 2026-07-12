@@ -24,12 +24,13 @@ from btx_platform.hubspot import (  # noqa: E402
     map_contacts,
     map_deals,
 )
+from tests.auth_helpers import make_clerk_fixture  # noqa: E402
 
-AUTH = "hubspot-test-token"
+CLERK = make_clerk_fixture()
 
 
-def _headers() -> dict[str, str]:
-    return {"Authorization": f"Bearer {AUTH}"}
+def _headers(**kwargs) -> dict[str, str]:
+    return CLERK.headers(**kwargs)
 
 
 class FakeHttpxClient:
@@ -188,8 +189,8 @@ def test_crm_route_uses_five_minute_cache(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     calls = 0
 
@@ -216,8 +217,8 @@ def test_crm_accounts_sync_canonical_account(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
 
     def fake_payload(_client, kind):
@@ -258,8 +259,8 @@ def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     captured: dict = {}
 
@@ -322,8 +323,8 @@ def test_crm_task_route_requires_hubspot_token(tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token=None)
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token=None)
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
 
     response = client.post("/crm/task", headers=_headers(), json={"title": "Follow up"})
@@ -336,8 +337,8 @@ def test_crm_task_route_maps_hubspot_errors_to_502(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
 
     class FakeHubSpotClient:
@@ -366,7 +367,7 @@ def test_crm_task_route_maps_hubspot_errors_to_502(monkeypatch, tmp_path: Path):
 def _create_proposed_work_item(client: TestClient, *, account_id: str = "hubspot-company-10") -> dict:
     response = client.post(
         "/work-items",
-        headers={**_headers(), "x-btx-actor": "tester"},
+        headers=_headers(email="tester@example.com"),
         json={
             "type": "account_action",
             "canonical_account_id": account_id,
@@ -388,8 +389,8 @@ def test_work_item_hubspot_task_happy_path_verifies_and_audits(monkeypatch, tmp_
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_proposed_work_item(client)
     calls: list[tuple[str, dict]] = []
@@ -417,7 +418,7 @@ def test_work_item_hubspot_task_happy_path_verifies_and_audits(monkeypatch, tmp_
 
     response = client.post(
         f"/work-items/{created['id']}/execute/hubspot-task",
-        headers={**_headers(), "X-Idempotency-Key": "work-item-idem-1", "x-btx-actor": "sales-user"},
+        headers={**_headers(email="sales-user@example.com"), "X-Idempotency-Key": "work-item-idem-1"},
         json={
             "confirmed": True,
             "relationship_record": {"match_method": "exact_domain", "confidence": 0.96},
@@ -458,8 +459,8 @@ def test_work_item_hubspot_task_retry_is_idempotent(monkeypatch, tmp_path: Path)
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_proposed_work_item(client)
     create_count = 0
@@ -501,8 +502,8 @@ def test_work_item_hubspot_task_failure_leaves_not_done_with_error(monkeypatch, 
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_proposed_work_item(client)
 
@@ -540,8 +541,8 @@ def test_work_item_hubspot_task_requires_confirmation_and_config(tmp_path: Path)
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token=None)
-    app = create_app(settings=settings, session_factory=sf)
+    settings = Settings(env="test", hubspot_access_token=None)
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_proposed_work_item(client)
 

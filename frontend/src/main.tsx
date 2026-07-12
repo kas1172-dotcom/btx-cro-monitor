@@ -4,6 +4,7 @@ import "@fontsource/inter/latin-400.css";
 import "@fontsource/inter/latin-700.css";
 import { App } from "./App.tsx";
 import { CockpitAccessGate } from "./app/cockpitAccess.tsx";
+import { CockpitAuthGate } from "./app/clerkAuth.tsx";
 import "./ui/styles.css";
 import { runOverflowAudit } from "./app/overflowAudit.ts";
 
@@ -15,8 +16,10 @@ if (env?.DEV) {
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <CockpitAccessGate>
-      <App />
-    </CockpitAccessGate>
+    <CockpitAuthGate>
+      <CockpitAccessGate>
+        <App />
+      </CockpitAccessGate>
+    </CockpitAuthGate>
   </StrictMode>,
 );

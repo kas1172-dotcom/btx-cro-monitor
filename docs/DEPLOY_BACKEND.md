@@ -26,16 +26,17 @@ brew install flyctl
 fly auth login
 ```
 
-Generate the backend bearer token locally:
-
-```bash
-openssl rand -base64 32
-```
+Create a Clerk application (clerk.com) if you don't have one yet. Single-tenant
+is fine to start. From its dashboard, copy the publishable key (frontend,
+non-secret) and the secret key (backend only), and note the instance's issuer
+URL (Frontend API URL under API Keys — looks like
+`https://<your-instance>.clerk.accounts.dev`).
 
 Create or gather these secrets before deploy:
 
 ```text
-BTX_BACKEND_AUTH_TOKEN       generated with openssl above
+CLERK_SECRET_KEY             Clerk backend secret key
+BTX_CLERK_ISSUER             Clerk instance issuer URL
 BTX_ANTHROPIC_API_KEY        Anthropic API key for /llm
 BTX_HUBSPOT_ACCESS_TOKEN     HubSpot private-app token
 BTX_GITHUB_PAT               GitHub token with permission to dispatch Actions
@@ -95,12 +96,26 @@ it automatically, set it explicitly as `BTX_DATABASE_URL`:
 fly secrets set BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@HOST:PORT/DBNAME"
 ```
 
-4. Set production secrets.
+4. Provision Redis for the Celery worker queue.
+
+```bash
+fly redis create   # note the redis:// URL it prints
+```
+
+5. Generate an encryption key for credentials stored at rest (connection
+   signing secrets):
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+6. Set production secrets.
 
 ```bash
 fly secrets set \
   BTX_ENV=prod \
-  BTX_BACKEND_AUTH_TOKEN="<openssl-output>" \
+  CLERK_SECRET_KEY="<clerk-secret-key>" \
+  BTX_CLERK_ISSUER="https://<your-instance>.clerk.accounts.dev" \
   BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io" \
   BTX_ANTHROPIC_API_KEY="<anthropic-key>" \
   BTX_HUBSPOT_ACCESS_TOKEN="<hubspot-private-app-token>" \
@@ -108,17 +123,43 @@ fly secrets set \
   BTX_GITHUB_PAT="<github-token>" \
   BTX_GITHUB_REPO="kas1172-dotcom/btx-cro-monitor" \
   BTX_GITHUB_WORKFLOW="monitor.yml" \
-  BTX_GITHUB_REF="main"
+  BTX_GITHUB_REF="main" \
+  BTX_REDIS_URL="<redis-url-from-step-4>" \
+  BTX_QUEUE_BACKEND=celery \
+  BTX_ENCRYPTION_KEY="<key-from-step-5>"
 ```
 
-5. Deploy.
+7. Run migrations before the new code serves traffic.
+
+```bash
+fly ssh console --app btx-platform -C "alembic upgrade head"
+# or locally against BTX_DATABASE_URL:
+BTX_DATABASE_URL="<prod-database-url>" alembic upgrade head
+```
+
+With `BTX_ENV=prod`, the app refuses to start against a database that hasn't
+had this run — it raises `SchemaNotMigrated` instead of silently creating
+tables from model metadata (that fallback is dev/test-only).
+
+8. Deploy. `fly.toml` defines two processes from the same image: `app`
+   (the API, serving `http_service`) and `worker` (the Celery consumer). Both
+   deploy together.
 
 ```bash
 fly deploy
 ```
 
-The app creates its SQLAlchemy tables on startup if they do not already exist.
-There are no Alembic migrations in this repo today.
+9. Confirm the worker process is running.
+
+```bash
+fly status --app btx-platform   # expect both an `app` and a `worker` machine
+fly logs --app btx-platform     # watch for celery worker startup + task logs
+```
+
+Every future schema change ships as a new file under `alembic/versions/`;
+generate one with `alembic revision --autogenerate -m "..."` after changing
+`btx_platform/models.py`, review the generated upgrade/downgrade, then run
+step 7 again on the next deploy.
 
 ## Smoke Tests
 
@@ -126,7 +167,7 @@ Set local shell variables for the smoke tests:
 
 ```bash
 export BASE="https://btx-platform.fly.dev"
-export TOKEN="<same-value-as-BTX_BACKEND_AUTH_TOKEN>"
+export TOKEN="<a-signed-in-user's-clerk-session-token>"
 ```
 
 Health is public:
@@ -212,9 +253,10 @@ VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
 VITE_COCKPIT_PASSWORD=<demo access password>
 ```
 
-Do not add a shared backend bearer token to the Pages build. Browser-safe
-backend auth is deferred to WP10; protected backend calls may reject public
-cockpit requests until then.
+Do not add a shared backend bearer token to the Pages build. Set
+`VITE_CLERK_PUBLISHABLE_KEY` as a GitHub Actions secret/variable instead —
+the cockpit gates itself behind Clerk sign-in and sends each user's own
+session token on backend calls.
 
 After those secrets are set, run the **Deploy Frontend Cockpit** workflow from
 the Actions tab. The cockpit will publish at:
@@ -229,6 +271,62 @@ If you need to update the allowed frontend origin on Fly later, run:
 fly secrets set --app btx-platform BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io"
 ```
 
-Do not expose `BTX_BACKEND_AUTH_TOKEN` as a long-term public frontend secret.
-For a real customer deployment, put the cockpit behind an access-control layer
-or add user authentication before showing private HubSpot data.
+Never put `CLERK_SECRET_KEY` in a `VITE_` variable or any frontend build — it
+is backend-only. Only `VITE_CLERK_PUBLISHABLE_KEY` belongs in the frontend
+build; it identifies the Clerk instance and is not a secret.
+
+## CI (WP10-C)
+
+`.github/workflows/ci.yml` runs on every PR into `main` and on push to `main`:
+frontend typecheck, build, and the fast test suites (`test:metrics`,
+`test:rail`, `test:settings`, `test:flows`, `test:tour`, `test:phase0`,
+`test:identity`, `test:map`, `test:live-adapter`, `test:deliverables`), plus
+backend `pytest`.
+
+`.github/workflows/e2e.yml` runs the Playwright browser suite
+(`frontend/tools/test-e2e-playwright.ts`) on the same triggers: builds the
+cockpit, boots it, signs in through Clerk (if configured), and walks the four
+core surfaces at desktop + mobile viewports. It always passes even without
+Clerk secrets configured — it exercises the app's no-auth fallback in that
+case — but only proves the real sign-in flow once these **optional** repo
+secrets are set: `VITE_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_EMAIL`,
+`E2E_CLERK_PASSWORD` (a dedicated test user's credentials, not a real BTX
+user). The HubSpot task-loop tier additionally needs `E2E_HUBSPOT_TEST_PORTAL=1`,
+`E2E_BACKEND_ENDPOINT` (a live backend, e.g. the staging deploy above), and
+`E2E_CLERK_SESSION_TOKEN` (a session token minted for the test user against
+that backend) — without them it skips that tier with a clear log line rather
+than failing.
+
+**Required GitHub settings** (maintainer, one-time): Settings → Branches →
+add a branch protection rule for `main` → enable "Require status checks to
+pass before merging" → select the `frontend` and `backend` jobs from the `CI`
+workflow, and the `e2e` job from the `E2E` workflow, as required checks.
+
+## Staging deploy (WP10-C)
+
+`.github/workflows/deploy-staging.yml` is **manual-only** (`workflow_dispatch`,
+never triggered by push/PR) and targets a separate, non-public Fly app —
+**production auto-deploy is intentionally not enabled by this task; `fly
+deploy` against `btx-platform` stays a manual step you run yourself**
+(Section 6 above). One-time setup before the staging workflow can run:
+
+```bash
+fly apps create btx-platform-staging
+fly postgres create --name btx-platform-staging-db --region iad
+fly postgres attach btx-platform-staging-db --app btx-platform-staging
+fly redis create   # note the URL, use it for the staging BTX_REDIS_URL
+fly secrets set --app btx-platform-staging \
+  BTX_ENV=prod \
+  CLERK_SECRET_KEY="<staging-or-shared-clerk-secret-key>" \
+  BTX_CLERK_ISSUER="https://<your-instance>.clerk.accounts.dev" \
+  BTX_ANTHROPIC_API_KEY="<anthropic-key>" \
+  BTX_HUBSPOT_ACCESS_TOKEN="<staging-hubspot-token-or-omit>" \
+  BTX_QUEUE_BACKEND=celery \
+  BTX_ENCRYPTION_KEY="<separate-key-from-prod>"
+```
+
+Then add the repo secret `FLY_API_TOKEN` (Settings → Secrets and variables →
+Actions) scoped to deploy `btx-platform-staging`, and optionally create a
+GitHub Environment named `staging` for an extra manual-approval gate. Run the
+workflow from the Actions tab; it requires typing "staging" into the confirm
+input as a safety check against fat-fingering a production deploy.

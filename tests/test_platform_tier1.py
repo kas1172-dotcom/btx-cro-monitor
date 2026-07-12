@@ -14,21 +14,22 @@ from btx_platform import models  # noqa: E402
 from btx_platform.api import create_app  # noqa: E402
 from btx_platform.config import Settings  # noqa: E402
 from btx_platform.db import init_db, make_engine, make_session_factory  # noqa: E402
+from btx_platform.ratelimit import RateLimiter  # noqa: E402
+from tests.auth_helpers import make_clerk_fixture  # noqa: E402
 
-AUTH = "tier1-token"
-
-
-def _headers() -> dict[str, str]:
-    return {"Authorization": f"Bearer {AUTH}"}
+CLERK = make_clerk_fixture()
 
 
-def _build(tmp_path: Path, **overrides):
+def _headers(**kwargs) -> dict[str, str]:
+    return CLERK.headers(**kwargs)
+
+
+def _build(tmp_path: Path, *, rate_limiter: RateLimiter | None = None, **overrides):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
     values = {
         "env": "test",
-        "backend_auth_token": AUTH,
         "anthropic_api_key": "anthropic-test-key",
         "pipeline_generated_dir": str(tmp_path / "generated"),
         "pipeline_output_dir": str(tmp_path / "artifacts"),
@@ -36,13 +37,86 @@ def _build(tmp_path: Path, **overrides):
         **overrides,
     }
     settings = Settings(**values)
-    app = create_app(settings=settings, session_factory=sf)
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier, rate_limiter=rate_limiter)
     return TestClient(app), sf, settings
 
 
 def test_auth_rejects_protected_routes(tmp_path: Path):
     client, _sf, _settings = _build(tmp_path)
     assert client.get("/engine-config/scoring_weights").status_code == 401
+
+
+def test_auth_rejects_expired_session(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+    headers = CLERK.headers(expires_in=-10)
+    response = client.get("/engine-config/scoring_weights", headers=headers)
+    assert response.status_code == 401
+    assert response.json()["code"] == "session_expired"
+
+
+def test_viewer_role_cannot_mutate(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+    headers = CLERK.headers(role="viewer")
+    # Reading is fine for a viewer...
+    assert client.get("/engine-config/scoring_weights", headers=headers).status_code == 200
+    # ...mutating is not.
+    document = client.get("/engine-config/scoring_weights", headers=headers).json()["document"]
+    response = client.put(
+        "/engine-config/scoring_weights",
+        json={"document": document, "change_note": "viewer attempt"},
+        headers=headers,
+    )
+    assert response.status_code == 403
+    assert response.json()["code"] == "forbidden"
+
+
+def test_tenant_cannot_read_another_tenants_work_items(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+    tenant_a = CLERK.headers(tenant_id="tenant-a")
+    tenant_b = CLERK.headers(tenant_id="tenant-b")
+
+    created = client.post(
+        "/work-items",
+        headers=tenant_a,
+        json={"type": "research_task", "recommended_action": "Research a signal."},
+    )
+    assert created.status_code == 201
+    item_id = created.json()["id"]
+
+    # Tenant B's list never contains tenant A's item.
+    listed = client.get("/work-items", headers=tenant_b).json()["records"]
+    assert item_id not in {item["id"] for item in listed}
+
+    # Tenant B can't reach it directly either — same 404 as a truly-missing id.
+    patched = client.patch(f"/work-items/{item_id}", headers=tenant_b, json={"owner": "intruder"})
+    assert patched.status_code == 404
+
+    # Tenant A still can.
+    own = client.get("/work-items", headers=tenant_a).json()["records"]
+    assert item_id in {item["id"] for item in own}
+
+
+def test_per_user_rate_limit_blocks_excess_mutations(tmp_path: Path):
+    limiter = RateLimiter(max_requests=2, window_seconds=60)
+    client, _sf, _settings = _build(tmp_path, rate_limiter=limiter)
+    headers = CLERK.headers(user_id="user-rate-limited")
+    payload = {"type": "research_task", "recommended_action": "Research a signal."}
+
+    first = client.post("/work-items", headers=headers, json=payload)
+    second = client.post("/work-items", headers=headers, json=payload)
+    third = client.post("/work-items", headers=headers, json=payload)
+
+    assert first.status_code == 201
+    assert second.status_code == 201
+    assert third.status_code == 429
+    assert third.json()["code"] == "rate_limited"
+
+    # Reads are never rate-limited (only mutating methods hit the limiter).
+    assert client.get("/work-items", headers=headers).status_code == 200
+
+    # A different user has their own bucket and is unaffected.
+    other = CLERK.headers(user_id="another-user")
+    assert client.post("/work-items", headers=other, json=payload).status_code == 201
 
 
 def test_latest_artifacts_public_and_reads_pipeline_output(tmp_path: Path):
@@ -64,20 +138,33 @@ def test_latest_artifacts_public_and_reads_pipeline_output(tmp_path: Path):
     assert body["archive"]["runs"][0]["run_id"] == "r1"
 
 
-def test_auth_uses_constant_time_compare(monkeypatch, tmp_path: Path):
-    calls: list[tuple[str, str]] = []
-
-    def fake_compare(candidate: str, expected: str) -> bool:
-        calls.append((candidate, expected))
-        return False
-
-    monkeypatch.setattr("btx_platform.api.hmac.compare_digest", fake_compare)
+def test_auth_rejects_malformed_bearer_token(tmp_path: Path):
     client, _sf, _settings = _build(tmp_path)
 
-    response = client.get("/engine-config/scoring_weights", headers={"Authorization": "Bearer wrong-token"})
+    response = client.get("/engine-config/scoring_weights", headers={"Authorization": "Bearer not-a-jwt"})
 
     assert response.status_code == 401
-    assert calls == [("Bearer wrong-token", f"Bearer {AUTH}")]
+    assert response.json()["code"] == "unauthorized"
+
+
+def test_auth_not_configured_when_no_clerk_issuer(tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(
+        env="test",
+        anthropic_api_key="anthropic-test-key",
+        pipeline_generated_dir=str(tmp_path / "generated"),
+        pipeline_output_dir=str(tmp_path / "artifacts"),
+        pipeline_min_interval_seconds=0,
+    )
+    app = create_app(settings=settings, session_factory=sf)  # no clerk_verifier injected, no clerk_issuer
+    client = TestClient(app)
+
+    response = client.get("/engine-config/scoring_weights", headers=_headers())
+
+    assert response.status_code == 503
+    assert response.json()["code"] == "auth_not_configured"
 
 
 def test_llm_route_matches_proxy_contract(monkeypatch, tmp_path: Path):
@@ -228,7 +315,7 @@ def test_work_item_full_lifecycle_and_audit(tmp_path: Path):
 
     created = client.post(
         "/work-items",
-        headers={**_headers(), "X-BTX-Actor": "analyst@example.com"},
+        headers=_headers(email="analyst@example.com"),
         json={
             "type": "account_action",
             "canonical_account_id": "acct-1",
@@ -249,7 +336,7 @@ def test_work_item_full_lifecycle_and_audit(tmp_path: Path):
 
     approved = client.patch(
         f"/work-items/{item_id}",
-        headers={**_headers(), "X-BTX-Actor": "manager@example.com"},
+        headers=_headers(email="manager@example.com"),
         json={"status": "approved", "approval_state": "approved"},
     )
     assert approved.status_code == 200
@@ -265,7 +352,7 @@ def test_work_item_full_lifecycle_and_audit(tmp_path: Path):
 
     done = client.patch(
         f"/work-items/{item_id}",
-        headers={**_headers(), "X-BTX-Actor": "morgan@example.com"},
+        headers=_headers(email="morgan@example.com"),
         json={"status": "done", "execution_state": "completed", "outcome": "Customer meeting booked."},
     )
     assert done.status_code == 200
@@ -291,7 +378,7 @@ def test_work_item_dismiss_requires_reason_and_records_it(tmp_path: Path):
 
     dismissed = client.post(
         f"/work-items/{item_id}/dismiss",
-        headers={**_headers(), "X-BTX-Actor": "reviewer@example.com"},
+        headers=_headers(email="reviewer@example.com"),
         json={"reason": "Not relevant to this account."},
     )
     assert dismissed.status_code == 200

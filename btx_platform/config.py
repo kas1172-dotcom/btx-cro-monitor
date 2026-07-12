@@ -36,7 +36,6 @@ class Settings(BaseSettings):
     idempotency_header: str = "X-Idempotency-Key"
     frontend_origin: str = "http://localhost:5173"
     frontend_origins: str | None = None
-    backend_auth_token: str | None = None
     anthropic_api_key: str | None = None
     anthropic_base_url: str = "https://api.anthropic.com/v1/messages"
     anthropic_version: str = "2023-06-01"
@@ -53,6 +52,23 @@ class Settings(BaseSettings):
     github_repo: str = "kas1172-dotcom/btx-cro-monitor"
     github_workflow: str = "monitor.yml"
     github_ref: str = "main"
+
+    # Auth (WP10-A): Clerk validates the session; the backend only checks it.
+    clerk_secret_key: str | None = None
+    clerk_issuer: str | None = None  # e.g. https://<your-instance>.clerk.accounts.dev
+    clerk_audience: str | None = None
+    rate_limit_max_requests: int = 30
+    rate_limit_window_seconds: float = 60.0
+
+    # Persistence/jobs/crypto (WP10-B).
+    encryption_key: str | None = None
+    queue_backend: str = "memory"  # memory (dev/test) | celery (prod)
+
+    # Observability, health, retention (WP10-C).
+    sentry_dsn: str | None = None
+    monitor_stale_after_days: int = 7
+    event_retention_days: int = 90
+    audit_retention_days: int = 365
 
     @property
     def cors_origins(self) -> list[str]:

@@ -44,7 +44,7 @@ async function healthCheck(): Promise<boolean> {
     const timer = setTimeout(() => ctrl.abort(), 5000);
     const res = await fetch(ENDPOINT, {
       method: "POST",
-      headers: backendHeaders({ "content-type": "application/json" }),
+      headers: await backendHeaders({ "content-type": "application/json" }),
       signal: ctrl.signal,
       body: JSON.stringify({
         model: LLM_MODELS.chatpil,
@@ -279,7 +279,7 @@ export async function askJarvis(
 
     const res = await fetch(ENDPOINT, {
       method: "POST",
-      headers: backendHeaders({ "content-type": "application/json" }),
+      headers: await backendHeaders({ "content-type": "application/json" }),
       signal: ctrl.signal,
       body: JSON.stringify({
         model: LLM_MODELS.chatpil,

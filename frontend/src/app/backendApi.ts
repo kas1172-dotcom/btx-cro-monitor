@@ -3,15 +3,32 @@ const processEnv = (globalThis as { process?: { env?: Record<string, string | un
 
 export const BACKEND_ENDPOINT = env?.VITE_BACKEND_ENDPOINT ?? processEnv?.VITE_BACKEND_ENDPOINT;
 
-export function backendHeaders(extra: Record<string, string> = {}): Record<string, string> {
-  // TODO(WP10): replace shared backend bearer tokens with browser-safe auth.
-  // Until then the cockpit must not hold or send a shared backend secret.
-  return { ...extra };
+/** Minimal shape of the global Clerk singleton once ClerkProvider has mounted. */
+interface ClerkGlobal {
+  session?: { getToken(): Promise<string | null> } | null;
+}
+
+async function clerkSessionToken(): Promise<string | null> {
+  const clerk = (globalThis as { Clerk?: ClerkGlobal }).Clerk;
+  if (!clerk?.session) return null;
+  try {
+    return await clerk.session.getToken();
+  } catch {
+    return null;
+  }
+}
+
+export async function backendHeaders(extra: Record<string, string> = {}): Promise<Record<string, string>> {
+  const token = await clerkSessionToken();
+  return {
+    ...extra,
+    ...(token ? { authorization: `Bearer ${token}` } : {}),
+  };
 }
 
 export async function backendJson<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!BACKEND_ENDPOINT) throw new Error("VITE_BACKEND_ENDPOINT is not configured.");
-  const headers = backendHeaders({ ...(init.body ? { "content-type": "application/json" } : {}), ...(init.headers as Record<string, string> | undefined) });
+  const headers = await backendHeaders({ ...(init.body ? { "content-type": "application/json" } : {}), ...(init.headers as Record<string, string> | undefined) });
   const response = await fetch(`${BACKEND_ENDPOINT}${path}`, { ...init, headers });
   if (!response.ok) {
     const body = await response.text().catch(() => "");

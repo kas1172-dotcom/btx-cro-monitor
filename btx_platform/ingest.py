@@ -18,6 +18,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from btx_platform import models
+from btx_platform.crypto import decrypt_if_encrypted
 from btx_platform.queue import JobQueue
 from btx_platform.schemas import WebhookEnvelope
 from btx_platform.security import verify_signature
@@ -52,13 +53,15 @@ def ingest(
     raw_body: bytes,
     signature: str | None,
     idempotency_header: str | None = None,
+    encryption_key: str | None = None,
 ) -> IngestOutcome:
     if not connection.active:
         raise IngestError(403, "connection is disabled")
 
     # 1. Authenticate over the raw bytes, before any parsing.
     if connection.signing_secret:
-        if not verify_signature(connection.signing_secret, raw_body, signature):
+        secret = decrypt_if_encrypted(connection.signing_secret, encryption_key=encryption_key)
+        if not verify_signature(secret, raw_body, signature):
             raise IngestError(401, "invalid or missing signature")
 
     # 2. Parse + strictly validate the envelope.

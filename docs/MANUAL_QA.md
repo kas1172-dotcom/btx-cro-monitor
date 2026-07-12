@@ -34,8 +34,8 @@ Artifact mode uses Vite-bundled JSON imports from `clients/btx/artifacts/run_out
 
 ## Backend live-mode Settings smoke test
 
-1. Start `btx_platform` with `BTX_BACKEND_AUTH_TOKEN`, `BTX_ANTHROPIC_API_KEY`, and either `BTX_PIPELINE_MECHANISM=subprocess` locally or `github` in production.
-2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, and `VITE_DATA_MODE=live`. The browser build must not hold a shared backend bearer token; protected backend-route QA waits for WP10 browser-safe auth or should use direct backend curl checks.
+1. Start `btx_platform` with `CLERK_SECRET_KEY`, `BTX_CLERK_ISSUER`, `BTX_ANTHROPIC_API_KEY`, and either `BTX_PIPELINE_MECHANISM=subprocess` locally or `github` in production.
+2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, `VITE_DATA_MODE=live`, and `VITE_CLERK_PUBLISHABLE_KEY`. Sign in through the Clerk gate; the browser now sends a per-user session token, never a shared secret.
 3. Open Settings → Engine tuning. Confirm the panel shows `Backend scoring_weights`, a version number, and editable scoring rows. Change one weight, save, and confirm the version/status updates.
 4. Open Settings → Sources. Toggle a source, save, reload, and confirm the saved enabled state returns from the backend.
 5. Click `Run collection now`. Confirm the button reports the run status, recent runs populate, and a second click inside the rate-limit window is refused with a visible message.

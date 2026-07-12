@@ -51,7 +51,7 @@ async function withTimeout(url: string, body: unknown): Promise<unknown> {
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: backendHeaders({ "content-type": "application/json" }),
+      headers: await backendHeaders({ "content-type": "application/json" }),
       body: JSON.stringify(body),
       signal: controller.signal,
     });

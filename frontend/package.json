@@ -21,11 +21,13 @@
     "test:tour": "tsx tools/test-tour.ts",
     "test:live-adapter": "tsx tools/test-live-adapter.ts",
     "test:mobile": "tsx tools/test-mobile-e2e.ts",
+    "test:e2e": "tsx tools/test-e2e-playwright.ts",
     "seed:hubspot": "tsx tools/seed-hubspot.ts",
     "cleanup:hubspot": "tsx tools/cleanup-hubspot.ts",
     "weekly:memo": "tsx tools/run-weekly-memo.ts"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.8",
     "@fontsource/inter": "^5.2.8",
     "@xyflow/react": "^12.3.5",
     "docx": "^9.7.1",

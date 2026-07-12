@@ -56,9 +56,9 @@ const companies: Company[] = [
 const originalConfig = structuredClone(CONFIG) as WeightsConfig;
 
 try {
-  const headers = backendHeaders({ "content-type": "application/json" });
+  const headers = await backendHeaders({ "content-type": "application/json" });
   assert(headers["content-type"] === "application/json", "backendHeaders should preserve caller headers");
-  assert(!("authorization" in headers) && !("Authorization" in headers), "browser backend helper must not emit a shared bearer token");
+  assert(!("authorization" in headers) && !("Authorization" in headers), "backend helper must not emit a bearer token when no Clerk session is present (outside a browser Clerk context, as in this test)");
 
   const related = buildArtifactSignals(artifactRun({
     item_id: "boeing-related",

@@ -22,9 +22,10 @@ from btx_platform.ingest import resolve_idempotency_key  # noqa: E402
 from btx_platform.queue import InMemoryQueue  # noqa: E402
 from btx_platform.schemas import WebhookEnvelope  # noqa: E402
 from btx_platform.security import compute_signature, verify_signature  # noqa: E402
+from tests.auth_helpers import make_clerk_fixture  # noqa: E402
 
 SECRET = "topsecret"
-AUTH = "test-token"
+CLERK = make_clerk_fixture()
 VALID = {"event_type": "contact.created", "data": {"id": 1, "name": "ACME"}, "external_id": "ext-1"}
 
 
@@ -38,7 +39,12 @@ def _build(settings: Settings | None = None):
         s.add(models.Connection(id="off", name="Disabled", signing_secret=None, active=False))
         s.commit()
     queue = InMemoryQueue()
-    app = create_app(settings=settings or Settings(env="test", backend_auth_token=AUTH), session_factory=sf, queue=queue)
+    app = create_app(
+        settings=settings or Settings(env="test"),
+        session_factory=sf,
+        queue=queue,
+        clerk_verifier=CLERK.verifier,
+    )
     return TestClient(app), sf, queue
 
 
@@ -47,10 +53,10 @@ def _signed(body: dict, secret: str = SECRET) -> tuple[bytes, str]:
     return raw, compute_signature(secret, raw)
 
 
-def _post(client, conn, raw, sig=None, idem=None, auth: bool = True):
+def _post(client, conn, raw, sig=None, idem=None):
+    # Webhooks authenticate with the connection's own HMAC signature, not a
+    # Clerk session — they're machine-to-machine, not a signed-in user.
     headers = {"Content-Type": "application/json"}
-    if auth:
-        headers["Authorization"] = f"Bearer {AUTH}"
     if sig is not None:
         headers["X-BTX-Signature"] = sig
     if idem is not None:
@@ -99,13 +105,21 @@ def test_valid_signed_payload_accepted_and_enqueued():
 
 def test_health():
     client, _sf, _q = _build()
-    assert client.get("/health").json()["status"] == "ok"
+    body = client.get("/health").json()
+    assert body["status"] in ("ok", "degraded")
+    assert body["db"] is True
+    assert body["monitor"]["status"] in ("ok", "stale", "missing", "invalid")
+    assert "hubspot" in body["integrations"] and "llm" in body["integrations"]
 
 
-def test_protected_routes_require_static_bearer_token():
+def test_webhooks_exempt_from_clerk_auth_but_other_routes_are_not():
+    """Webhooks authenticate via per-connection HMAC (a machine caller), not a
+    Clerk session. Confirm that exemption is scoped to /webhooks/* only — a
+    genuine user-facing route with no Authorization header still 401s."""
     client, _sf, _q = _build()
     raw, sig = _signed(VALID)
-    assert _post(client, "appA", raw, sig, auth=False).status_code == 401
+    assert _post(client, "appA", raw, sig).status_code == 200  # no Clerk token needed
+    assert client.get("/work-items").status_code == 401        # but this route still requires one
 
 
 # ─── auth ───────────────────────────────────────────────────────────────────
@@ -168,7 +182,7 @@ def test_schema_violation_422():
 
 
 def test_payload_too_large_413():
-    client, _sf, _q = _build(settings=Settings(env="test", max_body_bytes=10, backend_auth_token=AUTH))
+    client, _sf, _q = _build(settings=Settings(env="test", max_body_bytes=10))
     raw, sig = _signed(VALID)
     assert _post(client, "appA", raw, sig).status_code == 413
 

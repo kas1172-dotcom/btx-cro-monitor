@@ -1,0 +1,47 @@
+name: Deploy Backend (Staging)
+
+# Manual-only, non-public staging deploy of btx_platform. Never runs on
+# push/PR — production (btx-platform) stays a manual `fly deploy` per
+# docs/DEPLOY_BACKEND.md. This targets a SEPARATE Fly app the maintainer
+# provisions first (recommended name: btx-platform-staging), so a bad build
+# can never touch prod data or the public cockpit's backend.
+#
+# One-time setup before this workflow can run:
+#   1. fly apps create btx-platform-staging
+#   2. Provision staging Postgres/Redis and `fly secrets set` the same keys
+#      documented in docs/DEPLOY_BACKEND.md, scoped to the staging app.
+#   3. Add repo secret FLY_API_TOKEN (Settings -> Secrets and variables ->
+#      Actions) with deploy access to btx-platform-staging.
+#   4. Run `alembic upgrade head` against the staging database at least once
+#      (fly ssh console --app btx-platform-staging -C "alembic upgrade head").
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "staging" to confirm this deploys btx-platform-staging (not production)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-staging:
+    if: ${{ github.event.inputs.confirm == 'staging' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Fly.io (staging app only)
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Run migrations against staging
+        run: flyctl ssh console --app btx-platform-staging -C "alembic upgrade head"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: fly deploy (staging)
+        run: flyctl deploy --app btx-platform-staging --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

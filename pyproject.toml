@@ -31,6 +31,8 @@ platform = [
     "celery>=5.3",            # background workers (Phase 2)
     "redis>=5.0",             # broker/result backend (Phase 2)
     "httpx>=0.27",            # outbound forwarder + TestClient
+    "pyjwt[crypto]>=2.8",     # Clerk session JWT verification (WP10-A)
+    "cryptography>=42.0",     # application-level credential encryption (WP10-B)
 ]
 
 [tool.setuptools.packages.find]

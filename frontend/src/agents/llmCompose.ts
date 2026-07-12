@@ -112,7 +112,7 @@ async function callJson(system: string, content: string): Promise<LlmComposeResu
   try {
     const response = await fetch(ENDPOINT as string, {
       method: "POST",
-      headers: backendHeaders({ "content-type": "application/json" }),
+      headers: await backendHeaders({ "content-type": "application/json" }),
       body: JSON.stringify({ model: LLM_MODELS.composition, system, messages: [{ role: "user", content }] }),
       signal: controller.signal,
     });

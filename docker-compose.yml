@@ -1,6 +1,8 @@
 # Local infra for the integration platform (Engine #1).
-# Brings up Postgres + Redis; run the API/worker from your shell against them.
-# (A Dockerfile for the app images lands with the Phase 2 worker.)
+# Brings up Postgres + Redis; run the API/worker from your shell against them:
+#   uvicorn btx_platform.asgi:app --reload --port 8000
+#   celery -A btx_platform.workers.celery_app worker --loglevel=info
+# (BTX_QUEUE_BACKEND=celery and BTX_REDIS_URL point both at this redis service.)
 services:
   postgres:
     image: postgres:16-alpine

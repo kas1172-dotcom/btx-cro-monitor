@@ -23,6 +23,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from btx_platform.db import Base
 
+# Single-tenant today; every tenant-scoped row carries this so multi-tenant
+# is a config change (real org ids from Clerk) rather than a schema change.
+DEFAULT_TENANT_ID = "default"
+
 
 def _uuid() -> str:
     return uuid.uuid4().hex
@@ -46,9 +50,11 @@ class Connection(Base):
     __tablename__ = "connections"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     name: Mapped[str] = mapped_column(String(200))
     direction: Mapped[str] = mapped_column(String(16), default="inbound")  # inbound|outbound
     signing_secret: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    destination_url: Mapped[str | None] = mapped_column(Text, nullable=True)  # outbound|forward target
     active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
@@ -109,9 +115,10 @@ class DeadLetter(Base):
 class EngineConfig(Base):
     """Versioned JSON configuration edited from the frontend."""
     __tablename__ = "engine_configs"
-    __table_args__ = (UniqueConstraint("name", "version", name="uq_engine_config_version"),)
+    __table_args__ = (UniqueConstraint("tenant_id", "name", "version", name="uq_engine_config_version"),)
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     name: Mapped[str] = mapped_column(String(64), index=True)
     version: Mapped[int] = mapped_column(Integer)
     document: Mapped[dict] = mapped_column(JSON)
@@ -126,9 +133,10 @@ class CanonicalAccount(Base):
     are optional because most portals will not have BTX custom properties yet.
     """
     __tablename__ = "canonical_accounts"
-    __table_args__ = (UniqueConstraint("hubspot_company_id", name="uq_canonical_hubspot_company"),)
+    __table_args__ = (UniqueConstraint("tenant_id", "hubspot_company_id", name="uq_canonical_hubspot_company"),)
 
     id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     hubspot_company_id: Mapped[str] = mapped_column(String(80), nullable=False, index=True)
     domains: Mapped[list | None] = mapped_column(JSON, nullable=True)
     aliases: Mapped[list | None] = mapped_column(JSON, nullable=True)
@@ -147,6 +155,7 @@ class PipelineRun(Base):
     __tablename__ = "pipeline_runs"
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     triggered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     mechanism: Mapped[str] = mapped_column(String(32))
     status: Mapped[str] = mapped_column(String(32), index=True)
@@ -161,6 +170,7 @@ class WorkItem(Base):
     __tablename__ = "work_items"
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     type: Mapped[str] = mapped_column(String(40), index=True)
     canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     source_signal_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
@@ -189,6 +199,7 @@ class HubSpotTaskAudit(Base):
     __tablename__ = "hubspot_task_audits"
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     subject: Mapped[str] = mapped_column(String(300))
     hubspot_task_id: Mapped[str] = mapped_column(String(80), index=True)
