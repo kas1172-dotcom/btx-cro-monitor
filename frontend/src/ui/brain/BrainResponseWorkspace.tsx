@@ -1,9 +1,11 @@
+import { lazy, Suspense } from "react";
 import type { BrainResponse } from "../../brain/types.ts";
 import { BRAIN_AREA_LABELS } from "../../brain/types.ts";
 import type { World } from "../../app/useWorld.ts";
 import { OpportunityCards } from "./OpportunityCards.tsx";
-import { ProspectMap } from "../map/ProspectMap.tsx";
 import { SignalFeed } from "../feed/SignalFeed.tsx";
+
+const ProspectMap = lazy(() => import("../map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
 
 export function BrainResponseWorkspace({ response, world }: { response: BrainResponse; world: World }) {
   return (
@@ -16,7 +18,13 @@ export function BrainResponseWorkspace({ response, world }: { response: BrainRes
         <h2>Why This Matters</h2>
         <p>{response.whyThisMatters}</p>
       </section>
-      {response.focusView === "map" && <div className="brain-map-wrap"><ProspectMap world={world} /></div>}
+      {response.focusView === "map" && (
+        <div className="brain-map-wrap">
+          <Suspense fallback={<div className="loading">loading map…</div>}>
+            <ProspectMap world={world} />
+          </Suspense>
+        </div>
+      )}
       {response.focusView === "signals" && <div className="brain-embedded-view"><SignalFeed world={world} /></div>}
       {response.focusView === "brief" && (
         <div className="weekly-brief-grid">

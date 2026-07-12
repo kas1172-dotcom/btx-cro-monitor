@@ -1,11 +1,11 @@
 [
   {
     "id": "salesforce-crm",
-    "name": "Salesforce",
+    "name": "CRM",
     "category": "CRM",
     "status": "demo_connected",
     "demo_file": "crm.json",
-    "production_method": "OAuth-connected Salesforce REST/Bulk APIs via backend adapter",
+    "production_method": "OAuth-connected CRM REST/Bulk APIs via backend adapter",
     "description": "Simulated account, contact, activity, and opportunity context.",
     "is_demo": true
   },

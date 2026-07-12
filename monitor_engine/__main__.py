@@ -2,7 +2,7 @@
 python -m monitor_engine --config PATH --output DIR [options]
 
 Runs the full monitor pipeline for one client config: collect, prefilter,
-analyse (LLM), archive, and build a self-contained static site.
+analyse (LLM), archive, and write JSON artifacts.
 
 For a quick connectivity test without running the full pipeline, use the
 dedicated collector test runner:
@@ -33,7 +33,7 @@ def main() -> None:
     )
     ap.add_argument(
         "--output", default=Path("output"), type=Path, metavar="DIR",
-        help="Output directory for site artifacts (default: output/)",
+        help="Output directory for JSON artifacts (default: output/)",
     )
     ap.add_argument(
         "--archive", default=None, type=Path, metavar="PATH",

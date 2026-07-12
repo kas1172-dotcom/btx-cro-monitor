@@ -52,9 +52,9 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + o.value, 0);
   const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0] ?? fallbackSignal;
   const topSignalAccount = world.companies.find((c) => c.id === topSignal?.subject_id)?.name ?? "Portfolio monitor";
-  const accountSource = provenanceForRecord(company) === "HubSpot" ? "HubSpot CRM" : "companies.json";
-  const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "HubSpot") ? "HubSpot CRM" : "contacts.json";
-  const opportunitySource = opportunities.some((opportunity) => provenanceForRecord(opportunity) === "HubSpot") ? "HubSpot CRM" : "opportunities.json";
+  const accountSource = provenanceForRecord(company) === "CRM" ? "CRM" : "companies.json";
+  const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "CRM") ? "CRM" : "contacts.json";
+  const opportunitySource = opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "CRM" : "opportunities.json";
   const signalSource = topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json";
   const signalDisplay = world.dataMode === "hybrid" ? (topSignal?.artifact ? "Monitor" : "Demo") : topSignal?.artifact ? "Monitor" : "Signals";
 
@@ -77,7 +77,7 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       contactSource,
       opportunitySource,
       signalSource: signalDisplay,
-      fallbackDisclosure: world.dataMode === "hybrid" ? "Hybrid mode: account, contact, and deal facts are HubSpot; external market facts are Monitor; capacity/operating context is Demo fallback." : "",
+      fallbackDisclosure: world.dataMode === "hybrid" ? "Hybrid mode: account, contact, and deal facts are CRM; external market facts are Monitor; capacity/operating context is Demo fallback." : "",
       topSignal: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal) : "No monitor signal available.",
       artifactSignalFigures: signalFigureContext(topSignal ? [topSignal, ...signals] : signals),
       recommendedAction: rec ? `${actionLabel(rec.action)}: ${rec.reason}` : "Monitor until a stronger signal appears.",

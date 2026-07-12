@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
+import { latestCompletedQuarter, sixMonthTrendRangeForQuarter } from "../app/dateDefaults.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import { computeMetric } from "../metrics/catalog.ts";
 import { priorQuarter, quarterWindow } from "../metrics/time.ts";
@@ -8,7 +9,7 @@ import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
 
 const Inputs = z.object({
-  quarter: z.string().default("Q2 2026"),
+  quarter: z.string().default(() => latestCompletedQuarter()),
   audience: z.enum(["board", "ceo", "internal"]).default("board"),
   instructions: z.string().optional(),
 });
@@ -46,6 +47,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
   contextRecipe(inputs: Inputs, world: World): AgentContext {
     const window = quarterWindow(inputs.quarter);
     const prior = priorQuarter(window);
+    const trendRange = sixMonthTrendRangeForQuarter(inputs.quarter);
     const metrics = {
       revenue: computeMetric("revenue", world, undefined, window),
       bookings: computeMetric("bookings", world, undefined, window),
@@ -101,6 +103,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
   },
   async compose(ctx): Promise<Deliverable> {
     const f = ctx.facts;
+    const trendRange = sixMonthTrendRangeForQuarter(String(f.quarter));
     return {
       id: `deliv-${Date.now()}-board-deck`,
       type: "board_deck",
@@ -114,7 +117,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           id: "quarter-verdict",
           heading: "Quarter in One Slide",
           blocks: [
-            { kind: "text", text: `Demand is steady but capacity discipline matters: ${Number(f.bookToBill).toFixed(2)} book-to-bill on ${money(Number(f.revenue))} Q2 revenue.` },
+            { kind: "text", text: `Demand is steady but capacity discipline matters: ${Number(f.bookToBill).toFixed(2)} book-to-bill on ${money(Number(f.revenue))} ${f.quarter} revenue.` },
             { kind: "text", text: `Backlog ended at ${money(Number(f.backlog))}, ${Number(f.backlog) >= Number(f.priorBacklog) ? "up" : "down"} from the prior quarter, while win rate was ${pct(Number(f.winRate))}.` },
             { kind: "text", text: `Priority: protect the riskiest accounts while using capacity selectively on high-fit growth.` },
           ],
@@ -147,16 +150,16 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           id: "growth",
           heading: `Growth: demand ${Number(f.bookToBill) >= 1 ? "outruns" : "trails"} shipments at ${Number(f.bookToBill).toFixed(2)} book-to-bill`,
           blocks: [
-            { kind: "chart-spec", title: "Bookings trend", spec: { viz: "trend", metric: "bookings", timeRange: { from: "2026-01", to: "2026-06" } } },
-            { kind: "chart-spec", title: "Backlog trend", spec: { viz: "trend", metric: "backlog", timeRange: { from: "2026-01", to: "2026-06" } } },
-            { kind: "chart-spec", title: "Book-to-bill trend", spec: { viz: "trend", metric: "book_to_bill", timeRange: { from: "2026-01", to: "2026-06" } } },
+            { kind: "chart-spec", title: "Bookings trend", spec: { viz: "trend", metric: "bookings", timeRange: trendRange } },
+            { kind: "chart-spec", title: "Backlog trend", spec: { viz: "trend", metric: "backlog", timeRange: trendRange } },
+            { kind: "chart-spec", title: "Book-to-bill trend", spec: { viz: "trend", metric: "book_to_bill", timeRange: trendRange } },
           ],
         },
         {
           id: "predictability",
           heading: `Predictability: pipeline coverage is ${Number(f.pipelineCoverage).toFixed(1)}x versus a 3.0x planning target`,
           blocks: [
-            { kind: "chart-spec", title: "Pipeline coverage trend", spec: { viz: "trend", metric: "pipeline_coverage", timeRange: { from: "2026-01", to: "2026-06" } } },
+            { kind: "chart-spec", title: "Pipeline coverage trend", spec: { viz: "trend", metric: "pipeline_coverage", timeRange: trendRange } },
             { kind: "text", text: `Coverage is calculated as weighted pipeline divided by average monthly revenue in the quarter.` },
           ],
         },
@@ -164,8 +167,8 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           id: "efficiency",
           heading: `Efficiency: capacity averages ${pct(Number(f.capacity))}, margin ${pct(Number(f.margin))}`,
           blocks: [
-            { kind: "chart-spec", title: "Capacity utilization trend", spec: { viz: "trend", metric: "capacity_utilization", timeRange: { from: "2026-01", to: "2026-06" } } },
-            { kind: "chart-spec", title: "Average order value trend", spec: { viz: "trend", metric: "avg_order_value", timeRange: { from: "2026-01", to: "2026-06" } } },
+            { kind: "chart-spec", title: "Capacity utilization trend", spec: { viz: "trend", metric: "capacity_utilization", timeRange: trendRange } },
+            { kind: "chart-spec", title: "Average order value trend", spec: { viz: "trend", metric: "avg_order_value", timeRange: trendRange } },
           ],
         },
         {

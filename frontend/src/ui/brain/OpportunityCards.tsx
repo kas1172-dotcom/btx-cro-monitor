@@ -18,7 +18,14 @@ export function OpportunityCards({ cards }: { cards: OpportunityCard[] }) {
             onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
-              openDemoAction({ title: card.recommendedAction, accountName: card.companyName, action: "crm_task", evidence: card.topSignal });
+              openDemoAction({
+                title: card.recommendedAction,
+                accountName: card.companyName,
+                accountId: card.companyId,
+                action: "crm_task",
+                evidence: card.topSignal,
+                workItemType: "account_action",
+              });
             }}
           >
             Create task

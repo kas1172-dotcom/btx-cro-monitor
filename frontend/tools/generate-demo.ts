@@ -246,7 +246,7 @@ for (const account of ACCOUNT_ROWS) {
       contract_url: demoUrl(`contracts/${String(opportunitySeq).padStart(4, "0")}`),
       document_url: demoUrl(`documents/opportunities/${String(opportunitySeq).padStart(4, "0")}.pdf`),
       close_date: new Date(AS_OF_MS + int(-90, 180) * 86400000).toISOString().slice(0, 10),
-      ...provenance("Simulated Salesforce Opportunities"),
+      ...provenance("Simulated CRM Opportunities"),
     });
   }
 
@@ -332,7 +332,7 @@ const crm = ACCOUNT_ROWS.slice(0, 14).map((a, index) => {
     next_step: a.relationship === "target" ? "Validate decision-maker and capacity need" : "Review account plan and confirm next production window",
     relationship_health: a.business_motion === "reduce_risk" ? "needs attention" : a.relationship === "target" ? "new" : "active",
     open_pipeline_value: openOppValue,
-    ...provenance("Simulated Salesforce"),
+    ...provenance("Simulated CRM"),
   };
 });
 
@@ -362,7 +362,7 @@ const pipeline = {
 };
 
 const integrations = [
-  ["salesforce-crm", "Salesforce", "CRM", "demo_connected", "crm.json", "OAuth-connected Salesforce REST/Bulk APIs via backend adapter", "Simulated account, contact, activity, and opportunity context."],
+  ["crm", "CRM", "CRM", "demo_connected", "crm.json", "OAuth-connected CRM REST/Bulk APIs via backend adapter", "Simulated account, contact, activity, and opportunity context."],
   ["erp-capacity", "ERP / Capacity", "Operations", "demo_connected", "erp_capacity.json", "Authenticated ERP/MES adapter normalizing work-center capacity and backlog", "Simulated capacity, lead time, and constraint context."],
   ["pipeline-history", "Pipeline History", "Revenue Operations", "demo_connected", "pipeline_snapshots.json", "CRM opportunity history snapshots", "Simulated 24-month pipeline trend data."],
   ["public-news", "Public News / Market Signals", "Market Intelligence", "demo_connected", "news.json", "Monitor ingestion of RSS, APIs, and validated extracted signals", "Static market events shaped for signal extraction."],

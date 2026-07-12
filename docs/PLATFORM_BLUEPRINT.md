@@ -296,10 +296,10 @@ the existing engine), then **7 → 8** (operate it).
   `metrics_snapshots` instead of a static profile.
 - `monitor_engine.enrichment.connector` → the basis for the generic **App A/App
   B connectors** (same `{query}`/field-map idea, extended to POST/forward).
-- `monitor_engine.targets` (account map) → an internal dashboard view that can
-  ride along with the email.
-- The static site stays as the **internal dashboard**; email is the new
-  external channel.
+- `monitor_engine.targets` (account-map data) → JSON input for the cockpit's
+  internal map/prospecting views.
+- The React cockpit is the **internal dashboard**; email is the external
+  channel.
 
 ---
 

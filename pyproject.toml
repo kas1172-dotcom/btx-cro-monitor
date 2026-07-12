@@ -37,12 +37,5 @@ platform = [
 where = ["."]
 include = ["monitor_engine*", "btx_platform*"]
 
-[tool.setuptools.package-data]
-monitor_engine = [
-    "site/_assets/*.css",
-    "site/_assets/*.js",
-    "site/_template/*.html",
-]
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]

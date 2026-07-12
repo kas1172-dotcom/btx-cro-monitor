@@ -1,5 +1,5 @@
 // The port the brain reads the world through. DemoDataAdapter and a future live
-// adapter (Salesforce / ERP / SAM.gov) should implement THIS interface, so the
+// adapter (CRM / ERP / SAM.gov) should implement THIS interface, so the
 // engine can run on static snapshots now and live data later without changing
 // engine code. The engine defines the port; adapters implement it.
 //

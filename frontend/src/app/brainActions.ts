@@ -6,6 +6,7 @@ import { runAgent } from "../agents/runAgent.ts";
 import { saveBrainMemoryNote, saveDeliverable } from "../memory/localMemory.ts";
 import { setState } from "../store/store.ts";
 import type { MetricId } from "../metrics/types.ts";
+import { defaultDateAnchor, defaultTripWindow, latestCompletedQuarter } from "./dateDefaults.ts";
 
 export interface BrainActionOptions {
   accountId?: string;
@@ -36,10 +37,6 @@ export interface BrainActionResult {
   response: BrainResponse | null;
   deliverable: Deliverable | null;
 }
-
-const DEFAULT_START_DATE = "2026-07-07";
-const DEFAULT_END_DATE = "2026-07-09";
-const DEFAULT_QUARTER = "Q2 2026";
 
 function firstAvailableAccountId(world: World): string | undefined {
   return world.prospects[0]?.company.id ?? world.companies[0]?.id;
@@ -77,13 +74,14 @@ export async function dispatchBrainQuestion(
   let result: BrainActionResult;
 
   if (lower.includes("plan a trip") || lower.includes("who should i talk to") || lower.includes("who should i see")) {
+    const tripDefaults = defaultTripWindow(defaultDateAnchor(world));
     const cities = [...new Set(world.companies.map((company) => company.location.city))].sort();
     const city = cities.find((candidate) => lower.includes(candidate.toLowerCase())) ?? world.city ?? options.city ?? "Austin";
     events.composing?.("Clustering stops by day");
     const deliverable = await runAgent("itinerary", {
       city,
-      startDate: options.startDate ?? DEFAULT_START_DATE,
-      endDate: options.endDate ?? DEFAULT_END_DATE,
+      startDate: options.startDate ?? tripDefaults.startDate,
+      endDate: options.endDate ?? tripDefaults.endDate,
       focus: "mixed",
       instructions,
     }, world);
@@ -93,7 +91,7 @@ export async function dispatchBrainQuestion(
   } else if (lower.includes("board deck") || lower.includes("quarterly board")) {
     events.composing?.("Building board deck");
     const deliverable = await runAgent("board_deck", {
-      quarter: options.quarter ?? DEFAULT_QUARTER,
+      quarter: options.quarter ?? latestCompletedQuarter(defaultDateAnchor(world)),
       audience: "board",
       instructions,
     }, world);
@@ -102,9 +100,10 @@ export async function dispatchBrainQuestion(
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("analysis view") || lower.includes("show revenue by client") || lower.includes("revenue heatmap")) {
     events.composing?.("Preparing analysis view");
+    const quarter = options.quarter ?? latestCompletedQuarter(defaultDateAnchor(world));
     const deliverable = await runAgent("analysis_annotation", {
       metric: options.metric ?? "revenue",
-      quarter: options.quarter ?? DEFAULT_QUARTER,
+      quarter,
       instructions,
     }, world);
     saveDeliverable(deliverable);

@@ -1,26 +1,30 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import type React from "react";
 import { useStore, setState, closeDemoAction, goHome, clearTourRequest } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES, PROFILE } from "./app/config.ts";
-import { ProspectMap } from "./ui/map/ProspectMap.tsx";
-import { Copilot } from "./ui/copilot/Copilot.tsx";
 import { Dossier } from "./ui/company/Dossier.tsx";
 import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
-import { BrainHome } from "./ui/brain/BrainHome.tsx";
-import { RailAreaView } from "./ui/brain/RailAreaView.tsx";
 import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
 import { AskBrainBar } from "./ui/brain/AskBrainBar.tsx";
 import { RightContextPanel } from "./ui/brain/RightContextPanel.tsx";
 import { TourHud } from "./ui/brain/TourHud.tsx";
-import { DocumentViewer } from "./ui/deliverables/DocumentViewer.tsx";
-import { recordSimulatedAction, useMemory } from "./memory/localMemory.ts";
+import { useMemory } from "./memory/localMemory.ts";
 import { AnalysisView } from "./ui/analysis/AnalysisView.tsx";
-import { isMarketScopedView } from "./app/viewScope.ts";
-import { buildRailView } from "./app/railViews.ts";
 import { SettingsWorkspace } from "./ui/settings/SettingsWorkspace.tsx";
+import { TodayBrief } from "./ui/surfaces/TodayBrief.tsx";
+import { WorkQueue } from "./ui/surfaces/WorkQueue.tsx";
+import { Account360 } from "./ui/surfaces/Account360.tsx";
+import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
+import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
+import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
+import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
+import { countForSurface, type SurfaceId } from "./app/surfaces.ts";
+import { createWorkItem } from "./app/workItems.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
+const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
+const DocumentViewer = lazy(() => import("./ui/deliverables/DocumentViewer.tsx").then((module) => ({ default: module.DocumentViewer })));
 
 function formatRunDate(value: string | null | undefined): string {
   if (!value) return "not available";
@@ -28,13 +32,14 @@ function formatRunDate(value: string | null | undefined): string {
 }
 
 export function App() {
-  const { city, activeHome, activeSettings, activeBrainArea, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
+  const { city, activeHome, activeSettings, activeSurface, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
+  const [workItemStatus, setWorkItemStatus] = useState("");
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
-  const settingsActive = activeSettings && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const homeActive = activeHome && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const marketScoped = !homeActive && !settingsActive && isMarketScopedView({ activeBrainArea, brainResponse, activeDeliverable, activeAnalysisSpec });
+  const settingsActive = (activeSettings || activeSurface === "settings") && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const homeActive = (activeHome || activeSurface === "brief") && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const marketScoped = activeSurface === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const viewWorld = marketScoped ? marketWorld ?? world : world;
 
   // Right-panel: dossier takes priority over context panel, one at a time.
@@ -65,29 +70,33 @@ export function App() {
     if (settingsActive) return <SettingsWorkspace />;
     if (!world) return <div className="loading">loading…</div>;
     if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
-    if (activeDeliverable) return <DocumentViewer deliverable={activeDeliverable} world={world} />;
+    if (activeDeliverable) return (
+      <Suspense fallback={<div className="loading">loading deliverable…</div>}>
+        <DocumentViewer deliverable={activeDeliverable} world={world} />
+      </Suspense>
+    );
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
-    if (homeActive) return <BrainHome world={world} askBar={<AskBrainBar world={world} large />} />;
-    switch (activeBrainArea) {
-      case "market": return <RailAreaView area="market" world={viewWorld ?? world} />;
-      case "customer": return <RailAreaView area="customer" world={world} />;
-      case "capability": return <RailAreaView area="capability" world={world} />;
-      case "geographic": return viewWorld ? <ProspectMap world={viewWorld} /> : <div className="loading">loading map…</div>;
-      case "decision": return <RailAreaView area="decision" world={world} />;
-      case "workflow": return <RailAreaView area="workflow" world={world} />;
-      case "revenue": return <RailAreaView area="revenue" world={world} />;
-      default: return <RailAreaView area="revenue" world={world} />;
+    switch (activeSurface) {
+      case "brief": return <TodayBrief world={world} />;
+      case "work_queue": return <WorkQueue world={world} />;
+      case "accounts": return <Account360 world={world} />;
+      case "ask": return <AskSurface world={world} />;
+      case "map": return viewWorld ? (
+        <Suspense fallback={<div className="loading">loading map…</div>}>
+          <ProspectMap world={viewWorld} />
+        </Suspense>
+      ) : <div className="loading">loading map…</div>;
+      case "analysis": return <AnalysisDashboard world={world} />;
+      case "capacity": return <CapacityAssessment world={world} />;
+      case "programs": return <ProgramContractTracker world={world} />;
+      case "settings": return <SettingsWorkspace />;
+      default: return <TodayBrief world={world} />;
     }
   };
-  const counts = world ? {
-    market: buildRailView("market", viewWorld ?? world, memory).total,
-    customer: buildRailView("customer", world, memory).total,
-    capability: buildRailView("capability", world, memory).total,
-    revenue: buildRailView("revenue", world, memory).total,
-    geographic: buildRailView("geographic", viewWorld ?? world, memory).total,
-    decision: buildRailView("decision", world, memory).total,
-    workflow: buildRailView("workflow", world, memory).total,
-  } : {};
+  const counts = Object.fromEntries(
+    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
+      .map((surface) => [surface, countForSurface(surface, world, memory)]),
+  ) as Partial<Record<SurfaceId, number>>;
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
 
@@ -96,7 +105,7 @@ export function App() {
       className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
       style={{ "--right-w": rightW } as React.CSSProperties}
     >
-      <BrainSidebar activeBrainArea={activeBrainArea} counts={counts} homeActive={homeActive} settingsActive={settingsActive} />
+      <BrainSidebar activeSurface={settingsActive ? "settings" : homeActive ? "brief" : activeSurface} counts={counts} />
       <main className="quiet-main" onClickCapture={() => {
         if (activeCompanyId) setState({ activeCompanyId: null });
       }}>
@@ -151,8 +160,7 @@ export function App() {
           </label>}
         </header>
         <section className="quiet-stage">{renderDefault()}</section>
-        {world && !homeActive && !settingsActive && <AskBrainBar world={viewWorld ?? world} />}
-        {world && <Copilot world={world} />}
+        {world && !homeActive && !settingsActive && activeSurface !== "ask" && <AskBrainBar world={viewWorld ?? world} />}
       </main>
       <RightContextPanel response={brainResponse} />
 
@@ -170,12 +178,11 @@ export function App() {
       {demoAction && (
         <div className="demo-action-overlay" role="dialog" aria-modal="true" aria-labelledby="demo-action-title">
           <div className="demo-action-modal">
-            <p className="eyebrow">Demo workflow</p>
+            <p className="eyebrow">Create work item</p>
             <h2 id="demo-action-title">{demoAction.title}</h2>
             {demoAction.accountName && <p className="demo-action-account">{demoAction.accountName}</p>}
             <p>
-              In production, this would create a Salesforce task or lead, assign an owner, attach source evidence,
-              and schedule follow-up. This demo does not send email, write to a CRM, or call an external API.
+              Review the action before creating a durable backend work item. CRM execution is intentionally separate and lands in the later CRM write workflow.
             </p>
             {demoAction.evidence && (
               <div className="demo-action-evidence">
@@ -184,25 +191,41 @@ export function App() {
               </div>
             )}
             <div className="demo-action-steps">
-              <span>Create CRM task</span>
+              <span>Create work item</span>
               <span>Attach evidence</span>
               <span>Assign owner</span>
-              <span>Schedule follow-up</span>
+              <span>Queue approval</span>
             </div>
+            {workItemStatus && <div className={workItemStatus.startsWith("Created") ? "live-inline-status" : "live-inline-status error"}>{workItemStatus}</div>}
             <div className="demo-action-modal-actions">
               <button
                 onClick={() => {
-                  recordSimulatedAction({
+                  setWorkItemStatus("Creating work item...");
+                  void createWorkItem({
                     title: demoAction.title,
-                    summary: "Confirmed simulated workflow. Demo mode - no external writes occurred.",
-                    brainArea: "workflow",
+                    accountName: demoAction.accountName,
+                    accountId: demoAction.accountId,
+                    sourceSignalIds: demoAction.sourceSignalIds,
+                    evidence: demoAction.evidence,
+                    type: demoAction.workItemType,
+                  }).then((item) => {
+                    setWorkItemStatus(`Created work item ${item.id}.`);
+                    window.setTimeout(() => {
+                      closeDemoAction();
+                      setWorkItemStatus("");
+                      setState({ activeSurface: "work_queue" });
+                    }, 800);
+                  }).catch((error) => {
+                    setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
                   });
-                  closeDemoAction();
                 }}
               >
-                Confirm Demo Action
+                Confirm
               </button>
-              <button onClick={closeDemoAction}>Cancel</button>
+              <button onClick={() => {
+                setWorkItemStatus("");
+                closeDemoAction();
+              }}>Cancel</button>
             </div>
           </div>
         </div>

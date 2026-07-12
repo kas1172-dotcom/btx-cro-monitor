@@ -1,17 +1,6 @@
-import {
-  Document,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  WidthType,
-} from "docx";
-import ExcelJS from "exceljs";
 import type { Deliverable, DeliverableBlock, DeliverableSection, DeliverableType } from "./types.ts";
 import { deliverableToMarkdown } from "./markdown.ts";
+import { calendarStartFromDeliverable } from "../app/dateDefaults.ts";
 
 export type DownloadFormat = "markdown" | "docx" | "pdf" | "pptx" | "xlsx" | "csv" | "ics";
 
@@ -66,8 +55,19 @@ function emailBody(deliverable: Deliverable): string {
 }
 
 export async function downloadDocx(deliverable: Deliverable): Promise<void> {
+  const {
+    Document,
+    HeadingLevel,
+    Packer,
+    Paragraph,
+    Table,
+    TableCell,
+    TableRow,
+    TextRun,
+    WidthType,
+  } = await import("docx");
   const sections = exportSections(deliverable);
-  const children: Array<Paragraph | Table> = [
+  const children: any[] = [
     new Paragraph({ text: deliverable.form === "email" ? emailSubject(deliverable) : deliverable.title, heading: HeadingLevel.TITLE }),
   ];
 
@@ -136,7 +136,8 @@ export function printDeliverable(deliverable: Deliverable): void {
 }
 
 export async function downloadXlsx(deliverable: Deliverable): Promise<void> {
-  const workbook = new ExcelJS.Workbook();
+  const ExcelJS = await import("exceljs");
+  const workbook = new ExcelJS.default.Workbook();
   workbook.creator = "BTX Precision";
   const sheet = workbook.addWorksheet("Deliverable");
   sheet.addRow([deliverable.title]);
@@ -177,7 +178,7 @@ export function downloadCsv(deliverable: Deliverable): void {
 
 export function downloadIcs(deliverable: Deliverable): void {
   const stops = deliverable.sections.flatMap((section) => section.blocks).flatMap((block) => block.kind === "map-ref" ? block.stops ?? [] : []);
-  const start = new Date("2026-07-07T09:00:00");
+  const start = calendarStartFromDeliverable(deliverable.createdAt);
   const events = stops.map((stop, index) => {
     const eventStart = new Date(start.getTime() + index * 2.5 * 60 * 60 * 1000);
     const eventEnd = new Date(eventStart.getTime() + 45 * 60 * 1000);

@@ -22,7 +22,7 @@ function demoFallbackSnapshot(snapshot: OperatingSnapshot): OperatingSnapshot {
 
 export class HybridDataAdapter implements DataAdapter {
   private live = new LiveDataAdapter();
-  private artifact = new ArtifactDataAdapter();
+  private artifact = new ArtifactDataAdapter(this.live);
   private demo = new DemoDataAdapter();
 
   getCompanies(filter?: RegionFilter): Promise<Company[]> {
@@ -55,11 +55,11 @@ export class HybridDataAdapter implements DataAdapter {
       integrations: [
         {
           id: "hubspot",
-          name: "HubSpot CRM",
+          name: "Live CRM",
           category: "CRM",
           status: "demo_connected",
           demo_file: "",
-          production_method: "btx_platform HubSpot CRM v3 API",
+          production_method: "btx_platform CRM adapter",
           description: "Live companies, contacts, and deals.",
           is_demo: false,
         },

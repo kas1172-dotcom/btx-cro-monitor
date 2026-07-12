@@ -209,9 +209,12 @@ Add these repository secrets for the GitHub Pages frontend workflow:
 
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
-VITE_BACKEND_AUTH_TOKEN=<same value as BTX_BACKEND_AUTH_TOKEN on Fly>
 VITE_COCKPIT_PASSWORD=<demo access password>
 ```
+
+Do not add a shared backend bearer token to the Pages build. Browser-safe
+backend auth is deferred to WP10; protected backend calls may reject public
+cockpit requests until then.
 
 After those secrets are set, run the **Deploy Frontend Cockpit** workflow from
 the Actions tab. The cockpit will publish at:

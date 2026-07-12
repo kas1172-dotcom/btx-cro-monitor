@@ -1,7 +1,16 @@
 import { DemoDataAdapter } from "../src/adapters/demo/DemoDataAdapter.ts";
 import { analyze, buildProspects } from "../src/app/intelligence.ts";
-import { buildRailAuditViews, buildRailView, RAIL_AREAS } from "../src/app/railViews.ts";
 import { deriveNewsSignals } from "../src/app/newsIngest.ts";
+import { buildRailAuditViews } from "../src/app/railViews.ts";
+import {
+  ALL_SURFACES,
+  ANALYTICAL_SURFACES,
+  CORE_SURFACES,
+  UTILITY_SURFACES,
+  countForSurface,
+  surfaceFromBrainArea,
+} from "../src/app/surfaces.ts";
+import { deriveWorkItems, draftToCreatePayload, filterWorkItems } from "../src/app/workItems.ts";
 import newsData from "../data/demo/btx/news.json";
 import extractedData from "../data/demo/btx/extracted-signals.json";
 import type { World } from "../src/app/useWorld.ts";
@@ -49,33 +58,34 @@ const memory: MemoryState = {
 };
 
 const world = await loadWorld();
-const views = buildRailAuditViews(world, memory);
-const names = new Set(world.companies.map((company) => company.name));
-const componentIds = new Set<string>();
+const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId));
 
-assert(views.length === 8, `Expected 8 rail views including Home, got ${views.length}`);
+assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
+assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "map,analysis,capacity,programs", "Secondary nav must contain the analytical surfaces.");
+assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "settings", "Utility nav must only expose Settings.");
+assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
+assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
 
-for (const view of views) {
-  assert(view.componentId !== "", `${view.area} has no component id`);
-  assert(!componentIds.has(view.componentId), `${view.area} reuses component ${view.componentId}`);
-  componentIds.add(view.componentId);
-
-  if (view.area !== "home") {
-    assert(view.componentId !== "home", `${view.area} rendered the Home component`);
-  }
-
-  const hasComputedValue = /\d/.test(view.headline);
-  const hasEntityName = [...names].some((name) => view.headline.includes(name));
-  assert(hasComputedValue || hasEntityName, `${view.area} headline lacks a computed value or entity name: ${view.headline}`);
+for (const surface of ALL_SURFACES) {
+  assert(surface.componentId.startsWith("surface-"), `${surface.id} needs a surface component id.`);
+  countForSurface(surface.id, world, memory);
 }
 
-for (const area of RAIL_AREAS) {
-  const view = buildRailView(area, world, memory);
-  assert(view.total === view.rows.length || area === "geographic", `${area} badge count ${view.total} does not match rendered rows ${view.rows.length}`);
-}
+assert(surfaceFromBrainArea("geographic") === "map", "Legacy map routing should land on Map.");
+assert(surfaceFromBrainArea("workflow") === "work_queue", "Legacy workflow routing should land on Work Queue.");
+assert(surfaceFromBrainArea("decision") === "settings", "Legacy memory routing should land in Settings.");
 
-const revenue = buildRailView("revenue", world, memory);
-assert(revenue.componentId === "rail-revenue", "Revenue must render the pipeline rail view");
-assert(revenue.rows.slice(0, 5).every((row) => row.companyId && row.detailTarget === "pipeline"), "Revenue top rows must open account dossiers at pipeline context");
+const workItems = deriveWorkItems(world);
+assert(workItems.length > 0, "Core surfaces must be backed by work items.");
+assert(filterWorkItems(workItems, "needs_attention").every((item) => item.priority === "high" || item.priority === "urgent" || (item.due_date ?? "9999-99-99") < new Date().toISOString().slice(0, 10)), "Needs-attention view must filter work items.");
+const payload = draftToCreatePayload({ title: "Call account owner", accountId: "acct-1", sourceSignalIds: ["sig-1"], evidence: "brief.md" });
+assert(payload.canonical_account_id === "acct-1", "Work-item preview must preserve account id.");
+assert(payload.source_signal_ids?.[0] === "sig-1", "Work-item preview must preserve evidence signal ids.");
+assert(payload.approval_state === "pending", "Work-item preview should create approval-ready items.");
 
-console.log(`rail tabs ok: ${views.map((view) => `${view.area}:${view.componentId}`).join(", ")}`);
+// Keep the legacy rail audit as an overflow auditor for older detailed components.
+const auditViews = buildRailAuditViews(world, memory);
+assert(auditViews.length === 8, "Legacy overflow auditor should still cover home plus seven absorbed areas.");
+assert(new Set(auditViews.map((view) => view.componentId)).size === auditViews.length, "Overflow auditor component ids must remain distinct.");
+
+console.log(`ia surfaces ok: ${ALL_SURFACES.map((surface) => `${surface.id}:${surface.componentId}`).join(", ")}`);

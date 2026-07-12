@@ -71,6 +71,8 @@ def test_hubspot_pagination_and_rate_limit(monkeypatch):
     assert [record.id for record in records] == ["1", "2"]
     assert sleeps == [0.0]
     assert FakeHttpxClient.calls[0][0] == "GET"
+    assert "btx_aliases" in FakeHttpxClient.calls[1][2]["params"]["properties"]
+    assert "btx_known_programs" in FakeHttpxClient.calls[1][2]["params"]["properties"]
     assert FakeHttpxClient.calls[2][1] == "https://api.hubapi.com/page-2"
 
 
@@ -137,6 +139,12 @@ def test_hubspot_mappers_emit_frontend_shapes():
             "state": "PA",
             "hubspot_owner_id": "7",
             "btx_needs": "ITAR, precision machining",
+            "btx_aliases": "Acme; Acme Aero Systems",
+            "btx_facility_names": "Acme Pittsburgh",
+            "btx_cage_code": "1ABC2",
+            "btx_uei": "ABCDE12345",
+            "btx_known_programs": "F-35; B-21",
+            "btx_known_customers": "USAF; Navy",
         })],
         owners,
         {"1": ["2"]},
@@ -154,6 +162,15 @@ def test_hubspot_mappers_emit_frontend_shapes():
     )
 
     assert companies[0]["id"] == "hubspot-company-1"
+    assert companies[0]["canonical_account_id"] == "hubspot-company-1"
+    assert companies[0]["hubspot_company_id"] == "1"
+    assert companies[0]["domains"] == ["acme.example"]
+    assert companies[0]["aliases"] == ["Acme", "Acme Aero Systems"]
+    assert companies[0]["facility_names"] == ["Acme Pittsburgh"]
+    assert companies[0]["cage_code"] == "1ABC2"
+    assert companies[0]["uei"] == "ABCDE12345"
+    assert companies[0]["known_programs"] == ["F-35", "B-21"]
+    assert companies[0]["known_customers"] == ["USAF", "Navy"]
     assert companies[0]["location"]["city"] == "Pittsburgh"
     assert companies[0]["relationship"] == "customer"
     assert companies[0]["needs"] == ["ITAR", "precision machining"]
@@ -193,6 +210,48 @@ def test_crm_route_uses_five_minute_cache(monkeypatch, tmp_path: Path):
     third = client.get("/crm/accounts", headers=_headers())
     assert third.json()["records"] == [{"id": "accounts-2"}]
     assert calls == 2
+
+
+def test_crm_accounts_sync_canonical_account(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf)
+    client = TestClient(app)
+
+    def fake_payload(_client, kind):
+        assert kind == "accounts"
+        return {
+            "data_provenance": "HubSpot",
+            "records": [{
+                "id": "hubspot-company-10",
+                "canonical_account_id": "hubspot-company-10",
+                "hubspot_company_id": "10",
+                "domains": ["boeing.com"],
+                "aliases": ["Boeing"],
+                "facility_names": ["Fort Worth"],
+                "parent_id": None,
+                "subsidiary_ids": ["hubspot-company-11"],
+                "cage_code": "81205",
+                "uei": "BOEINGUEI1",
+                "known_programs": ["F-15EX"],
+                "known_customers": ["USAF"],
+            }],
+        }
+
+    monkeypatch.setattr("btx_platform.api.hubspot_payload", fake_payload)
+
+    response = client.get("/crm/accounts", headers=_headers())
+
+    assert response.status_code == 200
+    with sf() as session:
+        account = session.get(models.CanonicalAccount, "hubspot-company-10")
+    assert account is not None
+    assert account.hubspot_company_id == "10"
+    assert account.domains == ["boeing.com"]
+    assert account.aliases == ["Boeing"]
+    assert account.known_programs == ["F-15EX"]
 
 
 def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_path: Path):

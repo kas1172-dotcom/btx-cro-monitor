@@ -3,7 +3,9 @@
 Use this checklist for UI behaviors that are not covered by the deterministic TypeScript regression tests.
 
 - Navigation: exactly one Home icon appears in the rail; clicking the brand title returns to Home.
-- Rail tab sweep: click all 8 rail items (Home, Signals, Accounts, Capability, Revenue, Map, Memory, Actions), screenshot each, and confirm no tab renders Home or another tab's view.
+- Nav sweep at 1280px desktop: click Core (Today's Brief, Work Queue, Accounts, Ask), Analytical (Map, Analysis, Capacity, Programs), and Utility (Settings). Screenshot each and confirm every surface renders its distinct component.
+- Mobile sweep at 390px and 414px: verify the rail is a bottom touch tab bar, Core surfaces open as full-screen views, Ask reads like a chat surface, Account 360 scrolls without horizontal overflow, and the right context/dossier panels open as sheets.
+- Mobile map sweep at 390px and 414px: open Map, rotate or resize, and confirm tiles/markers redraw rather than appearing blank. The automated smoke writes reference screenshots to `/tmp/btx-mobile-smoke/cockpit-390.png`, `/tmp/btx-mobile-smoke/cockpit-414.png`, and `/tmp/btx-mobile-smoke/cockpit-1280.png`.
 - Ask chips: chips work from Home, responses, deliverables, and every workspace tab.
 - Parameter chips: Meeting brief shows account select; Plan a trip shows city and date range; Board deck shows quarter; Analysis view shows metric preset; Escape closes the popover.
 - Dossier: X closes the dossier, clicking the backdrop closes it, and Escape closes only the dossier without changing the active tab or response.
@@ -33,7 +35,7 @@ Artifact mode uses Vite-bundled JSON imports from `clients/btx/artifacts/run_out
 ## Backend live-mode Settings smoke test
 
 1. Start `btx_platform` with `BTX_BACKEND_AUTH_TOKEN`, `BTX_ANTHROPIC_API_KEY`, and either `BTX_PIPELINE_MECHANISM=subprocess` locally or `github` in production.
-2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_BACKEND_AUTH_TOKEN`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, and `VITE_DATA_MODE=live`.
+2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, and `VITE_DATA_MODE=live`. The browser build must not hold a shared backend bearer token; protected backend-route QA waits for WP10 browser-safe auth or should use direct backend curl checks.
 3. Open Settings → Engine tuning. Confirm the panel shows `Backend scoring_weights`, a version number, and editable scoring rows. Change one weight, save, and confirm the version/status updates.
 4. Open Settings → Sources. Toggle a source, save, reload, and confirm the saved enabled state returns from the backend.
 5. Click `Run collection now`. Confirm the button reports the run status, recent runs populate, and a second click inside the rate-limit window is refused with a visible message.

@@ -44,6 +44,12 @@ function clamp(value: number, max: number): number {
   return Math.max(0, Math.min(value, max));
 }
 
+function scoresSubject(signal: Signal, subjectId: string): boolean {
+  if (signal.scope === undefined) return signal.subject_id === subjectId;
+  if (signal.scope !== "specific_account") return false;
+  return signal.relationships?.some((record) => record.canonical_account_id === subjectId) === true;
+}
+
 /**
  * Score one subject from its (already validated) signals. Signals not belonging
  * to `subjectId` are ignored, so callers may pass a mixed list safely.
@@ -58,7 +64,7 @@ export function scoreSubject(
     dims[dimension] = { dimension, score: 0, raw: 0, contributions: [] };
   }
 
-  const mine = signals.filter((s) => s.subject_id === subjectId);
+  const mine = signals.filter((s) => scoresSubject(s, subjectId));
 
   // Group by event_type so repeats of the same kind decay together.
   const byType = new Map<string, Signal[]>();

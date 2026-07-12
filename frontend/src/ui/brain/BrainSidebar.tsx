@@ -1,43 +1,68 @@
-import type { BrainArea } from "../../brain/types.ts";
-import { goHome, setState } from "../../store/store.ts";
+import { setState } from "../../store/store.ts";
+import {
+  ANALYTICAL_SURFACES,
+  CORE_SURFACES,
+  UTILITY_SURFACES,
+  brainAreaForSurface,
+  type SurfaceId,
+} from "../../app/surfaces.ts";
 
-const AREAS: Array<{ id: BrainArea; icon: string; label: string; title: string }> = [
-  { id: "market", icon: "⚡", label: "Signals", title: "Market signals and news linked to your accounts" },
-  { id: "customer", icon: "☷", label: "Accounts", title: "Current business, account risk, and customer attention" },
-  { id: "capability", icon: "◷", label: "Capability", title: "Capacity, fit, and operating context" },
-  { id: "revenue", icon: "$", label: "Revenue", title: "Revenue priorities and recommendations" },
-  { id: "geographic", icon: "⌖", label: "Map", title: "Market map and geographic prospecting" },
-  { id: "decision", icon: "▤", label: "Memory", title: "Saved notes, activity, and reusable work" },
-  { id: "workflow", icon: "⇄", label: "Actions", title: "Simulated action workflows and integrations" },
-];
+const ICONS: Record<SurfaceId, string> = {
+  brief: "B",
+  work_queue: "Q",
+  accounts: "A",
+  ask: "?",
+  map: "M",
+  analysis: "%",
+  capacity: "C",
+  programs: "P",
+  settings: "*",
+};
 
-export function BrainSidebar({ activeBrainArea, counts, homeActive, settingsActive }: { activeBrainArea: BrainArea; counts: Partial<Record<BrainArea, number>>; homeActive: boolean; settingsActive: boolean }) {
+function openSurface(surface: SurfaceId): void {
+  setState({
+    activeSurface: surface,
+    activeSettings: surface === "settings",
+    activeHome: surface === "brief",
+    activeBrainArea: brainAreaForSurface(surface),
+    brainResponse: null,
+    activeDeliverable: null,
+    activeAnalysisSpec: null,
+    activeCompanyId: null,
+  });
+}
+
+export function BrainSidebar({
+  activeSurface,
+  counts,
+}: {
+  activeSurface: SurfaceId;
+  counts: Partial<Record<SurfaceId, number>>;
+}) {
+  const groups = [
+    { label: "Core", items: CORE_SURFACES },
+    { label: "Analytical", items: ANALYTICAL_SURFACES },
+    { label: "Utility", items: UTILITY_SURFACES },
+  ];
   return (
     <aside className="brain-rail">
-      <button className={homeActive ? "brain-rail-btn active" : "brain-rail-btn"} onClick={goHome} title="Home cockpit">
-        <span>⌂</span>
-        <strong>Home</strong>
-      </button>
-      {AREAS.map((area) => (
-        <button
-          key={area.id}
-          className={activeBrainArea === area.id && !homeActive && !settingsActive ? "brain-rail-btn active" : "brain-rail-btn"}
-          onClick={() => setState({ activeBrainArea: area.id, activeSettings: false, brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null })}
-          title={area.title}
-        >
-          <span>{area.icon}</span>
-          <strong>{area.label}</strong>
-          {counts[area.id] ? <em>{counts[area.id]}</em> : null}
-        </button>
+      {groups.map((group) => (
+        <div key={group.label} className={group.label === "Utility" ? "brain-rail-group brain-rail-utility" : "brain-rail-group"}>
+          <div className="brain-rail-group-label">{group.label}</div>
+          {group.items.map((surface) => (
+            <button
+              key={surface.id}
+              className={activeSurface === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
+              onClick={() => openSurface(surface.id)}
+              title={surface.title}
+            >
+              <span>{ICONS[surface.id]}</span>
+              <strong>{surface.label}</strong>
+              {counts[surface.id] ? <em>{counts[surface.id]}</em> : null}
+            </button>
+          ))}
+        </div>
       ))}
-      <button
-        className={settingsActive ? "brain-rail-btn brain-settings-btn active" : "brain-rail-btn brain-settings-btn"}
-        onClick={() => setState({ activeSettings: true, activeHome: false, brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null })}
-        title="Settings"
-      >
-        <span>⚙</span>
-        <strong>Settings</strong>
-      </button>
     </aside>
   );
 }

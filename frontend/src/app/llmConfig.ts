@@ -1,7 +1,15 @@
 // Model ids must be valid for the configured API key.
 // Override via env: VITE_MODEL_CHATPIL and VITE_MODEL_COMPOSE.
 // Defaults: claude-haiku-4-5-20251001 (chat), claude-sonnet-4-5 (composition).
-const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
+function viteEnv(): Record<string, string | undefined> | undefined {
+  try {
+    return (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
+  } catch {
+    return undefined;
+  }
+}
+
+const env = viteEnv();
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 
 export const LLM_MODELS = {

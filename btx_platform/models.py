@@ -119,6 +119,29 @@ class EngineConfig(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
 
+class CanonicalAccount(Base):
+    """Stable account identity derived from HubSpot company records.
+
+    The HubSpot company id is the source-of-truth join key; enrichment columns
+    are optional because most portals will not have BTX custom properties yet.
+    """
+    __tablename__ = "canonical_accounts"
+    __table_args__ = (UniqueConstraint("hubspot_company_id", name="uq_canonical_hubspot_company"),)
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    hubspot_company_id: Mapped[str] = mapped_column(String(80), nullable=False, index=True)
+    domains: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    aliases: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    facility_names: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    parent_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    subsidiary_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    cage_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    uei: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    known_programs: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    known_customers: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
 class PipelineRun(Base):
     """Audit row for a manually triggered monitor-engine pipeline run."""
     __tablename__ = "pipeline_runs"
@@ -131,6 +154,29 @@ class PipelineRun(Base):
     item_counts: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     detail: Mapped[str | None] = mapped_column(Text, nullable=True)
     config_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class WorkItem(Base):
+    """Durable server-backed work loop item for cockpit action surfaces."""
+    __tablename__ = "work_items"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    type: Mapped[str] = mapped_column(String(40), index=True)
+    canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    source_signal_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    owner: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
+    priority: Mapped[str] = mapped_column(String(32), default="normal", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="proposed", index=True)
+    due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    recommended_action: Mapped[str] = mapped_column(Text)
+    generated_artifact_ref: Mapped[str | None] = mapped_column(Text, nullable=True)
+    approval_state: Mapped[str] = mapped_column(String(32), default="not_required", index=True)
+    execution_state: Mapped[str] = mapped_column(String(32), default="not_started", index=True)
+    outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
+    follow_up_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    audit_history: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
 
 
 class HubSpotTaskAudit(Base):

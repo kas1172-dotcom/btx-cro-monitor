@@ -43,6 +43,19 @@ export interface Company {
   source_url?: string;
   /** Capability tags this company needs from a supplier — matched for fit. */
   needs: string[];
+  /** Stable canonical account id. CRM-backed live accounts use their adapter join key. */
+  canonical_account_id?: string;
+  hubspot_company_id?: string;
+  domains?: string[];
+  aliases?: string[];
+  facility_names?: string[];
+  canonical_location?: Partial<Location>;
+  parent_id?: string;
+  subsidiary_ids?: string[];
+  cage_code?: string;
+  uei?: string;
+  known_programs?: string[];
+  known_customers?: string[];
 }
 
 export interface Contact {

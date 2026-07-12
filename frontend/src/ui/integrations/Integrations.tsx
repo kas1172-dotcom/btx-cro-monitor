@@ -80,7 +80,7 @@ export function Integrations() {
 
           <div className="assumption-box">
             <strong>{ASSUMPTIONS.summary}</strong>
-            <p>Live mode is intentionally not configured for this static demo. Use `VITE_DATA_MODE=demo` until authenticated adapters are added.</p>
+            <p>Hybrid mode uses the backend for live CRM data and monitor artifacts. Use `VITE_DATA_MODE=demo` only for local fixture runs.</p>
           </div>
         </section>
       </div>

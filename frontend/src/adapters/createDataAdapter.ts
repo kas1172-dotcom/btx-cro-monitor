@@ -16,10 +16,10 @@ function urlDataMode(): string | undefined {
 export function getDataMode(): DataMode {
   const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
   const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
-  const mode = urlDataMode() ?? env?.VITE_DATA_MODE ?? processEnv?.VITE_DATA_MODE ?? "demo";
+  const mode = urlDataMode() ?? env?.VITE_DATA_MODE ?? processEnv?.VITE_DATA_MODE ?? "hybrid";
   if (mode === "artifact" || mode === "live" || mode === "demo" || mode === "hybrid") return mode;
-  console.warn(`Unknown data mode "${mode}". Falling back to demo.`);
-  return "demo";
+  console.warn(`Unknown data mode "${mode}". Falling back to hybrid.`);
+  return "hybrid";
 }
 
 export function createDataAdapter(mode: DataMode = getDataMode()): DataAdapter {

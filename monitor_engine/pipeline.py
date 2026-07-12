@@ -1,5 +1,5 @@
 """
-Full pipeline: collect → prefilter → analyse → archive → site.
+Full pipeline: collect → prefilter → analyse → archive → JSON artifacts.
 
 Entry point: monitor_engine/__main__.py
 Direct use:  from monitor_engine.pipeline import run_pipeline
@@ -31,11 +31,14 @@ from monitor_engine.feedback import (
 from monitor_engine.models import (
     ArchivedRun,
     ClientConfig,
+    DeepAnalysisSectionInfo,
+    EditionInfo,
+    EnricherInfo,
     RawItem,
     RunMeta,
     RunOutput,
+    SiteConfig,
 )
-from monitor_engine.site.builder import build_site
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +77,28 @@ def _engine_version() -> str:
         return "dev"
 
 
+def _site_config(config: ClientConfig) -> SiteConfig:
+    """Embed presentation metadata in run_output.json for artifact consumers."""
+    deep_sections = None
+    if config.deep_analysis is not None:
+        deep_sections = [
+            DeepAnalysisSectionInfo(id=s.id, label=s.label, kind=s.kind)
+            for s in config.deep_analysis.sections
+        ]
+
+    return SiteConfig(
+        name=config.branding.name,
+        accent_color=config.branding.accent_color,
+        editions=[
+            EditionInfo(id=ed.id, label=ed.label, categories=ed.categories)
+            for ed in config.editions
+        ],
+        deep_analysis_sections=deep_sections,
+        enrichers=[EnricherInfo(id=e.id, label=e.label) for e in config.enrichers],
+        account_map_url=None,
+    )
+
+
 def run_pipeline(
     config_path: Path,
     output_dir: Path,
@@ -86,10 +111,9 @@ def run_pipeline(
     """
     Run the full pipeline for one client config.
 
-    Writes ``index.html`` and ``run_output.json`` to *output_dir* and updates
-    the rolling archive.  Calls ``sys.exit(1)`` with a clear message if any
-    required env var is missing or if the output artifact fails schema
-    validation.
+    Writes ``run_output.json`` to *output_dir* and updates the rolling archive.
+    Calls ``sys.exit(1)`` with a clear message if any required env var is
+    missing or if the output artifact fails schema validation.
     """
     config = ClientConfig.model_validate(
         json.loads(config_path.read_text(encoding="utf-8"))
@@ -254,11 +278,14 @@ def run_pipeline(
         editorial=editorial,
         source_health=collection.health,
         entity_index=entity_index,
+        site_config=_site_config(config),
     )
 
-    # ── Build static site ────────────────────────────────────────────────
-    build_site(run_output, config, output_dir)
-    logger.info("Site written to %s", output_dir)
+    # ── Write JSON artifact ──────────────────────────────────────────────
+    (output_dir / "run_output.json").write_text(
+        run_output.model_dump_json(indent=2), encoding="utf-8"
+    )
+    logger.info("Artifact written to %s", output_dir / "run_output.json")
 
     # ── Validate (before persisting archive — bad output must not poison history) ──
     _validate_artifact(output_dir / "run_output.json")

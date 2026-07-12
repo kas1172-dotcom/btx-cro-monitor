@@ -3,6 +3,7 @@ import type { World } from "../../app/useWorld.ts";
 import { useStore } from "../../store/store.ts";
 import type { MetricId } from "../../metrics/types.ts";
 import { dispatchBrainQuestion } from "../../app/brainActions.ts";
+import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
 
 const ACTIONS = [
   "Plan a trip",
@@ -49,9 +50,11 @@ export function AskBrainBar({ world, large = false }: { world: World; large?: bo
   const [showWorking, setShowWorking] = useState(false);
   const [accountId, setAccountId] = useState(world.prospects[0]?.company.id ?? world.companies[0]?.id ?? "");
   const [tripCity, setTripCity] = useState(world.city ?? "Austin");
-  const [startDate, setStartDate] = useState("2026-07-07");
-  const [endDate, setEndDate] = useState("2026-07-09");
-  const [quarter, setQuarter] = useState("Q2 2026");
+  const tripDefaults = defaultTripWindow(defaultDateAnchor(world));
+  const quarters = quarterOptions(defaultDateAnchor(world));
+  const [startDate, setStartDate] = useState(tripDefaults.startDate);
+  const [endDate, setEndDate] = useState(tripDefaults.endDate);
+  const [quarter, setQuarter] = useState(quarters[0]);
   const [metric, setMetric] = useState<MetricId>("revenue");
   const [instructions, setInstructions] = useState("");
   const cities = [...new Set(world.companies.map((c) => c.location.city))].sort();
@@ -204,9 +207,7 @@ export function AskBrainBar({ world, large = false }: { world: World; large?: bo
           {pendingAction === "Board deck" && (
             <label>Quarter
               <select value={quarter} onChange={(event) => setQuarter(event.target.value)}>
-                <option>Q2 2026</option>
-                <option>Q1 2026</option>
-                <option>Q4 2025</option>
+                {quarters.map((item) => <option key={item}>{item}</option>)}
               </select>
             </label>
           )}

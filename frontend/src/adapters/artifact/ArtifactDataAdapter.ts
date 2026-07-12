@@ -8,6 +8,7 @@ import archiveData from "../../../../clients/btx/artifacts/archive.json";
 import type { DataAdapter, RegionFilter } from "../../engine/brain/ports.ts";
 import type { Company, Contact, Facility, Opportunity } from "../../engine/brain/entities.ts";
 import type { OperatingSnapshot } from "../../engine/brain/operatingSnapshot.ts";
+import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { DemoDataAdapter } from "../demo/DemoDataAdapter.ts";
 import { buildArtifactSignals, type ArtifactArchive, type ArtifactMappingResult } from "./artifactSignals.ts";
 
@@ -23,8 +24,14 @@ type LoadedArtifacts = {
   archive: ArtifactArchive;
   artifactPath: string;
   runOutput: unknown;
-  source: "published" | "bundled";
+  source: "backend" | "published" | "bundled";
 };
+
+interface BackendArtifactPayload {
+  artifact_path?: string;
+  archive?: ArtifactArchive;
+  run_output?: unknown;
+}
 
 function isStale(runAt: string): boolean {
   const ageMs = Date.now() - Date.parse(runAt);
@@ -37,6 +44,24 @@ export class ArtifactDataAdapter implements DataAdapter {
   private artifactError: string | null = null;
   private artifacts: Promise<LoadedArtifacts[]> | undefined;
   private activeArtifacts: LoadedArtifacts | null = null;
+
+  constructor(private accountProvider: Pick<DataAdapter, "getCompanies"> = new DemoDataAdapter()) {}
+
+  private async backendArtifacts(): Promise<LoadedArtifacts | null> {
+    if (!BACKEND_ENDPOINT) return null;
+    try {
+      const payload = await backendJson<BackendArtifactPayload>("/artifacts/latest");
+      if (!payload.run_output) throw new Error("Backend artifact payload missing run_output");
+      return {
+        archive: payload.archive ?? { runs: [], pinned: [] },
+        artifactPath: payload.artifact_path ?? `${BACKEND_ENDPOINT}/artifacts/latest`,
+        runOutput: payload.run_output,
+        source: "backend",
+      };
+    } catch {
+      return null;
+    }
+  }
 
   private async publishedArtifacts(): Promise<LoadedArtifacts | null> {
     try {
@@ -64,6 +89,7 @@ export class ArtifactDataAdapter implements DataAdapter {
   private async artifactCandidates(): Promise<LoadedArtifacts[]> {
     if (!this.artifacts) {
       this.artifacts = (async () => {
+        const backend = await this.backendArtifacts();
         const published = await this.publishedArtifacts();
         const bundled: LoadedArtifacts = {
           archive: archiveData as ArtifactArchive,
@@ -71,7 +97,7 @@ export class ArtifactDataAdapter implements DataAdapter {
           runOutput: runOutputData,
           source: "bundled",
         };
-        return published ? [published, bundled] : [bundled];
+        return [backend, published, bundled].filter((candidate): candidate is LoadedArtifacts => Boolean(candidate));
       })();
     }
     return this.artifacts;
@@ -80,7 +106,7 @@ export class ArtifactDataAdapter implements DataAdapter {
   private async artifactState(): Promise<ArtifactMappingResult | null> {
     if (this.artifact !== undefined) return this.artifact;
     const errors: string[] = [];
-    const companies = await this.demo.getCompanies();
+    const companies = await this.accountProvider.getCompanies();
     for (const candidate of await this.artifactCandidates()) {
       try {
         const artifact = buildArtifactSignals(candidate.runOutput, companies);
@@ -103,7 +129,7 @@ export class ArtifactDataAdapter implements DataAdapter {
   }
 
   async getCompanies(filter?: RegionFilter): Promise<Company[]> {
-    return this.demo.getCompanies(filter);
+    return this.accountProvider.getCompanies(filter);
   }
 
   async getSignals(filter?: RegionFilter): Promise<unknown[]> {

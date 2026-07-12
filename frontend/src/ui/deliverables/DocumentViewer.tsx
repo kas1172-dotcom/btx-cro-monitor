@@ -8,7 +8,7 @@ import { deliverableToMarkdown } from "../../deliverables/markdown.ts";
 import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
-import { downloadBoardDeck } from "../../deliverables/deck/pptx.ts";
+import { requestSectionRevision } from "../../deliverables/editorAssistant.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
   downloadCsv,
@@ -102,7 +102,10 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     if (format === "markdown") downloadMarkdown(current);
     if (format === "docx") await downloadDocx(current);
     if (format === "pdf") printDeliverable(current);
-    if (format === "pptx" && world) await downloadBoardDeck(current, world);
+    if (format === "pptx" && world) {
+      const { downloadBoardDeck } = await import("../../deliverables/deck/pptx.ts");
+      await downloadBoardDeck(current, world);
+    }
     if (format === "xlsx") await downloadXlsx(current);
     if (format === "csv") downloadCsv(current);
     if (format === "ics") downloadIcs(current);
@@ -122,19 +125,15 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       return;
     }
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-5",
-          system: "Revise one deliverable section. Preserve facts and numbers. Respect audience/form rules and banned vocabulary. Return only revised prose.",
-          messages: [{ role: "user", content: JSON.stringify({ title: current.title, audience: current.audience, form: current.form, section: target, instruction }) }],
-        }),
-      });
-      const data = (await res.json()) as { text?: string };
-      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text: data.text ?? firstText.text }]);
-    } catch {
-      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text: firstText.text, warning: "Assistant needs the connection — manual editing still works." }]);
+      const text = await requestSectionRevision({ endpoint, deliverable: current, section: target, instruction });
+      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text }]);
+    } catch (error) {
+      setSuggestions((items) => [...items, {
+        id: `${Date.now()}`,
+        sectionId: target.id,
+        text: "No suggestion generated.",
+        warning: error instanceof Error ? error.message : "Assistant revision failed.",
+      }]);
     } finally {
       setAssistantInput("");
     }
@@ -163,7 +162,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     const draft = createTaskDraft();
     if ((world?.dataMode === "hybrid" || world?.dataMode === "live")) {
       if (!BACKEND_ENDPOINT) {
-        setTaskDialog({ ...draft, status: "error", error: "Backend is not configured; live HubSpot task creation is unavailable." });
+        setTaskDialog({ ...draft, status: "error", error: "Backend is not configured; live CRM task creation is unavailable." });
         return;
       }
       setTaskDialog({ ...draft, status: "confirm" });
@@ -190,7 +189,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       });
       setTaskDialog({ ...draft, status: "created", id: result.id, recordUrl: result.record_url });
     } catch (error) {
-      setTaskDialog({ ...draft, status: "error", error: error instanceof Error ? error.message : "HubSpot task creation failed." });
+      setTaskDialog({ ...draft, status: "error", error: error instanceof Error ? error.message : "CRM task creation failed." });
     }
   }
 
@@ -239,7 +238,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       {taskDialog && (
         <div className="task-confirmation" role="dialog" aria-modal="true" aria-labelledby="task-confirm-title">
           <div className="task-confirmation-panel">
-            <p className="eyebrow">HubSpot task</p>
+            <p className="eyebrow">CRM task</p>
             <h2 id="task-confirm-title">{taskDialog.status === "created" ? "Task created" : "Create task?"}</h2>
             <div className="task-preview">
               <span>Subject</span>
@@ -258,7 +257,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
             {taskDialog.status === "error" && <div className="task-error" role="status">{taskDialog.error}</div>}
             {taskDialog.status === "created" && (
               <a className="task-success-link" href={taskDialog.recordUrl} target="_blank" rel="noreferrer">
-                Open in HubSpot
+                Open CRM record
               </a>
             )}
             <div className="task-confirmation-actions">

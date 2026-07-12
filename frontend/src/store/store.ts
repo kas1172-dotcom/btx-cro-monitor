@@ -8,9 +8,10 @@ import { useSyncExternalStore } from "react";
 import type { BrainArea, BrainResponse } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import type { ChartSpec } from "../metrics/types.ts";
+import { surfaceFromBrainArea, type SurfaceId } from "../app/surfaces.ts";
 
 export type View = "home" | "current" | "prospecting" | "map" | "dashboard" | "graph" | "feed" | "operating" | "integrations";
-export type SettingsSection = "general" | "engine" | "prompts" | "connections";
+export type SettingsSection = "general" | "memory" | "engine" | "prompts" | "sources" | "integrations";
 
 export interface UiState {
   city: string | null;
@@ -22,6 +23,7 @@ export interface UiState {
   activeHome: boolean;
   activeSettings: boolean;
   activeSettingsSection: SettingsSection;
+  activeSurface: SurfaceId;
   activeBrainArea: BrainArea;
   brainResponse: BrainResponse | null;
   activeDeliverable: Deliverable | null;
@@ -33,6 +35,9 @@ export interface UiState {
 export interface DemoActionNotice {
   title: string;
   accountName?: string;
+  accountId?: string;
+  sourceSignalIds?: string[];
+  workItemType?: "account_action" | "research_task" | "customer_question" | "capacity_check" | "meeting_brief" | "outreach_draft" | "qualified_opportunity" | "dismissed";
   action: "crm_task" | "follow_up" | "crm_lead";
   evidence?: string;
 }
@@ -47,6 +52,7 @@ let state: UiState = {
   activeHome: true,
   activeSettings: false,
   activeSettingsSection: "general",
+  activeSurface: "brief",
   activeBrainArea: "revenue",
   brainResponse: null,
   activeDeliverable: null,
@@ -60,6 +66,19 @@ export function setState(patch: Partial<UiState>): void {
   const nextPatch = { ...patch };
   if (patch.activeBrainArea !== undefined && patch.activeHome === undefined) {
     nextPatch.activeHome = false;
+  }
+  if (patch.activeBrainArea !== undefined && patch.activeSurface === undefined) {
+    nextPatch.activeSurface = surfaceFromBrainArea(patch.activeBrainArea);
+  }
+  if (patch.activeSurface !== undefined) {
+    nextPatch.activeHome = patch.activeSurface === "brief";
+    nextPatch.activeSettings = patch.activeSurface === "settings";
+  }
+  if (patch.activeHome === true && patch.activeSurface === undefined) {
+    nextPatch.activeSurface = "brief";
+  }
+  if (patch.activeSettings === true && patch.activeSurface === undefined) {
+    nextPatch.activeSurface = "settings";
   }
   if ((patch.activeBrainArea !== undefined || patch.activeHome) && patch.activeSettings === undefined) {
     nextPatch.activeSettings = false;
@@ -93,7 +112,12 @@ export function waitForState(
 }
 
 export function openCopilotWithPrompt(prompt: string): void {
-  setState({ copilotPrompt: prompt, copilotPromptId: state.copilotPromptId + 1 });
+  setState({
+    activeSurface: "ask",
+    askDraftPrompt: prompt,
+    copilotPrompt: prompt,
+    copilotPromptId: state.copilotPromptId + 1,
+  });
 }
 
 export function openDemoAction(action: DemoActionNotice): void {
@@ -108,6 +132,7 @@ export function goHome(): void {
   setState({
     activeHome: true,
     activeSettings: false,
+    activeSurface: "brief",
     brainResponse: null,
     activeDeliverable: null,
     activeAnalysisSpec: null,
@@ -130,6 +155,7 @@ export function resetUiState(): void {
     activeHome: true,
     activeSettings: false,
     activeSettingsSection: "general",
+    activeSurface: "brief",
     activeBrainArea: "revenue",
     brainResponse: null,
     activeDeliverable: null,

@@ -4,7 +4,7 @@ function assert(condition: unknown, message: string): void {
   if (!condition) throw new Error(message);
 }
 
-const expected = ["general", "engine", "prompts", "connections"];
+const expected = ["general", "memory", "engine", "prompts", "sources", "integrations"];
 const ids = SETTINGS_SECTIONS.map((section) => section.id);
 
 assert(ids.length === expected.length, `Expected ${expected.length} settings sections, got ${ids.length}`);

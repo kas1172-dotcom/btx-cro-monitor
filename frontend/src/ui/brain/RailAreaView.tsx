@@ -28,10 +28,10 @@ function detailFor(area: BrainArea, world: World): ReactNode {
   }
 }
 
-function areaProvenance(area: BrainArea): "HubSpot" | "Monitor" | "Demo" {
+function areaProvenance(area: BrainArea): "CRM" | "Monitor" | "Demo" {
   if (area === "market") return "Monitor";
   if (area === "capability" || area === "workflow" || area === "decision") return "Demo";
-  return "HubSpot";
+  return "CRM";
 }
 
 function openRow(companyId: string | undefined, target: "dossier" | "pipeline" | "detail" | undefined): void {
@@ -130,7 +130,7 @@ function RevenuePipelineTable({ world }: { world: World }) {
               <span>{value ?? money(0)}</span>
               <span>{score?.replace("score ", "") ?? "0"}</span>
               <em>{row.meta}</em>
-              {world.dataMode === "hybrid" && <ProvenanceBadge label="HubSpot" />}
+              {world.dataMode === "hybrid" && <ProvenanceBadge label="CRM" />}
             </button>
           );
         })}

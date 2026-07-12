@@ -51,13 +51,26 @@ async function loadWorld(city: string | null = null): Promise<World> {
 
 async function loadArtifactFixtureWorld(): Promise<World> {
   const adapter = new DemoDataAdapter();
-  const [companies, contacts, facilities, opportunities, snapshot] = await Promise.all([
+  const [demoCompanies, contacts, facilities, opportunities, snapshot] = await Promise.all([
     adapter.getCompanies(),
     adapter.getContacts(),
     adapter.getFacilities(),
     adapter.getOpportunities(),
     adapter.getOperatingSnapshot(),
   ]);
+  const companies = [...demoCompanies, {
+    id: "fixture-boeing",
+    name: "Boeing",
+    relationship: "target" as const,
+    account_status: "target_prospect" as const,
+    business_motion: "prospect_new_business" as const,
+    location: { city: "Pittsburgh", state: "PA", lat: 40.44, lon: -79.99, country: "USA" },
+    website_url: "https://boeing.com",
+    domains: ["boeing.com"],
+    aliases: ["Boeing", "The Boeing Company"],
+    known_programs: ["MUOS"],
+    needs: ["AS9100", "precision machining"],
+  }];
   const artifact = buildArtifactSignals(miniRunOutput, companies);
   assert(artifact.signals.length === 1, `Expected 1 artifact signal, got ${artifact.signals.length}`);
   const signal = artifact.signals[0];
@@ -101,25 +114,29 @@ async function loadArtifactFixtureWorld(): Promise<World> {
 
 async function loadHybridFixtureWorld(): Promise<World> {
   const demo = new DemoDataAdapter();
-  const [demoCompanies, facilities, demoSnapshot] = await Promise.all([
-    demo.getCompanies(),
+  const [facilities, demoSnapshot] = await Promise.all([
     demo.getFacilities(),
     demo.getOperatingSnapshot(),
   ]);
-  const artifact = buildArtifactSignals(miniRunOutput, demoCompanies);
   const companies = [{
     id: "hubspot-company-9001",
-    name: "Acme HubSpot Components",
+    name: "Boeing",
+    canonical_account_id: "hubspot-company-9001",
+    hubspot_company_id: "9001",
     relationship: "customer" as const,
     account_status: "active_pipeline" as const,
     business_motion: "grow_existing_business" as const,
     location: { city: "Pittsburgh", state: "PA", lat: 40.44, lon: -79.99, country: "USA" },
-    website_url: "https://acme.example",
+    website_url: "https://boeing.com",
+    domains: ["boeing.com"],
+    aliases: ["Boeing", "The Boeing Company"],
+    known_programs: ["MUOS"],
     needs: ["ITAR", "precision machining"],
     data_provenance: "HubSpot",
     source_name: "HubSpot",
     source_mode: "live",
   }];
+  const artifact = buildArtifactSignals(miniRunOutput, companies);
   const contacts = [{
     id: "hubspot-contact-9002",
     company_id: "hubspot-company-9001",
@@ -251,7 +268,7 @@ const hybridBriefText = hybridBrief.sections
     return block.title;
   })
   .join(" ");
-assert(hybridBriefText.includes("Acme HubSpot Components") && hybridBrief.sources.some((source) => source.source === "HubSpot CRM"), "Hybrid meeting brief missing real HubSpot account grounding");
+assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "CRM"), "Hybrid meeting brief missing real CRM account grounding");
 assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "monitor-engine artifacts"), "Hybrid meeting brief missing real monitor signal grounding");
 assert(hybridBriefText.includes("Demo fallback") || hybridBrief.sources.some((source) => source.source === "Demo fallback"), "Hybrid meeting brief missing demo fallback disclosure");
 
@@ -277,4 +294,4 @@ const deliverableText = [itinerary, memo, outreach]
   .join(" ");
 assert(!/\b[a-z]+_[a-z_]+\b/.test(deliverableText), `Rendered deliverables leaked snake_case: ${deliverableText.match(/\b[a-z]+_[a-z_]+\b/)?.[0]}`);
 
-console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, hybrid brief cited HubSpot + monitor, outreach ${outreach.sections.length} sections`);
+console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, hybrid brief cited CRM + monitor, outreach ${outreach.sections.length} sections`);

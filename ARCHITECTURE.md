@@ -1,217 +1,149 @@
-# BTX Enterprise Brain Architecture
+# BTX Backend-Canonical Architecture
 
-This repository supports the BTX Revenue Cockpit demo through three related systems:
+The canonical product is the React cockpit plus FastAPI backend. The Python monitor engine remains a data producer, not a UI renderer.
 
-1. `monitor_engine/` and `clients/btx/` — a Python-based static intelligence layer that can collect, normalize, score, and generate static artifacts from public, configured, or agent-assisted sources.
-2. `frontend/` — a React/Vite executive dashboard that presents account health, signals, pipeline context, recommendations, map-based prospecting, and guided selling workflows to a CRO.
-3. `btx_platform/` — an early FastAPI backend intended for future authenticated integrations, persistence, background jobs, queues, webhooks, and user-specific state.
-
-The current product posture is intentionally static-first. The demo should show a realistic operating model without requiring paid infrastructure, live customer credentials, or a production backend before the workflow is validated with the user.
-
-The core architectural principle is that the dashboard should consume a stable data adapter contract. Static demo data, monitor-generated artifacts, and future live API integrations should all populate that contract rather than forcing the frontend to depend directly on a specific data source.
-
----
-
-## System Responsibilities
-
-### Python Monitor
-
-The Python monitor is the intelligence and artifact-generation layer.
-
-It is responsible for:
-
-* ingesting public or configured sources
-* normalizing source data
-* generating static intelligence artifacts
-* scoring relevance where appropriate
-* preserving source provenance
-* producing JSON artifacts that can be consumed by the frontend
-
-For the BTX demo, this layer may include BTX-specific client configuration under `clients/btx/`.
-
-### React Frontend
-
-The frontend is the executive decision interface.
-
-It is responsible for:
-
-* rendering the CRO dashboard
-* presenting current-business and prospecting workflows
-* displaying account, signal, pipeline, capacity, map, and recommendation views
-* managing UI state and user interaction
-* providing ChatPill with the active page, account, prospect, region, ranking, or signal context
-* consuming data only through the shared data adapter interface
-
-The frontend should not be tightly coupled to whether data came from demo snapshots, monitor artifacts, or live API integrations.
-
-### FastAPI Backend
-
-The FastAPI backend is reserved for the future live product.
-
-It is intended to support:
-
-* authenticated customer integrations
-* API ingestion from CRM, ERP, production, contract, email, calendar, procurement, and market-intelligence systems
-* persistence
-* background jobs
-* queues
-* webhooks
-* user-specific state
-* durable workflow history
-
-The backend should eventually populate the same core adapter contract used by the static demo. This allows the frontend and primary scoring/presentation flows to remain stable while the data implementation evolves.
-
----
-
-## Intended Future Architecture
-
-In production, the system can evolve toward the following model:
+## Product Boundary
 
 ```text
-External APIs / internal customer systems / public sources
-        ↓
-FastAPI integration backend and/or Python monitor
-        ↓
-Normalized adapter contract
-        ↓
-Validation, scoring, recommendations, and provenance
-        ↓
-React executive dashboard
+frontend/      React cockpit: the user-facing CRO product
+btx_platform/  FastAPI backend: auth boundary, CRM/LLM/pipeline/settings/workflow APIs
+monitor_engine/ Python monitor: public-source collection, scoring, enrichment, JSON output
+clients/btx/   BTX configuration and committed JSON artifacts
 ```
 
-Potential live sources may include:
-
-* Salesforce
-* HubSpot
-* ERP or capacity systems
-* contract systems
-* production systems
-* customer/order data
-* email/calendar/call-note sources
-* SAM.gov
-* public news
-* market and company intelligence APIs
-
-The goal is for the scoring engine and primary UI flows to keep using the shared contract while the adapter implementation changes from static demo data to monitor artifacts or live integrations.
-
----
-
-## Static Demo Data Flow
-
-The demo currently uses static snapshots to simulate a realistic operating model:
+Retired:
 
 ```text
-External/public data + simulated internal data
-        ↓
-Demo data snapshots
-        ↓
-DemoDataAdapter
-        ↓
-Shared DataAdapter interface
-        ↓
-Validation / scoring / recommendations
-        ↓
-Executive dashboard
+Python-generated index.html
+Python-generated map.html
+Static-site service worker
+tooling/build_pages.py static dashboard copier
 ```
 
-The React app loads static JSON snapshots from:
+## Runtime Model
 
 ```text
-frontend/data/demo/btx/
+Defense / industry sources
+        ↓
+monitor_engine collectors, prefilter, scorer, enrichment
+        ↓
+run_output.json + archive.json + map_targets.json
+        ↓
+GitHub Pages /btx/*.json
+        ↓
+React cockpit
+        ↕
+FastAPI backend on Fly.io
+        ↕
+HubSpot, LLM provider, GitHub Actions pipeline, settings persistence
 ```
 
-These snapshots may simulate customer-private systems such as CRM, contacts, opportunities, ERP/capacity, contracts, pipeline, and account history.
+The monitor engine may run locally or in GitHub Actions. The cockpit fetches or bundles monitor artifacts through adapters. The backend owns live authenticated integrations and write actions.
 
-Public or monitor-produced artifacts should be labeled separately from simulated private data. The product should preserve provenance wherever possible so the user can understand whether a signal came from demo data, public intelligence, monitor output, or a future live integration.
+## Data-Contract Invariant
 
----
-
-## Data Adapter Boundary
-
-The data adapter contract is the most important architectural boundary in the product.
-
-Frontend components should not directly depend on raw demo JSON, monitor artifacts, or backend API response shapes. Instead, they should consume normalized methods from a shared adapter interface, such as:
+The monitor engine must continue to produce valid JSON artifacts:
 
 ```text
-getAccounts()
-getOpportunities()
-getSignals()
-getRecommendations()
-getCapacity()
-getContracts()
-getProspects()
-getMapEntities()
+run_output.json
+archive.json
+map_targets.json
 ```
 
-Future API integrations should replace the adapter implementation, not force broad rewrites across dashboard components.
+Required smoke:
 
-Dashboard and scoring changes should be narrowly scoped to genuinely new data needs. If a future source introduces new fields, those fields should be added intentionally to the shared contract rather than leaking source-specific shapes into UI components.
+```bash
+python3 -m monitor_engine --config clients/btx/config.json --output /tmp/btxout --archive /tmp/btxout/archive.json --skip-analysis
+python3 -c "from monitor_engine.models import RunOutput; from pathlib import Path; RunOutput.model_validate_json(Path('/tmp/btxout/run_output.json').read_text()); print('OK')"
+python3 -m monitor_engine.targets --config clients/btx/config.json --output /tmp/btxmap
+```
 
----
+`index.html`, `map.html`, and `sw.js` are no longer part of the engine contract.
+
+## Frontend
+
+The frontend is the decision interface. It is responsible for:
+
+- dashboard and rail navigation,
+- account dossiers,
+- monitor signal presentation,
+- map/prospecting views,
+- deliverables,
+- Chatpil/assistant UX,
+- provenance labels,
+- workflow buttons that call backend routes where live actions exist.
+
+Frontend components should consume normalized adapter methods, not raw source-specific shapes.
+
+## Backend
+
+The backend is the live product boundary. It is responsible for:
+
+- health and CORS,
+- bearer-protected routes,
+- HubSpot CRM reads,
+- HubSpot task creation,
+- LLM proxying,
+- engine configuration persistence,
+- pipeline dispatch/history,
+- future authenticated integrations and workflow audit.
+
+The backend should not hardcode demo behavior for production routes. If a live integration is missing, routes should return typed `not_configured` or provider errors.
+
+## Monitor Engine
+
+The monitor engine is responsible for:
+
+- collecting configured public/API/RSS/HTML sources,
+- applying keyword prefilters,
+- running LLM analysis when configured,
+- grouping related stories,
+- applying feedback,
+- enriching extracted entities,
+- building the entity graph,
+- updating the rolling archive,
+- writing JSON artifacts.
+
+It is not responsible for rendering the product UI.
 
 ## Adapter Modes
 
-The frontend selects a data adapter using `VITE_DATA_MODE`.
+`VITE_DATA_MODE` selects the frontend adapter:
 
-The default mode is `demo`.
+- `hybrid`: intended production demo default. HubSpot CRM reads are real, monitor signals are real artifacts, non-integrated operating context uses labeled demo fallback. Monitor artifacts remain market/portfolio-level unless the interim fit guard links them strongly to an account; unlinked artifacts do not affect account scores.
+- `live`: live backend-backed mode. It should surface backend issues clearly.
+- `artifact`: monitor-artifact mode for signal consumption without live CRM.
+- `demo`: deterministic dev/test scaffolding from `frontend/data/demo/btx/`.
 
-### `demo`
+Demo data remains load-bearing for local development, tests, and hybrid fallback until backend integrations cover those domains end to end.
 
-Loads curated BTX demo snapshots from:
+## Provenance
 
-```text
-frontend/data/demo/btx/
-```
+Hybrid mode must label data-bearing UI with provenance:
 
-This mode is intended for the static demo experience. It may include simulated private operating data, such as accounts, opportunities, contracts, capacity, pipeline, and contacts.
+- HubSpot: live CRM records,
+- Monitor: public monitor artifacts,
+- Demo: fallback operating context.
 
-### `artifact`
+Deliverables should not blend real and demo facts without provenance disclosure.
 
-Reserved for static intelligence artifacts generated by the Python monitor, such as:
+## Deployment
 
-```text
-/artifacts/brain_output.json
-```
+GitHub Actions are manual-dispatch by default.
 
-This mode is intended to prove that monitor-generated outputs can populate the same frontend contract without requiring a live backend.
+- `Monitor Pipeline` writes JSON artifacts back to `clients/btx/artifacts/`.
+- `Deploy Pages` publishes the cockpit under `/cockpit/` and selected JSON artifacts under `/btx/`.
+- Fly.io hosts `btx_platform`.
 
-### `live`
-
-Reserved for authenticated API-backed integrations through the future FastAPI backend.
-
-This mode should fail loudly and clearly in the static demo unless the required backend configuration is present. It should not silently fall back to demo data, because that would make it unclear whether the user is seeing simulated or live information.
-
----
-
-## Provenance and Trust
-
-Because this is a decision-support product, data provenance matters.
-
-Where practical, records should preserve metadata such as:
-
-* source type
-* source name
-* last refreshed timestamp
-* confidence level
-* supporting evidence
-* whether the record is simulated, public, monitor-generated, or live integration data
-
-This is especially important for rankings, signals, recommendations, and ChatPill explanations.
-
-The CRO should be able to understand not only what the product recommends, but why it recommends it and what evidence supports the recommendation.
-
----
+The Pages build does not bake any shared backend bearer token. Browser-safe backend auth is deferred to WP10; until then, protected backend routes may reject public cockpit calls.
 
 ## Architecture Rules
 
-1. The frontend should consume the shared adapter contract, not raw source-specific data shapes.
-2. Demo data should remain deterministic and static unless explicitly changed.
-3. Simulated private data and public/monitor-generated intelligence should be clearly distinguishable.
-4. `live` mode should fail clearly when not configured.
-5. Scoring and recommendation logic should be centralized or intentionally isolated, not scattered across unrelated UI components.
-6. Future API integrations should replace adapter implementations rather than requiring broad dashboard rewrites.
-7. The demo should stay static-first until the workflow is validated.
-8. Avoid adding backend infrastructure before it is needed for a validated live use case.
-9. Preserve a clear path from static demo data to artifact mode to live integrations.
-10. Prioritize a product experience that is useful, explainable, and credible for a CRO.
-
+1. The React cockpit and FastAPI backend are the canonical product.
+2. The monitor engine produces JSON data, not product HTML.
+3. Keep `run_output.json`, `archive.json`, and `map_targets.json` valid.
+4. Do not change engine scoring, collectors, enrichment, or backend behavior during declutter work unless explicitly required.
+5. Keep demo mode as dev/test scaffolding until live coverage is complete.
+6. Prefer adapter implementations over source-specific UI coupling.
+7. Preserve provenance whenever real and fallback data coexist.
+8. Do not commit local env files, virtualenvs, frontend build output, local DBs, or caches.
