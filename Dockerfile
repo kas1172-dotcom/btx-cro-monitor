@@ -6,7 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md alembic.ini ./
+COPY alembic ./alembic
 COPY monitor_engine ./monitor_engine
 COPY btx_platform ./btx_platform
 COPY tooling ./tooling
@@ -18,4 +19,7 @@ RUN python -m pip install --upgrade pip \
 
 EXPOSE 8000
 
+# Default process is the API; fly.toml's [processes] block runs the same
+# image as `worker` (celery -A btx_platform.workers.celery_app worker) for
+# the WP10-B background job process.
 CMD ["uvicorn", "btx_platform.asgi:app", "--host", "0.0.0.0", "--port", "8000"]

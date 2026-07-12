@@ -4,6 +4,10 @@ primary_region = "iad"
 [build]
   dockerfile = "Dockerfile"
 
+[processes]
+  app = "uvicorn btx_platform.asgi:app --host 0.0.0.0 --port 8000"
+  worker = "celery -A btx_platform.workers.celery_app worker --loglevel=info"
+
 [http_service]
   internal_port = 8000
   force_https = true
@@ -16,3 +20,10 @@ primary_region = "iad"
   cpu_kind = "shared"
   cpus = 1
   memory = "1gb"
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "512mb"
+  processes = ["worker"]

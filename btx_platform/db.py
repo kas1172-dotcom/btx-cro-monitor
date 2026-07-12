@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from pathlib import Path
 
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Engine
@@ -13,6 +14,11 @@ from sqlalchemy.pool import StaticPool
 
 class Base(DeclarativeBase):
     pass
+
+
+class SchemaNotMigrated(RuntimeError):
+    """Raised when a prod-env engine's schema doesn't match the latest Alembic
+    revision — the deploy forgot to run `alembic upgrade head` first."""
 
 
 def make_engine(url: str) -> Engine:
@@ -45,6 +51,7 @@ def init_db(engine: Engine) -> None:
     _ensure_work_item_action_columns(engine)
     _ensure_hubspot_task_audit_columns(engine)
     _ensure_tenant_id_columns(engine)
+    _ensure_connection_destination_column(engine)
 
 
 def _ensure_work_item_action_columns(engine: Engine) -> None:
@@ -102,6 +109,47 @@ def _ensure_tenant_id_columns(engine: Engine) -> None:
                 text(f"UPDATE {table} SET tenant_id = :tenant WHERE tenant_id IS NULL"),
                 {"tenant": DEFAULT_TENANT_ID},
             )
+
+
+def _ensure_connection_destination_column(engine: Engine) -> None:
+    """Add the WP10-B destination_url column for existing dev/prod databases."""
+    inspector = inspect(engine)
+    if "connections" not in inspector.get_table_names():
+        return
+    existing = {column["name"] for column in inspector.get_columns("connections")}
+    if "destination_url" in existing:
+        return
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE connections ADD COLUMN destination_url TEXT"))
+
+
+def assert_schema_current(engine: Engine) -> None:
+    """Fail fast if the database hasn't had `alembic upgrade head` run.
+
+    Called only when settings.env == "prod" (see api.create_app). Dev/test
+    keep using init_db()'s create_all() for zero-friction local SQLite; a
+    real deploy must not silently create tables from model metadata — that
+    would drift from what's tracked in alembic/versions/.
+    """
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    repo_root = Path(__file__).resolve().parents[1]
+    script = ScriptDirectory.from_config(Config(str(repo_root / "alembic.ini")))
+    head_revision = script.get_current_head()
+
+    inspector = inspect(engine)
+    if "alembic_version" not in inspector.get_table_names():
+        raise SchemaNotMigrated(
+            "Database has no alembic_version table. Run `alembic upgrade head` before serving traffic."
+        )
+    with engine.connect() as connection:
+        current = connection.execute(text("SELECT version_num FROM alembic_version")).scalar()
+    if current != head_revision:
+        raise SchemaNotMigrated(
+            f"Database schema is at revision {current!r} but code expects {head_revision!r}. "
+            "Run `alembic upgrade head` before serving traffic."
+        )
 
 
 @contextmanager

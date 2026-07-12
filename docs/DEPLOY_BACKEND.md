@@ -96,7 +96,20 @@ it automatically, set it explicitly as `BTX_DATABASE_URL`:
 fly secrets set BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@HOST:PORT/DBNAME"
 ```
 
-4. Set production secrets.
+4. Provision Redis for the Celery worker queue.
+
+```bash
+fly redis create   # note the redis:// URL it prints
+```
+
+5. Generate an encryption key for credentials stored at rest (connection
+   signing secrets):
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+6. Set production secrets.
 
 ```bash
 fly secrets set \
@@ -110,18 +123,43 @@ fly secrets set \
   BTX_GITHUB_PAT="<github-token>" \
   BTX_GITHUB_REPO="kas1172-dotcom/btx-cro-monitor" \
   BTX_GITHUB_WORKFLOW="monitor.yml" \
-  BTX_GITHUB_REF="main"
+  BTX_GITHUB_REF="main" \
+  BTX_REDIS_URL="<redis-url-from-step-4>" \
+  BTX_QUEUE_BACKEND=celery \
+  BTX_ENCRYPTION_KEY="<key-from-step-5>"
 ```
 
-5. Deploy.
+7. Run migrations before the new code serves traffic.
+
+```bash
+fly ssh console --app btx-platform -C "alembic upgrade head"
+# or locally against BTX_DATABASE_URL:
+BTX_DATABASE_URL="<prod-database-url>" alembic upgrade head
+```
+
+With `BTX_ENV=prod`, the app refuses to start against a database that hasn't
+had this run — it raises `SchemaNotMigrated` instead of silently creating
+tables from model metadata (that fallback is dev/test-only).
+
+8. Deploy. `fly.toml` defines two processes from the same image: `app`
+   (the API, serving `http_service`) and `worker` (the Celery consumer). Both
+   deploy together.
 
 ```bash
 fly deploy
 ```
 
-The app creates its SQLAlchemy tables on startup if they do not already exist.
-Alembic migrations land in WP10-B; see that section of
-`CODEX_EXECUTION_PLAYBOOK.md` once merged for `alembic upgrade head` steps.
+9. Confirm the worker process is running.
+
+```bash
+fly status --app btx-platform   # expect both an `app` and a `worker` machine
+fly logs --app btx-platform     # watch for celery worker startup + task logs
+```
+
+Every future schema change ships as a new file under `alembic/versions/`;
+generate one with `alembic revision --autogenerate -m "..."` after changing
+`btx_platform/models.py`, review the generated upgrade/downgrade, then run
+step 7 again on the next deploy.
 
 ## Smoke Tests
 

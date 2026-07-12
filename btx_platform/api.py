@@ -23,13 +23,13 @@ from sqlalchemy.orm import sessionmaker
 from btx_platform import models
 from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_token
 from btx_platform.config import Settings, get_settings
-from btx_platform.db import init_db, make_engine, make_session_factory
+from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
 from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload
 from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
-from btx_platform.queue import InMemoryQueue, JobQueue
+from btx_platform.queue import CeleryQueue, InMemoryQueue, JobQueue
 from btx_platform.ratelimit import RateLimiter
 from btx_platform.schemas import (
     CalendarEventRequest,
@@ -249,6 +249,17 @@ def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict, tenan
         session.commit()
 
 
+def _default_queue(settings: Settings) -> JobQueue:
+    """InMemoryQueue for dev/test; a real Celery/Redis queue when configured.
+    Imported lazily so the API process doesn't require Celery installed
+    unless BTX_QUEUE_BACKEND=celery is actually set."""
+    if settings.queue_backend != "celery":
+        return InMemoryQueue()
+    from btx_platform.workers import celery_app
+
+    return CeleryQueue(celery_app)
+
+
 def create_app(
     *,
     settings: Settings | None = None,
@@ -261,7 +272,13 @@ def create_app(
 
     if session_factory is None:
         engine = make_engine(settings.database_url)
-        init_db(engine)                       # dev/test; prod uses Alembic
+        if settings.env == "prod":
+            # Prod must never fall back to create_all() — that would drift
+            # from what alembic/versions/ tracks. Deploy runs
+            # `alembic upgrade head` before the new code serves traffic.
+            assert_schema_current(engine)
+        else:
+            init_db(engine)                   # dev/test convenience
         session_factory = make_session_factory(engine)
 
     app = FastAPI(title="BTX Engine — Integration Platform", version="0.1.0")
@@ -274,7 +291,7 @@ def create_app(
     )
     app.state.settings = settings
     app.state.session_factory = session_factory
-    app.state.queue = queue if queue is not None else InMemoryQueue()
+    app.state.queue = queue if queue is not None else _default_queue(settings)
     app.state.crm_cache = {}
     app.state.clerk_verifier = clerk_verifier or (
         ClerkVerifier(issuer=settings.clerk_issuer, audience=settings.clerk_audience)
@@ -909,6 +926,7 @@ def create_app(
                 outcome = ingest(
                     session, app.state.queue, connection,
                     raw_body=raw_body, signature=signature, idempotency_header=idem,
+                    encryption_key=settings.encryption_key,
                 )
             except IngestError as exc:
                 return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)

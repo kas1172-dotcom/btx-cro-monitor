@@ -60,15 +60,31 @@ VITE_ARTIFACT_BASE_URL=../btx \
 npm run build
 ```
 
-The browser build does not receive or send the shared backend bearer token. Protected backend browser auth is deferred to WP10; until then, public cockpit calls are made without an authorization header and protected routes may report an auth error.
+The browser build never holds a shared backend secret. Instead it gates the app behind Clerk sign-in (`VITE_CLERK_PUBLISHABLE_KEY`) and sends each signed-in user's session token on every backend call; the backend validates that token per-request against Clerk's JWKS.
 
 In `hybrid` mode, monitor artifacts are treated as real market/portfolio signals unless the interim text-fit guard can link them strongly to an account. Weak matches stay unlinked and do not change account scores.
 
 ## Local Backend
 
 ```bash
-pip install -e ".[dev]"
+pip install -e ".[dev,platform]"
 uvicorn btx_platform.asgi:app --reload --port 8001
+```
+
+Local SQLite dev creates its tables automatically on startup (`init_db`) — no
+migration step needed. Against Postgres (`docker-compose up postgres redis`,
+then `BTX_DATABASE_URL=postgresql+psycopg://btx:btx@localhost:5432/btx`), or
+whenever `BTX_ENV=prod`, run migrations explicitly first:
+
+```bash
+alembic upgrade head
+```
+
+To run the background forwarder (retries/dead-letters failed webhook
+forwards; needs Redis and `BTX_QUEUE_BACKEND=celery`):
+
+```bash
+celery -A btx_platform.workers.celery_app worker --loglevel=info
 ```
 
 Useful smoke checks:

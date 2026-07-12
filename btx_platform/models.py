@@ -54,6 +54,7 @@ class Connection(Base):
     name: Mapped[str] = mapped_column(String(200))
     direction: Mapped[str] = mapped_column(String(16), default="inbound")  # inbound|outbound
     signing_secret: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    destination_url: Mapped[str | None] = mapped_column(Text, nullable=True)  # outbound|forward target
     active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 

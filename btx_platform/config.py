@@ -60,6 +60,10 @@ class Settings(BaseSettings):
     rate_limit_max_requests: int = 30
     rate_limit_window_seconds: float = 60.0
 
+    # Persistence/jobs/crypto (WP10-B).
+    encryption_key: str | None = None
+    queue_backend: str = "memory"  # memory (dev/test) | celery (prod)
+
     @property
     def cors_origins(self) -> list[str]:
         raw = self.frontend_origins or self.frontend_origin
