@@ -797,20 +797,11 @@ p { line-height: 1.55; }
 .weekly-brief-grid strong { display: block; margin-top: 4px; }
 @media (max-width: 980px) {
   .quiet-cockpit { grid-template-columns: 52px minmax(0, 1fr) !important; }
-  .right-context { display: none; }
   .today-strip, .brain-opportunity-row, .weekly-brief-grid { grid-template-columns: 1fr; }
   .brain-rail { padding: 8px 6px; }
   .brain-rail-btn { grid-template-columns: 1fr; justify-items: center; padding: 7px 4px; }
   .brain-rail-btn strong, .brain-rail-btn em { display: none; }
   .quiet-cockpit > .inspector.open { position: fixed; inset: 0; z-index: 5000; }
-}
-
-@media (max-width: 899px) {
-  .quiet-cockpit::before {
-    content: "BTX Revenue Brain is designed for desktop — mobile companion coming soon.";
-    position: fixed; inset: 0; z-index: 9000; display: grid; place-items: center; padding: 24px;
-    background: var(--bg); color: var(--text); text-align: center; font-size: 20px;
-  }
 }
 
 .shell {
@@ -1807,4 +1798,246 @@ p { line-height: 1.55; }
   .demo-action-modal-actions { grid-template-columns: 1fr; }
   .task-confirmation-actions { grid-template-columns: 1fr; }
   .sample-library-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  html, body, #root { height: 100dvh; min-height: 100dvh; overflow: hidden; }
+  body { font-size: 14px; }
+  .quiet-cockpit {
+    display: block;
+    height: 100dvh;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+  .quiet-main {
+    height: 100dvh;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+  .quiet-topbar {
+    height: 56px;
+    padding: 0 10px;
+    justify-content: flex-start;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .quiet-topbar::-webkit-scrollbar { display: none; }
+  .quiet-brand {
+    min-height: 44px;
+    flex: 0 0 auto;
+    max-width: 178px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .data-provenance-status, .live-source-status, .artifact-status {
+    flex: 0 0 auto;
+    max-width: min(72vw, 260px);
+    min-height: 38px;
+  }
+  .cockpit-city-picker { margin-left: auto; min-height: 44px; }
+  .cockpit-city-picker select { min-height: 44px; }
+  .quiet-stage {
+    height: calc(100dvh - 56px - 76px - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .brain-rail {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 6400;
+    height: calc(76px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    border-right: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .brain-rail::-webkit-scrollbar { display: none; }
+  .brain-rail-group, .brain-rail-utility {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  .brain-rail-btn {
+    min-width: 68px;
+    min-height: 56px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 20px 1fr;
+    justify-items: center;
+    gap: 2px;
+    padding: 7px 8px;
+    touch-action: manipulation;
+  }
+  .brain-rail-btn strong {
+    display: block;
+    width: 100%;
+    font-size: 11px;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.05;
+  }
+  .brain-rail-btn em {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+  }
+  .brain-rail-btn span { font-size: 15px; }
+  .surface-page, .settings-workspace, .brain-response, .operating {
+    padding: 14px 12px 18px;
+  }
+  .surface-page > .quiet-view-head h1,
+  .settings-head h1,
+  .operating-head h1,
+  .brain-response-head h1 {
+    font-size: 24px;
+    line-height: 1.12;
+  }
+  .brief-grid, .brief-grid.compact, .settings-layout, .operating-summary, .operating-grid, .integration-mini-grid, .account360-layout, .account360-kpis {
+    grid-template-columns: 1fr;
+  }
+  .surface-panel, .settings-panel, .settings-nav, .operating-panel, .operating-summary div {
+    border-radius: 8px;
+  }
+  button,
+  .demo-action-btn,
+  .settings-nav button,
+  .surface-toolbar button,
+  .ask-action-row button,
+  .sample-library-head button,
+  .tour-actions button {
+    min-height: 44px;
+  }
+  input, select, textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .work-item-row, .signal-mini-list article, .account360-list button {
+    min-height: 56px;
+  }
+  .account360-list {
+    display: flex;
+    position: static;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .account360-list::-webkit-scrollbar { display: none; }
+  .account360-list button {
+    min-width: 230px;
+  }
+  .ask-brain {
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .ask-surface {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100dvh - 132px - env(safe-area-inset-bottom));
+  }
+  .ask-surface .ask-brain {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .ask-brain-form {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(23, 27, 18, .96);
+  }
+  .ask-brain-form input { min-width: 0; }
+  .ask-action-row {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px 0 2px;
+    scrollbar-width: none;
+  }
+  .ask-action-row::-webkit-scrollbar { display: none; }
+  .ask-action-row button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .ask-param-popover {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(86px + env(safe-area-inset-bottom));
+    width: auto;
+    max-height: min(70dvh, 520px);
+    overflow-y: auto;
+    z-index: 6600;
+  }
+  .right-context {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    top: auto;
+    z-index: 6300;
+    width: auto;
+    max-height: 72dvh;
+    overflow-y: auto;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+    box-shadow: 0 -16px 42px var(--shadow);
+  }
+  .quiet-cockpit > .inspector.open {
+    position: fixed;
+    inset: 56px 0 calc(76px + env(safe-area-inset-bottom)) 0;
+    z-index: 6200;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 0 12px 14px;
+  }
+  .map-shell {
+    position: relative;
+    display: grid;
+    grid-template-rows: minmax(320px, 55dvh) minmax(0, 1fr);
+    height: calc(100dvh - 56px - 76px - env(safe-area-inset-bottom));
+    min-height: 0;
+  }
+  .map {
+    position: relative;
+    inset: auto;
+    height: 55dvh;
+    min-height: 320px;
+  }
+  .map-rail {
+    position: relative;
+    width: auto;
+    max-height: none;
+    overflow-y: auto;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .map-prospect {
+    min-height: 64px;
+  }
+  .document-viewer, .editor-window, .pipeline-table-row, .analysis-grid {
+    grid-template-columns: 1fr;
+  }
 }

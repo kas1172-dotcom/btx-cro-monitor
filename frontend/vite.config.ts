@@ -10,11 +10,18 @@ export default defineConfig(({ command }) => ({
   base: command === "build" ? "./" : "/",
   plugins: [react()],
   build: {
+    modulePreload: false,
+    // Large Office-export vendors are lazy-loaded only after a user requests a
+    // download. Keep the mobile landing chunk warning focused on eager code.
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
           leaflet: ["leaflet", "react-leaflet"],
           flow: ["@xyflow/react"],
+          docx: ["docx"],
+          exceljs: ["exceljs"],
+          pptx: ["pptxgenjs"],
         },
       },
     },

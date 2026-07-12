@@ -9,7 +9,6 @@ import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { requestSectionRevision } from "../../deliverables/editorAssistant.ts";
-import { downloadBoardDeck } from "../../deliverables/deck/pptx.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
   downloadCsv,
@@ -103,7 +102,10 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     if (format === "markdown") downloadMarkdown(current);
     if (format === "docx") await downloadDocx(current);
     if (format === "pdf") printDeliverable(current);
-    if (format === "pptx" && world) await downloadBoardDeck(current, world);
+    if (format === "pptx" && world) {
+      const { downloadBoardDeck } = await import("../../deliverables/deck/pptx.ts");
+      await downloadBoardDeck(current, world);
+    }
     if (format === "xlsx") await downloadXlsx(current);
     if (format === "csv") downloadCsv(current);
     if (format === "ics") downloadIcs(current);

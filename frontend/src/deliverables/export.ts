@@ -1,15 +1,3 @@
-import {
-  Document,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  WidthType,
-} from "docx";
-import ExcelJS from "exceljs";
 import type { Deliverable, DeliverableBlock, DeliverableSection, DeliverableType } from "./types.ts";
 import { deliverableToMarkdown } from "./markdown.ts";
 import { calendarStartFromDeliverable } from "../app/dateDefaults.ts";
@@ -67,8 +55,19 @@ function emailBody(deliverable: Deliverable): string {
 }
 
 export async function downloadDocx(deliverable: Deliverable): Promise<void> {
+  const {
+    Document,
+    HeadingLevel,
+    Packer,
+    Paragraph,
+    Table,
+    TableCell,
+    TableRow,
+    TextRun,
+    WidthType,
+  } = await import("docx");
   const sections = exportSections(deliverable);
-  const children: Array<Paragraph | Table> = [
+  const children: any[] = [
     new Paragraph({ text: deliverable.form === "email" ? emailSubject(deliverable) : deliverable.title, heading: HeadingLevel.TITLE }),
   ];
 
@@ -137,7 +136,8 @@ export function printDeliverable(deliverable: Deliverable): void {
 }
 
 export async function downloadXlsx(deliverable: Deliverable): Promise<void> {
-  const workbook = new ExcelJS.Workbook();
+  const ExcelJS = await import("exceljs");
+  const workbook = new ExcelJS.default.Workbook();
   workbook.creator = "BTX Precision";
   const sheet = workbook.addWorksheet("Deliverable");
   sheet.addRow([deliverable.title]);

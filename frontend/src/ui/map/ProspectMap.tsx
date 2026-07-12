@@ -6,6 +6,7 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet";
 import { useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import type { World } from "../../app/useWorld.ts";
 import { setState, useStore } from "../../store/store.ts";
 import { explainRankingPrompt, outreachPrompt } from "../../app/copilotPrompts.ts";
@@ -20,10 +21,14 @@ function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
     const frame = window.requestAnimationFrame(invalidate);
     const timer = window.setTimeout(invalidate, 180);
     window.addEventListener("resize", invalidate);
+    window.addEventListener("orientationchange", invalidate);
+    document.addEventListener("visibilitychange", invalidate);
     return () => {
       window.cancelAnimationFrame(frame);
       window.clearTimeout(timer);
       window.removeEventListener("resize", invalidate);
+      window.removeEventListener("orientationchange", invalidate);
+      document.removeEventListener("visibilitychange", invalidate);
     };
   }, [map, watchKey]);
   return null;

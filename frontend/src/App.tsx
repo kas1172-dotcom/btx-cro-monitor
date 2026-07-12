@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import type React from "react";
 import { useStore, setState, closeDemoAction, goHome, clearTourRequest } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES, PROFILE } from "./app/config.ts";
-import { ProspectMap } from "./ui/map/ProspectMap.tsx";
 import { Dossier } from "./ui/company/Dossier.tsx";
 import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
 import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
 import { AskBrainBar } from "./ui/brain/AskBrainBar.tsx";
 import { RightContextPanel } from "./ui/brain/RightContextPanel.tsx";
 import { TourHud } from "./ui/brain/TourHud.tsx";
-import { DocumentViewer } from "./ui/deliverables/DocumentViewer.tsx";
 import { useMemory } from "./memory/localMemory.ts";
 import { AnalysisView } from "./ui/analysis/AnalysisView.tsx";
 import { SettingsWorkspace } from "./ui/settings/SettingsWorkspace.tsx";
@@ -25,6 +23,8 @@ import { countForSurface, type SurfaceId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
+const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
+const DocumentViewer = lazy(() => import("./ui/deliverables/DocumentViewer.tsx").then((module) => ({ default: module.DocumentViewer })));
 
 function formatRunDate(value: string | null | undefined): string {
   if (!value) return "not available";
@@ -70,14 +70,22 @@ export function App() {
     if (settingsActive) return <SettingsWorkspace />;
     if (!world) return <div className="loading">loading…</div>;
     if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
-    if (activeDeliverable) return <DocumentViewer deliverable={activeDeliverable} world={world} />;
+    if (activeDeliverable) return (
+      <Suspense fallback={<div className="loading">loading deliverable…</div>}>
+        <DocumentViewer deliverable={activeDeliverable} world={world} />
+      </Suspense>
+    );
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
     switch (activeSurface) {
       case "brief": return <TodayBrief world={world} />;
       case "work_queue": return <WorkQueue world={world} />;
       case "accounts": return <Account360 world={world} />;
       case "ask": return <AskSurface world={world} />;
-      case "map": return viewWorld ? <ProspectMap world={viewWorld} /> : <div className="loading">loading map…</div>;
+      case "map": return viewWorld ? (
+        <Suspense fallback={<div className="loading">loading map…</div>}>
+          <ProspectMap world={viewWorld} />
+        </Suspense>
+      ) : <div className="loading">loading map…</div>;
       case "analysis": return <AnalysisDashboard world={world} />;
       case "capacity": return <CapacityAssessment world={world} />;
       case "programs": return <ProgramContractTracker world={world} />;

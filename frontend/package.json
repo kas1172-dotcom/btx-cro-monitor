@@ -19,6 +19,7 @@
     "test:map": "tsx tools/test-map.ts",
     "test:tour": "tsx tools/test-tour.ts",
     "test:live-adapter": "tsx tools/test-live-adapter.ts",
+    "test:mobile": "tsx tools/test-mobile-e2e.ts",
     "seed:hubspot": "tsx tools/seed-hubspot.ts",
     "cleanup:hubspot": "tsx tools/cleanup-hubspot.ts",
     "weekly:memo": "tsx tools/run-weekly-memo.ts"
@@ -39,6 +40,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.61.1",
     "tsx": "^4.23.0",
     "typescript": "^5.6.3",
     "vite": "^6.0.7"
