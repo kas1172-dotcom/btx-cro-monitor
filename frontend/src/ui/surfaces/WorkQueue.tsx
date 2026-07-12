@@ -31,7 +31,7 @@ export function WorkQueue({ world }: { world: World }) {
           </button>
         ))}
       </div>
-      <WorkItemList items={items} />
+      <WorkItemList items={items} world={world} />
     </section>
   );
 }

@@ -221,6 +221,8 @@ class HubSpotClient:
         subject: str,
         body: str,
         timestamp: str,
+        owner_id: str | None = None,
+        idempotency_key: str | None = None,
         associations: Iterable[HubSpotTaskAssociation] = (),
     ) -> dict[str, Any]:
         association_inputs = []
@@ -241,9 +243,19 @@ class HubSpotClient:
                 "hs_task_status": "NOT_STARTED",
             },
         }
+        if owner_id:
+            payload["properties"]["hubspot_owner_id"] = owner_id
+        if idempotency_key:
+            payload["properties"]["hs_task_body"] = f"{body}\n\nBTX idempotency key: {idempotency_key}".strip()
         if association_inputs:
             payload["associations"] = association_inputs
         return self._post("/crm/v3/objects/tasks", json=payload)
+
+    def get_task(self, task_id: str) -> dict[str, Any]:
+        return self._get(
+            f"/crm/v3/objects/tasks/{task_id}",
+            params={"properties": "hs_task_subject,hs_task_body,hs_timestamp,hs_task_status,hubspot_owner_id"},
+        )
 
 
 def _clean(value: Any) -> str | None:

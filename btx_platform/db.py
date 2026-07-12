@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -42,6 +42,41 @@ def init_db(engine: Engine) -> None:
     from btx_platform import models  # noqa: F401
 
     Base.metadata.create_all(engine)
+    _ensure_work_item_action_columns(engine)
+    _ensure_hubspot_task_audit_columns(engine)
+
+
+def _ensure_work_item_action_columns(engine: Engine) -> None:
+    """Add WP8 work-item execution columns for existing dev/prod databases.
+
+    This is intentionally narrow and additive; it keeps first-run containers from
+    failing when the table already exists but predates the HubSpot action loop.
+    """
+    inspector = inspect(engine)
+    if "work_items" not in inspector.get_table_names():
+        return
+    existing = {column["name"] for column in inspector.get_columns("work_items")}
+    columns = {
+        "external_system": "VARCHAR(40)",
+        "external_record_id": "VARCHAR(120)",
+        "external_record_url": "TEXT",
+        "execution_idempotency_key": "VARCHAR(256)",
+        "execution_error": "TEXT",
+    }
+    with engine.begin() as connection:
+        for name, ddl_type in columns.items():
+            if name not in existing:
+                connection.execute(text(f"ALTER TABLE work_items ADD COLUMN {name} {ddl_type}"))
+
+
+def _ensure_hubspot_task_audit_columns(engine: Engine) -> None:
+    inspector = inspect(engine)
+    if "hubspot_task_audits" not in inspector.get_table_names():
+        return
+    existing = {column["name"] for column in inspector.get_columns("hubspot_task_audits")}
+    if "idempotency_key" not in existing:
+        with engine.begin() as connection:
+            connection.execute(text("ALTER TABLE hubspot_task_audits ADD COLUMN idempotency_key VARCHAR(256)"))
 
 
 @contextmanager

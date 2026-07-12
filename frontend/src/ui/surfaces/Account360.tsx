@@ -133,7 +133,7 @@ export function Account360({ world }: { world: World }) {
             </section>
             <section className="surface-panel">
               <div className="panel-head"><h2>Work items</h2></div>
-              <WorkItemList items={workItems} empty="No account-specific work items." />
+              <WorkItemList items={workItems} empty="No account-specific work items." world={world} />
             </section>
           </div>
         </div>

@@ -20,6 +20,11 @@ The cockpit work loop is backed by durable `work_items` stored in the BTX backen
 - `execution_state`: `not_started`, `queued`, `running`, `completed`, or `failed`
 - `outcome`: completion result, or dismissal reason
 - `follow_up_date`: ISO date/datetime
+- `external_system`: external system that fulfilled the work, currently `hubspot`
+- `external_record_id`: verified external object id
+- `external_record_url`: URL to open the verified external object
+- `execution_idempotency_key`: idempotency key that produced the external object
+- `execution_error`: last real execution error, if any
 - `audit_history`: append-only list of `{ timestamp, actor, action, before, after }`
 
 Status transitions are:
@@ -62,6 +67,54 @@ Updates owner, priority, status, outcome, due/follow-up dates, artifact ref, app
 Body: `{ "reason": "..." }`
 
 Dismisses the item, records the reason as `outcome`, marks execution completed, and appends an audit entry.
+
+`POST /work-items/{id}/execute/hubspot-task`
+
+Executes the one supported real action. Requires `confirmed=true` and uses `X-Idempotency-Key` to prevent duplicate HubSpot tasks.
+
+Body:
+
+```json
+{
+  "confirmed": true,
+  "task_text": "Call Acme about the verified signal",
+  "body": "Optional task body override",
+  "evidence": "Optional evidence summary",
+  "relationship_record": {
+    "match_method": "exact_domain",
+    "confidence": 0.96
+  },
+  "company_id": "hubspot-company-10",
+  "contact_id": "hubspot-contact-20",
+  "deal_id": "hubspot-deal-30",
+  "owner_id": "12345",
+  "due_at": "2026-07-20T15:00:00Z"
+}
+```
+
+Response:
+
+```json
+{
+  "status": "verified",
+  "duplicate": false,
+  "idempotency_key": "work-item-123",
+  "work_item": {},
+  "hubspot_task": {
+    "id": "987654321",
+    "record_url": "https://app.hubspot.com/tasks/987654321",
+    "verified": true
+  }
+}
+```
+
+Failure behavior:
+
+- missing confirmation returns `422 confirmation_required`
+- missing HubSpot token returns `501 not_configured`
+- HubSpot write/read/verify errors return `502 hubspot_error`
+- failed execution leaves the work item not done, sets `execution_state=failed`, stores `execution_error`, and appends an audit entry
+- retrying with the same idempotency key after success returns the same verified task with `duplicate=true`
 
 ## Deferred Manual Verification
 
