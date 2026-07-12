@@ -3,7 +3,7 @@
 Use this checklist for UI behaviors that are not covered by the deterministic TypeScript regression tests.
 
 - Navigation: exactly one Home icon appears in the rail; clicking the brand title returns to Home.
-- Rail tab sweep: click all 8 rail items (Home, Signals, Accounts, Capability, Revenue, Map, Memory, Actions), screenshot each, and confirm no tab renders Home or another tab's view.
+- Nav sweep: click Core (Today's Brief, Work Queue, Accounts, Ask), Analytical (Map, Analysis, Capacity, Programs), and Utility (Settings). Screenshot each and confirm every surface renders its distinct component.
 - Ask chips: chips work from Home, responses, deliverables, and every workspace tab.
 - Parameter chips: Meeting brief shows account select; Plan a trip shows city and date range; Board deck shows quarter; Analysis view shows metric preset; Escape closes the popover.
 - Dossier: X closes the dossier, clicking the backdrop closes it, and Escape closes only the dossier without changing the active tab or response.

@@ -93,6 +93,16 @@ p { line-height: 1.55; }
   border-radius: 999px; background: var(--accent); color: #171b12; font-style: normal; font-size: 10px; font-weight: 700;
 }
 .brain-settings-btn { margin-top: auto; }
+.brain-rail-group { display: grid; gap: 6px; }
+.brain-rail-utility { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); }
+.brain-rail-group-label {
+  padding: 8px 7px 2px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
 .rail-settings {
   display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid var(--line);
 }
@@ -192,6 +202,142 @@ p { line-height: 1.55; }
 .hybrid-inline-status span { color: var(--accent); text-transform: uppercase; letter-spacing: .4px; font-size: 10px; }
 .hybrid-inline-status strong { color: var(--text); }
 .quiet-stage { flex: 1 1 auto; min-height: 0; position: relative; overflow-y: auto; }
+
+.surface-page {
+  min-height: 100%;
+  padding: 18px;
+}
+.surface-page > .quiet-view-head {
+  max-width: 980px;
+  margin-bottom: 14px;
+}
+.surface-page > .quiet-view-head p:not(.eyebrow) {
+  color: var(--muted);
+}
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.brief-grid.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.surface-panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+}
+.surface-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.surface-toolbar button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.surface-toolbar button.active, .surface-toolbar button:hover {
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+.work-item-list, .signal-mini-list {
+  display: grid;
+  gap: 8px;
+}
+.work-item-row, .signal-mini-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+.signal-mini-list article {
+  grid-template-columns: minmax(0, 1fr);
+}
+.work-item-row strong, .signal-mini-list strong { display: block; }
+.work-item-row span, .signal-mini-list span,
+.work-item-row em, .signal-mini-list em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+.work-item-state {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  text-align: right;
+}
+.work-item-state span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.account360-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.account360-list {
+  display: grid;
+  gap: 8px;
+  position: sticky;
+  top: 12px;
+}
+.account360-list button {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.account360-list button.active, .account360-list button:hover {
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+.account360-list span, .account360-list em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+.account360-detail { display: grid; gap: 14px; }
+.account360-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.account360-kpis div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 12px;
+}
+.account360-kpis span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.account360-kpis strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 20px;
+}
+.ask-surface .ask-brain.large { max-width: 980px; }
+.ask-surface .surface-panel { max-width: 980px; margin-top: 14px; }
 .quiet-home {
   min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 22px; padding: 24px;
@@ -1642,6 +1788,11 @@ p { line-height: 1.55; }
 .tour-error .tour-actions button { background: rgba(255, 255, 255, .08); }
 @media (max-width: 980px) { .signal-card-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) {
+  .brain-rail-group-label { display: none; }
+  .brief-grid, .brief-grid.compact, .account360-layout, .account360-kpis { grid-template-columns: 1fr; }
+  .account360-list { position: static; }
+  .work-item-row { grid-template-columns: 1fr; }
+  .work-item-state { text-align: left; justify-content: start; }
   .signal-inbox-head { flex-direction: column; align-items: flex-start; }
   .signal-inbox-head h1 { font-size: 26px; }
   .signal-card-head { flex-direction: column; }

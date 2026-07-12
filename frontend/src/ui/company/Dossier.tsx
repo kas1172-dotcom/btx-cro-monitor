@@ -110,7 +110,9 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
               action: "crm_task",
               title: "Create CRM Task",
               accountName: company.name,
+              accountId: company.id,
               evidence: rec.reason,
+              workItemType: "account_action",
             }}
           />
         </div>

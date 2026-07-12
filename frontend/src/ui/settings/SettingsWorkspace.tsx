@@ -7,6 +7,8 @@ import { applyScoringConfig } from "../../app/config.ts";
 import { clearMemory } from "../../memory/localMemory.ts";
 import { resetUiState, setState, useStore, type SettingsSection } from "../../store/store.ts";
 import type { WeightsConfig } from "../../engine/decision/weights.ts";
+import { MemoryPanel } from "../brain/MemoryPanel.tsx";
+import { Integrations } from "../integrations/Integrations.tsx";
 
 type Dimension = "risk" | "opportunity" | "capacityRisk" | "competitivePressure";
 type SourceType = "rss" | "json_api" | "html_list";
@@ -107,15 +109,25 @@ function sectionCopy(section: SettingsSection): { title: string; body: string } 
         title: "Engine tuning",
         body: "Tune deterministic scoring weights. Changes apply immediately in this browser; save to persist them.",
       };
+    case "memory":
+      return {
+        title: "Memory",
+        body: "Review saved notes, generated deliverables, and activity history.",
+      };
     case "prompts":
       return {
         title: "Prompts & rubrics",
         body: "Agent prompt, rubric, gold example, and banned-vocabulary editors land here after engine settings are wired.",
       };
-    case "connections":
+    case "sources":
       return {
-        title: "Sources",
+        title: "Source admin",
         body: "Enable, add, or remove monitor-engine sources. Free-text suggestions stay in the request queue.",
+      };
+    case "integrations":
+      return {
+        title: "Integrations",
+        body: "Review CRM, ERP, work management, calendar, and market-data connection status.",
       };
     case "general":
       return {
@@ -405,10 +417,14 @@ export function SettingsWorkspace() {
                 <span>Clear local demo state and reload from the seeded snapshot.</span>
               </button>
             </div>
+          ) : active.id === "memory" ? (
+            <MemoryPanel />
           ) : active.id === "engine" ? (
             <EngineTuningPanel />
-          ) : active.id === "connections" ? (
+          ) : active.id === "sources" ? (
             <SourcesPanel />
+          ) : active.id === "integrations" ? (
+            <Integrations />
           ) : (
             <div className="settings-placeholder">
               <p>{copy.body}</p>
