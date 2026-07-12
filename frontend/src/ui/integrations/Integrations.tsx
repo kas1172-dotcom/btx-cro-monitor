@@ -2,6 +2,7 @@ import { useState } from "react";
 import integrationsData from "../../../data/demo/btx/integrations.json";
 import assumptionsData from "../../../data/demo/btx/assumptions.json";
 import type { AssumptionsSnapshot, IntegrationRecord } from "../../adapters/demo/types.ts";
+import { PlatformHealthWidget } from "./PlatformHealthWidget.tsx";
 
 const INTEGRATIONS = integrationsData as IntegrationRecord[];
 const ASSUMPTIONS = assumptionsData as AssumptionsSnapshot;
@@ -26,6 +27,8 @@ export function Integrations() {
           This static demo uses snapshots shaped like future API responses. In production, authenticated adapters populate the same contracts.
         </p>
       </div>
+
+      <PlatformHealthWidget />
 
       <div className="integration-layout">
         <section className="integration-list">

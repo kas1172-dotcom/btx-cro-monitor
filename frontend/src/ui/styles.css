@@ -1241,6 +1241,12 @@ p { line-height: 1.55; }
 .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 12px; }
 .detail-head h2 { margin: 0; font-size: 24px; }
 .integration-status { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 4px 9px; font-size: 12px; color: var(--text); }
+.platform-health-widget { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; }
+.platform-health-widget .detail-head { border-bottom: none; padding-bottom: 0; margin-bottom: 8px; }
+.platform-health-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.platform-health-list li { display: flex; align-items: center; gap: 10px; }
+.platform-health-list strong, .platform-health-list em { display: block; }
+.platform-health-list em { color: var(--muted); font-size: 12px; font-style: normal; margin-top: 1px; }
 .flow-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
 .flow-steps div { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 11px; }
 .flow-steps span { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 999px; background: var(--accent); color: #171b12; font-weight: 700; font-size: 12px; }

@@ -253,9 +253,10 @@ VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
 VITE_COCKPIT_PASSWORD=<demo access password>
 ```
 
-Do not add a shared backend bearer token to the Pages build. Browser-safe
-backend auth is deferred to WP10; protected backend calls may reject public
-cockpit requests until then.
+Do not add a shared backend bearer token to the Pages build. Set
+`VITE_CLERK_PUBLISHABLE_KEY` as a GitHub Actions secret/variable instead —
+the cockpit gates itself behind Clerk sign-in and sends each user's own
+session token on backend calls.
 
 After those secrets are set, run the **Deploy Frontend Cockpit** workflow from
 the Actions tab. The cockpit will publish at:
@@ -273,3 +274,59 @@ fly secrets set --app btx-platform BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.
 Never put `CLERK_SECRET_KEY` in a `VITE_` variable or any frontend build — it
 is backend-only. Only `VITE_CLERK_PUBLISHABLE_KEY` belongs in the frontend
 build; it identifies the Clerk instance and is not a secret.
+
+## CI (WP10-C)
+
+`.github/workflows/ci.yml` runs on every PR into `main` and on push to `main`:
+frontend typecheck, build, and the fast test suites (`test:metrics`,
+`test:rail`, `test:settings`, `test:flows`, `test:tour`, `test:phase0`,
+`test:identity`, `test:map`, `test:live-adapter`, `test:deliverables`), plus
+backend `pytest`.
+
+`.github/workflows/e2e.yml` runs the Playwright browser suite
+(`frontend/tools/test-e2e-playwright.ts`) on the same triggers: builds the
+cockpit, boots it, signs in through Clerk (if configured), and walks the four
+core surfaces at desktop + mobile viewports. It always passes even without
+Clerk secrets configured — it exercises the app's no-auth fallback in that
+case — but only proves the real sign-in flow once these **optional** repo
+secrets are set: `VITE_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_EMAIL`,
+`E2E_CLERK_PASSWORD` (a dedicated test user's credentials, not a real BTX
+user). The HubSpot task-loop tier additionally needs `E2E_HUBSPOT_TEST_PORTAL=1`,
+`E2E_BACKEND_ENDPOINT` (a live backend, e.g. the staging deploy above), and
+`E2E_CLERK_SESSION_TOKEN` (a session token minted for the test user against
+that backend) — without them it skips that tier with a clear log line rather
+than failing.
+
+**Required GitHub settings** (maintainer, one-time): Settings → Branches →
+add a branch protection rule for `main` → enable "Require status checks to
+pass before merging" → select the `frontend` and `backend` jobs from the `CI`
+workflow, and the `e2e` job from the `E2E` workflow, as required checks.
+
+## Staging deploy (WP10-C)
+
+`.github/workflows/deploy-staging.yml` is **manual-only** (`workflow_dispatch`,
+never triggered by push/PR) and targets a separate, non-public Fly app —
+**production auto-deploy is intentionally not enabled by this task; `fly
+deploy` against `btx-platform` stays a manual step you run yourself**
+(Section 6 above). One-time setup before the staging workflow can run:
+
+```bash
+fly apps create btx-platform-staging
+fly postgres create --name btx-platform-staging-db --region iad
+fly postgres attach btx-platform-staging-db --app btx-platform-staging
+fly redis create   # note the URL, use it for the staging BTX_REDIS_URL
+fly secrets set --app btx-platform-staging \
+  BTX_ENV=prod \
+  CLERK_SECRET_KEY="<staging-or-shared-clerk-secret-key>" \
+  BTX_CLERK_ISSUER="https://<your-instance>.clerk.accounts.dev" \
+  BTX_ANTHROPIC_API_KEY="<anthropic-key>" \
+  BTX_HUBSPOT_ACCESS_TOKEN="<staging-hubspot-token-or-omit>" \
+  BTX_QUEUE_BACKEND=celery \
+  BTX_ENCRYPTION_KEY="<separate-key-from-prod>"
+```
+
+Then add the repo secret `FLY_API_TOKEN` (Settings → Secrets and variables →
+Actions) scoped to deploy `btx-platform-staging`, and optionally create a
+GitHub Environment named `staging` for an extra manual-approval gate. Run the
+workflow from the Actions tab; it requires typing "staging" into the confirm
+input as a safety check against fat-fingering a production deploy.

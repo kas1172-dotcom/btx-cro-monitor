@@ -25,6 +25,8 @@ from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_toke
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
+from btx_platform.health import platform_health
+from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
 from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload
 from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
@@ -269,6 +271,7 @@ def create_app(
     rate_limiter: RateLimiter | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
+    configure_observability(settings)
 
     if session_factory is None:
         engine = make_engine(settings.database_url)
@@ -303,6 +306,19 @@ def create_app(
         window_seconds=settings.rate_limit_window_seconds,
     )
     seed_engine_configs(session_factory)
+
+    @app.middleware("http")
+    async def assign_request_id(request: Request, call_next):
+        request_id = request.headers.get("x-request-id") or new_request_id()
+        set_request_id(request_id)
+        request.state.request_id = request_id
+        try:
+            response = await call_next(request)
+        except Exception as exc:
+            capture_exception(exc)
+            raise
+        response.headers["x-request-id"] = request_id
+        return response
 
     @app.middleware("http")
     async def require_clerk_auth(request: Request, call_next):
@@ -349,14 +365,20 @@ def create_app(
         except Exception:
             logger.exception("health.db_failed")
             db_ok = False
+        detail = platform_health(settings, db_ok=db_ok)
+        # Keep the original flat fields (existing callers/tests depend on
+        # these) while adding the richer WP10-C freshness/integration detail.
         return {
-            "status": "ok",
+            "status": "ok" if detail["status"] == "ok" else detail["status"],
             "env": settings.env,
             "version": app.version,
             "db": db_ok,
             "live": bool(settings.hubspot_access_token),
             "llm": bool(settings.anthropic_api_key),
             "auth": app.state.clerk_verifier is not None,
+            "monitor": detail["monitor"],
+            "integrations": detail["integrations"],
+            "generated_at": detail["generated_at"],
         }
 
     @app.get("/artifacts/latest")

@@ -64,6 +64,12 @@ class Settings(BaseSettings):
     encryption_key: str | None = None
     queue_backend: str = "memory"  # memory (dev/test) | celery (prod)
 
+    # Observability, health, retention (WP10-C).
+    sentry_dsn: str | None = None
+    monitor_stale_after_days: int = 7
+    event_retention_days: int = 90
+    audit_retention_days: int = 365
+
     @property
     def cors_origins(self) -> list[str]:
         raw = self.frontend_origins or self.frontend_origin

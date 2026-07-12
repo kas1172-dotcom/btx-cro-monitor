@@ -105,7 +105,11 @@ def test_valid_signed_payload_accepted_and_enqueued():
 
 def test_health():
     client, _sf, _q = _build()
-    assert client.get("/health").json()["status"] == "ok"
+    body = client.get("/health").json()
+    assert body["status"] in ("ok", "degraded")
+    assert body["db"] is True
+    assert body["monitor"]["status"] in ("ok", "stale", "missing", "invalid")
+    assert "hubspot" in body["integrations"] and "llm" in body["integrations"]
 
 
 def test_webhooks_exempt_from_clerk_auth_but_other_routes_are_not():
