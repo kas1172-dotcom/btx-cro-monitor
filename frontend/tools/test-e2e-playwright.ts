@@ -1,13 +1,12 @@
 // WP10-C browser E2E. Two tiers, both real Playwright runs against a built
 // + served cockpit (not mocked):
 //
-// 1. Core-surface smoke (always runs): builds with a Clerk publishable key
-//    if one is configured, boots the preview server, and walks the four core
-//    surfaces at desktop + mobile viewports. If VITE_CLERK_PUBLISHABLE_KEY +
-//    E2E_CLERK_EMAIL/E2E_CLERK_PASSWORD are set, it performs a real Clerk
-//    sign-in first (per WP10-A, auth now gates the app). Without those env
-//    vars it skips the login step and asserts the app still boots — the same
-//    fallback CockpitAuthGate itself uses when Clerk isn't configured.
+// 1. Core-surface smoke (always runs): boots the preview server and walks the
+//    four core surfaces at desktop + mobile viewports. The real Clerk sign-in
+//    flow is opt-in with E2E_CLERK_LOGIN=1 plus VITE_CLERK_PUBLISHABLE_KEY,
+//    E2E_CLERK_EMAIL, and E2E_CLERK_PASSWORD. Without that explicit opt-in it
+//    skips Clerk and asserts the app still boots through CockpitAuthGate's
+//    no-auth-configured fallback.
 //
 // 2. HubSpot task loop (env-gated): only runs when E2E_BACKEND_ENDPOINT and
 //    E2E_HUBSPOT_TEST_PORTAL=1 are set, i.e. a maintainer has pointed this at
@@ -27,6 +26,7 @@ const SCREENSHOT_DIR = "/tmp/btx-e2e-smoke";
 const CLERK_PUBLISHABLE_KEY = process.env.VITE_CLERK_PUBLISHABLE_KEY;
 const CLERK_EMAIL = process.env.E2E_CLERK_EMAIL;
 const CLERK_PASSWORD = process.env.E2E_CLERK_PASSWORD;
+const CLERK_LOGIN_ENABLED = process.env.E2E_CLERK_LOGIN === "1";
 const HUBSPOT_LOOP_ENABLED = process.env.E2E_HUBSPOT_TEST_PORTAL === "1" && !!process.env.E2E_BACKEND_ENDPOINT;
 
 function assert(condition: unknown, message: string): void {
@@ -64,15 +64,13 @@ async function waitForPreview(): Promise<ReturnType<typeof spawn>> {
 async function signInWithClerkIfConfigured(page: Page): Promise<void> {
   await page.goto(BASE_URL, { waitUntil: "networkidle" });
 
-  if (!CLERK_PUBLISHABLE_KEY) {
-    // Mirrors CockpitAuthGate: no publishable key configured => unguarded.
-    console.log("e2e: VITE_CLERK_PUBLISHABLE_KEY not set, skipping Clerk login (matches CockpitAuthGate fallback).");
+  if (!CLERK_LOGIN_ENABLED) {
+    console.log("e2e: E2E_CLERK_LOGIN is not 1, skipping Clerk login (matches CockpitAuthGate fallback).");
     return;
   }
-  if (!CLERK_EMAIL || !CLERK_PASSWORD) {
+  if (!CLERK_PUBLISHABLE_KEY || !CLERK_EMAIL || !CLERK_PASSWORD) {
     throw new Error(
-      "VITE_CLERK_PUBLISHABLE_KEY is set but E2E_CLERK_EMAIL/E2E_CLERK_PASSWORD are not. " +
-      "Provide a test user's credentials to exercise the real Clerk sign-in flow.",
+      "E2E_CLERK_LOGIN=1 requires VITE_CLERK_PUBLISHABLE_KEY, E2E_CLERK_EMAIL, and E2E_CLERK_PASSWORD.",
     );
   }
 
@@ -170,7 +168,8 @@ async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
 
 await mkdir(SCREENSHOT_DIR, { recursive: true });
 const buildEnv = { ...process.env } as NodeJS.ProcessEnv;
-if (CLERK_PUBLISHABLE_KEY) buildEnv.VITE_CLERK_PUBLISHABLE_KEY = CLERK_PUBLISHABLE_KEY;
+if (CLERK_LOGIN_ENABLED && CLERK_PUBLISHABLE_KEY) buildEnv.VITE_CLERK_PUBLISHABLE_KEY = CLERK_PUBLISHABLE_KEY;
+if (!CLERK_LOGIN_ENABLED) delete buildEnv.VITE_CLERK_PUBLISHABLE_KEY;
 if (HUBSPOT_LOOP_ENABLED) buildEnv.VITE_BACKEND_ENDPOINT = process.env.E2E_BACKEND_ENDPOINT;
 await run("npm", ["run", "build"], buildEnv);
 await run("npx", ["playwright", "install", "chromium"]);

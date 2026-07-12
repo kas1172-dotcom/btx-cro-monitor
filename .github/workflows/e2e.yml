@@ -5,12 +5,10 @@ name: E2E
 # viewports (frontend/tools/test-e2e-playwright.ts). Separate from ci.yml
 # because it installs a browser and takes longer.
 #
-# The Clerk sign-in step and the HubSpot task-loop tier are env-gated behind
-# repo secrets a maintainer provisions (see docs/DEPLOY_BACKEND.md's CI
-# section and docs/DEMO_HUBSPOT_TASK.md). Without those secrets this workflow
-# still runs and passes — it exercises the app's own no-auth-configured
-# fallback, matching CockpitAuthGate's behavior — it just doesn't prove the
-# real Clerk flow until secrets exist.
+# The real Clerk sign-in step and HubSpot task-loop tier are explicit opt-ins
+# a maintainer can enable later (see docs/DEPLOY_BACKEND.md's CI section and
+# docs/DEMO_HUBSPOT_TASK.md). By default this workflow exercises the cockpit's
+# no-auth-configured fallback so ordinary PRs are not blocked on external auth.
 on:
   pull_request:
     branches: [main]
@@ -49,6 +47,7 @@ jobs:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           E2E_CLERK_EMAIL: ${{ secrets.E2E_CLERK_EMAIL }}
           E2E_CLERK_PASSWORD: ${{ secrets.E2E_CLERK_PASSWORD }}
+          E2E_CLERK_LOGIN: ${{ vars.E2E_CLERK_LOGIN }}
           # HubSpot task-loop tier stays off in CI (no test-portal backend is
           # reachable from GitHub-hosted runners); enable by also setting
           # E2E_BACKEND_ENDPOINT / E2E_CLERK_SESSION_TOKEN as repo secrets
