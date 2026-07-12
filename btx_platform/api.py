@@ -8,7 +8,6 @@ inject SQLite + an in-memory queue and production injects Postgres + Celery.
 from __future__ import annotations
 
 import logging
-import hmac
 import json
 import time
 from datetime import UTC, datetime, timedelta
@@ -22,6 +21,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from btx_platform import models
+from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_token
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import init_db, make_engine, make_session_factory
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
@@ -30,6 +30,7 @@ from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
 from btx_platform.queue import InMemoryQueue, JobQueue
+from btx_platform.ratelimit import RateLimiter
 from btx_platform.schemas import (
     CalendarEventRequest,
     CrmTaskRequest,
@@ -49,6 +50,12 @@ from btx_platform.schemas import (
 logger = logging.getLogger(__name__)
 CRM_CACHE_TTL_SECONDS = 300
 PUBLIC_PATHS = {"/health", "/artifacts/latest"}
+# Mutating routes require at least "analyst"; a viewer can read but not write.
+MUTATING_ROUTE_MIN_ROLE = "analyst"
+MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+# /webhooks/* is authenticated by its own per-connection HMAC signature, not
+# a Clerk session (the caller is a machine, not a signed-in user).
+WEBHOOK_PATH_PREFIX = "/webhooks/"
 WORK_ITEM_TRANSITIONS = {
     "proposed": {"approved", "dismissed"},
     "approved": {"in_progress", "dismissed"},
@@ -108,7 +115,21 @@ def _task_associations_from_values(
 
 
 def _actor(request: Request) -> str:
-    return request.headers.get("x-btx-actor") or "system"
+    """The authenticated Clerk user driving this mutation (audit trail identity).
+
+    Falls back to "system" only for routes exempt from Clerk auth (webhooks),
+    never as a way to spoof identity — the auth middleware already rejected
+    any request without a verified session before a route handler runs.
+    """
+    auth: AuthContext | None = getattr(request.state, "auth", None)
+    if auth is None:
+        return "system"
+    return auth.email or auth.user_id
+
+
+def _tenant_id(request: Request) -> str:
+    auth: AuthContext | None = getattr(request.state, "auth", None)
+    return auth.tenant_id if auth is not None else models.DEFAULT_TENANT_ID
 
 
 def _parse_datetime(value: str | None, field_name: str) -> datetime | None:
@@ -177,6 +198,19 @@ def _hubspot_task_record_url(task_id: str) -> str:
     return f"https://app.hubspot.com/tasks/{task_id}"
 
 
+def _get_tenant_work_item(session, item_id: str, tenant_id: str) -> models.WorkItem | None:
+    """Fetch a work item scoped to *tenant_id*.
+
+    A row that exists but belongs to a different tenant returns None, the same
+    as a missing row — the caller can't distinguish "not found" from "not
+    yours," which is exactly the point (no cross-tenant existence leak).
+    """
+    row = session.get(models.WorkItem, item_id)
+    if row is None or row.tenant_id != tenant_id:
+        return None
+    return row
+
+
 def _verified_task(task: dict, *, expected_subject: str, expected_body: str) -> bool:
     properties = task.get("properties") if isinstance(task.get("properties"), dict) else {}
     subject = properties.get("hs_task_subject") or task.get("hs_task_subject")
@@ -184,7 +218,7 @@ def _verified_task(task: dict, *, expected_subject: str, expected_body: str) -> 
     return bool(task.get("id")) and subject == expected_subject and expected_body in str(body)
 
 
-def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict) -> None:
+def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict, tenant_id: str = models.DEFAULT_TENANT_ID) -> None:
     records = payload.get("records")
     if not isinstance(records, list):
         return
@@ -200,6 +234,7 @@ def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict) -> No
                 continue
             session.merge(models.CanonicalAccount(
                 id=canonical_id,
+                tenant_id=tenant_id,
                 hubspot_company_id=hubspot_company_id,
                 domains=record.get("domains") if isinstance(record.get("domains"), list) else [],
                 aliases=record.get("aliases") if isinstance(record.get("aliases"), list) else [],
@@ -219,6 +254,8 @@ def create_app(
     settings: Settings | None = None,
     session_factory: sessionmaker | None = None,
     queue: JobQueue | None = None,
+    clerk_verifier: ClerkVerifier | None = None,
+    rate_limiter: RateLimiter | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
 
@@ -232,24 +269,58 @@ def create_app(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=False,
-        allow_methods=["GET", "POST", "PUT", "OPTIONS"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "OPTIONS"],
         allow_headers=["authorization", "content-type", "x-idempotency-key", settings.signature_header],
     )
     app.state.settings = settings
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else InMemoryQueue()
     app.state.crm_cache = {}
+    app.state.clerk_verifier = clerk_verifier or (
+        ClerkVerifier(issuer=settings.clerk_issuer, audience=settings.clerk_audience)
+        if settings.clerk_issuer
+        else None
+    )
+    app.state.rate_limiter = rate_limiter or RateLimiter(
+        max_requests=settings.rate_limit_max_requests,
+        window_seconds=settings.rate_limit_window_seconds,
+    )
     seed_engine_configs(session_factory)
 
     @app.middleware("http")
-    async def require_bearer_auth(request: Request, call_next):
-        if request.url.path in PUBLIC_PATHS or request.method == "OPTIONS":
+    async def require_clerk_auth(request: Request, call_next):
+        path = request.url.path
+        if path in PUBLIC_PATHS or request.method == "OPTIONS" or path.startswith(WEBHOOK_PATH_PREFIX):
             return await call_next(request)
-        if not settings.backend_auth_token:
-            return JSONResponse({"code": "auth_not_configured", "detail": "BTX_BACKEND_AUTH_TOKEN is required."}, status_code=503)
-        expected = f"Bearer {settings.backend_auth_token}"
-        if not hmac.compare_digest(request.headers.get("authorization") or "", expected):
-            return JSONResponse({"code": "unauthorized", "detail": "Missing or invalid bearer token."}, status_code=401)
+
+        verifier: ClerkVerifier | None = app.state.clerk_verifier
+        if verifier is None:
+            return JSONResponse(
+                {"code": "auth_not_configured", "detail": "CLERK_SECRET_KEY / BTX_CLERK_ISSUER is required."},
+                status_code=503,
+            )
+        token = bearer_token(request.headers.get("authorization"))
+        if not token:
+            return JSONResponse({"code": "unauthorized", "detail": "Missing bearer session token."}, status_code=401)
+        try:
+            auth = verifier.verify(token)
+        except AuthError as exc:
+            return JSONResponse({"code": exc.code, "detail": exc.detail}, status_code=exc.status_code)
+        request.state.auth = auth
+
+        if request.method in MUTATING_METHODS:
+            if not auth.has_role(MUTATING_ROUTE_MIN_ROLE):
+                return JSONResponse(
+                    {"code": "forbidden", "detail": f"Role '{auth.role}' cannot perform this action."},
+                    status_code=403,
+                )
+            limiter: RateLimiter = app.state.rate_limiter
+            if not limiter.allow(auth.user_id):
+                return JSONResponse(
+                    {"code": "rate_limited", "detail": "Too many requests. Try again shortly."},
+                    status_code=429,
+                )
+
         return await call_next(request)
 
     @app.get("/health")
@@ -268,7 +339,7 @@ def create_app(
             "db": db_ok,
             "live": bool(settings.hubspot_access_token),
             "llm": bool(settings.anthropic_api_key),
-            "auth": bool(settings.backend_auth_token),
+            "auth": app.state.clerk_verifier is not None,
         }
 
     @app.get("/artifacts/latest")
@@ -303,7 +374,7 @@ def create_app(
             status_code=501,
         )
 
-    def cached_hubspot_response(kind: str) -> Response:
+    def cached_hubspot_response(kind: str, tenant_id: str) -> Response:
         if not settings.hubspot_access_token:
             return not_configured(f"HubSpot {kind}")
         now = time.monotonic()
@@ -317,7 +388,7 @@ def create_app(
             logger.warning("hubspot.read_failed", extra={"kind": kind, "status_code": exc.status_code})
             return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
         if kind == "accounts":
-            _sync_canonical_accounts(session_factory, payload)
+            _sync_canonical_accounts(session_factory, payload, tenant_id)
         cache[kind] = (now + CRM_CACHE_TTL_SECONDS, payload)
         return JSONResponse(payload)
 
@@ -344,16 +415,16 @@ def create_app(
         return JSONResponse({"text": text_out})
 
     @app.get("/crm/accounts")
-    def crm_accounts() -> Response:
-        return cached_hubspot_response("accounts")
+    def crm_accounts(request: Request) -> Response:
+        return cached_hubspot_response("accounts", _tenant_id(request))
 
     @app.get("/crm/deals")
-    def crm_deals() -> Response:
-        return cached_hubspot_response("deals")
+    def crm_deals(request: Request) -> Response:
+        return cached_hubspot_response("deals", _tenant_id(request))
 
     @app.get("/crm/contacts")
-    def crm_contacts() -> Response:
-        return cached_hubspot_response("contacts")
+    def crm_contacts(request: Request) -> Response:
+        return cached_hubspot_response("contacts", _tenant_id(request))
 
     @app.post("/crm/task")
     def create_crm_task(payload: CrmTaskRequest, request: Request) -> Response:
@@ -380,6 +451,7 @@ def create_app(
         session = session_factory()
         try:
             session.add(models.HubSpotTaskAudit(
+                tenant_id=_tenant_id(request),
                 subject=payload.title,
                 hubspot_task_id=task_id,
                 record_url=record_url,
@@ -415,9 +487,10 @@ def create_app(
 
         idempotency_key = request.headers.get(settings.idempotency_header) or f"work-item:{item_id}:hubspot-task"
         actor = _actor(request)
+        tenant_id = _tenant_id(request)
         session = session_factory()
         try:
-            row = session.get(models.WorkItem, item_id)
+            row = _get_tenant_work_item(session, item_id, tenant_id)
             if row is None:
                 return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
 
@@ -547,6 +620,7 @@ def create_app(
                 },
             )
             session.add(models.HubSpotTaskAudit(
+                tenant_id=tenant_id,
                 subject=task_subject,
                 hubspot_task_id=task_id,
                 record_url=record_url,
@@ -594,6 +668,7 @@ def create_app(
         session = session_factory()
         try:
             row = models.WorkItem(
+                tenant_id=_tenant_id(request),
                 type=payload.type,
                 canonical_account_id=payload.canonical_account_id,
                 source_signal_ids=payload.source_signal_ids,
@@ -626,6 +701,7 @@ def create_app(
 
     @app.get("/work-items")
     def list_work_items(
+        request: Request,
         account: str | None = None,
         status: str | None = None,
         owner: str | None = None,
@@ -640,7 +716,7 @@ def create_app(
             return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
         session = session_factory()
         try:
-            query = session.query(models.WorkItem)
+            query = session.query(models.WorkItem).filter(models.WorkItem.tenant_id == _tenant_id(request))
             if account:
                 query = query.filter(models.WorkItem.canonical_account_id == account)
             if status:
@@ -676,7 +752,7 @@ def create_app(
     def patch_work_item(item_id: str, payload: WorkItemPatch, request: Request) -> Response:
         session = session_factory()
         try:
-            row = session.get(models.WorkItem, item_id)
+            row = _get_tenant_work_item(session, item_id, _tenant_id(request))
             if row is None:
                 return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
             before = _work_item_snapshot(row)
@@ -718,7 +794,7 @@ def create_app(
     def dismiss_work_item(item_id: str, payload: WorkItemDismiss, request: Request) -> Response:
         session = session_factory()
         try:
-            row = session.get(models.WorkItem, item_id)
+            row = _get_tenant_work_item(session, item_id, _tenant_id(request))
             if row is None:
                 return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
             try:
@@ -760,10 +836,10 @@ def create_app(
         ).model_dump()
 
     @app.get("/engine-config/{name}")
-    def get_engine_config(name: str) -> Response:
+    def get_engine_config(name: str, request: Request) -> Response:
         session = session_factory()
         try:
-            row = latest_config(session, name)
+            row = latest_config(session, name, _tenant_id(request))
             if row is None:
                 return JSONResponse({"code": "not_found", "detail": f"No config named {name}."}, status_code=404)
             return JSONResponse(config_response(row))
@@ -771,10 +847,10 @@ def create_app(
             session.close()
 
     @app.put("/engine-config/{name}")
-    def update_engine_config(name: str, payload: EngineConfigPut) -> Response:
+    def update_engine_config(name: str, payload: EngineConfigPut, request: Request) -> Response:
         session = session_factory()
         try:
-            row = put_config(session, name, payload.document, payload.change_note)
+            row = put_config(session, name, payload.document, payload.change_note, _tenant_id(request))
             logger.info("mutation.engine_config", extra={"config_name": name, "version": row.version})
             return JSONResponse(config_response(row))
         except KeyError as exc:
@@ -785,19 +861,19 @@ def create_app(
             session.close()
 
     @app.get("/engine-config/{name}/history")
-    def get_engine_config_history(name: str) -> Response:
+    def get_engine_config_history(name: str, request: Request) -> Response:
         session = session_factory()
         try:
-            rows = config_history(session, name)
+            rows = config_history(session, name, _tenant_id(request))
             return JSONResponse({"records": [config_response(row) for row in rows]})
         finally:
             session.close()
 
     @app.post("/pipeline/run")
-    def run_pipeline_now() -> Response:
+    def run_pipeline_now(request: Request) -> Response:
         session = session_factory()
         try:
-            row = trigger_pipeline(session, settings)
+            row = trigger_pipeline(session, settings, _tenant_id(request))
             logger.info("mutation.pipeline_run", extra={"run_id": row.id, "mechanism": row.mechanism, "status": row.status})
             return JSONResponse(run_response(row))
         except PipelineRateLimit as exc:
@@ -808,10 +884,10 @@ def create_app(
             session.close()
 
     @app.get("/pipeline/runs")
-    def get_pipeline_runs() -> Response:
+    def get_pipeline_runs(request: Request) -> Response:
         session = session_factory()
         try:
-            return JSONResponse({"records": [run_response(row) for row in list_runs(session)]})
+            return JSONResponse({"records": [run_response(row) for row in list_runs(session, _tenant_id(request))]})
         finally:
             session.close()
 

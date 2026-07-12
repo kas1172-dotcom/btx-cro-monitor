@@ -19,7 +19,7 @@ export async function requestSectionRevision({
 }: RevisionRequest): Promise<string> {
   const res = await fetchImpl(endpoint, {
     method: "POST",
-    headers: backendHeaders({ "content-type": "application/json" }),
+    headers: await backendHeaders({ "content-type": "application/json" }),
     body: JSON.stringify({
       model: LLM_MODELS.composition,
       system: "Revise one deliverable section. Preserve facts and numbers. Respect audience/form rules and banned vocabulary. Return only revised prose.",

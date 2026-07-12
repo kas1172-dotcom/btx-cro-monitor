@@ -76,8 +76,13 @@ Useful smoke checks:
 ```bash
 curl http://127.0.0.1:8001/health
 curl http://127.0.0.1:8001/engine-config/scoring_weights \
-  -H "Authorization: Bearer $BTX_BACKEND_AUTH_TOKEN"
+  -H "Authorization: Bearer $CLERK_SESSION_TOKEN"
 ```
+
+`$CLERK_SESSION_TOKEN` is a session JWT for a signed-in user (copy one from your
+browser's dev tools while signed in locally, or mint one with the Clerk backend
+SDK). There is no shared backend token anymore — see `docs/DEPLOY_BACKEND.md`
+for how Clerk auth is configured.
 
 Fly.io deployment instructions live in `docs/DEPLOY_BACKEND.md`.
 

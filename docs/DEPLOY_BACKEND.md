@@ -26,16 +26,17 @@ brew install flyctl
 fly auth login
 ```
 
-Generate the backend bearer token locally:
-
-```bash
-openssl rand -base64 32
-```
+Create a Clerk application (clerk.com) if you don't have one yet. Single-tenant
+is fine to start. From its dashboard, copy the publishable key (frontend,
+non-secret) and the secret key (backend only), and note the instance's issuer
+URL (Frontend API URL under API Keys — looks like
+`https://<your-instance>.clerk.accounts.dev`).
 
 Create or gather these secrets before deploy:
 
 ```text
-BTX_BACKEND_AUTH_TOKEN       generated with openssl above
+CLERK_SECRET_KEY             Clerk backend secret key
+BTX_CLERK_ISSUER             Clerk instance issuer URL
 BTX_ANTHROPIC_API_KEY        Anthropic API key for /llm
 BTX_HUBSPOT_ACCESS_TOKEN     HubSpot private-app token
 BTX_GITHUB_PAT               GitHub token with permission to dispatch Actions
@@ -100,7 +101,8 @@ fly secrets set BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@HOST:PORT/D
 ```bash
 fly secrets set \
   BTX_ENV=prod \
-  BTX_BACKEND_AUTH_TOKEN="<openssl-output>" \
+  CLERK_SECRET_KEY="<clerk-secret-key>" \
+  BTX_CLERK_ISSUER="https://<your-instance>.clerk.accounts.dev" \
   BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io" \
   BTX_ANTHROPIC_API_KEY="<anthropic-key>" \
   BTX_HUBSPOT_ACCESS_TOKEN="<hubspot-private-app-token>" \
@@ -118,7 +120,8 @@ fly deploy
 ```
 
 The app creates its SQLAlchemy tables on startup if they do not already exist.
-There are no Alembic migrations in this repo today.
+Alembic migrations land in WP10-B; see that section of
+`CODEX_EXECUTION_PLAYBOOK.md` once merged for `alembic upgrade head` steps.
 
 ## Smoke Tests
 
@@ -126,7 +129,7 @@ Set local shell variables for the smoke tests:
 
 ```bash
 export BASE="https://btx-platform.fly.dev"
-export TOKEN="<same-value-as-BTX_BACKEND_AUTH_TOKEN>"
+export TOKEN="<a-signed-in-user's-clerk-session-token>"
 ```
 
 Health is public:
@@ -229,6 +232,6 @@ If you need to update the allowed frontend origin on Fly later, run:
 fly secrets set --app btx-platform BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io"
 ```
 
-Do not expose `BTX_BACKEND_AUTH_TOKEN` as a long-term public frontend secret.
-For a real customer deployment, put the cockpit behind an access-control layer
-or add user authentication before showing private HubSpot data.
+Never put `CLERK_SECRET_KEY` in a `VITE_` variable or any frontend build — it
+is backend-only. Only `VITE_CLERK_PUBLISHABLE_KEY` belongs in the frontend
+build; it identifies the Clerk instance and is not a secret.

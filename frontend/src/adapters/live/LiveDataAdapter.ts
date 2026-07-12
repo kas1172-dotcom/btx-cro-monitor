@@ -77,7 +77,7 @@ export function normalizeOpportunities(response: LiveResponse<Opportunity>): Opp
 export class LiveDataAdapter implements DataAdapter {
   private async getJson<T>(path: string): Promise<T> {
     if (!ENDPOINT) throw new Error(MESSAGE);
-    const response = await fetch(`${ENDPOINT}${path}`, { headers: backendHeaders() });
+    const response = await fetch(`${ENDPOINT}${path}`, { headers: await backendHeaders() });
     if (!response.ok) {
       const body = await response.text();
       throw new Error(`Live adapter ${path} failed (${response.status}): ${body}`);

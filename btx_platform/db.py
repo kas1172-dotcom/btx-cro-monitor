@@ -44,6 +44,7 @@ def init_db(engine: Engine) -> None:
     Base.metadata.create_all(engine)
     _ensure_work_item_action_columns(engine)
     _ensure_hubspot_task_audit_columns(engine)
+    _ensure_tenant_id_columns(engine)
 
 
 def _ensure_work_item_action_columns(engine: Engine) -> None:
@@ -77,6 +78,30 @@ def _ensure_hubspot_task_audit_columns(engine: Engine) -> None:
     if "idempotency_key" not in existing:
         with engine.begin() as connection:
             connection.execute(text("ALTER TABLE hubspot_task_audits ADD COLUMN idempotency_key VARCHAR(256)"))
+
+
+def _ensure_tenant_id_columns(engine: Engine) -> None:
+    """Add the WP10-A tenant_id column for existing dev/prod databases.
+
+    New installs get it from create_all(); this backfills pre-WP10 SQLite
+    files so local dev doesn't need a fresh database.
+    """
+    from btx_platform.models import DEFAULT_TENANT_ID
+
+    tables = ("connections", "engine_configs", "canonical_accounts", "pipeline_runs", "work_items", "hubspot_task_audits")
+    inspector = inspect(engine)
+    with engine.begin() as connection:
+        for table in tables:
+            if table not in inspector.get_table_names():
+                continue
+            existing = {column["name"] for column in inspector.get_columns(table)}
+            if "tenant_id" in existing:
+                continue
+            connection.execute(text(f"ALTER TABLE {table} ADD COLUMN tenant_id VARCHAR(80)"))
+            connection.execute(
+                text(f"UPDATE {table} SET tenant_id = :tenant WHERE tenant_id IS NULL"),
+                {"tenant": DEFAULT_TENANT_ID},
+            )
 
 
 @contextmanager

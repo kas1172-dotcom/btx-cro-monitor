@@ -26,6 +26,7 @@
     "weekly:memo": "tsx tools/run-weekly-memo.ts"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.8",
     "@fontsource/inter": "^5.2.8",
     "@xyflow/react": "^12.3.5",
     "docx": "^9.7.1",

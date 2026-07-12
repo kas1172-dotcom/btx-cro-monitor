@@ -34,7 +34,7 @@ Use a HubSpot sandbox/test portal for the first live write.
 
 ```bash
 BASE=https://btx-platform.fly.dev
-TOKEN=<BTX_BACKEND_AUTH_TOKEN>
+TOKEN=<a-signed-in-user's-clerk-session-token>
 
 WORK_ITEM_ID=$(curl -s "$BASE/work-items" \
   -H "Authorization: Bearer $TOKEN" \

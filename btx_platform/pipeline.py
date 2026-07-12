@@ -31,14 +31,17 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _recent_runs(session: Session) -> list[models.PipelineRun]:
+def _recent_runs(session: Session, tenant_id: str = models.DEFAULT_TENANT_ID) -> list[models.PipelineRun]:
     return list(session.execute(
-        select(models.PipelineRun).order_by(models.PipelineRun.triggered_at.desc()).limit(20)
+        select(models.PipelineRun)
+        .where(models.PipelineRun.tenant_id == tenant_id)
+        .order_by(models.PipelineRun.triggered_at.desc())
+        .limit(20)
     ).scalars())
 
 
-def assert_can_start(session: Session, settings: Settings) -> None:
-    runs = _recent_runs(session)
+def assert_can_start(session: Session, settings: Settings, tenant_id: str = models.DEFAULT_TENANT_ID) -> None:
+    runs = _recent_runs(session, tenant_id)
     if any(run.status in {"queued", "running"} for run in runs):
         raise PipelineRateLimit("A pipeline run is already in progress.")
     if runs:
@@ -65,11 +68,11 @@ def _enabled_sources(registry: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
-def export_monitor_config(session: Session, settings: Settings) -> tuple[Path, Path]:
+def export_monitor_config(session: Session, settings: Settings, tenant_id: str = models.DEFAULT_TENANT_ID) -> tuple[Path, Path]:
     base = json.loads(CLIENT_CONFIG_PATH.read_text(encoding="utf-8"))
-    source_registry = latest_config(session, "source_registry")
-    client_profile = latest_config(session, "client_profile")
-    scoring_weights = latest_config(session, "scoring_weights")
+    source_registry = latest_config(session, "source_registry", tenant_id)
+    client_profile = latest_config(session, "client_profile", tenant_id)
+    scoring_weights = latest_config(session, "scoring_weights", tenant_id)
     if not source_registry or not client_profile or not scoring_weights:
         raise PipelineConfigError("Engine configuration has not been seeded.")
 
@@ -149,14 +152,15 @@ def dispatch_github(settings: Settings) -> str:
     return f"Dispatched {settings.github_workflow} on {settings.github_ref}."
 
 
-def trigger_pipeline(session: Session, settings: Settings) -> models.PipelineRun:
-    assert_can_start(session, settings)
+def trigger_pipeline(session: Session, settings: Settings, tenant_id: str = models.DEFAULT_TENANT_ID) -> models.PipelineRun:
+    assert_can_start(session, settings, tenant_id)
     mechanism = settings.pipeline_mechanism.lower()
     if mechanism not in {"subprocess", "github"}:
         raise PipelineConfigError("BTX_PIPELINE_MECHANISM must be subprocess or github.")
 
-    config_path, _scoring_path = export_monitor_config(session, settings)
+    config_path, _scoring_path = export_monitor_config(session, settings, tenant_id)
     run = models.PipelineRun(
+        tenant_id=tenant_id,
         mechanism=mechanism,
         status="running" if mechanism == "subprocess" else "queued",
         config_path=str(config_path),
@@ -188,5 +192,5 @@ def trigger_pipeline(session: Session, settings: Settings) -> models.PipelineRun
     return run
 
 
-def list_runs(session: Session, limit: int = 20) -> list[models.PipelineRun]:
-    return _recent_runs(session)[:limit]
+def list_runs(session: Session, tenant_id: str = models.DEFAULT_TENANT_ID, limit: int = 20) -> list[models.PipelineRun]:
+    return _recent_runs(session, tenant_id)[:limit]
