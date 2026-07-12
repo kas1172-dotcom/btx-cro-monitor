@@ -151,6 +151,7 @@ const figure = renderToStaticMarkup(
 );
 assert(figure.includes("Figure 1."), "Figure wrapper should stamp figure number");
 assert(figure.includes("X-axis: Fiscal quarter"), "Figure wrapper should stamp x-axis label");
+assert(figure.includes("aria-hidden=\"true\">·</i>"), "Figure wrapper should separate x-axis and y-axis labels");
 assert(figure.includes("Y-axis: $ millions"), "Figure wrapper should stamp y-axis label");
 assert(figure.includes("Summary:"), "Figure wrapper should stamp summary");
 let missingFigureFailed = false;
@@ -177,11 +178,15 @@ assert(!/\bretention|earnings|churned\b/i.test(caps), "capabilities assessment l
 const outreach = renderSteelSignalDocument(baseDeliverable("outreach", "Outreach Draft"), world);
 assert(outreach.includes("Outreach draft"), "outreach snapshot missing header");
 assert(outreach.includes("Why now") || outreach.includes("SOURCE"), "outreach snapshot missing evidence block");
+assert(outreach.includes("Would you be open to a short call"), "outreach snapshot missing explicit short-call ask");
+assert(outreach.includes("VP Sales, BTX Precision Machining"), "outreach snapshot missing signature title and company");
 
 const newsletter = renderSteelSignalDocument(baseDeliverable("weekly_memo", "Monthly Newsletter"), world);
 assert(newsletter.includes("Tell me"), "newsletter snapshot missing Tell me");
 assert(newsletter.includes("Show me"), "newsletter snapshot missing Show me");
 assert(newsletter.includes("So what"), "newsletter snapshot missing So what");
+assert(!newsletter.includes("<h2>Lockheed awards F-35 lot-19 sustainment; spares volume rises into FY27.</h2>"), "newsletter headline should not duplicate full tell text");
+assert(newsletter.includes("Treat as portfolio context") || newsletter.includes("Ask BD to watch") || newsletter.includes("planning tailwind"), "newsletter market-scope so-what should be distinct");
 
 const unsourcedWorld: World = { ...world, analysis: { ...world.analysis, valid: [marketSignal] } };
 const invalid = validateSteelSignalDeliverable(baseDeliverable("capabilities_assessment", "Unsourced"), unsourcedWorld);

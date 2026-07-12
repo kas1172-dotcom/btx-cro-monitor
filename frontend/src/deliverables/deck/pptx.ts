@@ -297,6 +297,7 @@ function addPitchChart(slide: pptxgen.Slide, pptx: pptxgen, x: number, figureNum
     showLegend: false,
     showValue: true,
     dataLabelPosition: "outEnd",
+    dataLabelFormatCode: '"$"0.0"M"',
     dataLabelColor: C.inkHex,
     dataLabelFontSize: 11,
     dataLabelFontFace: FONT,
@@ -322,7 +323,7 @@ function card(slide: pptxgen.Slide, pptx: pptxgen, x: number, y: number, w: numb
 }
 
 function pill(slide: pptxgen.Slide, pptx: pptxgen, x: number, y: number, label: string, color: string): number {
-  const w = 0.16 + label.length * 0.075;
+  const w = Math.max(1.25, 0.32 + label.length * 0.095);
   slide.addShape(pptx.ShapeType.roundRect, { x, y, w, h: 0.28, rectRadius: 0.14, fill: { color }, line: { color } });
   text(slide, label.toUpperCase(), x, y, w, 0.28, 8.5, C.whiteHex, true, 1, "center");
   return w;

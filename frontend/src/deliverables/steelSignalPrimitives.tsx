@@ -48,6 +48,7 @@ export function Figure({ meta, children }: { meta: FigureMeta; children: React.R
       <div className="ss-figure-body">{children}</div>
       <div className="ss-axis-row">
         <span>X-axis: {stripEmDashes(meta.xAxis)}</span>
+        <i aria-hidden="true">·</i>
         <span>Y-axis: {stripEmDashes(meta.yAxis)}</span>
       </div>
       <p className="ss-caption">{stripEmDashes(meta.caption)}</p>

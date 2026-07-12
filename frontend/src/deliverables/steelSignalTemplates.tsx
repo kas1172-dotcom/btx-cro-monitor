@@ -93,7 +93,7 @@ export function OutreachDraftTemplate({ deliverable, world }: { deliverable: Del
   const contact = company ? world.contacts.find((item) => item.company_id === company.id) : undefined;
   const relationship = company ? relationshipForCompany(world, company) : null;
   const subject = extractSectionText(deliverable, "subject") || `${company?.name ?? "Account"} production-capacity conversation`;
-  const body = extractSectionText(deliverable, "body") || "Draft body unavailable.";
+  const body = fullOutreachBody(extractSectionText(deliverable, "body"), company?.name ?? "your team", contact?.name ?? "Jordan");
   return (
     <main className="ss-page ss-outreach">
       <header className="ss-doc-header compact"><div><BrandMark /><div><p>BTX Precision Machining</p><span>Outreach draft · prepared for review before sending</span></div></div><aside><strong>Draft</strong></aside></header>
@@ -111,16 +111,17 @@ export function OutreachDraftTemplate({ deliverable, world }: { deliverable: Del
 }
 
 export function MonthlyNewsletterTemplate({ deliverable, world }: { deliverable: Deliverable; world: World }) {
-  const signals = accountOrMarketSignals(world).slice(0, 3);
+  const signals = dedupeSignals(accountOrMarketSignals(world)).slice(0, 3);
   const stories = [0, 1, 2].map((index) => {
     const signal = signals[index];
+    const fallback = newsletterFallbacks[index];
     return {
       number: `0${index + 1}`,
-      title: signal?.artifact?.headline ?? signal?.source_quote ?? newsletterFallbacks[index][0],
-      tell: signal?.source_quote ?? newsletterFallbacks[index][1],
+      title: signal ? newsletterTitle(signal, fallback.title) : fallback.title,
+      tell: signal ? newsletterTell(signal, fallback.tell) : fallback.tell,
       show: index === 0 ? "$2.4B" : index === 1 ? "2 programs" : "+8%",
       showSub: index === 0 ? "award value, multi-year" : index === 1 ? "seeking re-shore capacity" : "YoY in relevant lines",
-      soWhat: signal?.scope === "specific_account" ? "Account-linked evidence is ready for a work-item follow-up." : "Portfolio-level signal; keep it market scoped until a relationship record exists.",
+      soWhat: signal?.scope === "specific_account" ? "Account-linked evidence is ready for a work-item follow-up." : marketSoWhat(index),
     };
   });
   return (
@@ -185,6 +186,22 @@ function companyForId(world: World, id: string | undefined): Company | null {
   return world.companies.find((company) => company.id === id || company.canonical_account_id === id) ?? null;
 }
 
+function fullOutreachBody(rawBody: string, accountName: string, contactName: string): string {
+  const first = contactName.split(/\s+/)[0] || "Jordan";
+  const lines = rawBody.split("\n").map((line) => line.trim()).filter(Boolean);
+  const body = lines.join("\n\n");
+  const hasValue = /\bAS9100|ITAR|5-axis|build-to-print|on-time|capacity\b/i.test(body);
+  const hasAsk = /\b20-minute|short call|call|conversation\b/i.test(body);
+  const hasSignature = /\bVP Sales|BTX Precision Machining|alex\.chen@/i.test(body);
+  const output = [
+    body || `Hi ${first},`,
+    hasValue ? "" : `For ${accountName}, BTX can bring AS9100D, ITAR-registered 5-axis capacity to build-to-print aerospace work without adding qualification noise to the schedule.`,
+    hasAsk ? "" : `Would you be open to a short call next week to compare your current spares needs against where BTX can take load off the schedule?`,
+    hasSignature ? "" : "Alex Chen\nVP Sales, BTX Precision Machining\nalex.chen@btx.example · (682) 555-0140",
+  ].filter(Boolean).join("\n\n");
+  return output;
+}
+
 export function relationshipForCompany(world: World, company: Company | null | undefined): SignalRelationship | null {
   if (!company) return null;
   const ids = new Set([company.id, company.canonical_account_id].filter(Boolean));
@@ -198,6 +215,44 @@ export function relationshipForCompany(world: World, company: Company | null | u
 
 export function accountOrMarketSignals(world: World): Signal[] {
   return world.analysis.valid.filter((signal) => signal.scope === "specific_account" || signal.scope === "market" || signal.scope === "program" || signal.scope === "unlinked");
+}
+
+function dedupeSignals(signals: Signal[]): Signal[] {
+  const seen = new Set<string>();
+  const unique: Signal[] = [];
+  for (const signal of signals) {
+    const key = normalizeStoryKey(signal.artifact?.headline ?? signal.source_quote);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(signal);
+  }
+  return unique;
+}
+
+function newsletterTitle(signal: Signal, fallback: string): string {
+  const entityTitle = signal.entities.slice(0, 2).join(" + ");
+  const title = signal.artifact?.headline ?? (entityTitle || fallback);
+  return stripEmDashes(title)
+    .replace(/[.?!]\s*$/u, "")
+    .split(/;|:/u)[0]
+    .slice(0, 72);
+}
+
+function newsletterTell(signal: Signal, fallback: string): string {
+  const quote = stripEmDashes(signal.source_quote || signal.artifact?.analysis_text || fallback);
+  const title = newsletterTitle(signal, fallback).toLowerCase();
+  if (normalizeStoryKey(quote) === normalizeStoryKey(title)) {
+    return fallback;
+  }
+  return quote.endsWith(".") ? quote : `${quote}.`;
+}
+
+function marketSoWhat(index: number): string {
+  return [
+    "Treat as portfolio context; use it to shape target-list messaging, not account evidence.",
+    "Ask BD to watch for named program owners before creating account-specific actions.",
+    "Use this as a planning tailwind for capacity and content, while keeping scoring market scoped.",
+  ][index] ?? "Keep this market scoped until a relationship record links it to a canonical account.";
 }
 
 export function signalScopeForEvidence(signal: Signal): SignalScope {
@@ -236,10 +291,14 @@ function fitPercent(deliverable: Deliverable): string {
   return text.match(/\b(\d{2,3})%\b/)?.[0] ?? "91%";
 }
 
-const newsletterFallbacks: Array<[string, string]> = [
-  ["F-35 sustainment demand rises", "Public award activity points to growing build-to-print spares demand through FY27."],
-  ["Structures schedule pressure opens a capacity lane", "A tier-one supplier signal suggests domestic machining capacity may matter this month."],
-  ["Budget lines lift precision-component demand", "Defense funding requests show a market-level tailwind for precision aerospace components."],
+function normalizeStoryKey(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).slice(0, 9).join(" ");
+}
+
+const newsletterFallbacks: Array<{ title: string; tell: string }> = [
+  { title: "F-35 sustainment demand rises", tell: "Public award activity points to growing build-to-print spares demand through FY27." },
+  { title: "Structures schedule pressure opens a capacity lane", tell: "A tier-one supplier signal suggests domestic machining capacity may matter this month." },
+  { title: "Budget lines lift precision-component demand", tell: "Defense funding requests show a market-level tailwind for precision aerospace components." },
 ];
 
 function heatValue(world: World, company: Company, rowIndex: number, colIndex: number): number {
