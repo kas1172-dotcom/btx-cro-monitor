@@ -101,10 +101,11 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     setMenuOpen(false);
     if (format === "markdown") downloadMarkdown(current);
     if (format === "docx") await downloadDocx(current);
-    if (format === "pdf") printDeliverable(current);
+    if (format === "pdf") printDeliverable(current, world);
     if (format === "pptx" && world) {
-      const { downloadBoardDeck } = await import("../../deliverables/deck/pptx.ts");
-      await downloadBoardDeck(current, world);
+      const { downloadBoardDeck, downloadSalesPitch } = await import("../../deliverables/deck/pptx.ts");
+      if (current.type === "sales_pitch") await downloadSalesPitch(current, world);
+      else await downloadBoardDeck(current, world);
     }
     if (format === "xlsx") await downloadXlsx(current);
     if (format === "csv") downloadCsv(current);

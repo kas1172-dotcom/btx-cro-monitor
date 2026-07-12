@@ -3,6 +3,7 @@ import { computeMetric } from "../../metrics/catalog.ts";
 import { formatMetricValue } from "../../metrics/chartSpec.ts";
 import type { ChartSpec, MetricId } from "../../metrics/types.ts";
 import { AnalysisView } from "../analysis/AnalysisView.tsx";
+import { RetentionEarningsHeatmap } from "../../deliverables/steelSignalTemplates.tsx";
 
 const PRIMARY_METRICS: MetricId[] = ["pipeline_coverage", "bookings", "backlog", "book_to_bill", "win_rate", "capacity_utilization"];
 
@@ -32,6 +33,9 @@ export function AnalysisDashboard({ world }: { world: World }) {
         })}
       </div>
       <AnalysisView world={world} initialSpec={DEFAULT_SPEC} />
+      <section className="analysis-internal-heatmap" aria-label="Internal retention and earnings heat map">
+        <RetentionEarningsHeatmap world={world} />
+      </section>
     </section>
   );
 }

@@ -1,6 +1,8 @@
 import type { Deliverable, DeliverableBlock, DeliverableSection, DeliverableType } from "./types.ts";
 import { deliverableToMarkdown } from "./markdown.ts";
 import { calendarStartFromDeliverable } from "../app/dateDefaults.ts";
+import type { World } from "../app/useWorld.ts";
+import { renderSteelSignalDocument } from "./steelSignalTemplates.tsx";
 
 export type DownloadFormat = "markdown" | "docx" | "pdf" | "pptx" | "xlsx" | "csv" | "ics";
 
@@ -11,7 +13,7 @@ export const DELIVERABLE_DOWNLOAD_FORMATS: Record<DeliverableType, DownloadForma
   itinerary: ["docx", "pdf", "ics", "markdown"],
   board_deck: ["pptx", "pdf", "markdown"],
   analysis_view: ["xlsx", "csv", "pdf", "markdown"],
-  sales_pitch: ["docx", "pdf", "markdown"],
+  sales_pitch: ["pptx", "docx", "pdf", "markdown"],
   capabilities_assessment: ["docx", "pdf", "markdown"],
 };
 
@@ -110,7 +112,11 @@ export async function downloadDocx(deliverable: Deliverable): Promise<void> {
   downloadFile(`${slugTitle(deliverable)}.docx`, blob, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 }
 
-export function printDeliverable(deliverable: Deliverable): void {
+export function printDeliverable(deliverable: Deliverable, world?: World): void {
+  if (world && ["capabilities_assessment", "outreach", "weekly_memo"].includes(deliverable.type)) {
+    openPrintWindow(deliverable.title, renderSteelSignalDocument(deliverable, world));
+    return;
+  }
   const sections = exportSections(deliverable);
   const html = [
     "<!doctype html><html><head><title>",
@@ -127,6 +133,10 @@ export function printDeliverable(deliverable: Deliverable): void {
     ].join("")).join(""),
     '<div class="footer">BTX Precision</div></body></html>',
   ].join("");
+  openPrintWindow(deliverable.title, html);
+}
+
+function openPrintWindow(_title: string, html: string): void {
   const win = window.open("", "_blank", "noopener,noreferrer");
   if (!win) return;
   win.document.write(html);

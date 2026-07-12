@@ -2076,3 +2076,143 @@ p { line-height: 1.55; }
     grid-template-columns: 1fr;
   }
 }
+:root {
+  --ss-navy: #12263A;
+  --ss-teal: #2FB6A8;
+  --ss-steel: #3E7CB1;
+  --ss-ink: #12263A;
+  --ss-muted: #6B7787;
+  --ss-bg: #F6F8FB;
+  --ss-panel: #EAEFF5;
+  --ss-white: #FFFFFF;
+  --ss-ice: #AEC3D6;
+  --ss-line: #D8E0EA;
+  --ss-tint: #E7F4F2;
+  --ss-prov-border: #BFE3DD;
+  --ss-prov-ink: #1E8C7E;
+  --ss-green: #3FA66A;
+  --ss-amber: #E0A93B;
+  --ss-red: #D6533C;
+  --ss-font: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+.analysis-internal-heatmap {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--ss-line);
+  border-radius: 8px;
+  background: var(--ss-white);
+}
+
+.ss-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--ss-teal);
+  color: var(--ss-navy);
+  font-family: var(--ss-font);
+  font-weight: 700;
+}
+
+.ss-provenance-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--ss-prov-border);
+  border-radius: 8px;
+  background: var(--ss-tint);
+  color: var(--ss-muted);
+  font-family: var(--ss-font);
+}
+
+.ss-provenance-card > strong {
+  display: block;
+  color: var(--ss-prov-ink);
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.ss-provenance-card b {
+  color: var(--ss-ink);
+}
+
+.ss-figure {
+  margin: 0;
+  color: var(--ss-ink);
+  font-family: var(--ss-font);
+}
+
+.ss-figure figcaption {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.ss-axis-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  color: var(--ss-muted);
+  font-size: 10px;
+}
+
+.ss-caption {
+  color: var(--ss-muted);
+  font-size: 10px;
+}
+
+.ss-summary {
+  font-size: 10.5px;
+}
+
+.ss-pill {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  border: 1px solid var(--ss-prov-border);
+  background: var(--ss-tint);
+  color: var(--ss-prov-ink);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.ss-heatmap {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+}
+
+.ss-heatmap th,
+.ss-heatmap td {
+  border: 2px solid var(--ss-white);
+  padding: 8px;
+  text-align: center;
+}
+
+.ss-heatmap th {
+  background: var(--ss-panel);
+  color: var(--ss-ink);
+}
+
+.ss-status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--ss-teal);
+}
+
+.ss-status-dot.at-risk,
+.ss-status-dot.soft {
+  background: var(--ss-amber);
+}
+
+.ss-status-dot.churned {
+  background: var(--ss-red);
+}
