@@ -39,11 +39,22 @@ from btx_platform.schemas import (
     IngestAccepted,
     LlmProxyRequest,
     PipelineRunResponse,
+    WorkItemCreate,
+    WorkItemDismiss,
+    WorkItemPatch,
+    WorkItemResponse,
 )
 
 logger = logging.getLogger(__name__)
 CRM_CACHE_TTL_SECONDS = 300
 PUBLIC_PATHS = {"/health", "/artifacts/latest"}
+WORK_ITEM_TRANSITIONS = {
+    "proposed": {"approved", "dismissed"},
+    "approved": {"in_progress", "dismissed"},
+    "in_progress": {"done", "dismissed"},
+    "done": set(),
+    "dismissed": set(),
+}
 
 
 def _three_business_days_from_now() -> str:
@@ -74,6 +85,67 @@ def _task_associations(payload: CrmTaskRequest) -> list[HubSpotTaskAssociation]:
     if deal_id:
         associations.append(HubSpotTaskAssociation("deals", deal_id))
     return associations
+
+
+def _actor(request: Request) -> str:
+    return request.headers.get("x-btx-actor") or "system"
+
+
+def _parse_datetime(value: str | None, field_name: str) -> datetime | None:
+    if value is None:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{field_name} must be an ISO-8601 date or datetime") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed
+
+
+def _work_item_snapshot(row: models.WorkItem) -> dict:
+    return {
+        "id": row.id,
+        "type": row.type,
+        "canonical_account_id": row.canonical_account_id,
+        "source_signal_ids": row.source_signal_ids or [],
+        "owner": row.owner,
+        "priority": row.priority,
+        "status": row.status,
+        "due_date": row.due_date.isoformat() if row.due_date else None,
+        "recommended_action": row.recommended_action,
+        "generated_artifact_ref": row.generated_artifact_ref,
+        "approval_state": row.approval_state,
+        "execution_state": row.execution_state,
+        "outcome": row.outcome,
+        "follow_up_date": row.follow_up_date.isoformat() if row.follow_up_date else None,
+        "audit_history": row.audit_history or [],
+        "created_at": row.created_at.isoformat(),
+        "updated_at": row.updated_at.isoformat(),
+    }
+
+
+def _work_item_response(row: models.WorkItem) -> dict:
+    return WorkItemResponse(**_work_item_snapshot(row)).model_dump()
+
+
+def _append_work_item_audit(row: models.WorkItem, *, action: str, actor: str, before: dict | None, after: dict | None) -> None:
+    audit = list(row.audit_history or [])
+    audit.append({
+        "timestamp": datetime.now(UTC).isoformat(),
+        "actor": actor,
+        "action": action,
+        "before": before,
+        "after": after,
+    })
+    row.audit_history = audit
+
+
+def _validate_work_item_transition(current: str, next_status: str) -> None:
+    if next_status == current:
+        return
+    if next_status not in WORK_ITEM_TRANSITIONS.get(current, set()):
+        raise ValueError(f"invalid status transition {current} -> {next_status}")
 
 
 def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict) -> None:
@@ -306,6 +378,160 @@ def create_app(
     @app.post("/calendar/event")
     def create_calendar_event(payload: CalendarEventRequest) -> Response:
         return not_configured("Calendar event creation")
+
+    @app.post("/work-items")
+    def create_work_item(payload: WorkItemCreate, request: Request) -> Response:
+        try:
+            due_date = _parse_datetime(payload.due_date, "due_date")
+            follow_up_date = _parse_datetime(payload.follow_up_date, "follow_up_date")
+        except ValueError as exc:
+            return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
+        session = session_factory()
+        try:
+            row = models.WorkItem(
+                type=payload.type,
+                canonical_account_id=payload.canonical_account_id,
+                source_signal_ids=payload.source_signal_ids,
+                owner=payload.owner,
+                priority=payload.priority,
+                status=payload.status,
+                due_date=due_date,
+                recommended_action=payload.recommended_action,
+                generated_artifact_ref=payload.generated_artifact_ref,
+                approval_state=payload.approval_state,
+                execution_state=payload.execution_state,
+                outcome=payload.outcome,
+                follow_up_date=follow_up_date,
+                audit_history=[],
+            )
+            session.add(row)
+            session.flush()
+            _append_work_item_audit(
+                row,
+                action="create",
+                actor=_actor(request),
+                before=None,
+                after=_work_item_snapshot(row),
+            )
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(_work_item_response(row), status_code=201)
+        finally:
+            session.close()
+
+    @app.get("/work-items")
+    def list_work_items(
+        account: str | None = None,
+        status: str | None = None,
+        owner: str | None = None,
+        due_from: str | None = None,
+        due_to: str | None = None,
+        view: str | None = None,
+    ) -> Response:
+        try:
+            due_from_dt = _parse_datetime(due_from, "due_from")
+            due_to_dt = _parse_datetime(due_to, "due_to")
+        except ValueError as exc:
+            return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
+        session = session_factory()
+        try:
+            query = session.query(models.WorkItem)
+            if account:
+                query = query.filter(models.WorkItem.canonical_account_id == account)
+            if status:
+                query = query.filter(models.WorkItem.status == status)
+            if owner:
+                query = query.filter(models.WorkItem.owner == owner)
+            if due_from_dt:
+                query = query.filter(models.WorkItem.due_date >= due_from_dt)
+            if due_to_dt:
+                query = query.filter(models.WorkItem.due_date <= due_to_dt)
+            now = datetime.now(UTC)
+            if view == "needs_attention":
+                query = query.filter(
+                    models.WorkItem.status.notin_(["done", "dismissed"]),
+                    (models.WorkItem.priority.in_(["high", "urgent"])) | (models.WorkItem.due_date < now),
+                )
+            elif view == "prepared":
+                query = query.filter(models.WorkItem.generated_artifact_ref.is_not(None))
+            elif view == "needs_approval":
+                query = query.filter(models.WorkItem.approval_state == "pending")
+            elif view == "outcomes":
+                query = query.filter(models.WorkItem.status.in_(["done", "dismissed"]))
+            elif view == "what_changed":
+                query = query.filter(models.WorkItem.updated_at >= now - timedelta(days=7))
+            elif view is not None:
+                return JSONResponse({"code": "validation_error", "detail": f"Unknown work item view {view}."}, status_code=422)
+            rows = query.order_by(models.WorkItem.updated_at.desc(), models.WorkItem.created_at.desc()).all()
+            return JSONResponse({"records": [_work_item_response(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.patch("/work-items/{item_id}")
+    def patch_work_item(item_id: str, payload: WorkItemPatch, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = session.get(models.WorkItem, item_id)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+            before = _work_item_snapshot(row)
+            fields = payload.model_fields_set
+            try:
+                if "status" in fields and payload.status is not None:
+                    _validate_work_item_transition(row.status, payload.status)
+                    row.status = payload.status
+                if "due_date" in fields:
+                    row.due_date = _parse_datetime(payload.due_date, "due_date")
+                if "follow_up_date" in fields:
+                    row.follow_up_date = _parse_datetime(payload.follow_up_date, "follow_up_date")
+            except ValueError as exc:
+                return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
+            if "owner" in fields:
+                row.owner = payload.owner
+            if "priority" in fields and payload.priority is not None:
+                row.priority = payload.priority
+            if "recommended_action" in fields and payload.recommended_action is not None:
+                row.recommended_action = payload.recommended_action
+            if "generated_artifact_ref" in fields:
+                row.generated_artifact_ref = payload.generated_artifact_ref
+            if "approval_state" in fields and payload.approval_state is not None:
+                row.approval_state = payload.approval_state
+            if "execution_state" in fields and payload.execution_state is not None:
+                row.execution_state = payload.execution_state
+            if "outcome" in fields:
+                row.outcome = payload.outcome
+            row.updated_at = datetime.now(UTC)
+            after = _work_item_snapshot(row)
+            _append_work_item_audit(row, action="patch", actor=_actor(request), before=before, after=after)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(_work_item_response(row))
+        finally:
+            session.close()
+
+    @app.post("/work-items/{item_id}/dismiss")
+    def dismiss_work_item(item_id: str, payload: WorkItemDismiss, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = session.get(models.WorkItem, item_id)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+            try:
+                _validate_work_item_transition(row.status, "dismissed")
+            except ValueError as exc:
+                return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
+            before = _work_item_snapshot(row)
+            row.status = "dismissed"
+            row.outcome = payload.reason
+            row.execution_state = "completed"
+            row.updated_at = datetime.now(UTC)
+            after = _work_item_snapshot(row)
+            _append_work_item_audit(row, action="dismiss", actor=_actor(request), before=before, after=after)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(_work_item_response(row))
+        finally:
+            session.close()
 
     def config_response(row: models.EngineConfig) -> dict:
         return EngineConfigResponse(

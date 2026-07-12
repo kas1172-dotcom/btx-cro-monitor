@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class WebhookEnvelope(BaseModel):
@@ -165,3 +165,85 @@ class PipelineRunResponse(BaseModel):
     item_counts: dict | None = None
     detail: str | None = None
     config_path: str | None = None
+
+
+WorkItemType = Literal[
+    "account_action",
+    "research_task",
+    "customer_question",
+    "capacity_check",
+    "meeting_brief",
+    "outreach_draft",
+    "qualified_opportunity",
+    "dismissed",
+]
+WorkItemStatus = Literal["proposed", "approved", "in_progress", "done", "dismissed"]
+WorkItemPriority = Literal["low", "normal", "high", "urgent"]
+ApprovalState = Literal["not_required", "pending", "approved", "rejected"]
+ExecutionState = Literal["not_started", "queued", "running", "completed", "failed"]
+WorkItemView = Literal["what_changed", "needs_attention", "prepared", "needs_approval", "outcomes"]
+
+
+class WorkItemCreate(BaseModel):
+    type: WorkItemType
+    canonical_account_id: str | None = None
+    source_signal_ids: list[str] = []
+    owner: str | None = None
+    priority: WorkItemPriority = "normal"
+    status: WorkItemStatus = "proposed"
+    due_date: str | None = None
+    recommended_action: str = Field(min_length=1)
+    generated_artifact_ref: str | None = None
+    approval_state: ApprovalState = "not_required"
+    execution_state: ExecutionState = "not_started"
+    outcome: str | None = None
+    follow_up_date: str | None = None
+
+    @model_validator(mode="after")
+    def dismissed_requires_reason(self):
+        if (self.type == "dismissed" or self.status == "dismissed") and not (self.outcome or "").strip():
+            raise ValueError("dismissed work items require an outcome/reason")
+        return self
+
+
+class WorkItemPatch(BaseModel):
+    owner: str | None = None
+    priority: WorkItemPriority | None = None
+    status: WorkItemStatus | None = None
+    due_date: str | None = None
+    recommended_action: str | None = None
+    generated_artifact_ref: str | None = None
+    approval_state: ApprovalState | None = None
+    execution_state: ExecutionState | None = None
+    outcome: str | None = None
+    follow_up_date: str | None = None
+
+    @model_validator(mode="after")
+    def dismissed_requires_reason(self):
+        if self.status == "dismissed" and not (self.outcome or "").strip():
+            raise ValueError("dismissed transitions require outcome/reason; use /dismiss")
+        return self
+
+
+class WorkItemDismiss(BaseModel):
+    reason: str = Field(min_length=1)
+
+
+class WorkItemResponse(BaseModel):
+    id: str
+    type: str
+    canonical_account_id: str | None = None
+    source_signal_ids: list[str]
+    owner: str | None = None
+    priority: str
+    status: str
+    due_date: str | None = None
+    recommended_action: str
+    generated_artifact_ref: str | None = None
+    approval_state: str
+    execution_state: str
+    outcome: str | None = None
+    follow_up_date: str | None = None
+    audit_history: list[dict]
+    created_at: str
+    updated_at: str

@@ -221,3 +221,151 @@ def test_pipeline_rate_limit_refuses_recent_run(tmp_path: Path):
 
     assert response.status_code == 429
     assert response.json()["code"] == "rate_limited"
+
+
+def test_work_item_full_lifecycle_and_audit(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+
+    created = client.post(
+        "/work-items",
+        headers={**_headers(), "X-BTX-Actor": "analyst@example.com"},
+        json={
+            "type": "account_action",
+            "canonical_account_id": "acct-1",
+            "source_signal_ids": ["sig-1"],
+            "owner": "Riley",
+            "priority": "high",
+            "due_date": "2026-07-15T12:00:00Z",
+            "recommended_action": "Call the account about the linked signal.",
+            "approval_state": "pending",
+        },
+    )
+    assert created.status_code == 201
+    body = created.json()
+    assert body["status"] == "proposed"
+    assert body["audit_history"][0]["action"] == "create"
+    assert body["audit_history"][0]["actor"] == "analyst@example.com"
+    item_id = body["id"]
+
+    approved = client.patch(
+        f"/work-items/{item_id}",
+        headers={**_headers(), "X-BTX-Actor": "manager@example.com"},
+        json={"status": "approved", "approval_state": "approved"},
+    )
+    assert approved.status_code == 200
+    assert approved.json()["status"] == "approved"
+
+    started = client.patch(
+        f"/work-items/{item_id}",
+        headers=_headers(),
+        json={"status": "in_progress", "owner": "Morgan"},
+    )
+    assert started.status_code == 200
+    assert started.json()["owner"] == "Morgan"
+
+    done = client.patch(
+        f"/work-items/{item_id}",
+        headers={**_headers(), "X-BTX-Actor": "morgan@example.com"},
+        json={"status": "done", "execution_state": "completed", "outcome": "Customer meeting booked."},
+    )
+    assert done.status_code == 200
+    final = done.json()
+    assert final["status"] == "done"
+    assert final["outcome"] == "Customer meeting booked."
+    assert [entry["action"] for entry in final["audit_history"]] == ["create", "patch", "patch", "patch"]
+    assert final["audit_history"][-1]["before"]["status"] == "in_progress"
+    assert final["audit_history"][-1]["after"]["status"] == "done"
+
+
+def test_work_item_dismiss_requires_reason_and_records_it(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+    created = client.post(
+        "/work-items",
+        headers=_headers(),
+        json={"type": "research_task", "recommended_action": "Research a signal."},
+    )
+    item_id = created.json()["id"]
+
+    missing = client.post(f"/work-items/{item_id}/dismiss", headers=_headers(), json={"reason": ""})
+    assert missing.status_code == 422
+
+    dismissed = client.post(
+        f"/work-items/{item_id}/dismiss",
+        headers={**_headers(), "X-BTX-Actor": "reviewer@example.com"},
+        json={"reason": "Not relevant to this account."},
+    )
+    assert dismissed.status_code == 200
+    body = dismissed.json()
+    assert body["status"] == "dismissed"
+    assert body["outcome"] == "Not relevant to this account."
+    assert body["audit_history"][-1]["action"] == "dismiss"
+    assert body["audit_history"][-1]["actor"] == "reviewer@example.com"
+
+    invalid = client.post(
+        "/work-items",
+        headers=_headers(),
+        json={"type": "dismissed", "status": "dismissed", "recommended_action": "Dismiss without reason."},
+    )
+    assert invalid.status_code == 422
+
+
+def test_work_item_filters_and_derived_views(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+
+    def create(payload):
+        response = client.post("/work-items", headers=_headers(), json=payload)
+        assert response.status_code == 201
+        return response.json()
+
+    attention = create({
+        "type": "capacity_check",
+        "canonical_account_id": "acct-1",
+        "owner": "Riley",
+        "priority": "urgent",
+        "due_date": "2026-07-13T09:00:00Z",
+        "recommended_action": "Check capacity before quoting.",
+    })
+    prepared = create({
+        "type": "meeting_brief",
+        "canonical_account_id": "acct-2",
+        "owner": "Morgan",
+        "priority": "normal",
+        "generated_artifact_ref": "brief://acct-2/1",
+        "recommended_action": "Review generated meeting brief.",
+    })
+    approval = create({
+        "type": "outreach_draft",
+        "canonical_account_id": "acct-2",
+        "owner": "Morgan",
+        "priority": "low",
+        "approval_state": "pending",
+        "recommended_action": "Approve outreach draft.",
+    })
+    outcome = create({
+        "type": "customer_question",
+        "canonical_account_id": "acct-3",
+        "owner": "Riley",
+        "priority": "normal",
+        "recommended_action": "Answer customer question.",
+    })
+    client.patch(f"/work-items/{outcome['id']}", headers=_headers(), json={"status": "approved"})
+    client.patch(f"/work-items/{outcome['id']}", headers=_headers(), json={"status": "in_progress"})
+    client.patch(f"/work-items/{outcome['id']}", headers=_headers(), json={"status": "done", "outcome": "Answered."})
+
+    by_account = client.get("/work-items?account=acct-2", headers=_headers()).json()["records"]
+    assert {item["id"] for item in by_account} == {prepared["id"], approval["id"]}
+
+    by_owner = client.get("/work-items?owner=Riley", headers=_headers()).json()["records"]
+    assert {item["id"] for item in by_owner} == {attention["id"], outcome["id"]}
+
+    needs_attention = client.get("/work-items?view=needs_attention", headers=_headers()).json()["records"]
+    assert {item["id"] for item in needs_attention} == {attention["id"]}
+
+    prepared_view = client.get("/work-items?view=prepared", headers=_headers()).json()["records"]
+    assert {item["id"] for item in prepared_view} == {prepared["id"]}
+
+    approval_view = client.get("/work-items?view=needs_approval", headers=_headers()).json()["records"]
+    assert {item["id"] for item in approval_view} == {approval["id"]}
+
+    outcomes = client.get("/work-items?view=outcomes", headers=_headers()).json()["records"]
+    assert {item["id"] for item in outcomes} == {outcome["id"]}

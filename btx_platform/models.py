@@ -156,6 +156,29 @@ class PipelineRun(Base):
     config_path: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class WorkItem(Base):
+    """Durable server-backed work loop item for cockpit action surfaces."""
+    __tablename__ = "work_items"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    type: Mapped[str] = mapped_column(String(40), index=True)
+    canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    source_signal_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    owner: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
+    priority: Mapped[str] = mapped_column(String(32), default="normal", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="proposed", index=True)
+    due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    recommended_action: Mapped[str] = mapped_column(Text)
+    generated_artifact_ref: Mapped[str | None] = mapped_column(Text, nullable=True)
+    approval_state: Mapped[str] = mapped_column(String(32), default="not_required", index=True)
+    execution_state: Mapped[str] = mapped_column(String(32), default="not_started", index=True)
+    outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
+    follow_up_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    audit_history: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
 class HubSpotTaskAudit(Base):
     """Durable audit trail for task writes made from the cockpit."""
     __tablename__ = "hubspot_task_audits"
