@@ -1,7 +1,6 @@
 import type { World } from "../../app/useWorld.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
-import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
-import { provenanceForRecord } from "../../app/provenance.ts";
+import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 
 function accountName(world: World, id: string): string {
   return world.companies.find((company) => company.id === id)?.name ?? "Portfolio";
@@ -19,23 +18,28 @@ export function ProgramContractTracker({ world }: { world: World }) {
 
   return (
     <section className="surface-page" data-surface-component="surface-program-contract-tracker">
-      <div className="quiet-view-head">
-        <p className="eyebrow">Program / Contract Tracker</p>
-        <h1>{programSignals.length} program, award, and recompete signals relevant to BTX capabilities.</h1>
-      </div>
+      <SurfaceHeader
+        eyebrow="Program / contract tracker"
+        headline={`${programSignals.length} program, award, and recompete signals relevant to BTX capabilities.`}
+        subline="Program and award evidence stays market-level unless a relationship record links it to a canonical account."
+      />
       <div className="signal-mini-list">
         {programSignals.map((signal) => (
-          <article key={signal.id}>
-            <strong>{signalHeadline(signal)}</strong>
-            <span>
-              {signal.scope === "specific_account" ? accountName(world, signal.subject_id) : "Market / program"}
-              {" · "}{signalSourceName(signal)} {signalSourceDate(signal)}
-            </span>
-            <em>{signal.source_quote}</em>
-            {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(signal)} />}
-          </article>
+          <SignalCard
+            key={signal.id}
+            title={signalHeadline(signal)}
+            scope={signal.scope}
+            source={`${signal.scope === "specific_account" ? accountName(world, signal.subject_id) : "Market / program"} · ${signalSourceName(signal)}`}
+            date={signalSourceDate(signal)}
+            body={signal.source_quote}
+            provenance={{
+              entity: signal.entities[0] ?? (signal.scope === "specific_account" ? accountName(world, signal.subject_id) : "Market / program"),
+              method: signal.relationships?.[0]?.match_method,
+              confidence: signal.relationships?.[0]?.confidence ?? signal.confidence,
+            }}
+          />
         ))}
-        {programSignals.length === 0 && <div className="rail-quiet-empty">No program or contract tracker signals yet.</div>}
+        {programSignals.length === 0 && <EmptyState headline="No program signals" body="Contract and program signals will appear after the monitor validates new evidence." icon="signal" />}
       </div>
     </section>
   );

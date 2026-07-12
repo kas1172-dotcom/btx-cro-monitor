@@ -2,6 +2,7 @@ import type { World } from "../../app/useWorld.ts";
 import { useWorkItems } from "../../app/workItems.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
+import { EmptyState, ListRow, SignalCard, SurfaceHeader } from "../primitives.tsx";
 
 function nameOf(world: World, id: string | null): string {
   if (!id) return "Portfolio";
@@ -20,10 +21,11 @@ export function TodayBrief({ world }: { world: World }) {
 
   return (
     <section className="surface-page" data-surface-component="surface-todays-brief">
-      <div className="quiet-view-head">
-        <p className="eyebrow">Today's Revenue Brief</p>
-        <h1>{attention.items.length} items need attention; {prepared.items.length} prepared artifacts are ready.</h1>
-      </div>
+      <SurfaceHeader
+        eyebrow="Today's revenue brief"
+        headline={`${attention.items.length} items need attention; ${prepared.items.length} prepared artifacts are ready.`}
+        subline="External monitor signals, live account context, and queued work items in one operating brief."
+      />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
 
       <div className="brief-grid">
@@ -31,13 +33,21 @@ export function TodayBrief({ world }: { world: World }) {
           <div className="panel-head"><h2>What changed</h2></div>
           <div className="signal-mini-list">
             {topSignals.map((signal) => (
-              <article key={signal.id}>
-                <strong>{signalHeadline(signal)}</strong>
-                <span>{nameOf(world, signal.scope === "specific_account" ? signal.subject_id : null)} · {signalSourceName(signal)} {signalSourceDate(signal)}</span>
-                <em>{signal.source_quote}</em>
-              </article>
+              <SignalCard
+                key={signal.id}
+                title={signalHeadline(signal)}
+                scope={signal.scope}
+                source={`${nameOf(world, signal.scope === "specific_account" ? signal.subject_id : null)} · ${signalSourceName(signal)}`}
+                date={signalSourceDate(signal)}
+                body={signal.source_quote}
+                provenance={{
+                  entity: signal.entities[0] ?? nameOf(world, signal.scope === "specific_account" ? signal.subject_id : null),
+                  method: signal.relationships?.[0]?.match_method,
+                  confidence: signal.relationships?.[0]?.confidence ?? signal.confidence,
+                }}
+              />
             ))}
-            {topSignals.length === 0 && <div className="rail-quiet-empty">No validated monitor changes.</div>}
+            {topSignals.length === 0 && <EmptyState headline="No validated changes" body="Monitor artifacts are available, but no signal cleared validation for this brief." icon="signal" />}
           </div>
         </section>
         <section className="surface-panel">
@@ -46,7 +56,10 @@ export function TodayBrief({ world }: { world: World }) {
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Prepared</h2></div>
-          <WorkItemList items={prepared.items.slice(0, 5)} empty="No prepared artifacts." world={world} />
+          {prepared.items.slice(0, 5).map((item) => (
+            <ListRow key={item.id} name={item.recommended_action} subtitle={`${item.status} · ${nameOf(world, item.canonical_account_id)}`} />
+          ))}
+          {prepared.items.length === 0 && <EmptyState headline="No prepared artifacts" body="Meeting briefs, drafts, and memos will appear here when they are ready for review." icon="document" />}
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Needs approval</h2></div>

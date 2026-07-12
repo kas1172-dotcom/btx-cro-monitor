@@ -5,10 +5,9 @@ import { scoreFit } from "../../engine/decision/fit.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
 import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
-import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
-import { provenanceForRecord } from "../../app/provenance.ts";
 import { WorkItemList } from "./WorkItemList.tsx";
 import { deriveWorkItems } from "../../app/workItems.ts";
+import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 
 function money(value: number): string {
   return value >= 1_000_000 ? `$${(value / 1_000_000).toFixed(1)}M` : `$${Math.round(value / 1000)}k`;
@@ -51,10 +50,8 @@ export function Account360({ world }: { world: World }) {
   if (!selected) {
     return (
       <section className="surface-page" data-surface-component="surface-account-360">
-        <div className="quiet-view-head">
-          <p className="eyebrow">Accounts</p>
-          <h1>No canonical accounts are available.</h1>
-        </div>
+        <SurfaceHeader eyebrow="Accounts" headline="No canonical accounts are available." />
+        <EmptyState headline="No accounts" body="Connect a CRM source to populate canonical account records." />
       </section>
     );
   }
@@ -66,11 +63,11 @@ export function Account360({ world }: { world: World }) {
 
   return (
     <section className="surface-page account360" data-surface-component="surface-account-360">
-      <div className="quiet-view-head">
-        <p className="eyebrow">Accounts / Account 360</p>
-        <h1>{company.name}</h1>
-        <p>{formatAddress(company.location) ?? company.location.city} · canonical id {company.canonical_account_id ?? company.id}</p>
-      </div>
+      <SurfaceHeader
+        eyebrow="Accounts / Account 360"
+        headline={company.name}
+        subline={`${formatAddress(company.location) ?? company.location.city} · canonical id ${company.canonical_account_id ?? company.id}`}
+      />
 
       <div className="account360-layout">
         <aside className="account360-list">
@@ -102,15 +99,22 @@ export function Account360({ world }: { world: World }) {
             <div className="panel-head"><h2>Relationship-backed signals</h2></div>
             <div className="signal-mini-list">
               {selected.linkedSignals.map((signal) => (
-                <article key={signal.id}>
-                  <strong>{signalHeadline(signal)}</strong>
-                  <span>{signalSourceName(signal)} {signalSourceDate(signal)} · confidence {(signal.confidence * 100).toFixed(0)}%</span>
-                  <em>{signal.source_quote}</em>
-                  {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(signal)} />}
-                </article>
+                <SignalCard
+                  key={signal.id}
+                  title={signalHeadline(signal)}
+                  scope={signal.scope}
+                  source={signalSourceName(signal)}
+                  date={signalSourceDate(signal)}
+                  body={signal.source_quote}
+                  provenance={{
+                    entity: signal.entities[0] ?? company.name,
+                    method: signal.relationships?.[0]?.match_method,
+                    confidence: signal.relationships?.[0]?.confidence ?? signal.confidence,
+                  }}
+                />
               ))}
               {selected.linkedSignals.length === 0 && (
-                <div className="rail-quiet-empty">No relationship-backed account signals. Market signals stay portfolio-level until a relationship record exists.</div>
+                <EmptyState headline="No linked signals" body="Market signals stay portfolio-level until a relationship record backs the account link." icon="signal" />
               )}
             </div>
           </section>

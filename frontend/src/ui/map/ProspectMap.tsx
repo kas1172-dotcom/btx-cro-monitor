@@ -13,6 +13,7 @@ import { explainRankingPrompt, outreachPrompt } from "../../app/copilotPrompts.t
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { buildMapMarkers, mapCenter, mappableCompanies } from "./mapModel.ts";
+import { uiTokens } from "../../app/uiTokens.ts";
 
 function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   const map = useMap();
@@ -54,14 +55,14 @@ export function ProspectMap({ world }: { world: World }) {
         />
         {markers.map(({ company: c, center: markerCenter, opportunity: opp, prospect, radius }) => {
           const active = c.id === activeCompanyId;
-          const color = prospect ? "#9ecf6a" : "#7b8467";
+          const color = prospect ? uiTokens.color.success : uiTokens.color.textMuted;
           return (
             <CircleMarker
               key={c.id}
               center={markerCenter}
               radius={radius}
               pathOptions={{
-                color: active ? "#f4f1dc" : color,
+                color: active ? uiTokens.color.textPrimary : color,
                 weight: active ? 3 : 1,
                 fillColor: color,
                 fillOpacity: prospect ? 0.78 : 0.45,

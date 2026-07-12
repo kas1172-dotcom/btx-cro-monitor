@@ -1,8 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import type React from "react";
 import { useStore, setState, closeDemoAction, goHome, clearTourRequest } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
-import { CITIES, PROFILE } from "./app/config.ts";
+import { CITIES } from "./app/config.ts";
 import { Dossier } from "./ui/company/Dossier.tsx";
 import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
 import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
@@ -19,8 +18,9 @@ import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
 import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
 import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
-import { countForSurface, type SurfaceId } from "./app/surfaces.ts";
+import { ALL_SURFACES, countForSurface, type SurfaceId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
+import { AppShell, StatusChip } from "./ui/primitives.tsx";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
@@ -99,140 +99,134 @@ export function App() {
   ) as Partial<Record<SurfaceId, number>>;
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
+  const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeSurface))?.label ?? "Cockpit";
 
   return (
-    <div
+    <AppShell
       className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
-      style={{ "--right-w": rightW } as React.CSSProperties}
-    >
-      <BrainSidebar activeSurface={settingsActive ? "settings" : homeActive ? "brief" : activeSurface} counts={counts} />
-      <main className="quiet-main" onClickCapture={() => {
-        if (activeCompanyId) setState({ activeCompanyId: null });
-      }}>
+      rightW={rightW}
+      rail={<BrainSidebar activeSurface={settingsActive ? "settings" : homeActive ? "brief" : activeSurface} counts={counts} />}
+      topbar={(
         <header className="quiet-topbar">
-          <button className="quiet-brand" onClick={goHome}>{PROFILE.name} Revenue Brain</button>
-          {world?.dataMode === "hybrid" && world.provenanceSummary && (
-            <div className="data-provenance-status">
-              <span>Data provenance</span>
-              <strong>{world.provenanceSources.length} sources: {world.provenanceSummary}</strong>
-            </div>
-          )}
-          {world?.dataSource && !world.loadErrors.length && (
-            <div className="live-source-status">
-              <span>Live</span>
-              <strong>{world.dataSource}</strong>
-            </div>
-          )}
-          {world?.loadErrors.length ? (
-            <div className="live-source-status error" role="status">
-              <span>Live data issue</span>
-              <strong>{world.loadErrors[0]}</strong>
-            </div>
-          ) : null}
-          {world?.snapshot?.publicSignals.source_mode === "artifact" && (
-            <div className={world.snapshot.publicSignals.stale ? "artifact-status stale" : "artifact-status"}>
-              <span>Monitor run</span>
-              <strong>{formatRunDate(world.snapshot.publicSignals.run_at)}</strong>
-              {world.snapshot.publicSignals.stale && <em>stale data</em>}
-            </div>
-          )}
-          {world?.snapshot?.publicSignals.source_mode === "artifact_fallback" && (
-            <div className="artifact-status fallback">
-              <span>Artifact fallback</span>
-              <strong>{world.snapshot.publicSignals.notice ?? "Using demo signals"}</strong>
-            </div>
-          )}
-          {marketScoped && <label className="cockpit-city-picker">
-            <span>Market</span>
-            <select
-              value={city ?? ALL_MARKETS_VALUE}
-              onChange={(e) => setState({
-                city: e.target.value === ALL_MARKETS_VALUE ? null : e.target.value,
-                activeCompanyId: null,
-                activeAnalysisSpec: null,
-              })}
-            >
-              <option value={ALL_MARKETS_VALUE}>All Markets</option>
-              {CITIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </label>}
-        </header>
-        <section className="quiet-stage">{renderDefault()}</section>
-        {world && !homeActive && !settingsActive && activeSurface !== "ask" && <AskBrainBar world={viewWorld ?? world} />}
-      </main>
-      <RightContextPanel response={brainResponse} />
-
-      <aside className={dossierOpen ? "inspector open" : "inspector"}>
-        {dossierOpen && (
-          <div className="inspector-topbar">
-            <button className="inspector-back" onClick={() => setState({ activeCompanyId: null })} aria-label="Close dossier">×</button>
+          <div className="surface-title">
+            <span>Current surface</span>
+            <strong>{surfaceTitle}</strong>
           </div>
-        )}
-        {world && activeCompanyId ? (
-          <Dossier world={world} companyId={activeCompanyId} />
-        ) : null}
-      </aside>
-
-      {demoAction && (
-        <div className="demo-action-overlay" role="dialog" aria-modal="true" aria-labelledby="demo-action-title">
-          <div className="demo-action-modal">
-            <p className="eyebrow">Create work item</p>
-            <h2 id="demo-action-title">{demoAction.title}</h2>
-            {demoAction.accountName && <p className="demo-action-account">{demoAction.accountName}</p>}
-            <p>
-              Review the action before creating a durable backend work item. CRM execution is intentionally separate and lands in the later CRM write workflow.
-            </p>
-            {demoAction.evidence && (
-              <div className="demo-action-evidence">
-                <span>Evidence attached</span>
-                <strong>{demoAction.evidence}</strong>
+          <div className="topbar-status">
+            {world?.dataMode === "hybrid" && world.provenanceSummary && (
+              <StatusChip label="Data provenance" value={`${world.provenanceSources.length} sources`} />
+            )}
+            {world?.dataSource && !world.loadErrors.length && (
+              <StatusChip tone="success" label="Live source" value={world.dataSource} />
+            )}
+            {world?.loadErrors.length ? (
+              <StatusChip tone="danger" label="Live data issue" value={world.loadErrors[0]} />
+            ) : null}
+            {world?.snapshot?.publicSignals.source_mode === "artifact" && (
+              <StatusChip tone={world.snapshot.publicSignals.stale ? "warning" : "info"} label="Monitor run" value={formatRunDate(world.snapshot.publicSignals.run_at)} />
+            )}
+            {world?.snapshot?.publicSignals.source_mode === "artifact_fallback" && (
+              <StatusChip tone="warning" label="Artifact fallback" value={world.snapshot.publicSignals.notice ?? "Using demo signals"} />
+            )}
+            {marketScoped && <label className="cockpit-city-picker">
+              <span>Market</span>
+              <select
+                value={city ?? ALL_MARKETS_VALUE}
+                onChange={(e) => setState({
+                  city: e.target.value === ALL_MARKETS_VALUE ? null : e.target.value,
+                  activeCompanyId: null,
+                  activeAnalysisSpec: null,
+                })}
+              >
+                <option value={ALL_MARKETS_VALUE}>All Markets</option>
+                {CITIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </label>}
+          </div>
+        </header>
+      )}
+      onMainClickCapture={() => {
+        if (activeCompanyId) setState({ activeCompanyId: null });
+      }}
+      side={(
+        <>
+          <RightContextPanel response={brainResponse} />
+          <aside className={dossierOpen ? "inspector open" : "inspector"}>
+            {dossierOpen && (
+              <div className="inspector-topbar">
+                <button className="inspector-back" onClick={() => setState({ activeCompanyId: null })} aria-label="Close dossier">×</button>
               </div>
             )}
-            <div className="demo-action-steps">
-              <span>Create work item</span>
-              <span>Attach evidence</span>
-              <span>Assign owner</span>
-              <span>Queue approval</span>
+            {world && activeCompanyId ? (
+              <Dossier world={world} companyId={activeCompanyId} />
+            ) : null}
+          </aside>
+
+          {demoAction && (
+            <div className="demo-action-overlay" role="dialog" aria-modal="true" aria-labelledby="demo-action-title">
+              <div className="demo-action-modal">
+                <p className="eyebrow">Create work item</p>
+                <h2 id="demo-action-title">{demoAction.title}</h2>
+                {demoAction.accountName && <p className="demo-action-account">{demoAction.accountName}</p>}
+                <p>
+                  Review the action before creating a durable backend work item. CRM execution is intentionally separate and lands in the later CRM write workflow.
+                </p>
+                {demoAction.evidence && (
+                  <div className="demo-action-evidence">
+                    <span>Evidence attached</span>
+                    <strong>{demoAction.evidence}</strong>
+                  </div>
+                )}
+                <div className="demo-action-steps">
+                  <span>Create work item</span>
+                  <span>Attach evidence</span>
+                  <span>Assign owner</span>
+                  <span>Queue approval</span>
+                </div>
+                {workItemStatus && <div className={workItemStatus.startsWith("Created") ? "live-inline-status" : "live-inline-status error"}>{workItemStatus}</div>}
+                <div className="demo-action-modal-actions">
+                  <button
+                    onClick={() => {
+                      setWorkItemStatus("Creating work item...");
+                      void createWorkItem({
+                        title: demoAction.title,
+                        accountName: demoAction.accountName,
+                        accountId: demoAction.accountId,
+                        sourceSignalIds: demoAction.sourceSignalIds,
+                        evidence: demoAction.evidence,
+                        type: demoAction.workItemType,
+                      }).then((item) => {
+                        setWorkItemStatus(`Created work item ${item.id}.`);
+                        window.setTimeout(() => {
+                          closeDemoAction();
+                          setWorkItemStatus("");
+                          setState({ activeSurface: "work_queue" });
+                        }, 800);
+                      }).catch((error) => {
+                        setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
+                      });
+                    }}
+                  >
+                    Confirm
+                  </button>
+                  <button onClick={() => {
+                    setWorkItemStatus("");
+                    closeDemoAction();
+                  }}>Cancel</button>
+                </div>
+              </div>
             </div>
-            {workItemStatus && <div className={workItemStatus.startsWith("Created") ? "live-inline-status" : "live-inline-status error"}>{workItemStatus}</div>}
-            <div className="demo-action-modal-actions">
-              <button
-                onClick={() => {
-                  setWorkItemStatus("Creating work item...");
-                  void createWorkItem({
-                    title: demoAction.title,
-                    accountName: demoAction.accountName,
-                    accountId: demoAction.accountId,
-                    sourceSignalIds: demoAction.sourceSignalIds,
-                    evidence: demoAction.evidence,
-                    type: demoAction.workItemType,
-                  }).then((item) => {
-                    setWorkItemStatus(`Created work item ${item.id}.`);
-                    window.setTimeout(() => {
-                      closeDemoAction();
-                      setWorkItemStatus("");
-                      setState({ activeSurface: "work_queue" });
-                    }, 800);
-                  }).catch((error) => {
-                    setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
-                  });
-                }}
-              >
-                Confirm
-              </button>
-              <button onClick={() => {
-                setWorkItemStatus("");
-                closeDemoAction();
-              }}>Cancel</button>
-            </div>
-          </div>
-        </div>
+          )}
+          {tourRequested && world && (
+            <TourHud world={world} autoStart onDismiss={clearTourRequest} />
+          )}
+        </>
       )}
-      {tourRequested && world && (
-        <TourHud world={world} autoStart onDismiss={clearTourRequest} />
-      )}
-    </div>
+    >
+      <section className="quiet-stage">{renderDefault()}</section>
+      {world && !homeActive && !settingsActive && activeSurface !== "ask" && <AskBrainBar world={viewWorld ?? world} />}
+    </AppShell>
   );
 }
