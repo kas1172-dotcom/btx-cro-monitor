@@ -9,6 +9,7 @@ import { resetUiState, setState, useStore, type SettingsSection } from "../../st
 import type { WeightsConfig } from "../../engine/decision/weights.ts";
 import { MemoryPanel } from "../brain/MemoryPanel.tsx";
 import { Integrations } from "../integrations/Integrations.tsx";
+import { SurfaceHeader } from "../primitives.tsx";
 
 type Dimension = "risk" | "opportunity" | "capacityRisk" | "competitivePressure";
 type SourceType = "rss" | "json_api" | "html_list";
@@ -374,11 +375,7 @@ export function SettingsWorkspace() {
 
   return (
     <section className="settings-workspace">
-      <div className="settings-head">
-        <p className="eyebrow">Settings</p>
-        <h1>{active.label}</h1>
-        <p>{active.summary}</p>
-      </div>
+      <SurfaceHeader eyebrow="Settings" headline={active.label} subline={active.summary} />
 
       <div className="settings-layout">
         <nav className="settings-nav" aria-label="Settings sections">

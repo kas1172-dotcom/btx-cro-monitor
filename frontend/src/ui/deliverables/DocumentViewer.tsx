@@ -19,6 +19,7 @@ import {
   printDeliverable,
   type DownloadFormat,
 } from "../../deliverables/export.ts";
+import { uiTokens } from "../../app/uiTokens.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -309,7 +310,13 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
                       url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                       attribution='&copy; OpenStreetMap &copy; CARTO'
                     />
-                    {[...byDay.entries()].map(([day, points]) => <Polyline key={day} positions={points} pathOptions={{ color: day === 1 ? "#b7c46a" : day === 2 ? "#7fc7a6" : "#d3a95f", weight: 3 }} />)}
+                    {[...byDay.entries()].map(([day, points]) => (
+                      <Polyline
+                        key={day}
+                        positions={points}
+                        pathOptions={{ color: day === 1 ? uiTokens.color.accent : day === 2 ? uiTokens.color.success : uiTokens.color.warning, weight: 3 }}
+                      />
+                    ))}
                     {block.stops.map((stop, stopIndex) => {
                       const icon = L.divIcon({
                         className: `itinerary-pin itinerary-pin-day-${stop.day}`,

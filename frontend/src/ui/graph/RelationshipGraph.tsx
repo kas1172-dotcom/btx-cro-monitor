@@ -12,13 +12,14 @@ import "@xyflow/react/dist/style.css";
 import type { World } from "../../app/useWorld.ts";
 import type { Relationship } from "../../engine/brain/entities.ts";
 import { setState } from "../../store/store.ts";
+import { uiTokens } from "../../app/uiTokens.ts";
 
 const REL_COLOR: Record<string, string> = {
-  self: "#f4f1dc",
-  supplier: "#d97a67",
-  competitor: "#d6a84f",
-  customer: "#b7c46a",
-  target: "#9ecf6a",
+  self: uiTokens.color.textPrimary,
+  supplier: uiTokens.color.danger,
+  competitor: uiTokens.color.warning,
+  customer: uiTokens.color.accent,
+  target: uiTokens.color.success,
 };
 const REL_ORDER: Relationship[] = ["supplier", "competitor", "customer", "target"];
 
@@ -31,8 +32,8 @@ function headlineScore(world: World, id: string, rel: string): { label: string; 
 
 function nodeStyle(rel: string, isSelf: boolean): React.CSSProperties {
   return {
-    background: isSelf ? "#202718" : "#171b12",
-    color: "#e4e7d5",
+    background: isSelf ? uiTokens.color.panel : uiTokens.color.card,
+    color: uiTokens.color.textPrimary,
     border: `2px solid ${REL_COLOR[rel]}`,
     borderRadius: 10,
     padding: "8px 10px",
@@ -104,7 +105,7 @@ export function RelationshipGraph({ world }: { world: World }) {
         onNodeClick={(_event, node) => setState({ activeCompanyId: node.id })}
         proOptions={{ hideAttribution: true }}
       >
-        <Background color="#35402a" gap={20} />
+        <Background color={uiTokens.color.cardBorder} gap={20} />
         <Controls showInteractive={false} />
       </ReactFlow>
       <div className="graph-legend">

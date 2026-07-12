@@ -4,6 +4,7 @@ import { computeChart, formatMetricValue } from "../../metrics/chartSpec.ts";
 import type { ChartResult, ChartSpec, MetricId } from "../../metrics/types.ts";
 import { METRICS } from "../../metrics/catalog.ts";
 import { openDemoAction, setState } from "../../store/store.ts";
+import { uiTokens } from "../../app/uiTokens.ts";
 
 const METRIC_IDS = Object.keys(METRICS) as MetricId[];
 
@@ -117,7 +118,7 @@ function Grid({ result }: { result: ChartResult }) {
               <button
                 key={`${row}-${grid.cols[colIndex]}`}
                 className={grid.qtdCols.includes(grid.cols[colIndex]) ? "analysis-cell analysis-cell-qtd" : "analysis-cell"}
-                style={value !== null ? { backgroundColor: `rgba(183, 196, 106, ${0.16 + (value / max) * 0.72})` } : {}}
+                style={value !== null ? { backgroundColor: `rgba(${uiTokens.rgb.accent}, ${0.16 + (value / max) * 0.72})` } : {}}
                 title={`${row} / ${grid.cols[colIndex]}: ${value !== null ? fmt(value, result.meta.unit) : "—"}`}
                 data-provenance={result.provenance.map((p) => p.source).join(", ")}
                 onClick={() => setSelectedCell({ row, col: grid.cols[colIndex], value, provenance: result.provenance })}

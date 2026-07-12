@@ -6,18 +6,7 @@ import {
   brainAreaForSurface,
   type SurfaceId,
 } from "../../app/surfaces.ts";
-
-const ICONS: Record<SurfaceId, string> = {
-  brief: "B",
-  work_queue: "Q",
-  accounts: "A",
-  ask: "?",
-  map: "M",
-  analysis: "%",
-  capacity: "C",
-  programs: "P",
-  settings: "*",
-};
+import { CountBadge, UiIcon } from "../primitives.tsx";
 
 function openSurface(surface: SurfaceId): void {
   setState({
@@ -46,6 +35,10 @@ export function BrainSidebar({
   ];
   return (
     <aside className="brain-rail">
+      <div className="rail-brand" aria-label="BTX">
+        <span>BTX</span>
+        <strong>Steel & Signal</strong>
+      </div>
       {groups.map((group) => (
         <div key={group.label} className={group.label === "Utility" ? "brain-rail-group brain-rail-utility" : "brain-rail-group"}>
           <div className="brain-rail-group-label">{group.label}</div>
@@ -56,13 +49,17 @@ export function BrainSidebar({
               onClick={() => openSurface(surface.id)}
               title={surface.title}
             >
-              <span>{ICONS[surface.id]}</span>
+              <span><UiIcon name={surface.id} /></span>
               <strong>{surface.label}</strong>
-              {counts[surface.id] ? <em>{counts[surface.id]}</em> : null}
+              {counts[surface.id] ? <CountBadge value={counts[surface.id] ?? 0} /> : null}
             </button>
           ))}
         </div>
       ))}
+      <div className="rail-user-chip">
+        <UiIcon name="user" />
+        <span><strong>BTX operator</strong><em>Signed in</em></span>
+      </div>
     </aside>
   );
 }

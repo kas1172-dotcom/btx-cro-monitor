@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { useWorkItems, type WorkItemStatus } from "../../app/workItems.ts";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
+import { SurfaceHeader } from "../primitives.tsx";
 
 const STATUSES: Array<WorkItemStatus | "all"> = ["all", "proposed", "approved", "in_progress", "done", "dismissed"];
 
@@ -19,10 +20,11 @@ export function WorkQueue({ world }: { world: World }) {
 
   return (
     <section className="surface-page" data-surface-component="surface-work-queue">
-      <div className="quiet-view-head">
-        <p className="eyebrow">Work Queue</p>
-        <h1>{items.length} durable work items across account actions, approvals, deliverables, and outcomes.</h1>
-      </div>
+      <SurfaceHeader
+        eyebrow="Work queue"
+        headline={`${items.length} durable work items across account actions, approvals, deliverables, and outcomes.`}
+        subline="Each row carries status, owner, evidence, approval state, and execution history."
+      />
       <WorkItemSourceNote source={allItems.source} error={allItems.error} />
       <div className="surface-toolbar">
         {STATUSES.map((item) => (
