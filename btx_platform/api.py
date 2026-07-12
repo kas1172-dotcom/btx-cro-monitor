@@ -36,6 +36,7 @@ from btx_platform.schemas import (
     EmailSendRequest,
     EngineConfigPut,
     EngineConfigResponse,
+    HubSpotTaskExecuteRequest,
     IngestAccepted,
     LlmProxyRequest,
     PipelineRunResponse,
@@ -87,6 +88,25 @@ def _task_associations(payload: CrmTaskRequest) -> list[HubSpotTaskAssociation]:
     return associations
 
 
+def _task_associations_from_values(
+    *,
+    company_id: str | None,
+    contact_id: str | None,
+    deal_id: str | None,
+) -> list[HubSpotTaskAssociation]:
+    associations: list[HubSpotTaskAssociation] = []
+    hubspot_company_id = _hubspot_id(company_id, "hubspot-company-")
+    hubspot_contact_id = _hubspot_id(contact_id, "hubspot-contact-")
+    hubspot_deal_id = _hubspot_id(deal_id, "hubspot-deal-")
+    if hubspot_company_id:
+        associations.append(HubSpotTaskAssociation("companies", hubspot_company_id))
+    if hubspot_contact_id:
+        associations.append(HubSpotTaskAssociation("contacts", hubspot_contact_id))
+    if hubspot_deal_id:
+        associations.append(HubSpotTaskAssociation("deals", hubspot_deal_id))
+    return associations
+
+
 def _actor(request: Request) -> str:
     return request.headers.get("x-btx-actor") or "system"
 
@@ -119,6 +139,11 @@ def _work_item_snapshot(row: models.WorkItem) -> dict:
         "execution_state": row.execution_state,
         "outcome": row.outcome,
         "follow_up_date": row.follow_up_date.isoformat() if row.follow_up_date else None,
+        "external_system": row.external_system,
+        "external_record_id": row.external_record_id,
+        "external_record_url": row.external_record_url,
+        "execution_idempotency_key": row.execution_idempotency_key,
+        "execution_error": row.execution_error,
         "audit_history": row.audit_history or [],
         "created_at": row.created_at.isoformat(),
         "updated_at": row.updated_at.isoformat(),
@@ -146,6 +171,17 @@ def _validate_work_item_transition(current: str, next_status: str) -> None:
         return
     if next_status not in WORK_ITEM_TRANSITIONS.get(current, set()):
         raise ValueError(f"invalid status transition {current} -> {next_status}")
+
+
+def _hubspot_task_record_url(task_id: str) -> str:
+    return f"https://app.hubspot.com/tasks/{task_id}"
+
+
+def _verified_task(task: dict, *, expected_subject: str, expected_body: str) -> bool:
+    properties = task.get("properties") if isinstance(task.get("properties"), dict) else {}
+    subject = properties.get("hs_task_subject") or task.get("hs_task_subject")
+    body = properties.get("hs_task_body") or task.get("hs_task_body") or ""
+    return bool(task.get("id")) and subject == expected_subject and expected_body in str(body)
 
 
 def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict) -> None:
@@ -320,16 +356,19 @@ def create_app(
         return cached_hubspot_response("contacts")
 
     @app.post("/crm/task")
-    def create_crm_task(payload: CrmTaskRequest) -> Response:
+    def create_crm_task(payload: CrmTaskRequest, request: Request) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot task creation")
         body = payload.body or payload.evidence or ""
         associations = _task_associations(payload)
+        idempotency_key = request.headers.get(settings.idempotency_header)
         try:
             result = HubSpotClient(settings.hubspot_access_token).create_task(
                 subject=payload.title,
                 body=body,
                 timestamp=payload.due_at or _three_business_days_from_now(),
+                owner_id=payload.owner,
+                idempotency_key=idempotency_key,
                 associations=associations,
             )
         except HubSpotError as exc:
@@ -344,6 +383,7 @@ def create_app(
                 subject=payload.title,
                 hubspot_task_id=task_id,
                 record_url=record_url,
+                idempotency_key=idempotency_key,
                 associations={"records": audit_associations},
             ))
             session.commit()
@@ -355,6 +395,7 @@ def create_app(
                 "timestamp": datetime.now(UTC).isoformat(),
                 "subject": payload.title,
                 "task_id": task_id,
+                "idempotency_key": idempotency_key,
                 "associations": audit_associations,
             },
         )
@@ -364,6 +405,170 @@ def create_app(
             "record_url": record_url,
             "title": payload.title,
         })
+
+    @app.post("/work-items/{item_id}/execute/hubspot-task")
+    def execute_work_item_hubspot_task(item_id: str, payload: HubSpotTaskExecuteRequest, request: Request) -> Response:
+        if not payload.confirmed:
+            return JSONResponse({"code": "confirmation_required", "detail": "Explicit confirmation is required before writing to HubSpot."}, status_code=422)
+        if not settings.hubspot_access_token:
+            return not_configured("HubSpot task creation")
+
+        idempotency_key = request.headers.get(settings.idempotency_header) or f"work-item:{item_id}:hubspot-task"
+        actor = _actor(request)
+        session = session_factory()
+        try:
+            row = session.get(models.WorkItem, item_id)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+
+            if row.external_system == "hubspot" and row.external_record_id:
+                if row.execution_idempotency_key == idempotency_key:
+                    return JSONResponse({
+                        "status": "verified",
+                        "duplicate": True,
+                        "idempotency_key": idempotency_key,
+                        "work_item": _work_item_response(row),
+                        "hubspot_task": {
+                            "id": row.external_record_id,
+                            "record_url": row.external_record_url,
+                        },
+                    })
+                return JSONResponse({
+                    "code": "already_executed",
+                    "detail": "This work item already has a verified HubSpot task. Use the original idempotency key to retry safely.",
+                    "work_item": _work_item_response(row),
+                }, status_code=409)
+
+            task_subject = (payload.task_text or row.recommended_action).strip()
+            evidence = payload.evidence or row.generated_artifact_ref or ""
+            relationship_record = payload.relationship_record or {}
+            evidence_lines = []
+            if evidence:
+                evidence_lines.append(f"Evidence: {evidence}")
+            if row.source_signal_ids:
+                evidence_lines.append(f"Source signals: {', '.join(row.source_signal_ids)}")
+            if relationship_record:
+                evidence_lines.append(f"Relationship record: {json.dumps(relationship_record, sort_keys=True)}")
+            task_body = (payload.body or "\n".join([task_subject, *evidence_lines])).strip()
+            company_id = payload.company_id or row.canonical_account_id
+            owner_id = payload.owner_id or row.owner
+            due_at = payload.due_at or (row.due_date.isoformat() if row.due_date else _three_business_days_from_now())
+            associations = _task_associations_from_values(
+                company_id=company_id,
+                contact_id=payload.contact_id,
+                deal_id=payload.deal_id,
+            )
+            audit_associations = [association.__dict__ for association in associations]
+            before = _work_item_snapshot(row)
+            row.approval_state = "approved"
+            row.execution_state = "running"
+            row.execution_idempotency_key = idempotency_key
+            row.execution_error = None
+            row.updated_at = datetime.now(UTC)
+            _append_work_item_audit(
+                row,
+                action="hubspot_task_execute_started",
+                actor=actor,
+                before=before,
+                after={
+                    **_work_item_snapshot(row),
+                    "hubspot_task_preview": {
+                        "account": company_id,
+                        "owner": owner_id,
+                        "due_at": due_at,
+                        "task_text": task_subject,
+                        "evidence": evidence,
+                        "relationship_record": relationship_record,
+                        "associations": audit_associations,
+                        "idempotency_key": idempotency_key,
+                    },
+                },
+            )
+            session.commit()
+            session.refresh(row)
+
+            client = HubSpotClient(settings.hubspot_access_token)
+            try:
+                result = client.create_task(
+                    subject=task_subject,
+                    body=task_body,
+                    timestamp=due_at,
+                    owner_id=owner_id,
+                    idempotency_key=idempotency_key,
+                    associations=associations,
+                )
+                task_id = str(result.get("id"))
+                if not task_id:
+                    raise HubSpotError(method="POST", url="https://api.hubapi.com/crm/v3/objects/tasks", status_code=502, body="HubSpot returned no task id")
+                verified = client.get_task(task_id)
+                if not _verified_task(verified, expected_subject=task_subject, expected_body=task_body):
+                    raise HubSpotError(method="GET", url=f"https://api.hubapi.com/crm/v3/objects/tasks/{task_id}", status_code=502, body="Created task did not verify with expected fields")
+            except HubSpotError as exc:
+                before_failure = _work_item_snapshot(row)
+                row.execution_state = "failed"
+                row.execution_error = str(exc)
+                row.outcome = str(exc)
+                row.updated_at = datetime.now(UTC)
+                _append_work_item_audit(
+                    row,
+                    action="hubspot_task_execute_failed",
+                    actor=actor,
+                    before=before_failure,
+                    after=_work_item_snapshot(row),
+                )
+                session.commit()
+                session.refresh(row)
+                logger.warning("hubspot.work_item_task_failed", extra={"status_code": exc.status_code, "work_item_id": item_id})
+                return JSONResponse({"code": "hubspot_error", "detail": str(exc), "work_item": _work_item_response(row)}, status_code=502)
+
+            record_url = _hubspot_task_record_url(task_id)
+            before_success = _work_item_snapshot(row)
+            row.status = "done"
+            row.execution_state = "completed"
+            row.outcome = f"Created and verified HubSpot task {task_id}."
+            row.external_system = "hubspot"
+            row.external_record_id = task_id
+            row.external_record_url = record_url
+            row.execution_error = None
+            row.updated_at = datetime.now(UTC)
+            _append_work_item_audit(
+                row,
+                action="hubspot_task_execute_verified",
+                actor=actor,
+                before=before_success,
+                after={
+                    **_work_item_snapshot(row),
+                    "hubspot_task": {
+                        "id": task_id,
+                        "record_url": record_url,
+                        "verified": True,
+                        "properties": verified.get("properties", {}),
+                    },
+                },
+            )
+            session.add(models.HubSpotTaskAudit(
+                subject=task_subject,
+                hubspot_task_id=task_id,
+                record_url=record_url,
+                idempotency_key=idempotency_key,
+                associations={"records": audit_associations},
+            ))
+            session.commit()
+            session.refresh(row)
+            logger.info("hubspot.work_item_task_verified", extra={"work_item_id": item_id, "task_id": task_id, "idempotency_key": idempotency_key})
+            return JSONResponse({
+                "status": "verified",
+                "duplicate": False,
+                "idempotency_key": idempotency_key,
+                "work_item": _work_item_response(row),
+                "hubspot_task": {
+                    "id": task_id,
+                    "record_url": record_url,
+                    "verified": True,
+                },
+            })
+        finally:
+            session.close()
 
     @app.post("/email/send")
     def send_email(payload: EmailSendRequest) -> Response:

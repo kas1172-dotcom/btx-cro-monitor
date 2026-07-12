@@ -281,6 +281,41 @@ p { line-height: 1.55; }
   border-radius: 999px;
   padding: 3px 8px;
 }
+.work-item-confirm {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(183, 196, 106, .08);
+}
+.work-item-confirm span, .work-item-error, .work-item-success {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+.work-item-confirm div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.work-item-confirm button, .work-item-execute {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 7px 10px;
+  cursor: pointer;
+}
+.work-item-confirm button:first-child, .work-item-execute {
+  border-color: var(--accent);
+  background: rgba(183, 196, 106, .14);
+}
+.work-item-error { color: #f2a28f; }
+.work-item-success { color: var(--good); }
 .account360-layout {
   display: grid;
   grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);

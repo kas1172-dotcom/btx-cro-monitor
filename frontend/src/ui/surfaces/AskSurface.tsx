@@ -15,7 +15,7 @@ export function AskSurface({ world }: { world: World }) {
       <AskBrainBar world={world} large />
       <section className="surface-panel">
         <div className="panel-head"><h2>Work context</h2></div>
-        <WorkItemList items={attention.items.slice(0, 3)} empty="No urgent work items to anchor the conversation." />
+        <WorkItemList items={attention.items.slice(0, 3)} empty="No urgent work items to anchor the conversation." world={world} />
       </section>
     </section>
   );

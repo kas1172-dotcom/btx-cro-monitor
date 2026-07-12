@@ -42,23 +42,23 @@ export function TodayBrief({ world }: { world: World }) {
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Needs attention</h2></div>
-          <WorkItemList items={attention.items.slice(0, 5)} empty="No urgent work items." />
+          <WorkItemList items={attention.items.slice(0, 5)} empty="No urgent work items." world={world} />
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Prepared</h2></div>
-          <WorkItemList items={prepared.items.slice(0, 5)} empty="No prepared artifacts." />
+          <WorkItemList items={prepared.items.slice(0, 5)} empty="No prepared artifacts." world={world} />
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Needs approval</h2></div>
-          <WorkItemList items={approval.items.slice(0, 5)} empty="No approvals pending." />
+          <WorkItemList items={approval.items.slice(0, 5)} empty="No approvals pending." world={world} />
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Outcomes</h2></div>
-          <WorkItemList items={outcomes.items.slice(0, 5)} empty="No recent outcomes yet." />
+          <WorkItemList items={outcomes.items.slice(0, 5)} empty="No recent outcomes yet." world={world} />
         </section>
         <section className="surface-panel">
           <div className="panel-head"><h2>Queue snapshot</h2></div>
-          <WorkItemList items={changed.items.slice(0, 5)} empty="No source-backed work items." />
+          <WorkItemList items={changed.items.slice(0, 5)} empty="No source-backed work items." world={world} />
         </section>
       </div>
     </section>

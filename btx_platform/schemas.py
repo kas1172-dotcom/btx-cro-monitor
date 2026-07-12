@@ -68,6 +68,19 @@ class CrmTaskRequest(BaseModel):
     due_at: str | None = None
 
 
+class HubSpotTaskExecuteRequest(BaseModel):
+    confirmed: bool
+    task_text: str | None = None
+    body: str | None = None
+    evidence: str | None = None
+    relationship_record: dict | None = None
+    company_id: str | None = None
+    contact_id: str | None = None
+    deal_id: str | None = None
+    owner_id: str | None = None
+    due_at: str | None = None
+
+
 class EmailSendRequest(BaseModel):
     to: str
     subject: str
@@ -244,6 +257,11 @@ class WorkItemResponse(BaseModel):
     execution_state: str
     outcome: str | None = None
     follow_up_date: str | None = None
+    external_system: str | None = None
+    external_record_id: str | None = None
+    external_record_url: str | None = None
+    execution_idempotency_key: str | None = None
+    execution_error: str | None = None
     audit_history: list[dict]
     created_at: str
     updated_at: str

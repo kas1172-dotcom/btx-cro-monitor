@@ -35,6 +35,11 @@ export interface WorkItem {
   execution_state: ExecutionState;
   outcome: string | null;
   follow_up_date: string | null;
+  external_system: string | null;
+  external_record_id: string | null;
+  external_record_url: string | null;
+  execution_idempotency_key: string | null;
+  execution_error: string | null;
   audit_history: Array<Record<string, unknown>>;
   created_at: string;
   updated_at: string;
@@ -120,6 +125,11 @@ export function deriveWorkItems(world: World): WorkItem[] {
     execution_state: "not_started",
     outcome: null,
     follow_up_date: null,
+    external_system: null,
+    external_record_id: null,
+    external_record_url: null,
+    execution_idempotency_key: null,
+    execution_error: null,
     audit_history: derivedAudit("derived_from_recommendation"),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -142,6 +152,11 @@ export function deriveWorkItems(world: World): WorkItem[] {
     execution_state: "not_started",
     outcome: null,
     follow_up_date: null,
+    external_system: null,
+    external_record_id: null,
+    external_record_url: null,
+    execution_idempotency_key: null,
+    execution_error: null,
     audit_history: derivedAudit("derived_from_signal"),
     created_at: signal.detected_at,
     updated_at: signal.detected_at,
@@ -165,6 +180,11 @@ export function deriveWorkItems(world: World): WorkItem[] {
       execution_state: "not_started",
       outcome: null,
       follow_up_date: null,
+      external_system: null,
+      external_record_id: null,
+      external_record_url: null,
+      execution_idempotency_key: null,
+      execution_error: null,
       audit_history: derivedAudit("derived_from_opportunity"),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -244,5 +264,54 @@ export async function createWorkItem(draft: WorkItemDraft): Promise<WorkItem> {
   return backendJson<WorkItem>("/work-items", {
     method: "POST",
     body: JSON.stringify(draftToCreatePayload(draft)),
+  });
+}
+
+export interface ExecuteHubSpotTaskInput {
+  item: WorkItem;
+  confirmed: boolean;
+  accountName?: string;
+  relationshipRecord?: Record<string, unknown>;
+  companyId?: string | null;
+  contactId?: string | null;
+  dealId?: string | null;
+}
+
+export interface ExecuteHubSpotTaskResult {
+  status: "verified";
+  duplicate: boolean;
+  idempotency_key: string;
+  work_item: WorkItem;
+  hubspot_task: {
+    id: string;
+    record_url: string;
+    verified?: boolean;
+  };
+}
+
+export function hubSpotTaskIdempotencyKey(item: WorkItem): string {
+  return item.execution_idempotency_key ?? `work-item:${item.id}:hubspot-task`;
+}
+
+export async function executeHubSpotTask(input: ExecuteHubSpotTaskInput): Promise<ExecuteHubSpotTaskResult> {
+  return backendJson<ExecuteHubSpotTaskResult>(`/work-items/${input.item.id}/execute/hubspot-task`, {
+    method: "POST",
+    headers: { "x-idempotency-key": hubSpotTaskIdempotencyKey(input.item) },
+    body: JSON.stringify({
+      confirmed: input.confirmed,
+      task_text: input.item.recommended_action,
+      body: [
+        input.item.recommended_action,
+        input.accountName ? `Account: ${input.accountName}` : "",
+        input.item.source_signal_ids.length ? `Evidence signals: ${input.item.source_signal_ids.join(", ")}` : "",
+      ].filter(Boolean).join("\n"),
+      evidence: input.item.generated_artifact_ref ?? input.item.source_signal_ids.join(", "),
+      relationship_record: input.relationshipRecord ?? null,
+      company_id: input.companyId ?? input.item.canonical_account_id,
+      contact_id: input.contactId ?? null,
+      deal_id: input.dealId ?? null,
+      owner_id: input.item.owner,
+      due_at: input.item.due_date,
+    }),
   });
 }

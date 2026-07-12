@@ -267,10 +267,12 @@ def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_
         def __init__(self, token: str):
             captured["token"] = token
 
-        def create_task(self, *, subject, body, timestamp, associations):
+        def create_task(self, *, subject, body, timestamp, owner_id=None, idempotency_key=None, associations):
             captured["subject"] = subject
             captured["body"] = body
             captured["timestamp"] = timestamp
+            captured["owner_id"] = owner_id
+            captured["idempotency_key"] = idempotency_key
             captured["associations"] = list(associations)
             return {"id": "task-123"}
 
@@ -278,7 +280,7 @@ def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_
 
     response = client.post(
         "/crm/task",
-        headers=_headers(),
+        headers={**_headers(), "X-Idempotency-Key": "idem-direct-1"},
         json={
             "title": "Follow up: Meeting brief",
             "body": "Call procurement with the cited monitor signal.",
@@ -295,6 +297,7 @@ def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_
     assert captured["subject"] == "Follow up: Meeting brief"
     assert captured["body"] == "Call procurement with the cited monitor signal."
     assert captured["timestamp"].endswith("Z")
+    assert captured["idempotency_key"] == "idem-direct-1"
     assert [(item.object_type, item.object_id) for item in captured["associations"]] == [
         ("companies", "10"),
         ("contacts", "20"),
@@ -305,6 +308,7 @@ def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_
     assert len(audits) == 1
     assert audits[0].subject == "Follow up: Meeting brief"
     assert audits[0].hubspot_task_id == "task-123"
+    assert audits[0].idempotency_key == "idem-direct-1"
     assert audits[0].associations == {
         "records": [
             {"object_type": "companies", "object_id": "10"},
@@ -357,3 +361,202 @@ def test_crm_task_route_maps_hubspot_errors_to_502(monkeypatch, tmp_path: Path):
     assert "bad association" in response.json()["detail"]
     with sf() as session:
         assert session.query(models.HubSpotTaskAudit).count() == 0
+
+
+def _create_proposed_work_item(client: TestClient, *, account_id: str = "hubspot-company-10") -> dict:
+    response = client.post(
+        "/work-items",
+        headers={**_headers(), "x-btx-actor": "tester"},
+        json={
+            "type": "account_action",
+            "canonical_account_id": account_id,
+            "source_signal_ids": ["signal-1"],
+            "owner": "owner-7",
+            "priority": "high",
+            "status": "proposed",
+            "due_date": "2026-07-20T15:00:00Z",
+            "recommended_action": "Call Acme about the verified contract signal",
+            "generated_artifact_ref": "artifact-1",
+            "approval_state": "pending",
+        },
+    )
+    assert response.status_code == 201
+    return response.json()
+
+
+def test_work_item_hubspot_task_happy_path_verifies_and_audits(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf)
+    client = TestClient(app)
+    created = _create_proposed_work_item(client)
+    calls: list[tuple[str, dict]] = []
+
+    class FakeHubSpotClient:
+        def __init__(self, token: str):
+            assert token == "hubspot-token"
+
+        def create_task(self, **kwargs):
+            calls.append(("create", kwargs))
+            return {"id": "task-777"}
+
+        def get_task(self, task_id: str):
+            calls.append(("get", {"task_id": task_id}))
+            return {
+                "id": task_id,
+                "properties": {
+                    "hs_task_subject": "Call Acme about the verified contract signal",
+                    "hs_task_body": calls[0][1]["body"],
+                    "hs_task_status": "NOT_STARTED",
+                },
+            }
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+
+    response = client.post(
+        f"/work-items/{created['id']}/execute/hubspot-task",
+        headers={**_headers(), "X-Idempotency-Key": "work-item-idem-1", "x-btx-actor": "sales-user"},
+        json={
+            "confirmed": True,
+            "relationship_record": {"match_method": "exact_domain", "confidence": 0.96},
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "verified"
+    assert payload["duplicate"] is False
+    assert payload["hubspot_task"]["record_url"] == "https://app.hubspot.com/tasks/task-777"
+    item = payload["work_item"]
+    assert item["status"] == "done"
+    assert item["approval_state"] == "approved"
+    assert item["execution_state"] == "completed"
+    assert item["external_system"] == "hubspot"
+    assert item["external_record_id"] == "task-777"
+    assert item["external_record_url"] == "https://app.hubspot.com/tasks/task-777"
+    assert item["execution_idempotency_key"] == "work-item-idem-1"
+    assert item["execution_error"] is None
+    actions = [entry["action"] for entry in item["audit_history"]]
+    assert actions == ["create", "hubspot_task_execute_started", "hubspot_task_execute_verified"]
+    assert item["audit_history"][1]["after"]["hubspot_task_preview"]["owner"] == "owner-7"
+    assert item["audit_history"][1]["after"]["hubspot_task_preview"]["due_at"].startswith("2026-07-20")
+    assert item["audit_history"][1]["after"]["hubspot_task_preview"]["relationship_record"]["match_method"] == "exact_domain"
+    assert calls[0][0] == "create"
+    assert calls[0][1]["owner_id"] == "owner-7"
+    assert calls[0][1]["idempotency_key"] == "work-item-idem-1"
+    assert [(item.object_type, item.object_id) for item in calls[0][1]["associations"]] == [("companies", "10")]
+    with sf() as session:
+        audits = session.query(models.HubSpotTaskAudit).all()
+    assert len(audits) == 1
+    assert audits[0].hubspot_task_id == "task-777"
+    assert audits[0].idempotency_key == "work-item-idem-1"
+
+
+def test_work_item_hubspot_task_retry_is_idempotent(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf)
+    client = TestClient(app)
+    created = _create_proposed_work_item(client)
+    create_count = 0
+    created_body = ""
+
+    class FakeHubSpotClient:
+        def __init__(self, _token: str):
+            pass
+
+        def create_task(self, **_kwargs):
+            nonlocal create_count
+            nonlocal created_body
+            create_count += 1
+            created_body = _kwargs["body"]
+            return {"id": "task-888"}
+
+        def get_task(self, task_id: str):
+            return {
+                "id": task_id,
+                "properties": {
+                    "hs_task_subject": "Call Acme about the verified contract signal",
+                    "hs_task_body": created_body,
+                },
+            }
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+    headers = {**_headers(), "X-Idempotency-Key": "same-key"}
+    first = client.post(f"/work-items/{created['id']}/execute/hubspot-task", headers=headers, json={"confirmed": True})
+    second = client.post(f"/work-items/{created['id']}/execute/hubspot-task", headers=headers, json={"confirmed": True})
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert second.json()["duplicate"] is True
+    assert second.json()["hubspot_task"]["id"] == "task-888"
+    assert create_count == 1
+
+
+def test_work_item_hubspot_task_failure_leaves_not_done_with_error(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf)
+    client = TestClient(app)
+    created = _create_proposed_work_item(client)
+
+    class FakeHubSpotClient:
+        def __init__(self, _token: str):
+            pass
+
+        def create_task(self, **_kwargs):
+            return {"id": "task-999"}
+
+        def get_task(self, task_id: str):
+            return {"id": task_id, "properties": {"hs_task_subject": "Wrong", "hs_task_body": "Wrong"}}
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+
+    response = client.post(
+        f"/work-items/{created['id']}/execute/hubspot-task",
+        headers={**_headers(), "X-Idempotency-Key": "fail-key"},
+        json={"confirmed": True},
+    )
+
+    assert response.status_code == 502
+    assert response.json()["code"] == "hubspot_error"
+    item = response.json()["work_item"]
+    assert item["status"] == "proposed"
+    assert item["execution_state"] == "failed"
+    assert item["external_record_id"] is None
+    assert "did not verify" in item["execution_error"]
+    assert item["audit_history"][-1]["action"] == "hubspot_task_execute_failed"
+    with sf() as session:
+        assert session.query(models.HubSpotTaskAudit).count() == 0
+
+
+def test_work_item_hubspot_task_requires_confirmation_and_config(tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", backend_auth_token=AUTH, hubspot_access_token=None)
+    app = create_app(settings=settings, session_factory=sf)
+    client = TestClient(app)
+    created = _create_proposed_work_item(client)
+
+    missing_confirmation = client.post(
+        f"/work-items/{created['id']}/execute/hubspot-task",
+        headers=_headers(),
+        json={"confirmed": False},
+    )
+    assert missing_confirmation.status_code == 422
+    assert missing_confirmation.json()["code"] == "confirmation_required"
+
+    not_configured = client.post(
+        f"/work-items/{created['id']}/execute/hubspot-task",
+        headers=_headers(),
+        json={"confirmed": True},
+    )
+    assert not_configured.status_code == 501
+    assert not_configured.json()["code"] == "not_configured"
