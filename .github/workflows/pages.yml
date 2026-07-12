@@ -11,6 +11,8 @@ on:
         required: true
       VITE_COCKPIT_PASSWORD:
         required: true
+      VITE_CLERK_PUBLISHABLE_KEY:
+        required: false
   workflow_dispatch:
 
 permissions:
@@ -55,10 +57,11 @@ jobs:
           VITE_BACKEND_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}
           VITE_COPILOT_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}/llm
           VITE_ARTIFACT_BASE_URL: ../btx
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           COCKPIT_PASSWORD: ${{ secrets.VITE_COCKPIT_PASSWORD }}
         run: |
-          if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$COCKPIT_PASSWORD" ]; then
-            echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_COCKPIT_PASSWORD"
+          if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$COCKPIT_PASSWORD" ] || [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ]; then
+            echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_COCKPIT_PASSWORD, VITE_CLERK_PUBLISHABLE_KEY"
             exit 1
           fi
           export VITE_COCKPIT_PASSWORD_HASH="$(printf '%s' "$COCKPIT_PASSWORD" | sha256sum | awk '{print $1}')"

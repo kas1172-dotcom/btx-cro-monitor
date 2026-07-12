@@ -132,10 +132,26 @@ fly secrets set \
 7. Run migrations before the new code serves traffic.
 
 ```bash
-fly ssh console --app btx-platform -C "alembic upgrade head"
-# or locally against BTX_DATABASE_URL:
-BTX_DATABASE_URL="<prod-database-url>" alembic upgrade head
+fly ssh console --app btx-platform -C "sh -lc 'cd /app && alembic upgrade head'"
 ```
+
+The explicit `sh -lc` wrapper matters because Fly executes `-C` as a
+process. Without the shell wrapper, compound commands such as `cd /app && ...`
+are not interpreted by a shell.
+
+If the deployed image is not healthy enough for SSH, run the same migration
+locally through a Fly Postgres tunnel:
+
+```bash
+fly proxy 15432:5432 -a btx-platform-db
+
+# In another shell, use the same user/password/database from the Fly
+# DATABASE_URL secret, but point the host and port at the tunnel:
+BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@localhost:15432/DBNAME" \
+  alembic upgrade head
+```
+
+Keep the proxy process open until Alembic completes.
 
 With `BTX_ENV=prod`, the app refuses to start against a database that hasn't
 had this run — it raises `SchemaNotMigrated` instead of silently creating

@@ -22,12 +22,24 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
+
+def _sqlalchemy_url(url: str) -> str:
+    """Use the same psycopg v3 driver normalization as the running app."""
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    return url
+
+
 # The app and migrations must never point at different databases by default,
 # so fall back to the same Settings the app uses rather than alembic.ini's
 # placeholder — but only when the caller (CLI or a test's Config object)
 # hasn't already set an explicit URL, so tests can point at a throwaway file.
 if not config.get_main_option("sqlalchemy.url"):
-    config.set_main_option("sqlalchemy.url", get_settings().database_url)
+    config.set_main_option("sqlalchemy.url", _sqlalchemy_url(get_settings().database_url))
+else:
+    config.set_main_option("sqlalchemy.url", _sqlalchemy_url(config.get_main_option("sqlalchemy.url")))
 
 
 def run_migrations_offline() -> None:
