@@ -20,6 +20,8 @@ import {
   type DownloadFormat,
 } from "../../deliverables/export.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
+import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
+import type { ChartSpec } from "../../metrics/types.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -292,7 +294,14 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
                 </table>
               );
             }
-            if (block.kind === "chart-spec") return <pre key={`${section.id}-${index}`}>{JSON.stringify(block.spec, null, 2)}</pre>;
+            if (block.kind === "chart-spec") {
+              return (
+                <figure key={`${section.id}-${index}`} className="document-chart-figure">
+                  <figcaption>{block.title}</figcaption>
+                  {world ? <AnalysisFigure spec={block.spec as unknown as ChartSpec} world={world} interactive={false} /> : <pre>{JSON.stringify(block.spec, null, 2)}</pre>}
+                </figure>
+              );
+            }
             if (block.kind === "map-ref" && block.stops?.length) {
               const center: [number, number] = [
                 block.stops.reduce((sum, stop) => sum + stop.lat, 0) / block.stops.length,

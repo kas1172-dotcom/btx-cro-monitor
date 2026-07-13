@@ -56,6 +56,13 @@ function accountName(world: World, id: string): string {
   return world.companies.find((c) => c.id === id)?.name ?? id;
 }
 
+function accountScopedRevenueRows(spec: ChartSpec): RevenueRow[] {
+  return revenueRows.filter((r) =>
+    inMonthRange(r.month, spec.timeRange) &&
+    (!spec.filters?.accountId || r.account_id === spec.filters.accountId)
+  );
+}
+
 export function computeChart(spec: ChartSpec, world: World): ChartResult {
   const metric = METRICS[spec.metric];
   if (spec.viz === "trend") {
@@ -73,7 +80,7 @@ export function computeChart(spec: ChartSpec, world: World): ChartResult {
 
   if (spec.viz === "ranked_bar") {
     const byAccount = new Map<string, number>();
-    for (const row of revenueRows.filter((r) => inMonthRange(r.month, spec.timeRange))) byAccount.set(row.account_id, (byAccount.get(row.account_id) ?? 0) + row.revenue);
+    for (const row of accountScopedRevenueRows(spec)) byAccount.set(row.account_id, (byAccount.get(row.account_id) ?? 0) + row.revenue);
     const sorted = [...byAccount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
     const rankedValues = sorted.map(([, y]) => y);
     return {
@@ -85,7 +92,7 @@ export function computeChart(spec: ChartSpec, world: World): ChartResult {
     };
   }
 
-  const scopedRevenueRows = revenueRows.filter((r) => inMonthRange(r.month, spec.timeRange));
+  const scopedRevenueRows = accountScopedRevenueRows(spec);
   const quarterLabelByBase = quarterLabels(scopedRevenueRows);
   const colForMonth = (month: string) => spec.cols === "quarter" ? quarterLabelByBase.get(quarter(month)) ?? quarter(month) : month;
   const cols = [...new Set(scopedRevenueRows.map((r) => colForMonth(r.month)))];
@@ -132,5 +139,5 @@ function trendRows(spec: ChartSpec): Array<{ x: string; y: number }> {
   }
   if (spec.metric === "win_rate") return winLossRows.filter((r) => inMonthRange(r.month, spec.timeRange)).map((r) => ({ x: r.month, y: (r.wins / Math.max(1, r.wins + r.losses)) * 100 }));
   if (spec.metric === "avg_order_value") return winLossRows.filter((r) => inMonthRange(r.month, spec.timeRange)).map((r) => ({ x: r.month, y: r.win_value / Math.max(1, r.wins) }));
-  return revenueRows.filter((r) => inMonthRange(r.month, spec.timeRange)).map((row) => ({ x: row.month, y: row.revenue }));
+  return accountScopedRevenueRows(spec).map((row) => ({ x: row.month, y: row.revenue }));
 }

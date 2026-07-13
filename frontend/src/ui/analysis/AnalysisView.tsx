@@ -1,16 +1,24 @@
-import { Fragment, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { computeChart, formatMetricValue } from "../../metrics/chartSpec.ts";
 import type { ChartResult, ChartSpec, MetricId } from "../../metrics/types.ts";
 import { METRICS } from "../../metrics/catalog.ts";
-import { openDemoAction, setState } from "../../store/store.ts";
-import { uiTokens } from "../../app/uiTokens.ts";
+import type { Deliverable, DeliverableBlock, DeliverableSection } from "../../deliverables/types.ts";
+import { createDeliverableRecord, listDeliverableRecords, patchDeliverableRecord, type BackendDeliverableRecord } from "../../app/deliverablesApi.ts";
+import { saveDeliverable, useMemory } from "../../memory/localMemory.ts";
+import { AnalysisFigure } from "./ChartFigure.tsx";
+import { FigureTypePicker } from "./FigureTypePicker.tsx";
 
 const METRIC_IDS = Object.keys(METRICS) as MetricId[];
+const DEFAULT_SPEC: ChartSpec = {
+  metric: "revenue",
+  viz: "heatmap",
+  rows: "account",
+  cols: "quarter",
+};
 
-function fmt(value: number | null, unit: string): string {
-  return formatMetricValue(value, unit);
-}
+type SaveDestination = "new" | "insert";
+type ModalStep = "configure" | "save";
 
 function computeAnnotation(spec: ChartSpec, _world: World, result: ChartResult): string {
   const unit = result.meta.unit;
@@ -37,8 +45,8 @@ function computeAnnotation(spec: ChartSpec, _world: World, result: ChartResult):
 
     return [
       top ? `${top.name} is the top account in the latest complete quarter at ${fmtV(top.value)} (${Math.round(topShare)}% of period total).` : "",
-      completeCols.length > 1 ? `Portfolio ${result.meta.label.toLowerCase()} is ${trend} — ${fmtV(firstSum)} in ${completeCols[0]} vs ${fmtV(lastSum)} in ${lastCol ?? ""}.` : "",
-      topShare > 30 ? `Concentration risk: the top account holds over 30% of revenue, warranting diversification attention.` : `No single account dominates; concentration is within acceptable bounds.`,
+      completeCols.length > 1 ? `Portfolio ${result.meta.label.toLowerCase()} is ${trend}: ${fmtV(firstSum)} in ${completeCols[0]} vs ${fmtV(lastSum)} in ${lastCol ?? ""}.` : "",
+      topShare > 30 ? "Concentration risk: the top account holds over 30% of revenue, warranting diversification attention." : "No single account dominates; concentration is within acceptable bounds.",
     ].filter(Boolean).join(" ");
   }
 
@@ -60,150 +68,302 @@ function computeAnnotation(spec: ChartSpec, _world: World, result: ChartResult):
   return `${result.meta.label} analysis across the selected scope and period.`;
 }
 
-function Legend({ legend, unit }: { legend: NonNullable<ChartResult["legend"]>; unit: string }) {
-  if (legend.min === null && legend.max === null) return null;
-  return (
-    <div className="analysis-legend">
-      <span>{legend.colorEncodes}</span>
-      <span className="legend-scale">
-        <i className="leg-lo" />
-        {formatMetricValue(legend.min, unit)}
-        <i className="leg-mid" />
-        {legend.midLabel}
-        <i className="leg-hi" />
-        {formatMetricValue(legend.max, unit)}
-      </span>
-      {legend.qtdNote && <em>{legend.qtdNote}</em>}
-    </div>
-  );
+function figureTitle(spec: ChartSpec): string {
+  const metric = METRICS[spec.metric].label;
+  const viz = spec.viz.replace(/_/g, " ");
+  return `${metric} ${viz}`;
 }
 
-function Trend({ result }: { result: ChartResult }) {
-  const points = result.series?.[0]?.points ?? [];
-  const max = Math.max(1, ...points.map((p) => p.y));
-  const coords = points.map((p, i) => `${(i / Math.max(1, points.length - 1)) * 100},${100 - (p.y / max) * 88}`).join(" ");
-  return (
-    <div className="analysis-chart">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <polyline points={coords} fill="none" stroke="currentColor" strokeWidth="2" />
-      </svg>
-    </div>
-  );
+function chartBlock(spec: ChartSpec): DeliverableBlock {
+  return { kind: "chart-spec", title: figureTitle(spec), spec: spec as unknown as Record<string, unknown> };
 }
 
-interface SelectedCell {
-  row: string;
-  col: string;
-  value: number | null;
-  provenance: ChartResult["provenance"];
+function standaloneDeliverable(spec: ChartSpec, world: World, result: ChartResult, annotation: string): Deliverable {
+  const title = figureTitle(spec);
+  const entityIds = spec.filters?.accountId ? [spec.filters.accountId] : [];
+  return {
+    id: `deliv-${Date.now()}-analysis-view`,
+    type: "analysis_view",
+    title,
+    createdAt: new Date().toISOString(),
+    brainArea: "decision",
+    entityIds,
+    sections: [
+      {
+        id: "figure",
+        heading: title,
+        blocks: [
+          chartBlock(spec),
+          { kind: "text", text: annotation },
+        ],
+        audience: "internal",
+      },
+    ],
+    sources: result.provenance.length ? result.provenance : [{ source: "analysis dashboard", records: [spec.metric], reason: "Computed from the current operating world." }],
+    confidence: world.dataMode === "demo" ? "medium" : "high",
+    confidenceReason: "Computed through the metrics catalog and chart specification.",
+    audience: "internal",
+    form: "view",
+    actions: [
+      { id: "copy", label: "Copy", kind: "copy" },
+      { id: "download", label: "Download Markdown", kind: "download_markdown" },
+    ],
+  };
 }
 
-function Grid({ result }: { result: ChartResult }) {
-  const [selectedCell, setSelectedCell] = useState<SelectedCell | null>(null);
-  const grid = result.grid;
-  if (!grid) return null;
-  const fullPeriodValues = grid.values.flatMap((row) =>
-    row.filter((value, index): value is number => value !== null && !grid.qtdCols.includes(grid.cols[index])),
-  );
-  const max = Math.max(1, ...(fullPeriodValues.length ? fullPeriodValues : grid.values.flat().filter((v): v is number => v !== null)));
-  return (
-    <>
-      <div className="analysis-grid" style={{ gridTemplateColumns: `180px repeat(${grid.cols.length}, minmax(70px, 1fr))` }}>
-        <strong />
-        {grid.cols.map((col) => <strong key={col}>{col}</strong>)}
-        {grid.rows.map((row, rowIndex) => (
-          <Fragment key={`${row}-row`}>
-            <span>{row}</span>
-            {grid.values[rowIndex].map((value, colIndex) => (
-              <button
-                key={`${row}-${grid.cols[colIndex]}`}
-                className={grid.qtdCols.includes(grid.cols[colIndex]) ? "analysis-cell analysis-cell-qtd" : "analysis-cell"}
-                style={value !== null ? { backgroundColor: `rgba(${uiTokens.rgb.accent}, ${0.16 + (value / max) * 0.72})` } : {}}
-                title={`${row} / ${grid.cols[colIndex]}: ${value !== null ? fmt(value, result.meta.unit) : "—"}`}
-                data-provenance={result.provenance.map((p) => p.source).join(", ")}
-                onClick={() => setSelectedCell({ row, col: grid.cols[colIndex], value, provenance: result.provenance })}
-              >
-                {value !== null ? fmt(value, result.meta.unit) : "—"}
-              </button>
-            ))}
-          </Fragment>
-        ))}
-      </div>
-      {selectedCell && (
-        <div className="analysis-cell-provenance" role="dialog">
-          <strong>{selectedCell.row} · {selectedCell.col}</strong>
-          <div>Value: {fmt(selectedCell.value, result.meta.unit)}</div>
-          <div className="analysis-cell-sources">
-            {selectedCell.provenance.map((p) => (
-              <div key={p.source}>{p.source}: {p.reason}</div>
-            ))}
-          </div>
-          <button onClick={() => setSelectedCell(null)}>Close</button>
-        </div>
-      )}
-    </>
-  );
+function insertBlock(
+  deliverable: Deliverable,
+  sectionId: string,
+  block: DeliverableBlock,
+): Deliverable {
+  const updatedAt = new Date().toISOString();
+  const sectionExists = deliverable.sections.some((section) => section.id === sectionId);
+  const sections: DeliverableSection[] = sectionExists
+    ? deliverable.sections.map((section) => section.id === sectionId ? { ...section, blocks: [...section.blocks, block] } : section)
+    : [
+        ...deliverable.sections,
+        {
+          id: `figures-${Date.now()}`,
+          heading: "Figures",
+          blocks: [block],
+          audience: "internal",
+        },
+      ];
+  return {
+    ...deliverable,
+    sections,
+    sources: [
+      ...deliverable.sources,
+      { source: "analysis figure hub", records: [block.kind === "chart-spec" ? block.title : "figure"], reason: `Inserted chart spec on ${updatedAt}.` },
+    ],
+  };
 }
 
-function RankedBar({ result }: { result: ChartResult }) {
-  const points = result.series?.[0]?.points ?? [];
-  const max = Math.max(1, ...points.map((p) => p.y));
-  return (
-    <div className="analysis-bars">
-      {points.map((point) => (
-        <div key={point.x}>
-          <span>{point.x}</span>
-          <i style={{ width: `${(point.y / max) * 100}%` }} />
-          <strong>{fmt(point.y, result.meta.unit)}</strong>
-        </div>
-      ))}
-    </div>
-  );
+function localRecords(deliverables: Deliverable[]): Array<BackendDeliverableRecord<Deliverable>> {
+  return deliverables.map((deliverable) => ({
+    id: deliverable.id,
+    type: deliverable.type,
+    title: deliverable.title,
+    canonical_account_id: deliverable.entityIds[0] ?? null,
+    entity_ids: deliverable.entityIds,
+    document: deliverable,
+    created_at: deliverable.createdAt,
+    updated_at: deliverable.createdAt,
+  }));
 }
 
-export function AnalysisView({ world, initialSpec }: { world: World; initialSpec: ChartSpec }) {
-  const [spec, setSpec] = useState(initialSpec);
+export function AnalysisView({ world, initialSpec, openOnMount = false }: { world: World; initialSpec: ChartSpec; openOnMount?: boolean }) {
+  const memory = useMemory();
+  const [open, setOpen] = useState(openOnMount);
+  const [step, setStep] = useState<ModalStep>("configure");
+  const [spec, setSpec] = useState<ChartSpec>(initialSpec ?? DEFAULT_SPEC);
+  const [destination, setDestination] = useState<SaveDestination>("new");
+  const [records, setRecords] = useState<Array<BackendDeliverableRecord<Deliverable>>>(() => localRecords(memory.deliverables));
+  const [targetId, setTargetId] = useState("");
+  const [targetSectionId, setTargetSectionId] = useState("__new__");
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
   const result = useMemo(() => computeChart(spec, world), [spec, world]);
   const annotation = useMemo(() => computeAnnotation(spec, world, result), [spec, world, result]);
   const definition = METRICS[spec.metric].definition;
-  const subtitle = `${definition} (${spec.rows ?? "portfolio"} view, ${spec.cols ?? "monthly"})`;
-  const scopeLabel = `All markets · ${spec.timeRange ? `${spec.timeRange.from} – ${spec.timeRange.to}` : "all time"}`;
+  const selectedRecord = records.find((record) => record.id === targetId);
+  const selectedAccountId = spec.filters?.accountId ?? "__all__";
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    listDeliverableRecords()
+      .then((response) => {
+        if (!cancelled) setRecords(response.records as Array<BackendDeliverableRecord<Deliverable>>);
+      })
+      .catch(() => {
+        if (!cancelled) setRecords(localRecords(memory.deliverables));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, memory.deliverables]);
+
+  useEffect(() => {
+    if (!targetId && records[0]) setTargetId(records[0].id);
+  }, [records, targetId]);
+
+  function updateSpec(next: ChartSpec) {
+    setSpec(next);
+    setStatus("");
+    setError("");
+  }
+
+  function resetForNextFigure(message: string) {
+    setSpec(DEFAULT_SPEC);
+    setStep("configure");
+    setDestination("new");
+    setTargetSectionId("__new__");
+    setStatus(message);
+    setError("");
+  }
+
+  async function saveStandalone() {
+    const deliverable = standaloneDeliverable(spec, world, result, annotation);
+    try {
+      const record = await createDeliverableRecord(deliverable);
+      setRecords((items) => [record as BackendDeliverableRecord<Deliverable>, ...items]);
+    } catch {
+      saveDeliverable(deliverable);
+      setRecords((items) => [localRecords([deliverable])[0], ...items.filter((item) => item.id !== deliverable.id)]);
+    }
+    resetForNextFigure("Saved as a new analysis view. Ready for the next figure.");
+  }
+
+  async function insertIntoDeliverable() {
+    if (!selectedRecord) {
+      setError("Choose a deliverable first.");
+      return;
+    }
+    const updated = insertBlock(selectedRecord.document, targetSectionId, chartBlock(spec));
+    try {
+      const record = await patchDeliverableRecord(selectedRecord.id, { document: updated, entity_ids: updated.entityIds });
+      setRecords((items) => items.map((item) => item.id === selectedRecord.id ? record as BackendDeliverableRecord<Deliverable> : item));
+    } catch {
+      saveDeliverable(updated);
+      setRecords((items) => items.map((item) => item.id === selectedRecord.id ? localRecords([updated])[0] : item));
+    }
+    resetForNextFigure(`Inserted figure into ${updated.title}. Ready for the next figure.`);
+  }
+
+  async function saveFigure() {
+    setError("");
+    if (destination === "insert") await insertIntoDeliverable();
+    else await saveStandalone();
+  }
 
   return (
-    <section className="analysis-view">
+    <section className="analysis-view analysis-hub">
       <div className="quiet-view-head">
-        <p className="eyebrow">Analysis View</p>
-        <h1>{result.meta.label} by {spec.rows ?? "portfolio"}</h1>
+        <p className="eyebrow">Analysis figures</p>
+        <h1>Create a board-ready figure.</h1>
       </div>
-      <p className="analysis-subtitle">{subtitle}</p>
-      <p className="analysis-scope">{scopeLabel}</p>
-      {annotation && <div className="analysis-annotation">{annotation}</div>}
-      <div className="analysis-controls">
-        <select value={spec.metric} onChange={(event) => setSpec({ ...spec, metric: event.target.value as MetricId })}>
-          {METRIC_IDS.map((id) => <option key={id} value={id}>{METRICS[id].label}</option>)}
-        </select>
-        <select value={spec.viz} onChange={(event) => setSpec({ ...spec, viz: event.target.value as ChartSpec["viz"] })}>
-          <option value="heatmap">Heatmap</option>
-          <option value="trend">Trend</option>
-          <option value="ranked_bar">Ranked bar</option>
-          <option value="retention_grid">Retention grid</option>
-        </select>
-        <select value={spec.cols ?? "quarter"} onChange={(event) => setSpec({ ...spec, cols: event.target.value as ChartSpec["cols"] })}>
-          <option value="quarter">Quarter</option>
-          <option value="month">Month</option>
-        </select>
-        <button onClick={() => setState({ activeAnalysisSpec: spec })}>Save View</button>
-        <button onClick={() => openDemoAction({ title: "Add analysis view to board deck", action: "follow_up", evidence: `${result.meta.label} ${spec.viz}` })}>Add to deck</button>
-      </div>
-      {spec.viz === "trend" && <Trend result={result} />}
-      {spec.viz === "ranked_bar" && <RankedBar result={result} />}
-      {(spec.viz === "heatmap" || spec.viz === "retention_grid") && <Grid result={result} />}
-      {(spec.viz === "heatmap" || spec.viz === "ranked_bar") && result.legend && (
-        <Legend legend={result.legend} unit={result.meta.unit} />
+      <p className="analysis-subtitle">Choose scope, chart type, metric, and save destination without leaving the dashboard.</p>
+      <button className="accent-action-button" type="button" onClick={() => { setOpen(true); setStep("configure"); }}>
+        Create figure
+      </button>
+      {status && <div className="live-inline-status">{status}</div>}
+
+      {open && (
+        <div className="demo-action-overlay analysis-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="analysis-modal-title">
+          <div className="analysis-modal">
+            <header className="analysis-modal-head">
+              <div>
+                <p className="eyebrow">Figure hub</p>
+                <h2 id="analysis-modal-title">{step === "configure" ? "Create figure" : "Save destination"}</h2>
+              </div>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close figure hub">×</button>
+            </header>
+            {status && <div className="live-inline-status">{status}</div>}
+
+            {step === "configure" ? (
+              <div className="analysis-modal-grid">
+                <section className="analysis-modal-controls">
+                  <label>
+                    Client scope
+                    <select
+                      value={selectedAccountId}
+                      onChange={(event) => {
+                        const accountId = event.target.value;
+                        updateSpec({
+                          ...spec,
+                          filters: accountId === "__all__" ? undefined : { ...(spec.filters ?? {}), accountId },
+                        });
+                      }}
+                    >
+                      <option value="__all__">All accounts</option>
+                      {world.companies.map((company) => <option key={company.id} value={company.id}>{company.name}</option>)}
+                    </select>
+                  </label>
+                  <FigureTypePicker spec={spec} world={world} onSelect={(viz) => updateSpec({ ...spec, viz })} />
+                  <div className="analysis-field-grid">
+                    <label>
+                      Metric
+                      <select value={spec.metric} onChange={(event) => updateSpec({ ...spec, metric: event.target.value as MetricId })}>
+                        {METRIC_IDS.map((id) => <option key={id} value={id}>{METRICS[id].label}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      Columns
+                      <select value={spec.cols ?? "quarter"} onChange={(event) => updateSpec({ ...spec, cols: event.target.value as ChartSpec["cols"] })}>
+                        <option value="quarter">Quarter</option>
+                        <option value="month">Month</option>
+                      </select>
+                    </label>
+                    <label>
+                      Color
+                      <select value={spec.color ?? spec.metric} onChange={(event) => updateSpec({ ...spec, color: event.target.value as MetricId })}>
+                        {METRIC_IDS.map((id) => <option key={id} value={id}>{METRICS[id].label}</option>)}
+                      </select>
+                    </label>
+                  </div>
+                  <p className="muted">{definition}</p>
+                </section>
+                <section className="analysis-modal-preview" aria-label="Figure preview">
+                  <div className="panel-head">
+                    <h3>{figureTitle(spec)}</h3>
+                    <span>{selectedAccountId === "__all__" ? "All accounts" : world.companies.find((company) => company.id === selectedAccountId)?.name}</span>
+                  </div>
+                  <AnalysisFigure spec={spec} world={world} />
+                  {annotation && <div className="analysis-annotation">{annotation}</div>}
+                </section>
+                <div className="analysis-modal-actions">
+                  <button type="button" onClick={() => setStep("save")}>Done</button>
+                </div>
+              </div>
+            ) : (
+              <div className="analysis-save-step">
+                <fieldset>
+                  <legend>Save destination</legend>
+                  <label>
+                    <input type="radio" checked={destination === "new"} onChange={() => setDestination("new")} />
+                    Save as new view
+                  </label>
+                  <label>
+                    <input type="radio" checked={destination === "insert"} onChange={() => setDestination("insert")} />
+                    Insert into...
+                  </label>
+                </fieldset>
+
+                {destination === "insert" && (
+                  <div className="analysis-insert-fields">
+                    <label>
+                      Deliverable
+                      <select value={targetId} onChange={(event) => { setTargetId(event.target.value); setTargetSectionId("__new__"); }} disabled={records.length === 0}>
+                        {records.length === 0 && <option value="">No deliverables available</option>}
+                        {records.map((record) => <option key={record.id} value={record.id}>{record.title}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      Section
+                      <select value={targetSectionId} onChange={(event) => setTargetSectionId(event.target.value)} disabled={!selectedRecord}>
+                        <option value="__new__">Append new Figures section</option>
+                        {selectedRecord?.document.sections.map((section) => <option key={section.id} value={section.id}>{section.heading}</option>)}
+                      </select>
+                    </label>
+                  </div>
+                )}
+
+                <section className="analysis-save-preview">
+                  <strong>{figureTitle(spec)}</strong>
+                  <span>{spec.viz.replace(/_/g, " ")} · {METRICS[spec.metric].label}</span>
+                </section>
+                {error && <div className="live-inline-status error">{error}</div>}
+                <div className="analysis-modal-actions">
+                  <button type="button" onClick={() => setStep("configure")}>Back</button>
+                  <button type="button" onClick={() => void saveFigure()} disabled={destination === "insert" && records.length === 0}>Save</button>
+                </div>
+              </div>
+            )}
+            <p className="analysis-followup-note">Follow-up: the dashboard heatmap and Steel & Signal retention heatmap still use separate renderers.</p>
+          </div>
+        </div>
       )}
-      <div className="analysis-provenance">
-        {result.provenance.map((p) => <span key={p.source}>{p.source}: {p.reason}</span>)}
-      </div>
     </section>
   );
 }

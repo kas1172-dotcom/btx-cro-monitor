@@ -71,7 +71,7 @@ export function App() {
   const renderDefault = () => {
     if (settingsActive) return <SettingsWorkspace />;
     if (!world) return <div className="loading">loading…</div>;
-    if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
+    if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} openOnMount />;
     if (activeDeliverable) return (
       <Suspense fallback={<div className="loading">loading deliverable…</div>}>
         <DocumentViewer deliverable={activeDeliverable} world={world} />

@@ -19,6 +19,7 @@
     "test:trip": "tsx tools/test-trip-planner.tsx",
     "test:deliverables": "tsx tools/test-deliverable-templates.tsx",
     "test:deliverable-wizard": "tsx tools/test-deliverable-wizard.tsx",
+    "test:analysis-figure": "tsx tools/test-analysis-figure-hub.tsx",
     "test:phase0": "tsx tools/test-phase0-safe-honest.ts",
     "test:identity": "tsx tools/test-canonical-identity.ts",
     "test:map": "tsx tools/test-map.ts",
