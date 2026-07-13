@@ -3,7 +3,7 @@ import type { MemoryState } from "../memory/types.ts";
 import type { BrainArea } from "../brain/types.ts";
 
 export type CoreSurface = "brief" | "work_queue" | "accounts" | "ask";
-export type AnalyticalSurface = "map" | "analysis" | "capacity" | "programs";
+export type AnalyticalSurface = "prospecting" | "map" | "analysis" | "capacity" | "programs";
 export type UtilitySurface = "settings";
 export type SurfaceId = CoreSurface | AnalyticalSurface | UtilitySurface;
 
@@ -23,6 +23,7 @@ export const CORE_SURFACES: SurfaceSpec[] = [
 ];
 
 export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
+  { id: "prospecting", label: "Prospecting", group: "analytical", componentId: "surface-prospecting", title: "New business targets, buying signals, outreach queues, and list imports." },
   { id: "map", label: "Map", group: "analytical", componentId: "surface-map", title: "Geographic account and prospect map." },
   { id: "analysis", label: "Analysis", group: "analytical", componentId: "surface-analysis-dashboard", title: "Pipeline, bookings, backlog, book-to-bill, win/loss, and utilization analysis." },
   { id: "capacity", label: "Capacity", group: "analytical", componentId: "surface-capacity-assessment", title: "Machining capacity against backlog and demand." },
@@ -65,6 +66,7 @@ export function brainAreaForSurface(surface: SurfaceId): BrainArea {
     case "analysis":
       return "revenue";
     case "programs":
+    case "prospecting":
       return "market";
     case "accounts":
       return "customer";
@@ -85,6 +87,8 @@ export function countForSurface(surface: SurfaceId, world: World | null, memory:
       return world.companies.filter((company) => company.relationship === "customer" || company.relationship === "target").length;
     case "ask":
       return undefined;
+    case "prospecting":
+      return world.companies.filter((company) => company.business_motion === "prospect_new_business" || company.account_status === "target_prospect" || company.account_status === "new_logo").length;
     case "map":
       return world.prospects.length;
     case "analysis":

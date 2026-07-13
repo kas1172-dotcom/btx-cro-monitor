@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { accountStatus, isProspectingAccount } from "../../brain/classification.ts";
@@ -11,6 +12,7 @@ import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
+import { ImportListModal } from "./ImportListModal.tsx";
 
 const PROSPECT_STATUSES = new Set<AccountStatus>(["target_prospect", "new_logo"]);
 const PROSPECT_MOTIONS = new Set<BusinessMotion>(["prospect_new_business"]);
@@ -63,6 +65,7 @@ function visitReason(row: { opportunity: number; fit: number; signals: Signal[];
 
 export function Prospecting({ world }: { world: World }) {
   const { city } = useStore();
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const prospectSignals = world.analysis.valid.filter(isProspectingSignal);
   const idsFromSignals = new Set(prospectSignals.map((s) => s.subject_id));
   const prospectCompanies = world.companies.filter(
@@ -121,6 +124,7 @@ export function Prospecting({ world }: { world: World }) {
           New-logo and target-account discovery, ranked by fit, buying signal strength, revenue potential, geography,
           contact availability, and urgency.
         </p>
+        <button className="import-list-trigger" type="button" onClick={() => setIsImportOpen(true)}>Import list</button>
       </section>
 
       <section className="current-summary">
@@ -336,6 +340,7 @@ export function Prospecting({ world }: { world: World }) {
           ))}
         </div>
       </section>
+      {isImportOpen && <ImportListModal world={world} onClose={() => setIsImportOpen(false)} />}
     </div>
   );
 }

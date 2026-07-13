@@ -18,6 +18,7 @@ import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
 import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
 import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
+import { Prospecting } from "./ui/prospecting/Prospecting.tsx";
 import { ALL_SURFACES, countForSurface, type SurfaceId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
@@ -81,6 +82,7 @@ export function App() {
       case "work_queue": return <WorkQueue world={world} />;
       case "accounts": return <Account360 world={world} />;
       case "ask": return <AskSurface world={world} />;
+      case "prospecting": return <Prospecting world={world} />;
       case "map": return viewWorld ? (
         <Suspense fallback={<div className="loading">loading map…</div>}>
           <ProspectMap world={viewWorld} />
@@ -94,7 +96,7 @@ export function App() {
     }
   };
   const counts = Object.fromEntries(
-    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
+    (["brief", "work_queue", "accounts", "ask", "prospecting", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
       .map((surface) => [surface, countForSurface(surface, world, memory)]),
   ) as Partial<Record<SurfaceId, number>>;
 

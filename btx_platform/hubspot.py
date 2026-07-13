@@ -92,6 +92,26 @@ class HubSpotClient:
     def _post(self, path: str, *, json: dict[str, Any]) -> dict[str, Any]:
         return self._request("POST", f"{self.base_url}{path}", json=json)
 
+    def _batch_create(self, object_type: Literal["companies", "contacts"], rows: list[dict[str, Any]]) -> dict[str, Any]:
+        return self._post(
+            f"/crm/objects/2026-03/{object_type}/batch/create",
+            json={
+                "inputs": [
+                    {
+                        "properties": row.get("properties") or {},
+                        "objectWriteTraceId": row.get("objectWriteTraceId") or row.get("trace_id"),
+                    }
+                    for row in rows
+                ],
+            },
+        )
+
+    def create_companies_batch(self, rows: list[dict[str, Any]]) -> dict[str, Any]:
+        return self._batch_create("companies", rows)
+
+    def create_contacts_batch(self, rows: list[dict[str, Any]]) -> dict[str, Any]:
+        return self._batch_create("contacts", rows)
+
     def list_objects(self, object_type: ObjectType, properties: Iterable[str]) -> list[HubSpotObject]:
         records: list[HubSpotObject] = []
         next_url: str | None = None

@@ -36,3 +36,30 @@ export async function backendJson<T>(path: string, init: RequestInit = {}): Prom
   }
   return response.json() as Promise<T>;
 }
+
+export interface HubSpotImportRowInput {
+  row_id: string;
+  company: Record<string, string>;
+  contact?: Record<string, string>;
+}
+
+export interface HubSpotImportRowResult {
+  row_id: string;
+  status: "succeeded" | "partial" | "failed";
+  company_id: string | null;
+  contact_id: string | null;
+  reason: string | null;
+}
+
+export interface HubSpotImportResponse {
+  status: "completed";
+  summary: { succeeded: number; partial: number; failed: number };
+  rows: HubSpotImportRowResult[];
+}
+
+export async function importProspectsToHubSpot(rows: HubSpotImportRowInput[]): Promise<HubSpotImportResponse> {
+  return backendJson<HubSpotImportResponse>("/crm/import/prospects", {
+    method: "POST",
+    body: JSON.stringify({ rows }),
+  });
+}
