@@ -45,12 +45,14 @@ def test_migration_applies_and_matches_current_models(tmp_path: Path):
     for expected in (
         "connections", "events", "idempotency_keys", "outbound_log", "dead_letters",
         "engine_configs", "canonical_accounts", "pipeline_runs", "work_items",
-        "hubspot_task_audits", "alembic_version",
+        "hubspot_task_audits", "deliverables", "alembic_version",
     ):
         assert expected in tables, f"migration did not create {expected}"
 
     work_item_columns = {c["name"] for c in inspector.get_columns("work_items")}
     assert "tenant_id" in work_item_columns  # WP10-A column present in the initial migration
+    deliverable_columns = {c["name"] for c in inspector.get_columns("deliverables")}
+    assert {"tenant_id", "canonical_account_id", "program_id", "trip_id", "document"} <= deliverable_columns
 
 
 def test_migration_round_trips_upgrade_downgrade_upgrade(tmp_path: Path):
@@ -70,6 +72,25 @@ def test_migration_round_trips_upgrade_downgrade_upgrade(tmp_path: Path):
     command.upgrade(config, "head")
     tables_after_reup = set(inspect(engine).get_table_names())
     assert tables_after_reup == tables_after_up
+
+
+def test_deliverables_migration_downgrade_one_step_removes_table(tmp_path: Path):
+    db_path = tmp_path / "deliverables_roundtrip_test.db"
+    config = _alembic_config(db_path)
+
+    command.upgrade(config, "head")
+    engine = make_engine(f"sqlite:///{db_path}")
+    assert "deliverables" in set(inspect(engine).get_table_names())
+
+    command.downgrade(config, "-1")
+    engine = make_engine(f"sqlite:///{db_path}")
+    tables_after_down_one = set(inspect(engine).get_table_names())
+    assert "deliverables" not in tables_after_down_one
+    assert "work_items" in tables_after_down_one
+
+    command.upgrade(config, "head")
+    engine = make_engine(f"sqlite:///{db_path}")
+    assert "deliverables" in set(inspect(engine).get_table_names())
 
 
 def test_assert_schema_current_passes_after_migration(tmp_path: Path):

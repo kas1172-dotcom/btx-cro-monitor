@@ -180,6 +180,67 @@ class PipelineRunResponse(BaseModel):
     config_path: str | None = None
 
 
+DeliverableType = Literal[
+    "itinerary",
+    "meeting_brief",
+    "board_deck",
+    "weekly_memo",
+    "analysis_view",
+    "outreach",
+    "sales_pitch",
+    "capabilities_assessment",
+]
+DeliverableConfidence = Literal["low", "medium", "high"]
+
+
+class DeliverableCreate(BaseModel):
+    type: DeliverableType
+    title: str = Field(min_length=1)
+    canonical_account_id: str | None = None
+    program_id: str | None = None
+    trip_id: str | None = None
+    document: dict
+
+    @model_validator(mode="after")
+    def document_matches_summary(self):
+        if self.document.get("type") and self.document.get("type") != self.type:
+            raise ValueError("document.type must match type")
+        if self.document.get("title") and self.document.get("title") != self.title:
+            raise ValueError("document.title must match title")
+        return self
+
+
+class DeliverablePatch(BaseModel):
+    type: DeliverableType | None = None
+    title: str | None = Field(default=None, min_length=1)
+    canonical_account_id: str | None = None
+    program_id: str | None = None
+    trip_id: str | None = None
+    document: dict | None = None
+
+    @model_validator(mode="after")
+    def document_matches_summary(self):
+        if self.document is None:
+            return self
+        if self.type is not None and self.document.get("type") and self.document.get("type") != self.type:
+            raise ValueError("document.type must match type")
+        if self.title is not None and self.document.get("title") and self.document.get("title") != self.title:
+            raise ValueError("document.title must match title")
+        return self
+
+
+class DeliverableResponse(BaseModel):
+    id: str
+    type: str
+    title: str
+    canonical_account_id: str | None = None
+    program_id: str | None = None
+    trip_id: str | None = None
+    document: dict
+    created_at: str
+    updated_at: str
+
+
 WorkItemType = Literal[
     "account_action",
     "research_task",
