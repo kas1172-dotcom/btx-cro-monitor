@@ -438,6 +438,101 @@ button, input, select, textarea { font: inherit; }
   font-size: 15px;
   letter-spacing: 0;
 }
+.today-brief-page {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+.today-brief-page > .quiet-view-head {
+  margin-bottom: 0;
+}
+.today-mini-brief {
+  max-width: 980px;
+  box-shadow: none;
+}
+.today-mini-brief .panel-head span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.today-brief-list {
+  display: grid;
+  gap: 8px;
+}
+.today-brief-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
+}
+.today-brief-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.today-brief-item:last-child {
+  padding-bottom: 0;
+}
+.today-brief-item div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.today-brief-item strong {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.3;
+}
+.today-brief-item p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.today-brief-item span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.today-brief-item button.accent-action {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.today-attention-strip {
+  max-width: 980px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.today-attention-strip button {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.today-attention-strip button:hover {
+  border-color: rgba(var(--accent-rgb), .55);
+  background: var(--accent-tint);
+}
+.today-attention-strip span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.today-attention-strip strong {
+  color: var(--accent-text);
+  font-size: 24px;
+  line-height: 1;
+}
+.today-brief-page > .ask-brain {
+  max-width: 980px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+}
 .surface-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -1206,7 +1301,7 @@ button, input, select, textarea { font: inherit; }
 .weekly-brief-grid strong { display: block; margin-top: 4px; }
 @media (max-width: 980px) {
   .quiet-cockpit { grid-template-columns: 52px minmax(0, 1fr) !important; }
-  .today-strip, .brain-opportunity-row, .weekly-brief-grid { grid-template-columns: 1fr; }
+  .today-strip, .today-attention-strip, .brain-opportunity-row, .weekly-brief-grid { grid-template-columns: 1fr; }
   .brain-rail { padding: 8px 6px; }
   .rail-brand { justify-content: center; min-height: 40px; margin-bottom: 4px; }
   .rail-brand span { width: 34px; height: 34px; flex-basis: 34px; font-size: 10px; }

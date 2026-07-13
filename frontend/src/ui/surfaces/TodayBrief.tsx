@@ -1,79 +1,171 @@
+import type { ReactNode } from "react";
+import { PROFILE } from "../../app/config.ts";
+import { greetingForTime } from "../../app/greeting.ts";
+import { setState } from "../../store/store.ts";
 import type { World } from "../../app/useWorld.ts";
-import { useWorkItems } from "../../app/workItems.ts";
+import { useWorkItems, type WorkItem } from "../../app/workItems.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
-import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
-import { EmptyState, ListRow, SignalCard, SurfaceHeader } from "../primitives.tsx";
+import type { Signal } from "../../engine/signals/contract.ts";
+import type { SurfaceId } from "../../app/surfaces.ts";
+import { AskBrainBar } from "../brain/AskBrainBar.tsx";
+import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
+import { WorkItemSourceNote } from "./WorkItemList.tsx";
 
-function nameOf(world: World, id: string | null): string {
+type BriefLink = {
+  label: string;
+  surface: SurfaceId;
+  accountId?: string | null;
+};
+
+type BriefItem = {
+  id: string;
+  title: ReactNode;
+  reason: string;
+  meta: string;
+  link: BriefLink;
+  seed: string;
+};
+
+function nameOf(world: World, id: string | null | undefined): string {
   if (!id) return "Portfolio";
-  return world.companies.find((company) => company.id === id)?.name ?? id;
+  return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
+}
+
+function eventLabel(value: string): string {
+  return value.replace(/_/g, " ");
+}
+
+function signalLink(signal: Signal): BriefLink {
+  if (signal.scope === "specific_account" && signal.subject_id) {
+    return { label: "Open account", surface: "accounts", accountId: signal.subject_id };
+  }
+  if (signal.scope === "program" || signal.event_type.includes("contract") || signal.event_type.includes("award")) {
+    return { label: "Open programs", surface: "programs" };
+  }
+  return { label: "Open analysis", surface: "analysis" };
+}
+
+function navigate(link: BriefLink): void {
+  // TODO(WP0): replace this surface/account state patch with unified TabId navigation.
+  setState({
+    activeSurface: link.surface,
+    activeCompanyId: link.accountId ?? null,
+    brainResponse: null,
+    activeDeliverable: null,
+    activeAnalysisSpec: null,
+  });
+}
+
+function workItemToBriefItem(world: World, item: WorkItem): BriefItem {
+  const accountName = nameOf(world, item.canonical_account_id);
+  const due = item.due_date ? `Due ${item.due_date}` : "No due date";
+  const link = item.canonical_account_id
+    ? { label: "Open account", surface: "accounts" as const, accountId: item.canonical_account_id }
+    : { label: "Open queue", surface: "work_queue" as const };
+  return {
+    id: `work-${item.id}`,
+    title: item.recommended_action,
+    reason: `${item.priority} priority; ${due.toLowerCase()}.`,
+    meta: `${accountName} - ${item.status.replace(/_/g, " ")}`,
+    link,
+    seed: `Help me act on this work item: ${item.recommended_action}. Account: ${accountName}. ${due}.`,
+  };
+}
+
+function signalToBriefItem(world: World, signal: Signal): BriefItem {
+  const accountName = signal.scope === "specific_account" ? nameOf(world, signal.subject_id) : "Portfolio";
+  const source = signalSourceName(signal);
+  const sourceDate = signalSourceDate(signal);
+  const title = signalHeadline(signal);
+  return {
+    id: `signal-${signal.id}`,
+    title,
+    reason: `${Math.round(signal.confidence * 100)}% confidence ${eventLabel(signal.event_type)} signal from ${source}.`,
+    meta: `${accountName} - ${sourceDate}`,
+    link: signalLink(signal),
+    seed: `Explain today's top signal for a CRO: ${String(title)}. Evidence: ${signal.source_quote}`,
+  };
+}
+
+function isThisWeek(value: string | null | undefined, anchor = new Date()): boolean {
+  if (!value) return false;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  const start = new Date(anchor);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 7);
+  return date >= start && date <= end;
 }
 
 export function TodayBrief({ world }: { world: World }) {
-  const changed = useWorkItems(world, "what_changed");
   const attention = useWorkItems(world, "needs_attention");
-  const prepared = useWorkItems(world, "prepared");
   const approval = useWorkItems(world, "needs_approval");
-  const outcomes = useWorkItems(world, "outcomes");
+  const selectedSignalIds = new Set(attention.items.flatMap((item) => item.source_signal_ids));
   const topSignals = [...world.analysis.valid]
-    .sort((a, b) => b.detected_at.localeCompare(a.detected_at) || b.confidence - a.confidence)
-    .slice(0, 3);
+    .filter((signal) => !selectedSignalIds.has(signal.id))
+    .sort((a, b) => b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at))
+    .slice(0, 5);
+  const miniBrief = [
+    ...attention.items.map((item) => workItemToBriefItem(world, item)),
+    ...topSignals.map((signal) => signalToBriefItem(world, signal)),
+  ].slice(0, 5);
+  const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
+  const deadlineCount = [
+    ...attention.items.map((item) => item.due_date),
+    ...world.opportunities.filter((opp) => opp.stage !== "won" && opp.stage !== "lost").map((opp) => opp.close_date),
+  ].filter((date) => isThisWeek(date)).length;
+  const topSeed = miniBrief[0]?.seed;
 
   return (
-    <section className="surface-page" data-surface-component="surface-todays-brief">
+    <section className="surface-page today-brief-page" data-surface-component="surface-todays-brief">
       <SurfaceHeader
-        eyebrow="Today's revenue brief"
-        headline={`${attention.items.length} items need attention; ${prepared.items.length} prepared artifacts are ready.`}
-        subline="External monitor signals, live account context, and queued work items in one operating brief."
+        eyebrow="Daily briefing"
+        headline={greetingForTime(new Date(), PROFILE.sender_name)}
+        subline="The highest-signal account work, approval waits, and near-term dates from the current operating world."
       />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
 
-      <div className="brief-grid">
-        <section className="surface-panel">
-          <div className="panel-head"><h2>What changed</h2></div>
-          <div className="signal-mini-list">
-            {topSignals.map((signal) => (
-              <SignalCard
-                key={signal.id}
-                title={signalHeadline(signal)}
-                scope={signal.scope}
-                source={`${nameOf(world, signal.scope === "specific_account" ? signal.subject_id : null)} · ${signalSourceName(signal)}`}
-                date={signalSourceDate(signal)}
-                body={signal.source_quote}
-                provenance={{
-                  entity: signal.entities[0] ?? nameOf(world, signal.scope === "specific_account" ? signal.subject_id : null),
-                  method: signal.relationships?.[0]?.match_method,
-                  confidence: signal.relationships?.[0]?.confidence ?? signal.confidence,
-                }}
-              />
-            ))}
-            {topSignals.length === 0 && <EmptyState headline="No validated changes" body="Monitor artifacts are available, but no signal cleared validation for this brief." icon="signal" />}
-          </div>
-        </section>
-        <section className="surface-panel">
-          <div className="panel-head"><h2>Needs attention</h2></div>
-          <WorkItemList items={attention.items.slice(0, 5)} empty="No urgent work items." world={world} />
-        </section>
-        <section className="surface-panel">
-          <div className="panel-head"><h2>Prepared</h2></div>
-          {prepared.items.slice(0, 5).map((item) => (
-            <ListRow key={item.id} name={item.recommended_action} subtitle={`${item.status} · ${nameOf(world, item.canonical_account_id)}`} />
+      <section className="surface-panel today-mini-brief" aria-labelledby="today-mini-brief-title">
+        <div className="panel-head">
+          <h2 id="today-mini-brief-title">Mini-brief</h2>
+          <span>{miniBrief.length} signals</span>
+        </div>
+        <div className="today-brief-list">
+          {miniBrief.map((item) => (
+            <article key={item.id} className="today-brief-item">
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.reason}</p>
+                <span>{item.meta}</span>
+              </div>
+              <button type="button" className="accent-action" onClick={() => navigate(item.link)}>
+                {item.link.label}<UiIcon name="chevron" />
+              </button>
+            </article>
           ))}
-          {prepared.items.length === 0 && <EmptyState headline="No prepared artifacts" body="Meeting briefs, drafts, and memos will appear here when they are ready for review." icon="document" />}
-        </section>
-        <section className="surface-panel">
-          <div className="panel-head"><h2>Needs approval</h2></div>
-          <WorkItemList items={approval.items.slice(0, 5)} empty="No approvals pending." world={world} />
-        </section>
-        <section className="surface-panel">
-          <div className="panel-head"><h2>Outcomes</h2></div>
-          <WorkItemList items={outcomes.items.slice(0, 5)} empty="No recent outcomes yet." world={world} />
-        </section>
-        <section className="surface-panel">
-          <div className="panel-head"><h2>Queue snapshot</h2></div>
-          <WorkItemList items={changed.items.slice(0, 5)} empty="No source-backed work items." world={world} />
-        </section>
-      </div>
+          {miniBrief.length === 0 && (
+            <EmptyState headline="No briefing items" body="Validated signals and urgent work items will appear here after the monitor finds actionable evidence." icon="signal" />
+          )}
+        </div>
+      </section>
+
+      <section className="today-attention-strip" aria-label="Attention counters">
+        <button type="button" onClick={() => navigate({ label: "Open accounts", surface: "accounts" })}>
+          <span>Accounts needing attention</span>
+          <strong>{accountsNeedingAttention}</strong>
+        </button>
+        <button type="button" onClick={() => navigate({ label: "Open queue", surface: "work_queue" })}>
+          <span>Deliverables awaiting approval</span>
+          <strong>{approval.items.length}</strong>
+        </button>
+        <button type="button" onClick={() => navigate({ label: "Open programs", surface: "programs" })}>
+          <span>Deadlines this week</span>
+          <strong>{deadlineCount}</strong>
+        </button>
+      </section>
+
+      <AskBrainBar world={world} seedPrompt={topSeed} />
     </section>
   );
 }

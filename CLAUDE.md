@@ -155,6 +155,8 @@ Avoid vague or unexplained labels such as:
 
 If a term like “derisk” is used, make sure the UI explains exactly what it means.
 
+This does not mean every ranking, signal, or score must display its full reasoning inline, by default, in every list row or card. Default/scanning views (lists, feeds, map pins, rails) should stay compact: a rank position, a short label, and a lightweight confidence indicator (a small chip or dot, not a paragraph) are enough. The full why-it-ranks-highly explanation, evidence, and confidence detail should be one click away behind a clear drill-down (for example, "Why this ranks here"), not force-displayed before the user asks for it. Never make the reasoning unavailable, but never make the user read it before they've chosen to. When reviewing or planning UI, prioritize a clean, scannable default view; treat full explanations as progressive disclosure, not default clutter.
+
 ---
 
 ### 4. Make the map actionable
@@ -399,7 +401,7 @@ Default assumptions:
 * Optimize for BTX and Jamie first.
 * Prioritize CRO usefulness over generic abstraction.
 * Keep current business and prospecting conceptually separate.
-* Make rankings and signals explainable.
+* Make rankings and signals explainable, but only on demand — keep default/scanning views compact and let the user drill down for the full reasoning.
 * Make ChatPill context-aware.
 * Keep the UI clean, readable, and demo-ready.
 * Preserve a path toward future API-driven behavior.

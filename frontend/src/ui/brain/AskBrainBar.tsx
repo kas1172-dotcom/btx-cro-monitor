@@ -40,9 +40,9 @@ const INITIAL_STAGES: WorkStage[] = [
   { id: "composing", label: "Composing the answer", status: "pending" },
 ];
 
-export function AskBrainBar({ world, large = false }: { world: World; large?: boolean }) {
+export function AskBrainBar({ world, large = false, seedPrompt }: { world: World; large?: boolean; seedPrompt?: string }) {
   const { askDraftPrompt } = useStore();
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(seedPrompt ?? "");
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [workingQuestion, setWorkingQuestion] = useState<string | null>(null);
@@ -70,8 +70,12 @@ export function AskBrainBar({ world, large = false }: { world: World; large?: bo
   }, [pendingAction]);
 
   useEffect(() => {
-    setQuestion(askDraftPrompt);
+    if (askDraftPrompt) setQuestion(askDraftPrompt);
   }, [askDraftPrompt]);
+
+  useEffect(() => {
+    if (!askDraftPrompt && !question && seedPrompt) setQuestion(seedPrompt);
+  }, [askDraftPrompt, question, seedPrompt]);
 
   function updateStage(id: string, patch: Partial<WorkStage>) {
     setWorkingStages((stages) => stages.map((stage) => stage.id === id ? { ...stage, ...patch } : stage));
