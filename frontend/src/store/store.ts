@@ -27,6 +27,7 @@ export interface UiState {
   activeBrainArea: BrainArea;
   brainResponse: BrainResponse | null;
   activeDeliverable: Deliverable | null;
+  activeDeliverableOrigin: "generation" | "library" | null;
   activeAnalysisSpec: ChartSpec | null;
   askDraftPrompt: string;
   tourRequested: boolean;
@@ -56,6 +57,7 @@ let state: UiState = {
   activeBrainArea: "revenue",
   brainResponse: null,
   activeDeliverable: null,
+  activeDeliverableOrigin: null,
   activeAnalysisSpec: null,
   askDraftPrompt: "",
   tourRequested: false,
@@ -64,6 +66,11 @@ const listeners = new Set<() => void>();
 
 export function setState(patch: Partial<UiState>): void {
   const nextPatch = { ...patch };
+  if (patch.activeDeliverable !== undefined) {
+    nextPatch.activeDeliverableOrigin = patch.activeDeliverable
+      ? (patch.activeDeliverableOrigin ?? "generation")
+      : null;
+  }
   if (patch.activeBrainArea !== undefined && patch.activeHome === undefined) {
     nextPatch.activeHome = false;
   }
@@ -141,6 +148,10 @@ export function goHome(): void {
 }
 
 export function closeDeliverable(): void {
+  if (state.activeDeliverableOrigin === "library") {
+    setState({ activeDeliverable: null, activeSurface: "deliverables", activeHome: false, activeSettings: false });
+    return;
+  }
   setState({ activeDeliverable: null });
 }
 
@@ -159,6 +170,7 @@ export function resetUiState(): void {
     activeBrainArea: "revenue",
     brainResponse: null,
     activeDeliverable: null,
+    activeDeliverableOrigin: null,
     activeAnalysisSpec: null,
     askDraftPrompt: "",
     tourRequested: false,

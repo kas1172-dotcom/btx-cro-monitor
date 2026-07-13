@@ -4,7 +4,7 @@ import type { BrainArea } from "../brain/types.ts";
 
 export type CoreSurface = "brief" | "work_queue" | "accounts" | "ask";
 export type AnalyticalSurface = "map" | "analysis" | "capacity" | "programs";
-export type UtilitySurface = "settings";
+export type UtilitySurface = "deliverables" | "settings";
 export type SurfaceId = CoreSurface | AnalyticalSurface | UtilitySurface;
 
 export interface SurfaceSpec {
@@ -30,6 +30,7 @@ export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
 ];
 
 export const UTILITY_SURFACES: SurfaceSpec[] = [
+  { id: "deliverables", label: "Deliverable Editor", group: "utility", componentId: "surface-deliverable-library", title: "Browse, preview, edit, download, and send saved deliverables." },
   { id: "settings", label: "Settings", group: "utility", componentId: "surface-settings", title: "Memory, source admin, configuration, integrations, and engine tuning." },
 ];
 
@@ -60,6 +61,8 @@ export function brainAreaForSurface(surface: SurfaceId): BrainArea {
       return "capability";
     case "settings":
       return "decision";
+    case "deliverables":
+      return "workflow";
     case "work_queue":
       return "workflow";
     case "analysis":
@@ -95,6 +98,8 @@ export function countForSurface(surface: SurfaceId, world: World | null, memory:
       return world.analysis.valid.filter((signal) =>
         signal.event_type.includes("contract") || signal.event_type.includes("award") || signal.scope === "program"
       ).length;
+    case "deliverables":
+      return memory?.deliverables.length;
     case "settings":
       return memory ? memory.activity.length + memory.notes.length : undefined;
   }

@@ -8,6 +8,7 @@ import { deliverableToMarkdown } from "../../deliverables/markdown.ts";
 import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
+import { hasDeliverablesBackend, recordToDeliverable, saveDeliverableRecord } from "../../app/deliverablesApi.ts";
 import { requestSectionRevision } from "../../deliverables/editorAssistant.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
@@ -44,10 +45,11 @@ function editableSections(sections: DeliverableSection[]): DeliverableSection[] 
   }));
 }
 
-export function DocumentViewer({ deliverable, world }: { deliverable: Deliverable; world?: World }) {
+export function DocumentViewer({ deliverable, world, openedFrom = "generation" }: { deliverable: Deliverable; world?: World; openedFrom?: "generation" | "library" }) {
   const [sections, setSections] = useState(() => editableSections(deliverable.sections));
   const [title, setTitle] = useState(deliverable.title);
   const [dirty, setDirty] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [assistantInput, setAssistantInput] = useState("");
   const [suggestions, setSuggestions] = useState<Array<{ id: string; sectionId: string; text: string; warning?: string }>>([]);
@@ -59,6 +61,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
     setSections(editableSections(deliverable.sections));
     setTitle(deliverable.title);
     setDirty(false);
+    setSaveStatus("");
     setSuggestions([]);
     setMenuOpen(false);
   }, [deliverable.id, deliverable.sections]);
@@ -76,12 +79,12 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
   function closeEditor() {
     if (dirty) {
       const choice = window.confirm("Save changes before closing?");
-      if (choice) saveCurrent();
+      if (choice) void saveCurrent();
     }
     closeDeliverable();
   }
 
-  function saveCurrent() {
+  async function saveCurrent() {
     const saved: Deliverable = {
       ...current,
       sources: [
@@ -89,9 +92,21 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
         { source: "user edits", records: [current.id], reason: `Edited by user, ${new Date().toISOString()}` },
       ],
     };
-    saveDeliverable(saved);
-    setState({ activeDeliverable: saved });
-    setDirty(false);
+    const localSaved = saveDeliverable(saved);
+    setState({ activeDeliverable: localSaved, activeDeliverableOrigin: openedFrom === "library" ? "library" : "generation" });
+    setSaveStatus("Saved locally.");
+    try {
+      if (hasDeliverablesBackend()) {
+        const record = await saveDeliverableRecord(localSaved);
+        const persisted = recordToDeliverable(record);
+        saveDeliverable(persisted);
+        setState({ activeDeliverable: persisted, activeDeliverableOrigin: openedFrom === "library" ? "library" : "generation" });
+        setSaveStatus("Saved to program memory.");
+      }
+      setDirty(false);
+    } catch (error) {
+      setSaveStatus(error instanceof Error ? `Saved locally; backend save failed: ${error.message}` : "Saved locally; backend save failed.");
+    }
   }
 
   function copyMarkdown() {
@@ -206,6 +221,13 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
   }
 
   const formats = DELIVERABLE_DOWNLOAD_FORMATS[deliverable.type];
+  const accountId = current.canonicalAccountId ?? current.entityIds[0] ?? null;
+  const sourceAccount = accountId ? world?.companies.find((company) => company.id === accountId) : undefined;
+  const sourceTrace = sourceAccount
+    ? { label: `Generated from: ${sourceAccount.name}`, surface: "accounts" as const, companyId: sourceAccount.id }
+    : current.tripId
+      ? { label: `Generated from: ${current.tripId}`, surface: "map" as const, companyId: null }
+      : null;
 
   return (
     <div className="editor-overlay" role="dialog" aria-modal="true">
@@ -215,10 +237,25 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
           <p className="eyebrow">Deliverable</p>
           <input className="document-title-input" value={title} onChange={(event) => { setTitle(event.target.value); setDirty(true); }} />
           <span title={deliverable.confidenceReason}>{deliverable.audience ?? "Internal"} · {(deliverable.form ?? deliverable.type).replace(/_/g, " ")} · {deliverable.confidence} confidence{dirty ? " · edited" : ""}</span>
+          {sourceTrace && (
+            <button
+              className="document-source-trace"
+              onClick={() => setState({
+                activeDeliverable: null,
+                activeSurface: sourceTrace.surface,
+                activeCompanyId: sourceTrace.companyId,
+                activeHome: false,
+                activeSettings: false,
+              })}
+            >
+              {sourceTrace.label}
+            </button>
+          )}
+          {saveStatus && <span className="document-save-status">{saveStatus}</span>}
         </div>
         <div className="document-actions">
-          <button onClick={closeEditor} aria-label="Close editor">×</button>
-          <button onClick={saveCurrent}>Save to Library</button>
+          <button onClick={closeEditor} aria-label={openedFrom === "library" ? "Back to library" : "Close editor"}>{openedFrom === "library" ? "Back" : "×"}</button>
+          <button onClick={() => void saveCurrent()}>Save to Library</button>
           <button onClick={copyMarkdown}>Copy</button>
           <div className="download-menu">
             <button onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen}>Download</button>
@@ -281,7 +318,13 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
             {section.blocks.map((block, index) => {
             if (block.kind === "text") {
               return (
-                <p key={`${section.id}-${index}`} className="document-text-block">{block.text}</p>
+                <textarea
+                  key={`${section.id}-${index}`}
+                  className="document-text-block document-text-editor"
+                  value={block.text}
+                  onChange={(event) => updateText(section.id, index, event.target.value)}
+                  aria-label={`${section.heading} text`}
+                />
               );
             }
             if (block.kind === "table") {

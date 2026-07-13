@@ -18,6 +18,7 @@ import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
 import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
 import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
+import { DeliverableLibrary } from "./ui/surfaces/DeliverableLibrary.tsx";
 import { ALL_SURFACES, countForSurface, type SurfaceId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
@@ -32,7 +33,7 @@ function formatRunDate(value: string | null | undefined): string {
 }
 
 export function App() {
-  const { city, activeHome, activeSettings, activeSurface, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
+  const { city, activeHome, activeSettings, activeSurface, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested } = useStore();
   const [workItemStatus, setWorkItemStatus] = useState("");
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
@@ -72,7 +73,7 @@ export function App() {
     if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
     if (activeDeliverable) return (
       <Suspense fallback={<div className="loading">loading deliverable…</div>}>
-        <DocumentViewer deliverable={activeDeliverable} world={world} />
+        <DocumentViewer deliverable={activeDeliverable} world={world} openedFrom={activeDeliverableOrigin ?? "generation"} />
       </Suspense>
     );
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
@@ -89,12 +90,13 @@ export function App() {
       case "analysis": return <AnalysisDashboard world={world} />;
       case "capacity": return <CapacityAssessment world={world} />;
       case "programs": return <ProgramContractTracker world={world} />;
+      case "deliverables": return <DeliverableLibrary world={world} />;
       case "settings": return <SettingsWorkspace />;
       default: return <TodayBrief world={world} />;
     }
   };
   const counts = Object.fromEntries(
-    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
+    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "deliverables", "settings"] as SurfaceId[])
       .map((surface) => [surface, countForSurface(surface, world, memory)]),
   ) as Partial<Record<SurfaceId, number>>;
 

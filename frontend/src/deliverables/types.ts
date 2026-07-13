@@ -42,11 +42,15 @@ export interface DeliverableAction {
 
 export interface Deliverable {
   id: string;
+  backendRecordId?: string;
   type: DeliverableType;
   title: string;
   createdAt: string;
   brainArea: BrainArea;
   entityIds: string[];
+  canonicalAccountId?: string | null;
+  programId?: string | null;
+  tripId?: string | null;
   sections: DeliverableSection[];
   sources: ProvenanceEntry[];
   confidence: "low" | "medium" | "high";
