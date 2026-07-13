@@ -346,6 +346,31 @@ button, input, select, textarea { font: inherit; }
 .prov-crm { color: var(--good); border-color: rgba(var(--success-rgb), .45); background: rgba(var(--success-rgb), .08); }
 .prov-monitor { color: var(--accent); border-color: rgba(var(--accent-rgb), .45); background: rgba(var(--accent-rgb), .08); }
 .prov-demo { color: var(--warn); border-color: rgba(var(--warning-rgb), .45); background: rgba(var(--warning-rgb), .08); }
+
+/* Confidence gradient: how sure we are an account link is real, distinct from
+   provenance-badge's "where did this come from". Solid/full-opacity/teal for
+   a verified relationship-backed link; dashed/muted for unlinked or weak.
+   Transparent wrapper by default - it overrides the border of whatever
+   bordered element (e.g. .signal-card) it wraps, rather than stacking a
+   second border around it. */
+.confidence-edge { display: contents; }
+.confidence-edge > .signal-card { transition: border-color .15s ease, opacity .15s ease; }
+.confidence-verified > .signal-card { border-color: var(--accent); opacity: 1; }
+.confidence-confident > .signal-card { border-color: rgba(var(--accent-rgb), .7); opacity: .92; }
+.confidence-weak > .signal-card { border-style: dashed; border-color: var(--muted); opacity: .74; }
+
+/* Account health status ring, derived from the risk-dimension score. */
+.account-token {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; font-weight: var(--font-semibold); color: var(--text);
+  background: var(--panel-2); flex: 0 0 auto; line-height: 1;
+}
+.account-token-sm { width: 22px; height: 22px; font-size: 9px; }
+.account-token-md { width: 30px; height: 30px; font-size: 11px; }
+.account-token-growing { box-shadow: 0 0 0 2px var(--good); }
+.account-token-at-risk { box-shadow: 0 0 0 2px var(--warn); }
+.account-token-churned { box-shadow: 0 0 0 2px var(--bad); }
+
 .card-badge-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .live-inline-status {
   width: fit-content;
@@ -812,6 +837,8 @@ button, input, select, textarea { font: inherit; }
   border-color: var(--accent);
   background: var(--panel-2);
 }
+.account360-list button.account360-list-row { display: flex; align-items: center; gap: 10px; }
+.account360-list-row-main { display: grid; gap: 4px; min-width: 0; }
 .account360-list span, .account360-list em {
   color: var(--muted);
   font-size: 12px;
@@ -1337,7 +1364,7 @@ button, input, select, textarea { font: inherit; }
 }
 .brand { flex: 0 0 auto; font-weight: var(--font-semibold); letter-spacing: .3px; }
 .brand-mark { color: var(--accent); }
-.brand-sub { color: var(--muted); font-weight: 400; margin-left: 4px; }
+.brand-sub { color: var(--muted); font-weight: var(--font-regular); margin-left: 4px; }
 .demo-banner {
   color: var(--warn);
   border: 1px solid rgba(var(--warning-rgb), .45);
@@ -1690,6 +1717,7 @@ button, input, select, textarea { font: inherit; }
   color: var(--text); border-radius: 8px; padding: 11px; cursor: pointer; flex: 0 0 auto;
 }
 .map-prospect:hover, .map-prospect.active { border-color: var(--accent); background: rgba(var(--card-rgb), .96); }
+.map-prospect-rank { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 0 0 auto; }
 .map-prospect-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .map-prospect-main em, .map-prospect-main small { color: var(--muted); font-style: normal; font-size: 12px; line-height: 1.3; }
 .map-prospect-main strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 14px; }
@@ -1898,7 +1926,7 @@ button, input, select, textarea { font: inherit; }
 }
 .copilot-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); font-weight: var(--font-semibold); }
 .copilot-head > span { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.copilot-head small { color: var(--muted); font-size: 11px; font-weight: 400; }
+.copilot-head small { color: var(--muted); font-size: 11px; font-weight: var(--font-regular); }
 .copilot-controls { display: flex; align-items: center; gap: 4px; }
 .copilot-head button {
   width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
@@ -2564,6 +2592,17 @@ button, input, select, textarea { font: inherit; }
     grid-template-columns: 1fr;
   }
 }
+/* ============================================================================
+ * STEEL & SIGNAL DOCUMENT THEME — deliberate exception, see design.md.
+ * This block (and every .ss-* rule below it) styles EXPORTED DELIVERABLE
+ * DOCUMENTS ONLY (decks, PDFs, PPTX, the retention/earnings heat map render
+ * in frontend/src/deliverables/steelSignalTemplates.tsx) — a separate,
+ * intentionally light-mode print theme for a different artifact class than
+ * the cockpit app. It is excluded from the raw-hex guard
+ * (frontend/tools/check-design-tokens.ts) and from the cockpit retrofit.
+ * Do not consolidate with the cockpit tokens above without a deliberate,
+ * separate decision.
+ * ==========================================================================*/
 :root {
   --ss-navy: #12263A;
   --ss-teal: #2FB6A8;

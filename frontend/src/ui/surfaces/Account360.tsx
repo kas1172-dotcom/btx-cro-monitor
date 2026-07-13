@@ -8,6 +8,7 @@ import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/si
 import { WorkItemList } from "./WorkItemList.tsx";
 import { deriveWorkItems } from "../../app/workItems.ts";
 import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
+import { AccountToken } from "../common/AccountToken.tsx";
 
 function money(value: number): string {
   return value >= 1_000_000 ? `$${(value / 1_000_000).toFixed(1)}M` : `$${Math.round(value / 1000)}k`;
@@ -72,10 +73,13 @@ export function Account360({ world }: { world: World }) {
       <div className="account360-layout">
         <aside className="account360-list">
           {accountRows.map((row) => (
-            <button key={row.company.id} className={row.company.id === company.id ? "active" : ""} onClick={() => setSelectedId(row.company.id)}>
-              <strong>{row.company.name}</strong>
-              <span>opp {row.score?.dimensions.opportunity.score ?? 0} · risk {row.score?.dimensions.risk.score ?? 0}</span>
-              <em>{row.linkedSignals.length} linked signal{row.linkedSignals.length === 1 ? "" : "s"} · {money(row.openPipeline)} open</em>
+            <button key={row.company.id} className={row.company.id === company.id ? "active account360-list-row" : "account360-list-row"} onClick={() => setSelectedId(row.company.id)}>
+              <AccountToken name={row.company.name} riskScore={row.score?.dimensions.risk.score} size="sm" />
+              <span className="account360-list-row-main">
+                <strong>{row.company.name}</strong>
+                <span>opp {row.score?.dimensions.opportunity.score ?? 0} · risk {row.score?.dimensions.risk.score ?? 0}</span>
+                <em>{row.linkedSignals.length} linked signal{row.linkedSignals.length === 1 ? "" : "s"} · {money(row.openPipeline)} open</em>
+              </span>
             </button>
           ))}
         </aside>

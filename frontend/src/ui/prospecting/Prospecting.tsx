@@ -11,6 +11,7 @@ import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
+import { EmptyState } from "../primitives.tsx";
 
 const PROSPECT_STATUSES = new Set<AccountStatus>(["target_prospect", "new_logo"]);
 const PROSPECT_MOTIONS = new Set<BusinessMotion>(["prospect_new_business"]);
@@ -252,6 +253,9 @@ export function Prospecting({ world }: { world: World }) {
               </span>
             </button>
           ))}
+          {topProspects.length === 0 && (
+            <EmptyState headline="No new prospects" body="No accounts currently match the prospecting filters for this market." icon="accounts" />
+          )}
         </div>
 
         <div className="current-panel">
