@@ -129,7 +129,7 @@ export function TodayBrief({ world }: { world: World }) {
       <section className="surface-panel today-mini-brief" aria-labelledby="today-mini-brief-title">
         <div className="panel-head">
           <h2 id="today-mini-brief-title">Mini-brief</h2>
-          <span>{miniBrief.length} signals</span>
+          <span>{miniBrief.length} item{miniBrief.length === 1 ? "" : "s"}</span>
         </div>
         <div className="today-brief-list">
           {miniBrief.map((item) => (
