@@ -15,6 +15,12 @@ TIMEOUT_SECONDS = 10.0
 ObjectType = Literal["companies", "contacts", "deals"]
 AssociationType = Literal["companies", "contacts", "deals"]
 TaskAssociationType = Literal["companies", "contacts", "deals"]
+ListObjectType = Literal["company", "contact"]
+
+LIST_OBJECT_TYPE_IDS: dict[ListObjectType, str] = {
+    "contact": "0-1",
+    "company": "0-2",
+}
 
 
 class HubSpotError(RuntimeError):
@@ -91,6 +97,9 @@ class HubSpotClient:
 
     def _post(self, path: str, *, json: dict[str, Any]) -> dict[str, Any]:
         return self._request("POST", f"{self.base_url}{path}", json=json)
+
+    def _put(self, path: str, *, json: Any) -> dict[str, Any]:
+        return self._request("PUT", f"{self.base_url}{path}", json=json)
 
     def list_objects(self, object_type: ObjectType, properties: Iterable[str]) -> list[HubSpotObject]:
         records: list[HubSpotObject] = []
@@ -256,6 +265,70 @@ class HubSpotClient:
             f"/crm/v3/objects/tasks/{task_id}",
             params={"properties": "hs_task_subject,hs_task_body,hs_timestamp,hs_task_status,hubspot_owner_id"},
         )
+
+    def search_companies(self, query: str, *, limit: int = 10) -> list[HubSpotObject]:
+        payload = self._post(
+            "/crm/objects/2026-03/companies/search",
+            json={
+                "query": query,
+                "limit": max(1, min(limit, 100)),
+                "properties": [
+                    "name",
+                    "domain",
+                    "website",
+                    "city",
+                    "state",
+                    "address",
+                    "zip",
+                    "country",
+                    "description",
+                    "industry",
+                    "hubspot_owner_id",
+                    "btx_needs",
+                    "btx_aliases",
+                    "btx_facility_names",
+                    "btx_parent_id",
+                    "btx_subsidiary_ids",
+                    "btx_cage_code",
+                    "btx_uei",
+                    "btx_known_programs",
+                    "btx_known_customers",
+                ],
+            },
+        )
+        return [
+            HubSpotObject(id=str(item["id"]), properties=item.get("properties") or {})
+            for item in payload.get("results", [])
+        ]
+
+    def create_list(self, name: str, list_type: ListObjectType) -> str:
+        payload = self._post(
+            "/crm/lists/2026-03",
+            json={
+                "name": name,
+                "objectTypeId": LIST_OBJECT_TYPE_IDS[list_type],
+                "processingType": "MANUAL",
+            },
+        )
+        list_id = payload.get("listId") or payload.get("id")
+        if not list_id:
+            raise HubSpotError(
+                method="POST",
+                url=f"{self.base_url}/crm/lists/2026-03",
+                status_code=502,
+                body="HubSpot returned no listId",
+            )
+        return str(list_id)
+
+    def get_list(self, list_id: str) -> dict[str, Any]:
+        return self._get(f"/crm/lists/2026-03/{list_id}")
+
+    def add_records_to_list(self, list_id: str, record_ids: list[str]) -> dict[str, Any]:
+        return self._put(f"/crm/lists/2026-03/{list_id}/memberships/add", json=[str(item) for item in record_ids])
+
+    def get_list_memberships(self, list_id: str) -> list[str]:
+        payload = self._get(f"/crm/lists/2026-03/{list_id}/memberships")
+        return [str(item.get("recordId")) for item in payload.get("results", []) if item.get("recordId") is not None]
 
 
 def _clean(value: Any) -> str | None:

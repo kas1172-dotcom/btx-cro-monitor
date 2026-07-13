@@ -15,6 +15,7 @@
     "test:rail": "tsx tools/test-rail-tabs.ts",
     "test:settings": "tsx tools/test-settings-shell.ts",
     "test:deliverables": "tsx tools/test-deliverable-templates.tsx",
+    "test:hubspot-viewer": "tsx tools/test-hubspot-viewer.ts",
     "test:phase0": "tsx tools/test-phase0-safe-honest.ts",
     "test:identity": "tsx tools/test-canonical-identity.ts",
     "test:map": "tsx tools/test-map.ts",

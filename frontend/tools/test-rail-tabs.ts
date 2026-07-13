@@ -62,7 +62,7 @@ const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId))
 
 assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
 assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "map,analysis,capacity,programs", "Secondary nav must contain the analytical surfaces.");
-assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "settings", "Utility nav must only expose Settings.");
+assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "hubspot,settings", "Utility nav must expose HubSpot and Settings.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
 assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
 

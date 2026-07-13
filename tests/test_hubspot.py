@@ -130,6 +130,55 @@ def test_hubspot_create_task_payload_includes_associations(monkeypatch):
     }
 
 
+def test_hubspot_search_companies_uses_date_versioned_search(monkeypatch):
+    FakeHttpxClient.calls = []
+    FakeHttpxClient.responses = [
+        httpx.Response(200, json={"results": [{"id": "10", "properties": {"name": "Trinity Defense", "domain": "trinity.example"}}]}),
+    ]
+    monkeypatch.setattr("btx_platform.hubspot.httpx.Client", FakeHttpxClient)
+
+    records = HubSpotClient("token").search_companies("Trinity", limit=7)
+
+    assert records[0].id == "10"
+    method, url, kwargs = FakeHttpxClient.calls[0]
+    assert method == "POST"
+    assert url.endswith("/crm/objects/2026-03/companies/search")
+    assert kwargs["json"]["query"] == "Trinity"
+    assert kwargs["json"]["limit"] == 7
+    assert "btx_known_programs" in kwargs["json"]["properties"]
+
+
+def test_hubspot_create_list_and_add_memberships(monkeypatch):
+    FakeHttpxClient.calls = []
+    FakeHttpxClient.responses = [
+        httpx.Response(200, json={"listId": "55"}),
+        httpx.Response(200, json={"id": "55", "name": "BTX clients"}),
+        httpx.Response(200, json={"updated": True}),
+        httpx.Response(200, json={"results": [{"recordId": "10"}, {"recordId": "11"}]}),
+    ]
+    monkeypatch.setattr("btx_platform.hubspot.httpx.Client", FakeHttpxClient)
+
+    client = HubSpotClient("token")
+    list_id = client.create_list("BTX clients", "company")
+    verified = client.get_list(list_id)
+    client.add_records_to_list(list_id, ["10", "11"])
+    memberships = client.get_list_memberships(list_id)
+
+    assert list_id == "55"
+    assert verified["name"] == "BTX clients"
+    assert memberships == ["10", "11"]
+    assert FakeHttpxClient.calls[0][0] == "POST"
+    assert FakeHttpxClient.calls[0][1].endswith("/crm/lists/2026-03")
+    assert FakeHttpxClient.calls[0][2]["json"] == {
+        "name": "BTX clients",
+        "objectTypeId": "0-2",
+        "processingType": "MANUAL",
+    }
+    assert FakeHttpxClient.calls[2][0] == "PUT"
+    assert FakeHttpxClient.calls[2][1].endswith("/crm/lists/2026-03/55/memberships/add")
+    assert FakeHttpxClient.calls[2][2]["json"] == ["10", "11"]
+
+
 def test_hubspot_mappers_emit_frontend_shapes():
     owners = {"7": HubSpotOwner(id="7", name="Riley Owner", email="riley@example.com")}
     companies = map_companies(
@@ -362,6 +411,113 @@ def test_crm_task_route_maps_hubspot_errors_to_502(monkeypatch, tmp_path: Path):
     assert "bad association" in response.json()["detail"]
     with sf() as session:
         assert session.query(models.HubSpotTaskAudit).count() == 0
+
+
+def test_crm_company_search_route_maps_results(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+
+    class FakeHubSpotClient:
+        def __init__(self, token: str):
+            assert token == "hubspot-token"
+
+        def search_companies(self, query: str, *, limit: int = 10):
+            assert query == "Trinity"
+            assert limit == 5
+            return [HubSpotObject(id="10", properties={"name": "Trinity Defense", "city": "Pittsburgh"})]
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+
+    response = client.post("/crm/company-search", headers=_headers(), json={"query": "Trinity", "limit": 5})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_provenance"] == "HubSpot"
+    assert body["records"][0]["id"] == "hubspot-company-10"
+    assert body["records"][0]["name"] == "Trinity Defense"
+
+
+def test_crm_list_routes_create_add_verify_and_dedupe(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+    calls: list[tuple[str, dict]] = []
+
+    class FakeHubSpotClient:
+        def __init__(self, token: str):
+            assert token == "hubspot-token"
+
+        def create_list(self, name: str, list_type: str):
+            calls.append(("create", {"name": name, "list_type": list_type}))
+            return "list-123"
+
+        def get_list(self, list_id: str):
+            calls.append(("get_list", {"list_id": list_id}))
+            return {"id": list_id, "name": "BTX client list"}
+
+        def add_records_to_list(self, list_id: str, record_ids: list[str]):
+            calls.append(("add", {"list_id": list_id, "record_ids": record_ids}))
+            return {}
+
+        def get_list_memberships(self, list_id: str):
+            calls.append(("memberships", {"list_id": list_id}))
+            return ["10", "11"]
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+    headers = {**_headers(), "X-Idempotency-Key": "client-list-1"}
+
+    created = client.post("/crm/lists", headers=headers, json={"name": "BTX client list", "list_type": "company"})
+    retry = client.post("/crm/lists", headers=headers, json={"name": "BTX client list", "list_type": "company"})
+    added = client.put(
+        "/crm/lists/list-123/records",
+        headers=_headers(),
+        json={"list_type": "company", "record_ids": ["hubspot-company-10", "hubspot-company-11"]},
+    )
+
+    assert created.status_code == 200
+    assert retry.status_code == 200
+    assert retry.json()["duplicate"] is True
+    assert added.status_code == 200
+    assert added.json()["list"]["record_ids"] == ["10", "11"]
+    assert [call[0] for call in calls] == ["create", "get_list", "add", "memberships"]
+
+
+def test_crm_list_add_requires_readback_membership(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+
+    class FakeHubSpotClient:
+        def __init__(self, _token: str):
+            pass
+
+        def add_records_to_list(self, _list_id: str, _record_ids: list[str]):
+            return {}
+
+        def get_list_memberships(self, _list_id: str):
+            return ["10"]
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+
+    response = client.put(
+        "/crm/lists/list-123/records",
+        headers=_headers(),
+        json={"list_type": "company", "record_ids": ["hubspot-company-10", "hubspot-company-11"]},
+    )
+
+    assert response.status_code == 502
+    assert response.json()["code"] == "hubspot_error"
+    assert "missing records" in response.json()["detail"]
 
 
 def _create_proposed_work_item(client: TestClient, *, account_id: str = "hubspot-company-10") -> dict:

@@ -81,6 +81,21 @@ class HubSpotTaskExecuteRequest(BaseModel):
     due_at: str | None = None
 
 
+class HubSpotCompanySearchRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=200)
+    limit: int = Field(default=10, ge=1, le=100)
+
+
+class HubSpotListCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=250)
+    list_type: Literal["company", "contact"]
+
+
+class HubSpotListAddRecordsRequest(BaseModel):
+    list_type: Literal["company", "contact"]
+    record_ids: list[str] = Field(min_length=1, max_length=1000)
+
+
 class EmailSendRequest(BaseModel):
     to: str
     subject: str

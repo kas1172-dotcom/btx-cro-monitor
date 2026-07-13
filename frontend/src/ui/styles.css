@@ -2179,6 +2179,127 @@ button, input, select, textarea { font: inherit; }
   display: grid; place-items: center; border-radius: 999px; border: 2px solid var(--text-primary);
   color: var(--page); font-weight: var(--font-semibold); font-size: 12px; box-shadow: 0 4px 12px rgba(var(--page-rgb), .28);
 }
+
+.hubspot-viewer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.hubspot-viewer h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.hubspot-viewer .surface-panel > p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.hubspot-mini-list,
+.hubspot-stage-list,
+.hubspot-select-list {
+  display: grid;
+  gap: 8px;
+}
+.hubspot-mini-list article,
+.hubspot-stage-list div,
+.hubspot-select-list label {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  padding: 10px;
+}
+.hubspot-mini-list article span,
+.hubspot-list-controls span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.hubspot-mini-list article strong,
+.hubspot-stage-list strong,
+.hubspot-select-list strong {
+  color: var(--text);
+  font-size: 14px;
+}
+.hubspot-mini-list article em,
+.hubspot-stage-list em,
+.hubspot-select-list em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+.hubspot-mini-list article button,
+.hubspot-lookup-panel form button,
+.hubspot-create-list {
+  width: fit-content;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+}
+.hubspot-mini-list article button:hover,
+.hubspot-lookup-panel form button:hover,
+.hubspot-create-list:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.hubspot-stage-list div {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+.hubspot-stage-list span {
+  color: var(--text);
+  text-transform: capitalize;
+}
+.hubspot-lookup-panel form,
+.hubspot-list-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.hubspot-lookup-panel input,
+.hubspot-list-controls input,
+.hubspot-list-controls select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 9px 10px;
+}
+.hubspot-list-controls label {
+  display: grid;
+  gap: 6px;
+}
+.hubspot-select-list {
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.hubspot-select-list label {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+.hubspot-select-list input {
+  width: 18px;
+  height: 18px;
+}
+.hubspot-create-list {
+  margin-top: 12px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--page);
+}
+.hubspot-create-list:disabled {
+  opacity: .6;
+  cursor: wait;
+}
 .itinerary-pin span { display: grid; place-items: center; width: 100%; height: 100%; }
 .itinerary-pin-day-1 { background: var(--accent); }
 .itinerary-pin-day-2 { background: var(--success); }

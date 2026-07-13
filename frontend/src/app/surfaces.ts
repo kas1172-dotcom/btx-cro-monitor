@@ -4,7 +4,7 @@ import type { BrainArea } from "../brain/types.ts";
 
 export type CoreSurface = "brief" | "work_queue" | "accounts" | "ask";
 export type AnalyticalSurface = "map" | "analysis" | "capacity" | "programs";
-export type UtilitySurface = "settings";
+export type UtilitySurface = "hubspot" | "settings";
 export type SurfaceId = CoreSurface | AnalyticalSurface | UtilitySurface;
 
 export interface SurfaceSpec {
@@ -30,6 +30,7 @@ export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
 ];
 
 export const UTILITY_SURFACES: SurfaceSpec[] = [
+  { id: "hubspot", label: "HubSpot", group: "utility", componentId: "surface-hubspot-viewer", title: "Curated HubSpot activity, pipeline, lookup, and client list creation." },
   { id: "settings", label: "Settings", group: "utility", componentId: "surface-settings", title: "Memory, source admin, configuration, integrations, and engine tuning." },
 ];
 
@@ -59,6 +60,7 @@ export function brainAreaForSurface(surface: SurfaceId): BrainArea {
     case "capacity":
       return "capability";
     case "settings":
+    case "hubspot":
       return "decision";
     case "work_queue":
       return "workflow";
@@ -95,6 +97,8 @@ export function countForSurface(surface: SurfaceId, world: World | null, memory:
       return world.analysis.valid.filter((signal) =>
         signal.event_type.includes("contract") || signal.event_type.includes("award") || signal.scope === "program"
       ).length;
+    case "hubspot":
+      return world.contacts.length + world.opportunities.length;
     case "settings":
       return memory ? memory.activity.length + memory.notes.length : undefined;
   }

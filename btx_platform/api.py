@@ -27,7 +27,7 @@ from btx_platform.db import assert_schema_current, init_db, make_engine, make_se
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
 from btx_platform.health import platform_health
 from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
-from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload
+from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload, map_companies
 from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
@@ -39,6 +39,9 @@ from btx_platform.schemas import (
     EmailSendRequest,
     EngineConfigPut,
     EngineConfigResponse,
+    HubSpotCompanySearchRequest,
+    HubSpotListAddRecordsRequest,
+    HubSpotListCreateRequest,
     HubSpotTaskExecuteRequest,
     IngestAccepted,
     LlmProxyRequest,
@@ -200,6 +203,21 @@ def _hubspot_task_record_url(task_id: str) -> str:
     return f"https://app.hubspot.com/tasks/{task_id}"
 
 
+def _hubspot_list_record_url(list_id: str) -> str:
+    return f"https://app.hubspot.com/lists/{list_id}"
+
+
+def _hubspot_record_id(value: str, list_type: str) -> str:
+    prefix = "hubspot-company-" if list_type == "company" else "hubspot-contact-"
+    return value.removeprefix(prefix)
+
+
+def _verified_list(created: dict, *, expected_id: str, expected_name: str) -> bool:
+    list_id = created.get("listId") or created.get("id")
+    name = created.get("name")
+    return str(list_id) == expected_id and (name is None or str(name) == expected_name)
+
+
 def _get_tenant_work_item(session, item_id: str, tenant_id: str) -> models.WorkItem | None:
     """Fetch a work item scoped to *tenant_id*.
 
@@ -296,6 +314,7 @@ def create_app(
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else _default_queue(settings)
     app.state.crm_cache = {}
+    app.state.crm_list_idempotency = {}
     app.state.clerk_verifier = clerk_verifier or (
         ClerkVerifier(issuer=settings.clerk_issuer, audience=settings.clerk_audience)
         if settings.clerk_issuer
@@ -464,6 +483,82 @@ def create_app(
     @app.get("/crm/contacts")
     def crm_contacts(request: Request) -> Response:
         return cached_hubspot_response("contacts", _tenant_id(request))
+
+    @app.post("/crm/company-search")
+    def crm_company_search(payload: HubSpotCompanySearchRequest) -> Response:
+        if not settings.hubspot_access_token:
+            return not_configured("HubSpot company search")
+        try:
+            client = HubSpotClient(settings.hubspot_access_token)
+            companies = client.search_companies(payload.query, limit=payload.limit)
+            records = map_companies(companies, {}, {}, {})
+        except HubSpotError as exc:
+            logger.warning("hubspot.company_search_failed", extra={"status_code": exc.status_code})
+            return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
+        return JSONResponse({"data_provenance": "HubSpot", "records": records})
+
+    @app.post("/crm/lists")
+    def create_hubspot_list(payload: HubSpotListCreateRequest, request: Request) -> Response:
+        if not settings.hubspot_access_token:
+            return not_configured("HubSpot list creation")
+        idempotency_key = request.headers.get(settings.idempotency_header)
+        if idempotency_key:
+            cached = app.state.crm_list_idempotency.get(("create", idempotency_key))
+            if cached:
+                return JSONResponse({**cached, "duplicate": True})
+        try:
+            client = HubSpotClient(settings.hubspot_access_token)
+            list_id = client.create_list(payload.name, payload.list_type)
+            verified = client.get_list(list_id)
+            if not _verified_list(verified, expected_id=list_id, expected_name=payload.name):
+                raise HubSpotError(method="GET", url=f"https://api.hubapi.com/crm/lists/2026-03/{list_id}", status_code=502, body="Created list did not verify with expected fields")
+        except HubSpotError as exc:
+            logger.warning("hubspot.list_create_failed", extra={"status_code": exc.status_code, "name": payload.name})
+            return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
+        body = {
+            "status": "verified",
+            "duplicate": False,
+            "idempotency_key": idempotency_key,
+            "list": {
+                "id": list_id,
+                "name": payload.name,
+                "list_type": payload.list_type,
+                "record_url": _hubspot_list_record_url(list_id),
+                "verified": True,
+            },
+        }
+        if idempotency_key:
+            app.state.crm_list_idempotency[("create", idempotency_key)] = body
+        return JSONResponse(body)
+
+    @app.put("/crm/lists/{list_id}/records")
+    def add_hubspot_list_records(list_id: str, payload: HubSpotListAddRecordsRequest, request: Request) -> Response:
+        if not settings.hubspot_access_token:
+            return not_configured("HubSpot list membership")
+        idempotency_key = request.headers.get(settings.idempotency_header)
+        normalized_ids = [_hubspot_record_id(item, payload.list_type) for item in payload.record_ids]
+        try:
+            client = HubSpotClient(settings.hubspot_access_token)
+            client.add_records_to_list(list_id, normalized_ids)
+            memberships = set(client.get_list_memberships(list_id))
+            missing = [record_id for record_id in normalized_ids if record_id not in memberships]
+            if missing:
+                raise HubSpotError(method="GET", url=f"https://api.hubapi.com/crm/lists/2026-03/{list_id}/memberships", status_code=502, body=f"List membership readback missing records: {', '.join(missing)}")
+        except HubSpotError as exc:
+            logger.warning("hubspot.list_membership_failed", extra={"status_code": exc.status_code, "list_id": list_id})
+            return JSONResponse({"code": "hubspot_error", "detail": str(exc)}, status_code=502)
+        return JSONResponse({
+            "status": "verified",
+            "duplicate": False,
+            "idempotency_key": idempotency_key,
+            "list": {
+                "id": list_id,
+                "list_type": payload.list_type,
+                "record_ids": normalized_ids,
+                "record_url": _hubspot_list_record_url(list_id),
+                "verified": True,
+            },
+        })
 
     @app.post("/crm/task")
     def create_crm_task(payload: CrmTaskRequest, request: Request) -> Response:
