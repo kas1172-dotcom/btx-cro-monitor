@@ -657,6 +657,20 @@ button, input, select, textarea { font: inherit; }
   width: 14px;
   height: 14px;
 }
+.accent-action-button {
+  width: fit-content;
+  border: 1px solid rgba(var(--accent-rgb), .45);
+  border-radius: 8px;
+  background: rgba(var(--accent-rgb), .12);
+  color: var(--accent-text);
+  padding: 8px 12px;
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+}
+.accent-action-button:hover {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), .18);
+}
 .empty-state {
   display: grid;
   justify-items: center;
@@ -839,6 +853,50 @@ button, input, select, textarea { font: inherit; }
   display: block;
   margin-top: 3px;
   font-size: 20px;
+}
+.deadlines-panel .panel-head span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.deadlines-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.deadlines-list li {
+  display: grid;
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: baseline;
+  border-top: 1px solid var(--line);
+  padding: 10px 0 0;
+}
+.deadlines-list li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.deadlines-list time {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+.deadlines-list strong {
+  min-width: 0;
+  color: var(--text);
+  font-size: 13px;
+}
+.deadlines-list span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+.deadlines-list em {
+  grid-column: 2 / -1;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
 }
 .ask-surface .ask-brain.large { max-width: 980px; }
 .ask-surface .surface-panel { max-width: 980px; margin-top: 14px; }

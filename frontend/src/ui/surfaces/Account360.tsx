@@ -7,6 +7,9 @@ import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import { WorkItemList } from "./WorkItemList.tsx";
 import { deriveWorkItems } from "../../app/workItems.ts";
+import type { Company } from "../../engine/brain/entities.ts";
+import { DeadlinesPanel, deadlinesForAccounts } from "../clients/DeadlinesPanel.tsx";
+import { DeliverableWizard } from "../deliverables/DeliverableWizard.tsx";
 import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 
 function money(value: number): string {
@@ -23,10 +26,15 @@ function relationshipBackedSignals(world: World, accountId: string) {
     .sort((a, b) => b.detected_at.localeCompare(a.detected_at));
 }
 
+export function clientCompaniesForAccount360(companies: Company[]): Company[] {
+  return companies.filter((company) => company.business_motion !== "prospect_new_business");
+}
+
 export function Account360({ world }: { world: World }) {
+  const [showDeliverableWizard, setShowDeliverableWizard] = useState(false);
+  const allWorkItems = useMemo(() => deriveWorkItems(world), [world]);
   const accountRows = useMemo(() => {
-    return world.companies
-      .filter((company) => company.relationship === "customer" || company.relationship === "target")
+    return clientCompaniesForAccount360(world.companies)
       .map((company) => ({
         company,
         score: world.analysis.byId.get(company.id),
@@ -40,18 +48,22 @@ export function Account360({ world }: { world: World }) {
         a.company.name.localeCompare(b.company.name)
       );
   }, [world]);
+  const clientDeadlines = useMemo(
+    () => deadlinesForAccounts(accountRows.map((row) => row.company), world.opportunities, allWorkItems).slice(0, 8),
+    [accountRows, allWorkItems, world.opportunities],
+  );
   const [selectedId, setSelectedId] = useState(accountRows[0]?.company.id ?? "");
   const selected = accountRows.find((row) => row.company.id === selectedId) ?? accountRows[0];
   const contacts = selected ? world.contacts.filter((contact) => contact.company_id === selected.company.id) : [];
   const deals = selected ? world.opportunities.filter((opp) => opp.company_id === selected.company.id) : [];
   const facilities = selected ? world.facilities.filter((facility) => facility.company_id === selected.company.id) : [];
-  const workItems = selected ? deriveWorkItems(world).filter((item) => item.canonical_account_id === selected.company.id).slice(0, 5) : [];
+  const workItems = selected ? allWorkItems.filter((item) => item.canonical_account_id === selected.company.id).slice(0, 5) : [];
 
   if (!selected) {
     return (
       <section className="surface-page" data-surface-component="surface-account-360">
-        <SurfaceHeader eyebrow="Accounts" headline="No canonical accounts are available." />
-        <EmptyState headline="No accounts" body="Connect a CRM source to populate canonical account records." />
+        <SurfaceHeader eyebrow="Clients" headline="No client accounts are available." />
+        <EmptyState headline="No clients" body="Connect a CRM source to populate canonical client records." />
       </section>
     );
   }
@@ -64,7 +76,7 @@ export function Account360({ world }: { world: World }) {
   return (
     <section className="surface-page account360" data-surface-component="surface-account-360">
       <SurfaceHeader
-        eyebrow="Accounts / Account 360"
+        eyebrow="Clients / Account 360"
         headline={company.name}
         subline={`${formatAddress(company.location) ?? company.location.city} · canonical id ${company.canonical_account_id ?? company.id}`}
       />
@@ -92,8 +104,22 @@ export function Account360({ world }: { world: World }) {
             <section className="surface-panel">
               <div className="panel-head"><h2>Recommended action</h2></div>
               <p><strong>{actionLabel(rec.action)}</strong> - {rec.reason}</p>
+              <button type="button" className="accent-action-button" onClick={() => setShowDeliverableWizard(true)}>
+                Generate deliverable
+              </button>
             </section>
           )}
+
+          {showDeliverableWizard && (
+            <DeliverableWizard
+              mode="single"
+              world={world}
+              entityId={company.id}
+              onClose={() => setShowDeliverableWizard(false)}
+            />
+          )}
+
+          <DeadlinesPanel deadlines={clientDeadlines} />
 
           <section className="surface-panel">
             <div className="panel-head"><h2>Relationship-backed signals</h2></div>

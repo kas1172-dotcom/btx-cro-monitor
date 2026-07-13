@@ -18,7 +18,7 @@ export interface SurfaceSpec {
 export const CORE_SURFACES: SurfaceSpec[] = [
   { id: "brief", label: "Today's Brief", group: "core", componentId: "surface-todays-brief", title: "What changed, needs attention, is prepared, needs approval, and has outcomes." },
   { id: "work_queue", label: "Work Queue", group: "core", componentId: "surface-work-queue", title: "Durable work items, owners, approvals, due dates, evidence, and outcomes." },
-  { id: "accounts", label: "Accounts", group: "core", componentId: "surface-account-360", title: "Account 360: canonical account health, linked signals, contacts, deals, capacity fit, and recommended actions." },
+  { id: "accounts", label: "Clients", group: "core", componentId: "surface-account-360", title: "Clients: current-business account health, linked signals, contacts, deals, deadlines, capacity fit, and recommended actions." },
   { id: "ask", label: "Ask", group: "core", componentId: "surface-ask", title: "Primary conversational assistant." },
 ];
 
@@ -82,7 +82,7 @@ export function countForSurface(surface: SurfaceId, world: World | null, memory:
     case "work_queue":
       return world.analysis.recommendations.length;
     case "accounts":
-      return world.companies.filter((company) => company.relationship === "customer" || company.relationship === "target").length;
+      return world.companies.filter((company) => company.business_motion !== "prospect_new_business").length;
     case "ask":
       return undefined;
     case "map":
