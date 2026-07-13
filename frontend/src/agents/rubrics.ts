@@ -5,6 +5,8 @@ export const AGENT_RUBRICS = {
     "Make the brief account-specific. Talking points must connect a validated signal to a provided company capability in 1-2 full sentences. Avoid generic filler.",
   itinerary:
     "Make every stop practical. Explain why visit, why now, who to talk to, and one specific company capability hook. Avoid route optimization claims.",
+  trip_brief:
+    "Compile the trip into one internal brief: logistics first, then concise stop-by-stop meeting prep. Do not add travel integrations or unsupported claims.",
   board_deck:
     "Deck headlines must be so-whats, not labels. Executive summary is verdict-first: verdict, evidence, implication. Board prose must be concise.",
   outreach:

@@ -10,6 +10,7 @@ const iconPaths: Record<IconName, ReactNode> = {
   prospecting: <path d="M12 3v3m0 12v3M3 12h3m12 0h3M7.8 7.8l2.1 2.1m4.2 4.2 2.1 2.1m0-8.4-2.1 2.1m-4.2 4.2-2.1 2.1M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />,
   ask: <path d="M6 8a6 6 0 0 1 12 0c0 4-6 5-6 9M12 22h.01" />,
   map: <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15m6-12v15" />,
+  trip_planner: <path d="M4 5h6l4 14 3-9 3 4M4 19h16M6 9h3m8-4h3" />,
   analysis: <path d="M4 19V5m0 14h17M8 16V9m5 7V6m5 10v-4" />,
   capacity: <path d="M4 18h16M6 18V8l6-4 6 4v10M9 18v-6h6v6" />,
   programs: <path d="M5 4h10l4 4v12H5V4Zm9 0v5h5M8 13h8M8 17h6" />,

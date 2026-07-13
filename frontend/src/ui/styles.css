@@ -1040,6 +1040,144 @@ button, input, select, textarea { font: inherit; }
   color: var(--text-secondary);
   font-size: 13px;
 }
+.trip-planner-surface {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+.trip-input-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) minmax(120px, .55fr) minmax(220px, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+.trip-input-form .panel-head,
+.trip-input-form fieldset,
+.trip-input-form .accent-action-button {
+  grid-column: 1 / -1;
+}
+.trip-input-form label,
+.trip-input-form fieldset {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.trip-input-form input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 9px 10px;
+  font: inherit;
+}
+.trip-input-form fieldset {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+}
+.trip-input-form legend {
+  color: var(--accent);
+  font-weight: var(--font-semibold);
+  padding: 0 4px;
+}
+.trip-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.trip-goals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.trip-goals label {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text-secondary);
+  padding: 8px;
+}
+.trip-goals input {
+  width: auto;
+  min-height: auto;
+}
+.trip-planner-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.15fr) minmax(280px, .85fr);
+  gap: 14px;
+  align-items: start;
+}
+.trip-map-panel {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  min-height: 520px;
+}
+.trip-map-panel .map-shell {
+  min-height: 460px;
+}
+.trip-candidate-list,
+.trip-brief-panel {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 12px;
+}
+.trip-planner-layout > .prospect-detail {
+  position: relative;
+  z-index: 2;
+}
+.trip-candidate-rows {
+  display: grid;
+  gap: 8px;
+}
+.trip-candidate-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 9px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.trip-candidate-row:hover,
+.trip-candidate-row.active {
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+.trip-candidate-row span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: var(--font-semibold);
+}
+.trip-candidate-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trip-candidate-row em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+.trip-brief-panel p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
 .ask-surface .ask-brain.large { max-width: 980px; }
 .ask-surface .surface-panel { max-width: 980px; margin-top: 14px; }
 .quiet-home {
@@ -2632,7 +2770,9 @@ button, input, select, textarea { font: inherit; }
 @media (max-width: 980px) { .signal-card-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) {
   .brain-rail-group-label { display: none; }
-  .brief-grid, .brief-grid.compact, .account360-layout, .account360-kpis { grid-template-columns: 1fr; }
+  .brief-grid, .brief-grid.compact, .account360-layout, .account360-kpis, .trip-input-form, .trip-planner-layout { grid-template-columns: 1fr; }
+  .trip-form-row, .trip-goals { grid-template-columns: 1fr; }
+  .trip-map-panel, .trip-map-panel .map-shell { min-height: 62dvh; }
   .account360-list { position: static; }
   .work-item-row { grid-template-columns: 1fr; }
   .work-item-state { text-align: left; justify-content: start; }

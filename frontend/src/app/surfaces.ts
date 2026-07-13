@@ -3,7 +3,7 @@ import type { MemoryState } from "../memory/types.ts";
 import type { BrainArea } from "../brain/types.ts";
 
 export type CoreSurface = "brief" | "work_queue" | "accounts" | "prospecting" | "ask";
-export type AnalyticalSurface = "map" | "analysis" | "capacity" | "programs";
+export type AnalyticalSurface = "map" | "trip_planner" | "analysis" | "capacity" | "programs";
 export type UtilitySurface = "settings";
 export type SurfaceId = CoreSurface | AnalyticalSurface | UtilitySurface;
 
@@ -25,6 +25,7 @@ export const CORE_SURFACES: SurfaceSpec[] = [
 
 export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
   { id: "map", label: "Map", group: "analytical", componentId: "surface-map", title: "Geographic account and prospect map." },
+  { id: "trip_planner", label: "Trip Planner", group: "analytical", componentId: "surface-trip-planner", title: "Goal, region, date, and candidate-stop trip planning." },
   { id: "analysis", label: "Analysis", group: "analytical", componentId: "surface-analysis-dashboard", title: "Pipeline, bookings, backlog, book-to-bill, win/loss, and utilization analysis." },
   { id: "capacity", label: "Capacity", group: "analytical", componentId: "surface-capacity-assessment", title: "Machining capacity against backlog and demand." },
   { id: "programs", label: "Programs", group: "analytical", componentId: "surface-program-contract-tracker", title: "Program, contract award, and recompete tracker." },
@@ -57,6 +58,7 @@ export function surfaceFromBrainArea(area: BrainArea): SurfaceId {
 export function brainAreaForSurface(surface: SurfaceId): BrainArea {
   switch (surface) {
     case "map":
+    case "trip_planner":
       return "geographic";
     case "capacity":
       return "capability";
@@ -93,6 +95,10 @@ export function countForSurface(surface: SurfaceId, world: World | null, memory:
       return undefined;
     case "map":
       return world.prospects.length;
+    case "trip_planner":
+      return world.companies.filter((company) =>
+        ["grow_existing_business", "manage_current_business", "reduce_risk", "prospect_new_business"].includes(company.business_motion ?? "")
+      ).length;
     case "analysis":
       return world.opportunities.filter((opportunity) => opportunity.stage !== "won" && opportunity.stage !== "lost").length;
     case "capacity":

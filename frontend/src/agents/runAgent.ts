@@ -5,6 +5,7 @@ import { validateAudienceAndForm } from "./contract.ts";
 import { weeklyMemoAgent } from "./weeklyMemoAgent.ts";
 import { meetingBriefAgent } from "./meetingBriefAgent.ts";
 import { itineraryAgent } from "./itineraryAgent.ts";
+import { tripBriefAgent } from "./tripBriefAgent.ts";
 import { boardDeckAgent } from "./boardDeckAgent.ts";
 import { maybeComposeWithLlm } from "./llmCompose.ts";
 import { outreachAgent } from "./outreachAgent.ts";
@@ -16,6 +17,7 @@ const AGENTS = {
   weekly_memo: weeklyMemoAgent,
   meeting_brief: meetingBriefAgent,
   itinerary: itineraryAgent,
+  trip_brief: tripBriefAgent,
   board_deck: boardDeckAgent,
   outreach: outreachAgent,
   analysis_annotation: analysisAnnotationAgent,

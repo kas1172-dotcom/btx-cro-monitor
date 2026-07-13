@@ -56,6 +56,12 @@ export function mappableCompanies(companies: Company[]): MapPoint[] {
   });
 }
 
+export function filterCompaniesByCandidateIds(companies: Company[], candidateIds?: string[]): Company[] {
+  if (!candidateIds?.length) return companies;
+  const allowed = new Set(candidateIds);
+  return companies.filter((company) => allowed.has(company.id) || (company.canonical_account_id ? allowed.has(company.canonical_account_id) : false));
+}
+
 export function mapCenter(points: MapPoint[]): [number, number] {
   return points.length ? [avg(points.map((point) => point.lat)), avg(points.map((point) => point.lon))] : FALLBACK_CENTER;
 }
@@ -69,8 +75,8 @@ export function opportunityRadius(opportunity: number, prospect: boolean): numbe
   return prospect ? Math.min(16, 7 + opportunity / 12) : 5;
 }
 
-export function buildMapMarkers(companies: Company[], byId: Map<string, CompanyScore>): MapMarker[] {
-  return mappableCompanies(companies).map((point) => {
+export function buildMapMarkers(companies: Company[], byId: Map<string, CompanyScore>, candidateIds?: string[]): MapMarker[] {
+  return mappableCompanies(filterCompaniesByCandidateIds(companies, candidateIds)).map((point) => {
     const opportunity = scoreForCompany(point.company, byId)?.dimensions.opportunity.score ?? 0;
     const prospect = isProspect(point.company.relationship);
     return {
