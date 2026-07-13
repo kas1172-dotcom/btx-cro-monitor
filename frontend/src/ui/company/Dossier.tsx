@@ -19,15 +19,12 @@ import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
-import { runAgent, type AgentId } from "../../agents/runAgent.ts";
-import { saveDeliverable } from "../../memory/localMemory.ts";
-import { setState } from "../../store/store.ts";
+import { DeliverableWizard } from "../deliverables/DeliverableWizard.tsx";
 
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
-  const [busyDeliverable, setBusyDeliverable] = useState<AgentId | null>(null);
+  const [showDeliverableWizard, setShowDeliverableWizard] = useState(false);
   const company = world.companies.find((c) => c.id === companyId);
   if (!company) return null;
-  const activeCompany = company;
 
   const score = world.analysis.byId.get(companyId);
   const fit = scoreFit(company.needs, PROFILE.capabilities);
@@ -50,21 +47,6 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const fmtM = (v: number) => `$${(v / 1e6).toFixed(1)}M`;
   const companyAddress = formatAddress(company.location);
   const links = companyLinks(company);
-  async function createDeliverable(agentId: AgentId) {
-    setBusyDeliverable(agentId);
-    try {
-      const inputs = agentId === "board_deck"
-        ? { quarter: "Q2 2026", audience: "board" }
-        : agentId === "outreach"
-          ? { accountId: activeCompany.id, instructions: "Keep it concise and tied to the strongest available evidence." }
-          : { accountId: activeCompany.id };
-      const deliverable = await runAgent(agentId, inputs, world);
-      saveDeliverable(deliverable);
-      setState({ activeDeliverable: deliverable, activeCompanyId: null, activeBrainArea: deliverable.brainArea, brainResponse: null, activeAnalysisSpec: null });
-    } finally {
-      setBusyDeliverable(null);
-    }
-  }
 
   return (
     <div className="dossier">
@@ -87,12 +69,17 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
       <section className="dossier-actions">
         <h4>Create deliverable</h4>
         <div className="dossier-action-row">
-          <button onClick={() => void createDeliverable("meeting_brief")} disabled={busyDeliverable !== null}>{busyDeliverable === "meeting_brief" ? "Creating..." : "Meeting brief"}</button>
-          <button onClick={() => void createDeliverable("outreach")} disabled={busyDeliverable !== null}>{busyDeliverable === "outreach" ? "Creating..." : "Outreach"}</button>
-          <button onClick={() => void createDeliverable("sales_pitch")} disabled={busyDeliverable !== null}>{busyDeliverable === "sales_pitch" ? "Creating..." : "Sales pitch"}</button>
-          <button onClick={() => void createDeliverable("capabilities_assessment")} disabled={busyDeliverable !== null}>{busyDeliverable === "capabilities_assessment" ? "Creating..." : "Capabilities assessment"}</button>
+          <button onClick={() => setShowDeliverableWizard(true)}>Generate deliverable</button>
         </div>
       </section>
+      {showDeliverableWizard && (
+        <DeliverableWizard
+          mode="single"
+          world={world}
+          entityId={company.id}
+          onClose={() => setShowDeliverableWizard(false)}
+        />
+      )}
 
       {rec && (
         <div className={`rec rec-${rec.action}`}>

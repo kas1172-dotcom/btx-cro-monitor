@@ -2053,6 +2053,129 @@ button, input, select, textarea { font: inherit; }
 .demo-action-modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .demo-action-modal-actions button:last-child { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); }
 
+.deliverable-wizard {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: min(860px, calc(100dvh - 36px));
+  overflow: auto;
+  display: grid;
+  gap: 14px;
+}
+.deliverable-wizard-close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 36px !important;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-2) !important;
+  color: var(--muted) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  font-size: 18px;
+}
+.deliverable-wizard-kicker {
+  margin: 0 !important;
+  color: var(--accent) !important;
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.deliverable-wizard-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.deliverable-wizard-options button {
+  width: auto;
+  min-height: 96px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.deliverable-wizard-options button.selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .28);
+}
+.deliverable-wizard-options span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.deliverable-wizard-summary {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 10px 12px;
+  align-items: center;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.deliverable-wizard-summary > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.deliverable-wizard-summary select,
+.deliverable-wizard-summary input,
+.deliverable-wizard-instructions textarea {
+  width: 100%;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px;
+  font: inherit;
+}
+.deliverable-wizard-inline {
+  display: grid;
+  grid-template-columns: 1fr 140px 140px;
+  gap: 8px;
+}
+.deliverable-wizard-instructions {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.deliverable-wizard-instructions textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+.deliverable-wizard-notice,
+.deliverable-wizard-error {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.deliverable-wizard-notice {
+  color: var(--warning);
+  background: rgba(var(--warning-rgb), .10);
+}
+.deliverable-wizard-error {
+  color: var(--danger);
+  background: rgba(var(--danger-rgb), .10);
+}
+.deliverable-wizard-done {
+  display: grid;
+  gap: 12px;
+}
+.deliverable-wizard-done ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
 /* Deliverables + memory */
 .document-viewer {
   display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px;

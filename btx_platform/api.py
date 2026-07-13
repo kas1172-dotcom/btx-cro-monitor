@@ -36,6 +36,9 @@ from btx_platform.ratelimit import RateLimiter
 from btx_platform.schemas import (
     CalendarEventRequest,
     CrmTaskRequest,
+    DeliverableCreate,
+    DeliverablePatch,
+    DeliverableResponse,
     EmailSendRequest,
     EngineConfigPut,
     EngineConfigResponse,
@@ -208,6 +211,26 @@ def _get_tenant_work_item(session, item_id: str, tenant_id: str) -> models.WorkI
     yours," which is exactly the point (no cross-tenant existence leak).
     """
     row = session.get(models.WorkItem, item_id)
+    if row is None or row.tenant_id != tenant_id:
+        return None
+    return row
+
+
+def _deliverable_response(row: models.DeliverableRecord) -> dict:
+    return DeliverableResponse(
+        id=row.id,
+        type=row.type,
+        title=row.title,
+        canonical_account_id=row.canonical_account_id,
+        entity_ids=row.entity_ids or [],
+        document=row.document,
+        created_at=row.created_at.isoformat(),
+        updated_at=row.updated_at.isoformat(),
+    ).model_dump()
+
+
+def _get_tenant_deliverable(session, deliverable_id: str, tenant_id: str) -> models.DeliverableRecord | None:
+    row = session.get(models.DeliverableRecord, deliverable_id)
     if row is None or row.tenant_id != tenant_id:
         return None
     return row
@@ -696,6 +719,85 @@ def create_app(
     @app.post("/calendar/event")
     def create_calendar_event(payload: CalendarEventRequest) -> Response:
         return not_configured("Calendar event creation")
+
+    @app.post("/deliverables")
+    def create_deliverable(payload: DeliverableCreate, request: Request) -> Response:
+        session = session_factory()
+        try:
+            tenant_id = _tenant_id(request)
+            existing = _get_tenant_deliverable(session, payload.id, tenant_id)
+            if existing is not None:
+                return JSONResponse(
+                    {"code": "conflict", "detail": f"Deliverable {payload.id} already exists."},
+                    status_code=409,
+                )
+            row = models.DeliverableRecord(
+                id=payload.id,
+                tenant_id=tenant_id,
+                type=payload.type,
+                title=payload.title,
+                canonical_account_id=payload.canonical_account_id,
+                entity_ids=payload.entity_ids,
+                document=payload.document,
+            )
+            session.add(row)
+            session.commit()
+            session.refresh(row)
+            logger.info("mutation.deliverable_create", extra={"deliverable_id": row.id, "type": row.type})
+            return JSONResponse(_deliverable_response(row), status_code=201)
+        finally:
+            session.close()
+
+    @app.get("/deliverables")
+    def list_deliverables(request: Request, account: str | None = None, type: str | None = None) -> Response:
+        session = session_factory()
+        try:
+            query = session.query(models.DeliverableRecord).filter(models.DeliverableRecord.tenant_id == _tenant_id(request))
+            if account:
+                query = query.filter(models.DeliverableRecord.canonical_account_id == account)
+            if type:
+                query = query.filter(models.DeliverableRecord.type == type)
+            rows = query.order_by(models.DeliverableRecord.updated_at.desc(), models.DeliverableRecord.created_at.desc()).all()
+            return JSONResponse({"records": [_deliverable_response(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.get("/deliverables/{deliverable_id}")
+    def get_deliverable(deliverable_id: str, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_deliverable(session, deliverable_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No deliverable {deliverable_id}."}, status_code=404)
+            return JSONResponse(_deliverable_response(row))
+        finally:
+            session.close()
+
+    @app.patch("/deliverables/{deliverable_id}")
+    def patch_deliverable(deliverable_id: str, payload: DeliverablePatch, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_deliverable(session, deliverable_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No deliverable {deliverable_id}."}, status_code=404)
+            fields = payload.model_fields_set
+            if "type" in fields and payload.type is not None:
+                row.type = payload.type
+            if "title" in fields and payload.title is not None:
+                row.title = payload.title
+            if "canonical_account_id" in fields:
+                row.canonical_account_id = payload.canonical_account_id
+            if "entity_ids" in fields:
+                row.entity_ids = payload.entity_ids or []
+            if "document" in fields and payload.document is not None:
+                row.document = payload.document
+            row.updated_at = datetime.now(UTC)
+            session.commit()
+            session.refresh(row)
+            logger.info("mutation.deliverable_patch", extra={"deliverable_id": row.id})
+            return JSONResponse(_deliverable_response(row))
+        finally:
+            session.close()
 
     @app.post("/work-items")
     def create_work_item(payload: WorkItemCreate, request: Request) -> Response:

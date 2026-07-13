@@ -4,6 +4,9 @@ import { useStore } from "../../store/store.ts";
 import type { MetricId } from "../../metrics/types.ts";
 import { dispatchBrainQuestion } from "../../app/brainActions.ts";
 import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
+import { ASK_DELIVERABLE_ACTIONS } from "../../agents/deliverableRegistry.ts";
+import type { AgentId } from "../../agents/runAgent.ts";
+import { DeliverableWizard } from "../deliverables/DeliverableWizard.tsx";
 
 const ACTIONS = [
   "Plan a trip",
@@ -40,10 +43,18 @@ const INITIAL_STAGES: WorkStage[] = [
   { id: "composing", label: "Composing the answer", status: "pending" },
 ];
 
+function askDeliverableAgent(action: string | null): AgentId | null {
+  if (!action) return null;
+  return Object.prototype.hasOwnProperty.call(ASK_DELIVERABLE_ACTIONS, action)
+    ? ASK_DELIVERABLE_ACTIONS[action as keyof typeof ASK_DELIVERABLE_ACTIONS]
+    : null;
+}
+
 export function AskBrainBar({ world, large = false, seedPrompt }: { world: World; large?: boolean; seedPrompt?: string }) {
   const { askDraftPrompt } = useStore();
   const [question, setQuestion] = useState(seedPrompt ?? "");
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [wizardAgent, setWizardAgent] = useState<AgentId | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [workingQuestion, setWorkingQuestion] = useState<string | null>(null);
   const [workingStages, setWorkingStages] = useState<WorkStage[]>(INITIAL_STAGES);
@@ -59,6 +70,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
   const [instructions, setInstructions] = useState("");
   const cities = [...new Set(world.companies.map((c) => c.location.city))].sort();
   const accounts = world.prospects.map((p) => p.company);
+  const pendingWizardAgent = askDeliverableAgent(pendingAction);
 
   useEffect(() => {
     if (!pendingAction) return;
@@ -126,15 +138,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
     const actionInstructions = instructions;
     setPendingAction(null);
     try {
-      if (action === "Meeting brief" || action === "Sales pitch" || action === "Capabilities assessment") {
-        const account = accounts.find((item) => item.id === accountId);
-        const label = action === "Meeting brief"
-          ? "Meeting brief"
-          : action === "Sales pitch"
-            ? "Draft a sales pitch"
-            : "Can we actually serve";
-        await submit(`${label} for ${account?.name ?? accountId}${actionInstructions ? `. Instructions: ${actionInstructions}` : ""}`);
-      } else if (action === "Plan a trip") {
+      if (action === "Plan a trip") {
         await submit(`Plan a trip to ${tripCity} from ${startDate} to ${endDate}${actionInstructions ? `. Instructions: ${actionInstructions}` : ""}`);
       } else if (action === "Board deck") {
         await submit(`Generate a ${quarter} board deck${actionInstructions ? `. Instructions: ${actionInstructions}` : ""}`);
@@ -190,13 +194,31 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         <div className="ask-param-popover" role="dialog" aria-label={`${pendingAction} parameters`}>
           <button className="ask-param-close" onClick={() => setPendingAction(null)} aria-label="Close">×</button>
           <strong>{pendingAction}</strong>
-          {["Meeting brief", "Sales pitch", "Capabilities assessment"].includes(pendingAction) && (
-            <label>Account
-              <select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
-                {accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
-              </select>
-            </label>
-          )}
+          {pendingWizardAgent ? (
+            <>
+              <label>Account
+                <select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
+                  {accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
+                </select>
+              </label>
+              <label>Instructions
+                <textarea
+                  value={instructions}
+                  onChange={(event) => setInstructions(event.target.value)}
+                  placeholder="Optional: emphasize, include, or avoid anything..."
+                />
+              </label>
+              <button
+                onClick={() => {
+                  setWizardAgent(pendingWizardAgent);
+                  setPendingAction(null);
+                }}
+              >
+                Continue
+              </button>
+            </>
+          ) : (
+            <>
           {pendingAction === "Plan a trip" && (
             <>
               <label>City
@@ -230,13 +252,28 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
             <textarea
               value={instructions}
               onChange={(event) => setInstructions(event.target.value)}
-              placeholder="Optional: emphasize, include, or avoid anything…"
+              placeholder="Optional: emphasize, include, or avoid anything..."
             />
           </label>
           <button onClick={() => void runParameterizedAction(pendingAction)} disabled={busyAction !== null}>
             {busyAction === pendingAction ? "Working..." : "Confirm"}
           </button>
+            </>
+          )}
         </div>
+      )}
+      {wizardAgent && (
+        <DeliverableWizard
+          mode="single"
+          world={world}
+          entityId={accountId}
+          initialAgentId={wizardAgent}
+          initialInstructions={instructions}
+          onClose={() => {
+            setWizardAgent(null);
+            setInstructions("");
+          }}
+        />
       )}
     </div>
   );

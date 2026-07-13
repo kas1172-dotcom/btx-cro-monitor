@@ -165,6 +165,21 @@ class PipelineRun(Base):
     config_path: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class DeliverableRecord(Base):
+    """Saved cockpit deliverable library entry."""
+    __tablename__ = "deliverables"
+
+    id: Mapped[str] = mapped_column(String(120), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    type: Mapped[str] = mapped_column(String(64), index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    entity_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    document: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
 class WorkItem(Base):
     """Durable server-backed work loop item for cockpit action surfaces."""
     __tablename__ = "work_items"

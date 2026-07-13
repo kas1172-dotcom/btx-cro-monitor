@@ -180,6 +180,34 @@ class PipelineRunResponse(BaseModel):
     config_path: str | None = None
 
 
+class DeliverableCreate(BaseModel):
+    id: str = Field(min_length=1, max_length=120)
+    type: str = Field(min_length=1, max_length=64)
+    title: str = Field(min_length=1, max_length=300)
+    canonical_account_id: str | None = None
+    entity_ids: list[str] = []
+    document: dict
+
+
+class DeliverablePatch(BaseModel):
+    type: str | None = Field(default=None, min_length=1, max_length=64)
+    title: str | None = Field(default=None, min_length=1, max_length=300)
+    canonical_account_id: str | None = None
+    entity_ids: list[str] | None = None
+    document: dict | None = None
+
+
+class DeliverableResponse(BaseModel):
+    id: str
+    type: str
+    title: str
+    canonical_account_id: str | None = None
+    entity_ids: list[str]
+    document: dict
+    created_at: str
+    updated_at: str
+
+
 WorkItemType = Literal[
     "account_action",
     "research_task",
