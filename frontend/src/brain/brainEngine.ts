@@ -1,4 +1,5 @@
 import type { World } from "../app/useWorld.ts";
+import type { ActiveContext } from "../app/useActiveContext.ts";
 import { classifyQuestion } from "./classifyQuestion.ts";
 import { retrieveContext } from "./retrieveContext.ts";
 import { generateBrainResponse } from "./generateBrainResponse.ts";
@@ -25,10 +26,10 @@ export function processBrainQuestion(question: string, world?: World): BrainResp
   return generateBrainResponse(context, world);
 }
 
-export async function processBrainQuestionAsync(question: string, world?: World): Promise<BrainResponse> {
+export async function processBrainQuestionAsync(question: string, world?: World, activeContext?: ActiveContext): Promise<BrainResponse> {
   if (!world) return processBrainQuestion(question, world);
-  const classification = await routeBrainQuestion(question, world);
-  const context = retrieveContext(question, classification.intent, classification.activatedBrainAreas, world);
+  const classification = await routeBrainQuestion(question, world, activeContext);
+  const context = retrieveContext(question, classification.intent, classification.activatedBrainAreas, world, activeContext);
   const response = generateBrainResponse(context, world);
   return {
     ...response,

@@ -12,6 +12,8 @@ import { GROUNDING_CONTRACT, CURRENT_VS_PROSPECTING } from "../app/promptContrac
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { setState } from "../store/store.ts";
 import { backendHeaders } from "../app/backendApi.ts";
+import type { ActiveContext } from "../app/useActiveContext.ts";
+import { describeActiveContext } from "../app/useActiveContext.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -150,11 +152,15 @@ const nameIn = (world: World) => (id: string) =>
 const companyIn = (world: World) => (id: string) =>
   world.companies.find((c) => c.id === id);
 
-export function engineContext(world: World): string {
+export function engineContext(world: World, activeContext?: ActiveContext): string {
   const nameOf = nameIn(world);
   const companyOf = companyIn(world);
   const lines: string[] = [];
   const persp = world.analysis.persp;
+  if (activeContext) {
+    lines.push("ACTIVE COCKPIT CONTEXT:");
+    lines.push(describeActiveContext(activeContext, world));
+  }
   if (persp) {
     const d = persp.dimensions;
     const ph = pipelineHealth(world.opportunities.filter((o) => o.company_id === persp.subject_id));
@@ -201,7 +207,7 @@ export function engineContext(world: World): string {
   return lines.join("\n");
 }
 
-function systemPrompt(world: World): string {
+function systemPrompt(world: World, activeContext?: ActiveContext): string {
   return `You are Chatpil, the revenue chief-of-staff for ${PROFILE.name} Precision's CRO. You are grounded exclusively in the ENGINE STATE context below.
 
 ${GROUNDING_CONTRACT}
@@ -216,7 +222,7 @@ BEHAVIORAL RULES:
 - Be concise and warm-professional. No preamble, no bullet-soup unless comparing 3+ items. Lead with the recommendation.
 
 ENGINE STATE (your only source of truth):
-${engineContext(world)}`;
+${engineContext(world, activeContext)}`;
 }
 
 // ── Debug-text guard ──────────────────────────────────────────────────────────
@@ -246,7 +252,7 @@ export interface Msg {
 export async function askJarvis(
   history: Msg[],
   world: World,
-  options?: { currentArea?: string; selectedCompanyId?: string | null },
+  options?: { currentArea?: string; selectedCompanyId?: string | null; activeContext?: ActiveContext },
 ): Promise<Msg> {
   const last = history[history.length - 1]?.content ?? "";
 
@@ -283,7 +289,7 @@ export async function askJarvis(
       signal: ctrl.signal,
       body: JSON.stringify({
         model: LLM_MODELS.chatpil,
-        system: systemPrompt(world),
+        system: systemPrompt(world, options?.activeContext),
         messages: apiMessages,
       }),
     });

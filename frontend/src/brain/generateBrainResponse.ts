@@ -52,6 +52,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
   let focusView: BrainResponse["focusView"] = "accounts";
   let noteArea: SavedBrainNote["brainArea"] = ctx.activatedBrainAreas[0] ?? "revenue";
   let noteTitle = "Revenue Brain note";
+  const activeScore = ctx.activeAccount ? world.analysis.byId.get(ctx.activeAccount.id) : undefined;
 
   if (ctx.intent === "market_signals") {
     const names = ctx.topSignals.slice(0, 3).map((s) => `${world.companies.find((c) => c.id === s.subject_id)?.name ?? s.subject_id}: ${s.value ? money(s.value) : displayLabel(s.event_type)}`).join(", ");
@@ -107,11 +108,21 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     noteArea = "revenue";
     noteTitle = "Weekly CRO brief";
   } else {
-    directAnswer = `${PROFILE.name} has ${ctx.topProspects.length} priority opportunities, ${ctx.topSignals.length} active signals, and ${money(ctx.pipelineValue)} open pipeline across ${ctx.openDealCount} deals.`;
-    whyThisMatters = "The engine ranks where revenue attention should go next using fit, signals, risk, and production context.";
-    recommendedActions = ["Review top opportunities", "Ask for a city plan", "Ask for account risk"];
-    suggestedNextQuestions = ["Who should I target in Austin?", "Which accounts are at risk?", "What market signals matter this week?"];
-    relatedOpportunities = ctx.topProspects.slice(0, 5).map((p) => cardFor(p, world));
+    if (ctx.activeAccount) {
+      const dimensions = activeScore?.dimensions;
+      directAnswer = `${ctx.activeAccount.name} is the active account. ${PROFILE.name} has ${ctx.topSignals.length} active signals and ${money(ctx.pipelineValue)} open pipeline across ${ctx.openDealCount} deals; for this account, risk is ${dimensions?.risk.score ?? "not provided"} and opportunity is ${dimensions?.opportunity.score ?? "not provided"}.`;
+      whyThisMatters = `You asked from ${ctx.activeAccount.name}'s context, so the next step should be framed around that account before broad portfolio ranking.`;
+      recommendedActions = ["Review this account's linked signals", "Check open deals and owner next step", "Draft an account-specific follow-up"];
+      suggestedNextQuestions = [`What is driving ${ctx.activeAccount.name}'s score?`, `Draft outreach for ${ctx.activeAccount.name}.`, "Which market signals matter this week?"];
+      const activeProspect = world.prospects.find((prospect) => prospect.company.id === ctx.activeAccount?.id);
+      relatedOpportunities = activeProspect ? [cardFor(activeProspect, world)] : ctx.topProspects.slice(0, 4).map((p) => cardFor(p, world));
+    } else {
+      directAnswer = `${PROFILE.name} has ${ctx.topProspects.length} priority opportunities, ${ctx.topSignals.length} active signals, and ${money(ctx.pipelineValue)} open pipeline across ${ctx.openDealCount} deals.`;
+      whyThisMatters = "The engine ranks where revenue attention should go next using fit, signals, risk, and production context.";
+      recommendedActions = ["Review top opportunities", "Ask for a city plan", "Ask for account risk"];
+      suggestedNextQuestions = ["Who should I target in Austin?", "Which accounts are at risk?", "What market signals matter this week?"];
+      relatedOpportunities = ctx.topProspects.slice(0, 5).map((p) => cardFor(p, world));
+    }
     focusView = "accounts";
     noteArea = "revenue";
     noteTitle = "Revenue focus";

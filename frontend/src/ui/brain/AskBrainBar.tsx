@@ -4,6 +4,7 @@ import { useStore } from "../../store/store.ts";
 import type { MetricId } from "../../metrics/types.ts";
 import { dispatchBrainQuestion } from "../../app/brainActions.ts";
 import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
+import { useActiveContext, type ActiveContext } from "../../app/useActiveContext.ts";
 
 const ACTIONS = [
   "Plan a trip",
@@ -40,15 +41,20 @@ const INITIAL_STAGES: WorkStage[] = [
   { id: "composing", label: "Composing the answer", status: "pending" },
 ];
 
+function accountFromContext(world: World, context: ActiveContext): string {
+  return context.accountId ?? context.prospectId ?? world.prospects[0]?.company.id ?? world.companies[0]?.id ?? "";
+}
+
 export function AskBrainBar({ world, large = false, seedPrompt }: { world: World; large?: boolean; seedPrompt?: string }) {
   const { askDraftPrompt } = useStore();
+  const activeContext = useActiveContext();
   const [question, setQuestion] = useState(seedPrompt ?? "");
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [workingQuestion, setWorkingQuestion] = useState<string | null>(null);
   const [workingStages, setWorkingStages] = useState<WorkStage[]>(INITIAL_STAGES);
   const [showWorking, setShowWorking] = useState(false);
-  const [accountId, setAccountId] = useState(world.prospects[0]?.company.id ?? world.companies[0]?.id ?? "");
+  const [accountId, setAccountId] = useState(() => accountFromContext(world, activeContext));
   const [tripCity, setTripCity] = useState(world.city ?? "Austin");
   const tripDefaults = defaultTripWindow(defaultDateAnchor(world));
   const quarters = quarterOptions(defaultDateAnchor(world));
@@ -58,7 +64,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
   const [metric, setMetric] = useState<MetricId>("revenue");
   const [instructions, setInstructions] = useState("");
   const cities = [...new Set(world.companies.map((c) => c.location.city))].sort();
-  const accounts = world.prospects.map((p) => p.company);
+  const accounts = world.companies;
 
   useEffect(() => {
     if (!pendingAction) return;
@@ -76,6 +82,11 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
   useEffect(() => {
     if (!askDraftPrompt && !question && seedPrompt) setQuestion(seedPrompt);
   }, [askDraftPrompt, question, seedPrompt]);
+
+  useEffect(() => {
+    const next = accountFromContext(world, activeContext);
+    if (next && next !== accountId) setAccountId(next);
+  }, [activeContext.accountId, activeContext.prospectId, accountId, world]);
 
   function updateStage(id: string, patch: Partial<WorkStage>) {
     setWorkingStages((stages) => stages.map((stage) => stage.id === id ? { ...stage, ...patch } : stage));
@@ -98,6 +109,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         quarter,
         metric,
         instructions,
+        activeContext,
       }, {
         routed: (response, usedFallback) => updateStage("routed", {
           status: usedFallback ? "fallback" : "done",

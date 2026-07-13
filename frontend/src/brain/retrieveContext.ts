@@ -1,4 +1,6 @@
 import type { World } from "../app/useWorld.ts";
+import type { ActiveContext } from "../app/useActiveContext.ts";
+import { describeActiveContext } from "../app/useActiveContext.ts";
 import type { BrainArea, ContextSource, QuestionIntent } from "./types.ts";
 import type { Company } from "../engine/brain/entities.ts";
 import type { Prospect } from "../app/intelligence.ts";
@@ -14,19 +16,34 @@ export interface RetrievedContext {
   contextUsed: ContextSource[];
   pipelineValue: number;
   openDealCount: number;
+  activeContext?: ActiveContext;
+  activeAccount?: Company;
 }
 
-export function retrieveContext(question: string, intent: QuestionIntent, activatedBrainAreas: BrainArea[], world: World): RetrievedContext {
+export function retrieveContext(question: string, intent: QuestionIntent, activatedBrainAreas: BrainArea[], world: World, activeContext?: ActiveContext): RetrievedContext {
   const q = question.toLowerCase();
   const city = [...new Set(world.companies.map((c) => c.location.city))].find((c) => q.includes(c.toLowerCase())) ?? world.city;
+  const activeAccount = activeContext?.accountId
+    ? world.companies.find((company) => company.id === activeContext.accountId)
+    : undefined;
+  const activeProspect = activeAccount
+    ? world.prospects.find((prospect) => prospect.company.id === activeAccount.id)
+    : undefined;
   const prospectPool = city ? world.prospects.filter((p) => p.company.location.city === city) : world.prospects;
-  const topProspects = prospectPool.slice(0, 6);
-  const atRiskAccounts = [...world.analysis.scores]
+  const topProspects = [
+    ...(activeProspect ? [activeProspect] : []),
+    ...prospectPool.filter((prospect) => prospect.company.id !== activeProspect?.company.id),
+  ].slice(0, 6);
+  const rankedAtRiskAccounts = [...world.analysis.scores]
     .filter((s) => s.dimensions.risk.score >= 50 || s.dimensions.competitivePressure.score >= 50)
     .sort((a, b) => Math.max(b.dimensions.risk.score, b.dimensions.competitivePressure.score) - Math.max(a.dimensions.risk.score, a.dimensions.competitivePressure.score))
     .slice(0, 6)
     .map((s) => world.companies.find((c) => c.id === s.subject_id))
     .filter((c): c is Company => Boolean(c));
+  const atRiskAccounts = [
+    ...(activeAccount ? [activeAccount] : []),
+    ...rankedAtRiskAccounts.filter((account) => account.id !== activeAccount?.id),
+  ].slice(0, 6);
   const topSignals = [...world.analysis.valid]
     .sort((a, b) => b.confidence - a.confidence)
     .slice(0, 8);
@@ -43,6 +60,7 @@ export function retrieveContext(question: string, intent: QuestionIntent, activa
   if (activatedBrainAreas.includes("geographic")) contextUsed.push({ source: "companies.json + facilities.json", reason: "Addresses and map coordinates." });
   if (activatedBrainAreas.includes("decision")) contextUsed.push({ source: "recommendation engine", reason: "Prioritized deterministic actions." });
   if (activatedBrainAreas.includes("workflow")) contextUsed.push({ source: "workflow simulator", reason: "Demo-only task and outreach actions." });
+  if (activeContext) contextUsed.unshift({ source: "active cockpit context", reason: describeActiveContext(activeContext, world) });
 
   return {
     question,
@@ -55,5 +73,7 @@ export function retrieveContext(question: string, intent: QuestionIntent, activa
     contextUsed,
     pipelineValue: openDeals.reduce((sum, deal) => sum + deal.value, 0),
     openDealCount: openDeals.length,
+    activeContext,
+    activeAccount,
   };
 }

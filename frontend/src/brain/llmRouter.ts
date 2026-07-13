@@ -5,6 +5,8 @@ import type { Classification } from "./classifyQuestion.ts";
 import type { BrainArea, QuestionIntent } from "./types.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { backendHeaders } from "../app/backendApi.ts";
+import type { ActiveContext } from "../app/useActiveContext.ts";
+import { describeActiveContext } from "../app/useActiveContext.ts";
 
 const ENDPOINT = (import.meta as ImportMeta & { env?: { VITE_COPILOT_ENDPOINT?: string } }).env?.VITE_COPILOT_ENDPOINT;
 const INTENTS: QuestionIntent[] = [
@@ -34,7 +36,7 @@ export interface RoutedClassification extends Classification {
   params: Record<string, unknown>;
 }
 
-function routerSystem(world: World): string {
+function routerSystem(world: World, activeContext?: ActiveContext): string {
   const names = world.companies.map((c) => c.name).join(", ");
   const cities = [...new Set(world.companies.map((c) => c.location.city))].join(", ");
   return `Route a CRO question for the BTX Revenue Brain. Return strict JSON only.
@@ -42,6 +44,8 @@ Allowed intents: ${INTENTS.join(", ")}.
 Allowed brain areas: ${AREAS.join(", ")}.
 Known account names: ${names}.
 Known cities: ${cities}.
+Active cockpit context:
+${activeContext ? describeActiveContext(activeContext, world) : "None."}
 Do not answer the user. Do not compute scores or numbers. Extract only routing metadata present in the question or known names.`;
 }
 
@@ -62,14 +66,14 @@ async function withTimeout(url: string, body: unknown): Promise<unknown> {
   }
 }
 
-export async function routeBrainQuestion(question: string, world: World): Promise<RoutedClassification> {
+export async function routeBrainQuestion(question: string, world: World, activeContext?: ActiveContext): Promise<RoutedClassification> {
   const fallback = classifyQuestion(question);
   if (!ENDPOINT) return { ...fallback, routedBy: "offline_fallback", entities: [], params: {} };
 
   try {
     const raw = await withTimeout(ENDPOINT, {
       model: LLM_MODELS.routing,
-      system: routerSystem(world),
+      system: routerSystem(world, activeContext),
       messages: [{ role: "user", content: question }],
     });
     const text = (raw as { text?: unknown }).text;

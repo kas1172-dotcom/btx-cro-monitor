@@ -9,6 +9,7 @@ import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { requestSectionRevision } from "../../deliverables/editorAssistant.ts";
+import { useActiveContext } from "../../app/useActiveContext.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
   downloadCsv,
@@ -45,6 +46,7 @@ function editableSections(sections: DeliverableSection[]): DeliverableSection[] 
 }
 
 export function DocumentViewer({ deliverable, world }: { deliverable: Deliverable; world?: World }) {
+  const activeContext = useActiveContext();
   const [sections, setSections] = useState(() => editableSections(deliverable.sections));
   const [title, setTitle] = useState(deliverable.title);
   const [dirty, setDirty] = useState(false);
@@ -127,7 +129,7 @@ export function DocumentViewer({ deliverable, world }: { deliverable: Deliverabl
       return;
     }
     try {
-      const text = await requestSectionRevision({ endpoint, deliverable: current, section: target, instruction });
+      const text = await requestSectionRevision({ endpoint, deliverable: current, section: target, instruction, activeContext });
       setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text }]);
     } catch (error) {
       setSuggestions((items) => [...items, {

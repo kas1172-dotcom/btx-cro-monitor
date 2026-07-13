@@ -7,6 +7,7 @@ import { saveBrainMemoryNote, saveDeliverable } from "../memory/localMemory.ts";
 import { setState } from "../store/store.ts";
 import type { MetricId } from "../metrics/types.ts";
 import { defaultDateAnchor, defaultTripWindow, latestCompletedQuarter } from "./dateDefaults.ts";
+import type { ActiveContext } from "./useActiveContext.ts";
 
 export interface BrainActionOptions {
   accountId?: string;
@@ -16,6 +17,7 @@ export interface BrainActionOptions {
   quarter?: string;
   metric?: MetricId;
   instructions?: string;
+  activeContext?: ActiveContext;
 }
 
 export interface BrainActionEvents {
@@ -44,8 +46,7 @@ function firstAvailableAccountId(world: World): string | undefined {
 
 function namedAccountId(question: string, world: World): string | undefined {
   const lower = question.toLowerCase();
-  const accounts = world.prospects.map((prospect) => prospect.company);
-  return accounts.find((account) => lower.includes(account.name.toLowerCase()))?.id;
+  return world.companies.find((account) => lower.includes(account.name.toLowerCase()))?.id;
 }
 
 function routeArea(response: BrainResponse, fallback: BrainArea = "revenue"): BrainArea {
@@ -61,7 +62,7 @@ export async function dispatchBrainQuestion(
   const q = question.trim();
   if (!q) throw new Error("Cannot dispatch an empty brain question");
 
-  const response = await processBrainQuestionAsync(q, world);
+  const response = await processBrainQuestionAsync(q, world, options.activeContext);
   const usedFallback = response.contextUsed.some((source) => source.source === "offline routing fallback");
   events.routed?.(response, usedFallback);
   events.retrieved?.(response);
@@ -121,7 +122,7 @@ export async function dispatchBrainQuestion(
     });
     result = { completion: "analysis", response, deliverable: null };
   } else if (lower.includes("meeting brief")) {
-    const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
+    const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? options.activeContext?.accountId ?? options.activeContext?.prospectId ?? firstAvailableAccountId(world);
     if (!selectedAccountId) throw new Error("No account available for meeting brief");
     events.composing?.("Composing meeting brief");
     const deliverable = await runAgent("meeting_brief", { accountId: selectedAccountId, instructions }, world);
@@ -129,7 +130,7 @@ export async function dispatchBrainQuestion(
     setState({ brainResponse: response, activeBrainArea: "customer", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("sales pitch") || lower.includes("draft a pitch") || lower.includes("one-page pitch") || lower.includes("one page pitch")) {
-    const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
+    const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? options.activeContext?.accountId ?? options.activeContext?.prospectId ?? firstAvailableAccountId(world);
     if (!selectedAccountId) throw new Error("No account available for sales pitch");
     events.composing?.("Drafting sales pitch");
     const deliverable = await runAgent("sales_pitch", { accountId: selectedAccountId, instructions }, world);
@@ -137,7 +138,7 @@ export async function dispatchBrainQuestion(
     setState({ brainResponse: response, activeBrainArea: "workflow", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("capabilities assessment") || lower.includes("can we actually serve") || lower.includes("should we chase") || lower.includes("can btx serve")) {
-    const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
+    const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? options.activeContext?.accountId ?? options.activeContext?.prospectId ?? firstAvailableAccountId(world);
     if (!selectedAccountId) throw new Error("No account available for capabilities assessment");
     events.composing?.("Checking fit and capacity");
     const deliverable = await runAgent("capabilities_assessment", { accountId: selectedAccountId, instructions }, world);
