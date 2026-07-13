@@ -15,6 +15,7 @@
     "test:rail": "tsx tools/test-rail-tabs.ts",
     "test:settings": "tsx tools/test-settings-shell.ts",
     "test:clients": "tsx tools/test-clients-surface.tsx",
+    "test:prospecting": "tsx tools/test-prospecting-surface.tsx",
     "test:deliverables": "tsx tools/test-deliverable-templates.tsx",
     "test:deliverable-wizard": "tsx tools/test-deliverable-wizard.tsx",
     "test:phase0": "tsx tools/test-phase0-safe-honest.ts",

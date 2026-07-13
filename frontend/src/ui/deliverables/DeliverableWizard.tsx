@@ -1,21 +1,32 @@
 import { useEffect, useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
-import { createDeliverableRecord, listDeliverableRecords, patchDeliverableRecord, type BackendDeliverableRecord } from "../../app/deliverablesApi.ts";
+import {
+  createDeliverableRecord,
+  listDeliverableRecords,
+  patchDeliverableRecord,
+  PROSPECT_GENERATION_RECORD_TYPE,
+  type BackendDeliverableRecord,
+} from "../../app/deliverablesApi.ts";
 import type { MetricId } from "../../metrics/types.ts";
 import { DELIVERABLE_AGENT_OPTIONS, deliverableOption, type WizardMode } from "../../agents/deliverableRegistry.ts";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import type { Deliverable, DeliverableSection } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
+import { createWorkItem } from "../../app/workItems.ts";
+
+export type WizardAction = "deliverable" | "hubspot_task";
 
 interface DeliverableWizardProps {
   mode: WizardMode;
   world: World;
   entityId?: string;
   entityIds?: string[];
+  actions?: WizardAction[];
   initialAgentId?: AgentId;
   initialInstructions?: string;
+  onComplete?(result: { deliverables: Deliverable[]; actions: WizardAction[] }): void | Promise<void>;
   onClose(): void;
 }
 
@@ -54,8 +65,10 @@ export function DeliverableWizard({
   world,
   entityId,
   entityIds,
+  actions = ["deliverable"],
   initialAgentId,
   initialInstructions = "",
+  onComplete,
   onClose,
 }: DeliverableWizardProps) {
   const anchor = defaultDateAnchor(world);
@@ -64,6 +77,7 @@ export function DeliverableWizard({
   const defaultAgent = initialAgentId ?? "meeting_brief";
   const [step, setStep] = useState<WizardStep>("pick");
   const [selectedAgents, setSelectedAgents] = useState<AgentId[]>([defaultAgent]);
+  const [selectedActions, setSelectedActions] = useState<WizardAction[]>(actions.includes("deliverable") ? ["deliverable"] : [actions[0] ?? "deliverable"]);
   const [accountId, setAccountId] = useState(entityId ?? entityIds?.[0] ?? world.prospects[0]?.company.id ?? world.companies[0]?.id ?? "");
   const [instructions, setInstructions] = useState(initialInstructions || deliverableOption(defaultAgent).defaultInstructions || "");
   const [tripCity, setTripCity] = useState(world.city ?? world.companies[0]?.location.city ?? "");
@@ -93,6 +107,7 @@ export function DeliverableWizard({
   const requiresQuarter = selectedOptions.some((option) => option.requiresQuarter);
   const requiresMetric = selectedOptions.some((option) => option.requiresMetric);
   const canSelectMultiple = mode === "multi-select";
+  const canChooseActions = actions.length > 1;
 
   useEffect(() => {
     if (mode !== "insert-into-existing") return;
@@ -100,8 +115,9 @@ export function DeliverableWizard({
     void listDeliverableRecords()
       .then((result) => {
         if (!alive) return;
-        setExisting(result.records);
-        setSelectedExistingId((current) => current || result.records[0]?.id || "");
+        const deliverables = result.records.filter((record) => record.type !== PROSPECT_GENERATION_RECORD_TYPE);
+        setExisting(deliverables);
+        setSelectedExistingId((current) => current || deliverables[0]?.id || "");
       })
       .catch((err: unknown) => {
         if (!alive) return;
@@ -120,6 +136,14 @@ export function DeliverableWizard({
     });
     const option = deliverableOption(id);
     if (!instructions && option.defaultInstructions) setInstructions(option.defaultInstructions);
+  }
+
+  function toggleAction(action: WizardAction) {
+    setSelectedActions((current) => {
+      if (!actions.includes(action)) return current;
+      if (current.includes(action)) return current.length === 1 ? current : current.filter((item) => item !== action);
+      return [...current, action];
+    });
   }
 
   function inputsFor(id: AgentId): Record<string, unknown> {
@@ -184,10 +208,22 @@ export function DeliverableWizard({
     setNotice(null);
     try {
       const generated: Deliverable[] = [];
-      for (const id of selectedAgents) {
-        generated.push(await runAgent(id, inputsFor(id), world));
+      if (selectedActions.includes("deliverable")) {
+        for (const id of selectedAgents) {
+          generated.push(await runAgent(id, inputsFor(id), world));
+        }
+        await saveGenerated(generated);
       }
-      await saveGenerated(generated);
+      if (selectedActions.includes("hubspot_task")) {
+        await createWorkItem({
+          title: `Create HubSpot task for ${companyName(world, accountId)}`,
+          accountId,
+          type: "account_action",
+          priority: "high",
+          evidence: "prospecting action wizard",
+        });
+      }
+      await onComplete?.({ deliverables: generated, actions: selectedActions });
       setStep("done");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create deliverable.");
@@ -219,12 +255,37 @@ export function DeliverableWizard({
         {step === "pick" && (
           <>
             <div className="deliverable-wizard-options">
+              {canChooseActions && (
+                <div className="deliverable-wizard-action-picker" aria-label="Actions">
+                  {actions.includes("deliverable") && (
+                    <button
+                      type="button"
+                      className={selectedActions.includes("deliverable") ? "selected" : ""}
+                      onClick={() => toggleAction("deliverable")}
+                    >
+                      <strong>Deliverables</strong>
+                      <span>Generate one or more saved deliverables.</span>
+                    </button>
+                  )}
+                  {actions.includes("hubspot_task") && (
+                    <button
+                      type="button"
+                      className={selectedActions.includes("hubspot_task") ? "selected" : ""}
+                      onClick={() => toggleAction("hubspot_task")}
+                    >
+                      <strong>HubSpot task</strong>
+                      <span>Create a backend work item for CRM task execution.</span>
+                    </button>
+                  )}
+                </div>
+              )}
               {DELIVERABLE_AGENT_OPTIONS.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   className={selectedAgents.includes(option.id) ? "selected" : ""}
                   onClick={() => toggleAgent(option.id)}
+                  disabled={!selectedActions.includes("deliverable")}
                 >
                   <strong>{option.label}</strong>
                   <span>{option.description}</span>
@@ -232,7 +293,7 @@ export function DeliverableWizard({
               ))}
             </div>
             <div className="demo-action-modal-actions">
-              <button type="button" onClick={() => setStep("confirm")}>Continue</button>
+              <button type="button" onClick={() => setStep("confirm")} disabled={!selectedActions.length}>Continue</button>
               <button type="button" onClick={onClose}>Cancel</button>
             </div>
           </>
@@ -242,7 +303,12 @@ export function DeliverableWizard({
           <>
             <div className="deliverable-wizard-summary">
               <span>Types</span>
-              <strong>{selectedOptions.map((option) => option.label).join(", ")}</strong>
+              <strong>
+                {[
+                  selectedActions.includes("deliverable") ? selectedOptions.map((option) => option.label).join(", ") : null,
+                  selectedActions.includes("hubspot_task") ? "HubSpot task" : null,
+                ].filter(Boolean).join(", ")}
+              </strong>
               {requiresAccount && (
                 <>
                   <span>Account</span>
@@ -314,7 +380,11 @@ export function DeliverableWizard({
 
         {step === "done" && (
           <div className="deliverable-wizard-done">
-            <strong>{saved.length} deliverable{saved.length === 1 ? "" : "s"} saved</strong>
+            <strong>
+              {saved.length
+                ? `${saved.length} deliverable${saved.length === 1 ? "" : "s"} saved`
+                : "Action saved"}
+            </strong>
             <ul>
               {saved.map((deliverable) => <li key={deliverable.id}>{deliverable.title}</li>)}
             </ul>

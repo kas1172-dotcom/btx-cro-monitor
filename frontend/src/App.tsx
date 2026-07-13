@@ -14,6 +14,7 @@ import { SettingsWorkspace } from "./ui/settings/SettingsWorkspace.tsx";
 import { TodayBrief } from "./ui/surfaces/TodayBrief.tsx";
 import { WorkQueue } from "./ui/surfaces/WorkQueue.tsx";
 import { Account360 } from "./ui/surfaces/Account360.tsx";
+import { Prospecting } from "./ui/surfaces/Prospecting.tsx";
 import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
 import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
@@ -80,6 +81,7 @@ export function App() {
       case "brief": return <TodayBrief world={world} />;
       case "work_queue": return <WorkQueue world={world} />;
       case "accounts": return <Account360 world={world} />;
+      case "prospecting": return <Prospecting world={world} />;
       case "ask": return <AskSurface world={world} />;
       case "map": return viewWorld ? (
         <Suspense fallback={<div className="loading">loading map…</div>}>
@@ -94,7 +96,7 @@ export function App() {
     }
   };
   const counts = Object.fromEntries(
-    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
+    (["brief", "work_queue", "accounts", "prospecting", "ask", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
       .map((surface) => [surface, countForSurface(surface, world, memory)]),
   ) as Partial<Record<SurfaceId, number>>;
 

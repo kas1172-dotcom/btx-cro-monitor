@@ -60,7 +60,7 @@ const memory: MemoryState = {
 const world = await loadWorld();
 const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId));
 
-assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
+assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,prospecting,ask", "Primary nav must include the core surfaces plus Prospecting.");
 assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "map,analysis,capacity,programs", "Secondary nav must contain the analytical surfaces.");
 assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "settings", "Utility nav must only expose Settings.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
@@ -72,6 +72,7 @@ for (const surface of ALL_SURFACES) {
 }
 
 assert(surfaceFromBrainArea("geographic") === "map", "Legacy map routing should land on Map.");
+assert(surfaceFromBrainArea("market") === "prospecting", "Legacy market routing should land on Prospecting.");
 assert(surfaceFromBrainArea("workflow") === "work_queue", "Legacy workflow routing should land on Work Queue.");
 assert(surfaceFromBrainArea("decision") === "settings", "Legacy memory routing should land in Settings.");
 

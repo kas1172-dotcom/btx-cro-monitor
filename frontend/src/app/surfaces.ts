@@ -2,7 +2,7 @@ import type { World } from "./useWorld.ts";
 import type { MemoryState } from "../memory/types.ts";
 import type { BrainArea } from "../brain/types.ts";
 
-export type CoreSurface = "brief" | "work_queue" | "accounts" | "ask";
+export type CoreSurface = "brief" | "work_queue" | "accounts" | "prospecting" | "ask";
 export type AnalyticalSurface = "map" | "analysis" | "capacity" | "programs";
 export type UtilitySurface = "settings";
 export type SurfaceId = CoreSurface | AnalyticalSurface | UtilitySurface;
@@ -19,6 +19,7 @@ export const CORE_SURFACES: SurfaceSpec[] = [
   { id: "brief", label: "Today's Brief", group: "core", componentId: "surface-todays-brief", title: "What changed, needs attention, is prepared, needs approval, and has outcomes." },
   { id: "work_queue", label: "Work Queue", group: "core", componentId: "surface-work-queue", title: "Durable work items, owners, approvals, due dates, evidence, and outcomes." },
   { id: "accounts", label: "Clients", group: "core", componentId: "surface-account-360", title: "Clients: current-business account health, linked signals, contacts, deals, deadlines, capacity fit, and recommended actions." },
+  { id: "prospecting", label: "Prospecting", group: "core", componentId: "surface-prospecting", title: "New-business prospect list with shallow detail, evidence expansion, and action generation." },
   { id: "ask", label: "Ask", group: "core", componentId: "surface-ask", title: "Primary conversational assistant." },
 ];
 
@@ -46,6 +47,7 @@ export function surfaceFromBrainArea(area: BrainArea): SurfaceId {
     case "workflow":
       return "work_queue";
     case "market":
+      return "prospecting";
     case "customer":
     case "revenue":
       return "accounts";
@@ -66,6 +68,8 @@ export function brainAreaForSurface(surface: SurfaceId): BrainArea {
       return "revenue";
     case "programs":
       return "market";
+    case "prospecting":
+      return "market";
     case "accounts":
       return "customer";
     case "ask":
@@ -83,6 +87,8 @@ export function countForSurface(surface: SurfaceId, world: World | null, memory:
       return world.analysis.recommendations.length;
     case "accounts":
       return world.companies.filter((company) => company.business_motion !== "prospect_new_business").length;
+    case "prospecting":
+      return world.companies.filter((company) => company.business_motion === "prospect_new_business").length;
     case "ask":
       return undefined;
     case "map":
