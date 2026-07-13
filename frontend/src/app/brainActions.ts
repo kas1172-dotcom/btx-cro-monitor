@@ -1,6 +1,7 @@
 import type { World } from "./useWorld.ts";
 import { processBrainQuestionAsync } from "../brain/brainEngine.ts";
-import type { BrainArea, BrainResponse } from "../brain/types.ts";
+import type { TabId } from "./surfaces.ts";
+import type { BrainResponse } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import { runAgent } from "../agents/runAgent.ts";
 import { saveBrainMemoryNote, saveDeliverable } from "../memory/localMemory.ts";
@@ -48,8 +49,8 @@ function namedAccountId(question: string, world: World): string | undefined {
   return accounts.find((account) => lower.includes(account.name.toLowerCase()))?.id;
 }
 
-function routeArea(response: BrainResponse, fallback: BrainArea = "revenue"): BrainArea {
-  return response.activatedBrainAreas[0] ?? fallback;
+function routeArea(response: BrainResponse, fallback: TabId = "analysis"): TabId {
+  return response.activatedTabs[0] ?? fallback;
 }
 
 export async function dispatchBrainQuestion(
@@ -86,7 +87,7 @@ export async function dispatchBrainQuestion(
       instructions,
     }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: "geographic", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: "map", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("board deck") || lower.includes("quarterly board")) {
     events.composing?.("Building board deck");
@@ -96,7 +97,7 @@ export async function dispatchBrainQuestion(
       instructions,
     }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: "revenue", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: "analysis", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("analysis view") || lower.includes("show revenue by client") || lower.includes("revenue heatmap")) {
     events.composing?.("Preparing analysis view");
@@ -109,7 +110,7 @@ export async function dispatchBrainQuestion(
     saveDeliverable(deliverable);
     setState({
       brainResponse: response,
-      activeBrainArea: "decision",
+      activeTab: "analysis",
       activeDeliverable: null,
       activeAnalysisSpec: {
         viz: "heatmap",
@@ -126,7 +127,7 @@ export async function dispatchBrainQuestion(
     events.composing?.("Composing meeting brief");
     const deliverable = await runAgent("meeting_brief", { accountId: selectedAccountId, instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: "customer", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: "accounts", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("sales pitch") || lower.includes("draft a pitch") || lower.includes("one-page pitch") || lower.includes("one page pitch")) {
     const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
@@ -134,7 +135,7 @@ export async function dispatchBrainQuestion(
     events.composing?.("Drafting sales pitch");
     const deliverable = await runAgent("sales_pitch", { accountId: selectedAccountId, instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: "workflow", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: "work_queue", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("capabilities assessment") || lower.includes("can we actually serve") || lower.includes("should we chase") || lower.includes("can btx serve")) {
     const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
@@ -142,25 +143,25 @@ export async function dispatchBrainQuestion(
     events.composing?.("Checking fit and capacity");
     const deliverable = await runAgent("capabilities_assessment", { accountId: selectedAccountId, instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: "capability", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: "capacity", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("draft outreach") || lower.includes("outreach")) {
     events.composing?.("Drafting outreach");
     const deliverable = await runAgent("outreach", { instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: "workflow", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: "work_queue", activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("weekly brief") || lower.includes("care about this week")) {
     events.composing?.("Composing weekly brief");
     const deliverable = await runAgent("weekly_memo", { title: "Weekly CRO Memo", instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeBrainArea: routeArea(response), activeDeliverable: deliverable, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: routeArea(response), activeDeliverable: deliverable, activeAnalysisSpec: null });
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("activity log") || lower.includes("saved to brain")) {
-    setState({ activeBrainArea: "decision", brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null });
+    setState({ activeTab: "settings", brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null });
     result = { completion: "activity", response: null, deliverable: null };
   } else {
-    setState({ brainResponse: response, activeBrainArea: routeArea(response), activeDeliverable: null, activeAnalysisSpec: null });
+    setState({ brainResponse: response, activeTab: routeArea(response), activeDeliverable: null, activeAnalysisSpec: null });
     result = { completion: "response", response, deliverable: null };
   }
 

@@ -50,7 +50,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
   let suggestedNextQuestions: string[] = [];
   let relatedOpportunities: OpportunityCard[] = [];
   let focusView: BrainResponse["focusView"] = "accounts";
-  let noteArea: SavedBrainNote["brainArea"] = ctx.activatedBrainAreas[0] ?? "revenue";
+  let noteArea: SavedBrainNote["brainArea"] = ctx.activatedTabs[0] ?? "analysis";
   let noteTitle = "Revenue Brain note";
 
   if (ctx.intent === "market_signals") {
@@ -61,7 +61,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     suggestedNextQuestions = ["Which accounts connect to these signals?", "Who should BTX call first?", "Draft outreach for the top signal account."];
     relatedOpportunities = ctx.topProspects.slice(0, 4).map((p) => cardFor(p, world));
     focusView = "signals";
-    noteArea = "market";
+    noteArea = "programs";
     noteTitle = "Market signal review";
   } else if (ctx.intent === "geographic_prospecting") {
     const city = ctx.city ?? "selected market";
@@ -71,7 +71,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     suggestedNextQuestions = [`Draft outreach for the top ${city} target.`, `Show all ${city} targets on the map.`, "Create a meeting brief for the first stop."];
     relatedOpportunities = ctx.topProspects.map((p) => cardFor(p, world));
     focusView = "map";
-    noteArea = "geographic";
+    noteArea = "map";
     noteTitle = `${city} prospecting plan`;
   } else if (ctx.intent === "account_risk") {
     directAnswer = `${ctx.atRiskAccounts.length} accounts show elevated risk. Priority: ${ctx.atRiskAccounts.slice(0, 3).map((c) => c.name).join(", ") || "none"}.`;
@@ -83,7 +83,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
       .filter((p): p is Prospect => Boolean(p))
       .map((p) => cardFor(p, world));
     focusView = "accounts";
-    noteArea = "revenue";
+    noteArea = "analysis";
     noteTitle = "Account risk review";
   } else if (ctx.intent === "capabilities") {
     const hours = world.snapshot?.capacity.reduce((sum, row) => sum + row.available_5_axis_hours_next_30d, 0) ?? 0;
@@ -93,7 +93,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     suggestedNextQuestions = ["Which accounts best match BTX capabilities?", "What should BTX not sell right now?", "Draft capability-led outreach."];
     relatedOpportunities = ctx.topProspects.filter((p) => p.fit.score >= 60).slice(0, 5).map((p) => cardFor(p, world));
     focusView = "capabilities";
-    noteArea = "capability";
+    noteArea = "capacity";
     noteTitle = "Production-fit sales focus";
   } else if (ctx.intent === "weekly_brief") {
     const top = ctx.topProspects[0];
@@ -104,7 +104,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     suggestedNextQuestions = ["Generate a board-ready summary.", "Create a meeting brief for the top risk.", "Show the top opportunity on the map."];
     relatedOpportunities = ctx.topProspects.slice(0, 4).map((p) => cardFor(p, world));
     focusView = "brief";
-    noteArea = "revenue";
+    noteArea = "brief";
     noteTitle = "Weekly CRO brief";
   } else {
     directAnswer = `${PROFILE.name} has ${ctx.topProspects.length} priority opportunities, ${ctx.topSignals.length} active signals, and ${money(ctx.pipelineValue)} open pipeline across ${ctx.openDealCount} deals.`;
@@ -113,7 +113,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     suggestedNextQuestions = ["Who should I target in Austin?", "Which accounts are at risk?", "What market signals matter this week?"];
     relatedOpportunities = ctx.topProspects.slice(0, 5).map((p) => cardFor(p, world));
     focusView = "accounts";
-    noteArea = "revenue";
+    noteArea = "analysis";
     noteTitle = "Revenue focus";
   }
 
@@ -121,7 +121,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     question: ctx.question,
     directAnswer,
     whyThisMatters,
-    activatedBrainAreas: ctx.activatedBrainAreas,
+    activatedTabs: ctx.activatedTabs,
     contextUsed: ctx.contextUsed,
     recommendedActions: recommendedActions.slice(0, 4),
     savedNote: {

@@ -120,10 +120,10 @@ export async function executeTourStep(step: TourStep, world: World, timeoutMs = 
     await dispatchBrainQuestion(askPrompt(step, world), world, { accountId: account.id });
   }
   if (step.execution === "dossier") {
-    setState({ activeCompanyId: account.id, activeDeliverable: null, activeAnalysisSpec: null, brainResponse: null, activeBrainArea: "customer" });
+    setState({ activeCompanyId: account.id, activeDeliverable: null, activeAnalysisSpec: null, brainResponse: null, activeTab: "accounts" });
   }
   if (step.execution === "hold") {
-    setState({ activeCompanyId: account.id, activeDeliverable: null, activeAnalysisSpec: null, brainResponse: null, activeBrainArea: "customer" });
+    setState({ activeCompanyId: account.id, activeDeliverable: null, activeAnalysisSpec: null, brainResponse: null, activeTab: "accounts" });
     await new Promise((resolve) => setTimeout(resolve, 1200));
   }
   if (step.execution === "analysis") {
@@ -131,7 +131,7 @@ export async function executeTourStep(step: TourStep, world: World, timeoutMs = 
       activeCompanyId: null,
       activeDeliverable: null,
       brainResponse: null,
-      activeBrainArea: "decision",
+      activeTab: "analysis",
       activeAnalysisSpec: {
         viz: "heatmap",
         metric: "revenue",
@@ -146,7 +146,7 @@ export async function executeTourStep(step: TourStep, world: World, timeoutMs = 
     if (!step.agentId) throw new Error("Tour agent step missing agentId");
     const deliverable = await runAgent(step.agentId, agentInputs(step, world), world);
     saveDeliverable(deliverable);
-    setState({ activeDeliverable: deliverable, activeCompanyId: null, activeAnalysisSpec: null, brainResponse: null, activeBrainArea: deliverable.brainArea });
+    setState({ activeDeliverable: deliverable, activeCompanyId: null, activeAnalysisSpec: null, brainResponse: null, activeTab: deliverable.brainArea });
   }
   if (step.execution === "home") {
     setState({ activeHome: true, brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null, activeCompanyId: null });

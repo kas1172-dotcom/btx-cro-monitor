@@ -45,7 +45,7 @@ export function ProspectMap({ world }: { world: World }) {
   const watchKey = `${world.city ?? "all"}:${markers.length}:${activeCompanyId ?? "none"}`;
 
   return (
-    <div className="map-shell">
+    <div className="map-shell" data-surface-component="surface-map">
       <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
         <MapSizeInvalidator watchKey={watchKey} />
         <ZoomControl position="bottomright" />

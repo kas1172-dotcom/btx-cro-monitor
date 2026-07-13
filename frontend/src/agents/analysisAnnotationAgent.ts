@@ -106,7 +106,7 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
       type: "analysis_view",
       title: `${f.label} Annotation \u2014 ${f.quarter}`,
       createdAt: new Date().toISOString(),
-      brainArea: "decision",
+      brainArea: "analysis",
       entityIds: ctx.entityIds,
       confidence: prior > 0 ? "high" : "medium",
       confidenceReason: prior > 0 ? "Current and prior quarter data both available." : "No prior quarter for comparison.",

@@ -105,7 +105,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
       type: "weekly_memo",
       title: String(f.title),
       createdAt: now,
-      brainArea: "revenue",
+      brainArea: "brief",
       entityIds: ctx.entityIds,
       confidence: conf,
       confidenceReason: conf === "high" ? "High: opportunity, risk, and evidence are all linked." : conf === "medium" ? "Medium: at least one evidence field is incomplete." : "Low: key account evidence is missing.",

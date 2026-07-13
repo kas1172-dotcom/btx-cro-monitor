@@ -134,7 +134,7 @@ export const outreachAgent: DeliverableAgent<Inputs> = {
       type: "outreach",
       title: `Draft Outreach - ${f.accountName}`,
       createdAt: new Date().toISOString(),
-      brainArea: "workflow",
+      brainArea: "work_queue",
       entityIds: ctx.entityIds,
       confidence: conf,
       confidenceReason: conf === "high" ? "High: named contact, public business hook, and capacity context are available." : conf === "medium" ? `Medium: ${f.contactNote}` : "Low: missing named contact and public business hook.",

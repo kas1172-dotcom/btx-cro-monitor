@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { SurfaceId } from "../app/surfaces.ts";
+import type { TabId } from "../app/surfaces.ts";
 
-type IconName = SurfaceId | "document" | "empty" | "chevron" | "signal" | "user";
+type IconName = TabId | "document" | "empty" | "chevron" | "signal" | "user";
 
 const iconPaths: Record<IconName, ReactNode> = {
   brief: <path d="M5 5h14M5 10h10M5 15h14M5 20h8" />,

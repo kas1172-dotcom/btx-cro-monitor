@@ -1,4 +1,4 @@
-import type { BrainArea } from "../brain/types.ts";
+import type { TabId } from "../app/surfaces.ts";
 
 export type DeliverableType =
   | "itinerary"
@@ -45,7 +45,7 @@ export interface Deliverable {
   type: DeliverableType;
   title: string;
   createdAt: string;
-  brainArea: BrainArea;
+  brainArea: TabId;
   entityIds: string[];
   sections: DeliverableSection[];
   sources: ProvenanceEntry[];

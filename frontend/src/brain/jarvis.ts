@@ -12,6 +12,7 @@ import { GROUNDING_CONTRACT, CURRENT_VS_PROSPECTING } from "../app/promptContrac
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { setState } from "../store/store.ts";
 import { backendHeaders } from "../app/backendApi.ts";
+import { TAB_IDS, type TabId } from "../app/surfaces.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -100,12 +101,12 @@ export function dispatchChatpilAction(intent: string, world: World): string | nu
 
   // "show me the map" / "open the map"
   if (/(show|open|go to).*(map|geographic)/.test(lower)) {
-    setState({ activeBrainArea: "geographic" });
+    setState({ activeTab: "map" });
     return "Opened the map view.";
   }
   // "show accounts" / "open current business"
   if (/(show|open).*(account|current business|customer)/.test(lower)) {
-    setState({ activeBrainArea: "customer" });
+    setState({ activeTab: "accounts" });
     return "Opened the accounts view.";
   }
   // "open <company name>"
@@ -211,7 +212,8 @@ ${CURRENT_VS_PROSPECTING}
 BEHAVIORAL RULES:
 - Answer the question directly from context. At the end of your answer, include a compact "based on: …" line citing the specific facts used (keep it to one line, comma-separated).
 - When natural, close with ONE useful offer as a question (e.g. "Want me to draft the outreach?" or "Should I pull the capabilities assessment?") — mark it clearly with "OFFER:" at the start of the line so the UI can render it as a button.
-- Navigation: if the user says "open X" or "show me Y", respond with "ACTION:open_dossier:<company_id>" or "ACTION:open_area:<area>" on its own line, then confirm in one sentence what you did.
+- Navigation: if the user says "open X" or "show me Y", respond with "ACTION:open_dossier:<company_id>" or "ACTION:open_area:<tab>" on its own line, then confirm in one sentence what you did.
+Allowed tabs: ${TAB_IDS.join(", ")}.
 - Know your limits: if a question asks for data not in the context (European churn, pricing history, etc.), say exactly: "That data isn't in my context. What I do have: [list 1-2 relevant things that ARE available]." Never fabricate.
 - Be concise and warm-professional. No preamble, no bullet-soup unless comparing 3+ items. Lead with the recommendation.
 
@@ -353,9 +355,8 @@ function parseAssistantReply(raw: string, world: World): Msg {
           actionConfirmation = `Opened dossier for ${company.name}.`;
         }
       } else if (actionType === "open_area") {
-        const validAreas = ["revenue", "customer", "market", "geographic", "capability", "decision", "workflow"];
-        if (validAreas.includes(payload)) {
-          setState({ activeBrainArea: payload as Parameters<typeof setState>[0]["activeBrainArea"] });
+        if ((TAB_IDS as readonly string[]).includes(payload)) {
+          setState({ activeTab: payload as TabId });
           actionConfirmation = `Navigated to ${payload} view.`;
         }
       }

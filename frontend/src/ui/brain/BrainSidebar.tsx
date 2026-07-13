@@ -3,17 +3,15 @@ import {
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
   UTILITY_SURFACES,
-  brainAreaForSurface,
-  type SurfaceId,
+  type TabId,
 } from "../../app/surfaces.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
 
-function openSurface(surface: SurfaceId): void {
+function openSurface(surface: TabId): void {
   setState({
-    activeSurface: surface,
+    activeTab: surface,
     activeSettings: surface === "settings",
     activeHome: surface === "brief",
-    activeBrainArea: brainAreaForSurface(surface),
     brainResponse: null,
     activeDeliverable: null,
     activeAnalysisSpec: null,
@@ -22,11 +20,11 @@ function openSurface(surface: SurfaceId): void {
 }
 
 export function BrainSidebar({
-  activeSurface,
+  activeTab,
   counts,
 }: {
-  activeSurface: SurfaceId;
-  counts: Partial<Record<SurfaceId, number>>;
+  activeTab: TabId;
+  counts: Partial<Record<TabId, number>>;
 }) {
   const groups = [
     { label: "Core", items: CORE_SURFACES },
@@ -45,7 +43,7 @@ export function BrainSidebar({
           {group.items.map((surface) => (
             <button
               key={surface.id}
-              className={activeSurface === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
+              className={activeTab === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
               onClick={() => openSurface(surface.id)}
               title={surface.title}
             >

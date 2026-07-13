@@ -6,14 +6,14 @@ import type { World } from "../../app/useWorld.ts";
 import { useWorkItems, type WorkItem } from "../../app/workItems.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
-import type { SurfaceId } from "../../app/surfaces.ts";
+import type { TabId } from "../../app/surfaces.ts";
 import { AskBrainBar } from "../brain/AskBrainBar.tsx";
 import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
 
 type BriefLink = {
   label: string;
-  surface: SurfaceId;
+  surface: TabId;
   accountId?: string | null;
 };
 
@@ -46,9 +46,8 @@ function signalLink(signal: Signal): BriefLink {
 }
 
 function navigate(link: BriefLink): void {
-  // TODO(WP0): replace this surface/account state patch with unified TabId navigation.
   setState({
-    activeSurface: link.surface,
+    activeTab: link.surface,
     activeCompanyId: link.accountId ?? null,
     brainResponse: null,
     activeDeliverable: null,

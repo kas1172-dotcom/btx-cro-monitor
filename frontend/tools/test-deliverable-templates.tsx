@@ -114,7 +114,7 @@ function baseDeliverable(type: Deliverable["type"], title: string): Deliverable 
     type,
     title,
     createdAt: "2026-07-12T12:00:00Z",
-    brainArea: type === "capabilities_assessment" ? "capability" : type === "outreach" ? "workflow" : "revenue",
+    brainArea: type === "capabilities_assessment" ? "capacity" : type === "outreach" ? "work_queue" : "analysis",
     entityIds: ["hubspot-company-100"],
     confidence: "high",
     sections: [

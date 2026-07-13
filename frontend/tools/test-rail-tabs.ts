@@ -1,14 +1,13 @@
 import { DemoDataAdapter } from "../src/adapters/demo/DemoDataAdapter.ts";
 import { analyze, buildProspects } from "../src/app/intelligence.ts";
 import { deriveNewsSignals } from "../src/app/newsIngest.ts";
-import { buildRailAuditViews } from "../src/app/railViews.ts";
 import {
   ALL_SURFACES,
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
+  TAB_IDS,
   UTILITY_SURFACES,
   countForSurface,
-  surfaceFromBrainArea,
 } from "../src/app/surfaces.ts";
 import { deriveWorkItems, draftToCreatePayload, filterWorkItems } from "../src/app/workItems.ts";
 import newsData from "../data/demo/btx/news.json";
@@ -63,6 +62,7 @@ const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId))
 assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
 assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "map,analysis,capacity,programs", "Secondary nav must contain the analytical surfaces.");
 assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "settings", "Utility nav must only expose Settings.");
+assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,map,analysis,capacity,programs,settings", "TabId order must stay canonical.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
 assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
 
@@ -71,9 +71,16 @@ for (const surface of ALL_SURFACES) {
   countForSurface(surface.id, world, memory);
 }
 
-assert(surfaceFromBrainArea("geographic") === "map", "Legacy map routing should land on Map.");
-assert(surfaceFromBrainArea("workflow") === "work_queue", "Legacy workflow routing should land on Work Queue.");
-assert(surfaceFromBrainArea("decision") === "settings", "Legacy memory routing should land in Settings.");
+const componentByTab = Object.fromEntries(ALL_SURFACES.map((surface) => [surface.id, surface.componentId]));
+assert(componentByTab.brief === "surface-todays-brief", "Brief tab must mount Today's Brief.");
+assert(componentByTab.work_queue === "surface-work-queue", "Work Queue tab must mount Work Queue.");
+assert(componentByTab.accounts === "surface-account-360", "Accounts tab must mount Account 360.");
+assert(componentByTab.ask === "surface-ask", "Ask tab must mount Ask.");
+assert(componentByTab.map === "surface-map", "Map tab must mount Map.");
+assert(componentByTab.analysis === "surface-analysis-dashboard", "Analysis tab must mount Analysis dashboard.");
+assert(componentByTab.capacity === "surface-capacity-assessment", "Capacity tab must mount Capacity assessment.");
+assert(componentByTab.programs === "surface-program-contract-tracker", "Programs tab must mount Program tracker.");
+assert(componentByTab.settings === "surface-settings", "Settings tab must mount Settings.");
 
 const workItems = deriveWorkItems(world);
 assert(workItems.length > 0, "Core surfaces must be backed by work items.");
@@ -83,9 +90,4 @@ assert(payload.canonical_account_id === "acct-1", "Work-item preview must preser
 assert(payload.source_signal_ids?.[0] === "sig-1", "Work-item preview must preserve evidence signal ids.");
 assert(payload.approval_state === "pending", "Work-item preview should create approval-ready items.");
 
-// Keep the legacy rail audit as an overflow auditor for older detailed components.
-const auditViews = buildRailAuditViews(world, memory);
-assert(auditViews.length === 8, "Legacy overflow auditor should still cover home plus seven absorbed areas.");
-assert(new Set(auditViews.map((view) => view.componentId)).size === auditViews.length, "Overflow auditor component ids must remain distinct.");
-
-console.log(`ia surfaces ok: ${ALL_SURFACES.map((surface) => `${surface.id}:${surface.componentId}`).join(", ")}`);
+console.log(`tab surfaces ok: ${ALL_SURFACES.map((surface) => `${surface.id}:${surface.componentId}`).join(", ")}`);

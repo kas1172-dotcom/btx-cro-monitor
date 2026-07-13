@@ -40,16 +40,16 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
   function ask(question: string) {
     const response = processBrainQuestion(question, world);
     saveBrainMemoryNote(response.savedNote);
-    setState({ brainResponse: response, activeBrainArea: response.activatedBrainAreas[0] ?? "revenue" });
+    setState({ brainResponse: response, activeTab: response.activatedTabs[0] ?? "analysis" });
   }
 
   function openSample(sample: Deliverable) {
     const chartBlock = sample.sections.flatMap((section) => section.blocks).find((block) => block.kind === "chart-spec");
     if (sample.type === "analysis_view" && chartBlock?.kind === "chart-spec") {
-      setState({ activeAnalysisSpec: chartBlock.spec as unknown as ChartSpec, activeBrainArea: "decision", brainResponse: null, activeDeliverable: null });
+      setState({ activeAnalysisSpec: chartBlock.spec as unknown as ChartSpec, activeTab: "analysis", brainResponse: null, activeDeliverable: null });
       return;
     }
-    setState({ activeDeliverable: sample, activeBrainArea: sample.brainArea, brainResponse: null, activeAnalysisSpec: null });
+    setState({ activeDeliverable: sample, activeTab: sample.brainArea, brainResponse: null, activeAnalysisSpec: null });
   }
 
   const recent = memory.activity[0];

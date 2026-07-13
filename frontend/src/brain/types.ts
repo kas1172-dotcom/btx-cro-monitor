@@ -1,21 +1,4 @@
-export type BrainArea =
-  | "market"
-  | "customer"
-  | "capability"
-  | "revenue"
-  | "geographic"
-  | "decision"
-  | "workflow";
-
-export const BRAIN_AREA_LABELS: Record<BrainArea, string> = {
-  market: "Market",
-  customer: "Accounts",
-  capability: "Capability",
-  revenue: "Revenue",
-  geographic: "Geographic",
-  decision: "Decision",
-  workflow: "Workflow",
-};
+import type { TabId } from "../app/surfaces.ts";
 
 export interface ContextSource {
   source: string;
@@ -24,7 +7,7 @@ export interface ContextSource {
 
 export interface SavedBrainNote {
   title: string;
-  brainArea: BrainArea;
+  brainArea: TabId;
   summary: string;
   entities: string[];
 }
@@ -59,7 +42,7 @@ export interface BrainResponse {
   question: string;
   directAnswer: string;
   whyThisMatters: string;
-  activatedBrainAreas: BrainArea[];
+  activatedTabs: TabId[];
   contextUsed: ContextSource[];
   recommendedActions: string[];
   savedNote: SavedBrainNote;

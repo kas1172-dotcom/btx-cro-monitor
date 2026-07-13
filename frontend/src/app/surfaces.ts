@@ -1,14 +1,13 @@
 import type { World } from "./useWorld.ts";
 import type { MemoryState } from "../memory/types.ts";
-import type { BrainArea } from "../brain/types.ts";
 
-export type CoreSurface = "brief" | "work_queue" | "accounts" | "ask";
-export type AnalyticalSurface = "map" | "analysis" | "capacity" | "programs";
-export type UtilitySurface = "settings";
-export type SurfaceId = CoreSurface | AnalyticalSurface | UtilitySurface;
+export type CoreTab = "brief" | "work_queue" | "accounts" | "ask";
+export type AnalyticalTab = "map" | "analysis" | "capacity" | "programs";
+export type UtilityTab = "settings";
+export type TabId = CoreTab | AnalyticalTab | UtilityTab;
 
 export interface SurfaceSpec {
-  id: SurfaceId;
+  id: TabId;
   label: string;
   group: "core" | "analytical" | "utility";
   componentId: string;
@@ -35,46 +34,21 @@ export const UTILITY_SURFACES: SurfaceSpec[] = [
 
 export const ALL_SURFACES = [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES];
 
-export function surfaceFromBrainArea(area: BrainArea): SurfaceId {
-  switch (area) {
-    case "geographic":
-      return "map";
-    case "capability":
-      return "capacity";
-    case "decision":
-      return "settings";
-    case "workflow":
-      return "work_queue";
-    case "market":
-    case "customer":
-    case "revenue":
-      return "accounts";
-  }
-}
+export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"];
 
-export function brainAreaForSurface(surface: SurfaceId): BrainArea {
-  switch (surface) {
-    case "map":
-      return "geographic";
-    case "capacity":
-      return "capability";
-    case "settings":
-      return "decision";
-    case "work_queue":
-      return "workflow";
-    case "analysis":
-      return "revenue";
-    case "programs":
-      return "market";
-    case "accounts":
-      return "customer";
-    case "ask":
-    case "brief":
-      return "revenue";
-  }
-}
+export const TAB_LABELS: Record<TabId, string> = {
+  brief: "Today's Brief",
+  work_queue: "Work Queue",
+  accounts: "Accounts",
+  ask: "Ask",
+  map: "Map",
+  analysis: "Analysis",
+  capacity: "Capacity",
+  programs: "Programs",
+  settings: "Settings",
+};
 
-export function countForSurface(surface: SurfaceId, world: World | null, memory: MemoryState | null): number | undefined {
+export function countForSurface(surface: TabId, world: World | null, memory: MemoryState | null): number | undefined {
   if (!world) return undefined;
   switch (surface) {
     case "brief":
