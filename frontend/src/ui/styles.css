@@ -1154,7 +1154,14 @@ button, input, select, textarea { font: inherit; }
 .settings-weight-row strong {
   font-size: 12px;
 }
-.settings-weight-row input, .settings-source-row input, .settings-source-row select, .settings-request textarea {
+.settings-weight-row input,
+.settings-source-row input,
+.settings-source-row select,
+.settings-request textarea,
+.settings-template-row input,
+.settings-template-row textarea,
+.settings-request-form input,
+.settings-request-form textarea {
   width: 100%;
   min-width: 0;
   border: 1px solid var(--line);
@@ -1191,7 +1198,10 @@ button, input, select, textarea { font: inherit; }
 .settings-source-row label input {
   width: auto;
 }
-.settings-source-row button, .settings-inline-actions button, .settings-primary {
+.settings-source-row button,
+.settings-inline-actions button,
+.settings-template-actions button,
+.settings-primary {
   padding: 9px 11px;
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -1199,8 +1209,88 @@ button, input, select, textarea { font: inherit; }
   color: var(--text);
   cursor: pointer;
 }
-.settings-source-row button:hover, .settings-inline-actions button:hover, .settings-primary:hover {
+.settings-source-row button:hover,
+.settings-inline-actions button:hover,
+.settings-template-actions button:hover,
+.settings-primary:hover {
   border-color: var(--accent);
+}
+.settings-template-list {
+  display: grid;
+  gap: 10px;
+}
+.settings-template-row {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(var(--text-primary-rgb), .02);
+}
+.settings-template-main {
+  display: grid;
+  grid-template-columns: minmax(104px, .45fr) minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+.settings-template-main label,
+.settings-template-prompt,
+.settings-request-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.settings-template-toggle {
+  align-self: center;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+.settings-template-toggle input {
+  width: auto;
+}
+.settings-template-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.settings-template-actions button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.settings-template-prompt textarea,
+.settings-request-form textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+.settings-integration-request {
+  margin-top: 16px;
+}
+.settings-request-form {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(var(--text-primary-rgb), .02);
+}
+.settings-request-list {
+  display: grid;
+  gap: 8px;
+}
+.settings-request-list article {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+.settings-request-list span,
+.settings-request-list em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
 }
 .settings-inline-actions {
   display: flex;
@@ -1765,7 +1855,7 @@ button, input, select, textarea { font: inherit; }
   .rail-quiet-row, .pipeline-table-row { grid-template-columns: 1fr; }
   .pipeline-table-head { display: none; }
   .settings-layout { grid-template-columns: 1fr; }
-  .settings-status, .settings-source-row, .settings-runs div { grid-template-columns: 1fr; }
+  .settings-status, .settings-source-row, .settings-template-main, .settings-runs div { grid-template-columns: 1fr; }
   .settings-weight-head, .settings-weight-row { min-width: 620px; }
   .current-account-row, .current-pipeline-row, .current-signal-row, .prospect-card, .visit-plan-card { grid-template-columns: 1fr; }
   .current-score, .prospect-card-score, .visit-plan-meta { white-space: normal; align-items: flex-start; }
@@ -2197,6 +2287,14 @@ button, input, select, textarea { font: inherit; }
 }
 .memory-controls input { min-width: min(420px, 100%); flex: 1; }
 .memory-list { display: grid; gap: 8px; }
+.memory-section-label {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
 .memory-row {
   display: grid; grid-template-columns: 110px minmax(180px, .7fr) minmax(280px, 1fr); gap: 12px; align-items: center;
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 11px 12px;

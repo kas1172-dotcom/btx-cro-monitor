@@ -45,6 +45,7 @@ def test_migration_applies_and_matches_current_models(tmp_path: Path):
     for expected in (
         "connections", "events", "idempotency_keys", "outbound_log", "dead_letters",
         "engine_configs", "canonical_accounts", "pipeline_runs", "work_items",
+        "deliverables", "deliverable_templates", "integration_requests",
         "hubspot_task_audits", "alembic_version",
     ):
         assert expected in tables, f"migration did not create {expected}"

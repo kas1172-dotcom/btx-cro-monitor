@@ -194,6 +194,51 @@ class WorkItem(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
 
 
+class Deliverable(Base):
+    """Document-like deliverable persisted for the cockpit library/memory."""
+    __tablename__ = "deliverables"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    type: Mapped[str] = mapped_column(String(80), index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    program_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    trip_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    document: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class DeliverableTemplate(Base):
+    """Settings-managed metadata for the fixed deliverable agent set."""
+    __tablename__ = "deliverable_templates"
+    __table_args__ = (UniqueConstraint("tenant_id", "agent_id", name="uq_deliverable_template_agent"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    agent_id: Mapped[str] = mapped_column(String(80), index=True)
+    label: Mapped[str] = mapped_column(String(160))
+    enabled: Mapped[bool] = mapped_column(default=True, index=True)
+    order: Mapped[int] = mapped_column("sort_order", Integer, default=0, index=True)
+    prompt_override: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class IntegrationRequest(Base):
+    """Stored request for a future integration implementation."""
+    __tablename__ = "integration_requests"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    requester_name: Mapped[str] = mapped_column(String(160))
+    integration_name: Mapped[str] = mapped_column(String(160), index=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
 class HubSpotTaskAudit(Base):
     """Durable audit trail for task writes made from the cockpit."""
     __tablename__ = "hubspot_task_audits"

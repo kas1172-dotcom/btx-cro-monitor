@@ -169,6 +169,75 @@ class EngineConfigResponse(BaseModel):
     updated_at: str
 
 
+class DeliverableCreate(BaseModel):
+    id: str = Field(min_length=1, max_length=64)
+    type: str = Field(min_length=1, max_length=80)
+    title: str = Field(min_length=1, max_length=300)
+    canonical_account_id: str | None = None
+    program_id: str | None = None
+    trip_id: str | None = None
+    document: dict
+
+
+class DeliverablePatch(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=300)
+    canonical_account_id: str | None = None
+    program_id: str | None = None
+    trip_id: str | None = None
+    document: dict | None = None
+
+
+class DeliverableResponse(BaseModel):
+    id: str
+    type: str
+    title: str
+    canonical_account_id: str | None = None
+    program_id: str | None = None
+    trip_id: str | None = None
+    document: dict
+    created_at: str
+    updated_at: str
+
+
+class DeliverableTemplatePatch(BaseModel):
+    label: str | None = Field(default=None, min_length=1, max_length=160)
+    enabled: bool | None = None
+    order: int | None = None
+    prompt_override: str | None = None
+
+
+class DeliverableTemplateResponse(BaseModel):
+    agent_id: str
+    label: str
+    enabled: bool
+    order: int
+    prompt_override: str | None = None
+    updated_at: str
+
+
+IntegrationRequestStatus = Literal["pending", "reviewed", "dismissed"]
+
+
+class IntegrationRequestCreate(BaseModel):
+    requester_name: str = Field(min_length=1, max_length=160)
+    integration_name: str = Field(min_length=1, max_length=160)
+    notes: str | None = None
+
+
+class IntegrationRequestPatch(BaseModel):
+    status: IntegrationRequestStatus
+
+
+class IntegrationRequestResponse(BaseModel):
+    id: str
+    requester_name: str
+    integration_name: str
+    notes: str | None = None
+    status: str
+    created_at: str
+    updated_at: str
+
+
 class PipelineRunResponse(BaseModel):
     id: str
     triggered_at: str

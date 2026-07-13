@@ -2,10 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import defaultWeights from "../../../data/config/scoring-weights.v1.json";
 import clientConfig from "../../../../clients/btx/config.json";
 import { SETTINGS_SECTIONS } from "../../app/settingsSections.ts";
-import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
+import {
+  BACKEND_ENDPOINT,
+  backendJson,
+  createBackendIntegrationRequest,
+  listBackendIntegrationRequests,
+  type BackendIntegrationRequest,
+} from "../../app/backendApi.ts";
 import { applyScoringConfig } from "../../app/config.ts";
+import {
+  DEFAULT_TEMPLATE_PROMPTS,
+  useDeliverableTemplates,
+  type DeliverableTemplateMeta,
+} from "../../app/deliverableTemplates.ts";
 import { clearMemory } from "../../memory/localMemory.ts";
 import { resetUiState, setState, useStore, type SettingsSection } from "../../store/store.ts";
+import type { AgentId } from "../../agents/runAgent.ts";
 import type { WeightsConfig } from "../../engine/decision/weights.ts";
 import { MemoryPanel } from "../brain/MemoryPanel.tsx";
 import { Integrations } from "../integrations/Integrations.tsx";
@@ -49,6 +61,7 @@ interface PipelineRun {
 const WEIGHTS_KEY = "btx.settings.scoring_weights";
 const SOURCES_KEY = "btx.settings.source_registry";
 const SOURCE_REQUESTS_KEY = "btx.settings.source_requests";
+const INTEGRATION_REQUESTS_KEY = "btx.settings.integration_requests";
 const DIMENSIONS: Dimension[] = ["risk", "opportunity", "capacityRisk", "competitivePressure"];
 const LIVE_MODE = Boolean(BACKEND_ENDPOINT);
 
@@ -118,7 +131,7 @@ function sectionCopy(section: SettingsSection): { title: string; body: string } 
     case "prompts":
       return {
         title: "Prompts & rubrics",
-        body: "Agent prompt, rubric, gold example, and banned-vocabulary editors land here after engine settings are wired.",
+        body: "Enable, reorder, rename, and override rubric text for the existing deliverable templates.",
       };
     case "sources":
       return {
@@ -368,6 +381,202 @@ function SourcesPanel() {
   );
 }
 
+function TemplateRow({
+  template,
+  first,
+  last,
+  onPatch,
+  onMove,
+}: {
+  template: DeliverableTemplateMeta;
+  first: boolean;
+  last: boolean;
+  onPatch: (agentId: AgentId, patch: Partial<Omit<DeliverableTemplateMeta, "agent_id" | "updated_at">>) => void;
+  onMove: (agentId: AgentId, direction: "up" | "down") => void;
+}) {
+  const [label, setLabel] = useState(template.label);
+  const [prompt, setPrompt] = useState(template.prompt_override ?? "");
+
+  useEffect(() => {
+    setLabel(template.label);
+    setPrompt(template.prompt_override ?? "");
+  }, [template.agent_id, template.label, template.prompt_override]);
+
+  return (
+    <article className="settings-template-row">
+      <div className="settings-template-main">
+        <label className="settings-template-toggle">
+          <input
+            type="checkbox"
+            checked={template.enabled}
+            onChange={(event) => onPatch(template.agent_id, { enabled: event.target.checked })}
+          />
+          <span>{template.enabled ? "Enabled" : "Disabled"}</span>
+        </label>
+        <label>
+          <span>Label</span>
+          <input
+            value={label}
+            onChange={(event) => setLabel(event.target.value)}
+            onBlur={() => {
+              const trimmed = label.trim();
+              if (trimmed && trimmed !== template.label) onPatch(template.agent_id, { label: trimmed });
+              else setLabel(template.label);
+            }}
+          />
+        </label>
+        <div className="settings-template-actions">
+          <button onClick={() => onMove(template.agent_id, "up")} disabled={first}>Move up</button>
+          <button onClick={() => onMove(template.agent_id, "down")} disabled={last}>Move down</button>
+        </div>
+      </div>
+      <label className="settings-template-prompt">
+        <span>Rubric / system-prompt override</span>
+        <textarea
+          value={prompt}
+          placeholder={DEFAULT_TEMPLATE_PROMPTS[template.agent_id]}
+          onChange={(event) => setPrompt(event.target.value)}
+          onBlur={() => onPatch(template.agent_id, { prompt_override: prompt.trim() || null })}
+        />
+      </label>
+    </article>
+  );
+}
+
+function TemplateManagementPanel() {
+  const { templates, status, patchTemplate, moveTemplate } = useDeliverableTemplates();
+
+  return (
+    <div className="settings-live-panel">
+      <div className="settings-status">
+        <strong>{LIVE_MODE ? "Backend deliverable templates" : "Local deliverable templates"}</strong>
+        <span>{templates.filter((template) => template.enabled).length} enabled of {templates.length}</span>
+        <em>{status}</em>
+      </div>
+      <div className="settings-template-list">
+        {templates.map((template, index) => (
+          <TemplateRow
+            key={template.agent_id}
+            template={template}
+            first={index === 0}
+            last={index === templates.length - 1}
+            onPatch={(agentId, patch) => void patchTemplate(agentId, patch)}
+            onMove={(agentId, direction) => void moveTemplate(agentId, direction)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function localIntegrationRequests(): BackendIntegrationRequest[] {
+  return readLocal<BackendIntegrationRequest[]>(INTEGRATION_REQUESTS_KEY, []);
+}
+
+function writeLocalIntegrationRequests(records: BackendIntegrationRequest[]): void {
+  window.localStorage.setItem(INTEGRATION_REQUESTS_KEY, JSON.stringify(records));
+}
+
+function IntegrationRequestsPanel() {
+  const [requests, setRequests] = useState<BackendIntegrationRequest[]>(() => localIntegrationRequests());
+  const [requesterName, setRequesterName] = useState("");
+  const [integrationName, setIntegrationName] = useState("");
+  const [notes, setNotes] = useState("");
+  const [status, setStatus] = useState(LIVE_MODE ? "Loading integration requests..." : "Local request queue.");
+
+  useEffect(() => {
+    let alive = true;
+    if (!LIVE_MODE) return;
+    listBackendIntegrationRequests()
+      .then((records) => {
+        if (!alive) return;
+        setRequests(records);
+        setStatus("Loaded from backend.");
+      })
+      .catch((error) => {
+        if (alive) setStatus(error instanceof Error ? error.message : "Could not load integration requests.");
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  async function submitRequest(): Promise<void> {
+    const requester = requesterName.trim();
+    const integration = integrationName.trim();
+    if (!requester || !integration) {
+      setStatus("Requester and integration name are required.");
+      return;
+    }
+    setStatus("Saving request...");
+    try {
+      if (LIVE_MODE) {
+        const saved = await createBackendIntegrationRequest({
+          requester_name: requester,
+          integration_name: integration,
+          notes: notes.trim() || null,
+        });
+        setRequests((current) => [saved, ...current]);
+      } else {
+        const now = new Date().toISOString();
+        const saved: BackendIntegrationRequest = {
+          id: `req-${Date.now()}`,
+          requester_name: requester,
+          integration_name: integration,
+          notes: notes.trim() || null,
+          status: "pending",
+          created_at: now,
+          updated_at: now,
+        };
+        const next = [saved, ...requests];
+        setRequests(next);
+        writeLocalIntegrationRequests(next);
+      }
+      setRequesterName("");
+      setIntegrationName("");
+      setNotes("");
+      setStatus("Request saved.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Request save failed.");
+    }
+  }
+
+  return (
+    <div className="settings-live-panel settings-integration-request">
+      <div className="settings-status">
+        <strong>Request an integration</strong>
+        <span>Stored ticket flow for future connector work.</span>
+        <em>{status}</em>
+      </div>
+      <div className="settings-request-form">
+        <label>
+          <span>Your name</span>
+          <input value={requesterName} onChange={(event) => setRequesterName(event.target.value)} />
+        </label>
+        <label>
+          <span>Integration</span>
+          <input value={integrationName} onChange={(event) => setIntegrationName(event.target.value)} placeholder="ERP, Slack, Outlook, Salesforce..." />
+        </label>
+        <label>
+          <span>Notes</span>
+          <textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="What should this connector read or write?" />
+        </label>
+        <button className="settings-primary" onClick={() => void submitRequest()}>Submit request</button>
+      </div>
+      <div className="settings-request-list">
+        {requests.map((request) => (
+          <article key={request.id}>
+            <strong>{request.integration_name}</strong>
+            <span>{request.status} · requested by {request.requester_name} · {new Date(request.created_at).toLocaleString()}</span>
+            {request.notes && <em>{request.notes}</em>}
+          </article>
+        ))}
+        {requests.length === 0 && <div className="settings-placeholder">No integration requests yet.</div>}
+      </div>
+    </div>
+  );
+}
+
 export function SettingsWorkspace() {
   const { activeSettingsSection, activeBrainArea } = useStore();
   const active = SETTINGS_SECTIONS.find((section) => section.id === activeSettingsSection) ?? SETTINGS_SECTIONS[0];
@@ -418,10 +627,15 @@ export function SettingsWorkspace() {
             <MemoryPanel />
           ) : active.id === "engine" ? (
             <EngineTuningPanel />
+          ) : active.id === "prompts" ? (
+            <TemplateManagementPanel />
           ) : active.id === "sources" ? (
             <SourcesPanel />
           ) : active.id === "integrations" ? (
-            <Integrations />
+            <>
+              <Integrations />
+              <IntegrationRequestsPanel />
+            </>
           ) : (
             <div className="settings-placeholder">
               <p>{copy.body}</p>

@@ -24,6 +24,13 @@ from btx_platform import models
 from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_token
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
+from btx_platform.deliverables import (
+    deliverable_response,
+    ensure_deliverable_templates,
+    integration_request_response,
+    seed_deliverable_templates,
+    template_response,
+)
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
 from btx_platform.health import platform_health
 from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
@@ -36,6 +43,9 @@ from btx_platform.ratelimit import RateLimiter
 from btx_platform.schemas import (
     CalendarEventRequest,
     CrmTaskRequest,
+    DeliverableCreate,
+    DeliverablePatch,
+    DeliverableTemplatePatch,
     EmailSendRequest,
     EngineConfigPut,
     EngineConfigResponse,
@@ -43,6 +53,8 @@ from btx_platform.schemas import (
     IngestAccepted,
     LlmProxyRequest,
     PipelineRunResponse,
+    IntegrationRequestCreate,
+    IntegrationRequestPatch,
     WorkItemCreate,
     WorkItemDismiss,
     WorkItemPatch,
@@ -213,6 +225,13 @@ def _get_tenant_work_item(session, item_id: str, tenant_id: str) -> models.WorkI
     return row
 
 
+def _get_tenant_deliverable(session, deliverable_id: str, tenant_id: str) -> models.Deliverable | None:
+    row = session.get(models.Deliverable, deliverable_id)
+    if row is None or row.tenant_id != tenant_id:
+        return None
+    return row
+
+
 def _verified_task(task: dict, *, expected_subject: str, expected_body: str) -> bool:
     properties = task.get("properties") if isinstance(task.get("properties"), dict) else {}
     subject = properties.get("hs_task_subject") or task.get("hs_task_subject")
@@ -306,6 +325,7 @@ def create_app(
         window_seconds=settings.rate_limit_window_seconds,
     )
     seed_engine_configs(session_factory)
+    seed_deliverable_templates(session_factory)
 
     @app.middleware("http")
     async def assign_request_id(request: Request, call_next):
@@ -850,6 +870,178 @@ def create_app(
             session.commit()
             session.refresh(row)
             return JSONResponse(_work_item_response(row))
+        finally:
+            session.close()
+
+    @app.post("/deliverables")
+    def create_deliverable(payload: DeliverableCreate, request: Request) -> Response:
+        session = session_factory()
+        try:
+            tenant_id = _tenant_id(request)
+            existing = _get_tenant_deliverable(session, payload.id, tenant_id)
+            if existing is not None:
+                existing.type = payload.type
+                existing.title = payload.title
+                existing.canonical_account_id = payload.canonical_account_id
+                existing.program_id = payload.program_id
+                existing.trip_id = payload.trip_id
+                existing.document = payload.document
+                existing.updated_at = datetime.now(UTC)
+                session.commit()
+                session.refresh(existing)
+                return JSONResponse(deliverable_response(existing))
+            row = models.Deliverable(
+                id=payload.id,
+                tenant_id=tenant_id,
+                type=payload.type,
+                title=payload.title,
+                canonical_account_id=payload.canonical_account_id,
+                program_id=payload.program_id,
+                trip_id=payload.trip_id,
+                document=payload.document,
+            )
+            session.add(row)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(deliverable_response(row), status_code=201)
+        finally:
+            session.close()
+
+    @app.get("/deliverables")
+    def list_deliverables(request: Request, account: str | None = None, type: str | None = None) -> Response:
+        session = session_factory()
+        try:
+            query = session.query(models.Deliverable).filter(models.Deliverable.tenant_id == _tenant_id(request))
+            if account:
+                query = query.filter(models.Deliverable.canonical_account_id == account)
+            if type:
+                query = query.filter(models.Deliverable.type == type)
+            rows = query.order_by(models.Deliverable.updated_at.desc(), models.Deliverable.created_at.desc()).all()
+            return JSONResponse({"records": [deliverable_response(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.get("/deliverables/{deliverable_id}")
+    def get_deliverable(deliverable_id: str, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_deliverable(session, deliverable_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No deliverable {deliverable_id}."}, status_code=404)
+            return JSONResponse(deliverable_response(row))
+        finally:
+            session.close()
+
+    @app.patch("/deliverables/{deliverable_id}")
+    def patch_deliverable(deliverable_id: str, payload: DeliverablePatch, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_deliverable(session, deliverable_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No deliverable {deliverable_id}."}, status_code=404)
+            fields = payload.model_fields_set
+            if "title" in fields and payload.title is not None:
+                row.title = payload.title
+            if "canonical_account_id" in fields:
+                row.canonical_account_id = payload.canonical_account_id
+            if "program_id" in fields:
+                row.program_id = payload.program_id
+            if "trip_id" in fields:
+                row.trip_id = payload.trip_id
+            if "document" in fields and payload.document is not None:
+                row.document = payload.document
+                row.type = str(payload.document.get("type") or row.type)
+            row.updated_at = datetime.now(UTC)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(deliverable_response(row))
+        finally:
+            session.close()
+
+    @app.get("/deliverable-templates")
+    def list_deliverable_templates(request: Request) -> Response:
+        session = session_factory()
+        try:
+            tenant_id = _tenant_id(request)
+            ensure_deliverable_templates(session, tenant_id)
+            session.commit()
+            rows = session.query(models.DeliverableTemplate).filter(
+                models.DeliverableTemplate.tenant_id == tenant_id,
+            ).order_by(models.DeliverableTemplate.order.asc(), models.DeliverableTemplate.label.asc()).all()
+            return JSONResponse({"records": [template_response(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.patch("/deliverable-templates/{agent_id}")
+    def patch_deliverable_template(agent_id: str, payload: DeliverableTemplatePatch, request: Request) -> Response:
+        session = session_factory()
+        try:
+            tenant_id = _tenant_id(request)
+            ensure_deliverable_templates(session, tenant_id)
+            row = session.query(models.DeliverableTemplate).filter(
+                models.DeliverableTemplate.tenant_id == tenant_id,
+                models.DeliverableTemplate.agent_id == agent_id,
+            ).one_or_none()
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No deliverable template {agent_id}."}, status_code=404)
+            fields = payload.model_fields_set
+            if "label" in fields and payload.label is not None:
+                row.label = payload.label
+            if "enabled" in fields and payload.enabled is not None:
+                row.enabled = payload.enabled
+            if "order" in fields and payload.order is not None:
+                row.order = payload.order
+            if "prompt_override" in fields:
+                row.prompt_override = payload.prompt_override
+            row.updated_at = datetime.now(UTC)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(template_response(row))
+        finally:
+            session.close()
+
+    @app.post("/integration-requests")
+    def create_integration_request(payload: IntegrationRequestCreate, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = models.IntegrationRequest(
+                tenant_id=_tenant_id(request),
+                requester_name=payload.requester_name,
+                integration_name=payload.integration_name,
+                notes=payload.notes,
+                status="pending",
+            )
+            session.add(row)
+            session.commit()
+            session.refresh(row)
+            # TODO: outbound notification hook (email/Slack/webhook) can be called here once configured.
+            return JSONResponse(integration_request_response(row), status_code=201)
+        finally:
+            session.close()
+
+    @app.get("/integration-requests")
+    def list_integration_requests(request: Request) -> Response:
+        session = session_factory()
+        try:
+            rows = session.query(models.IntegrationRequest).filter(
+                models.IntegrationRequest.tenant_id == _tenant_id(request),
+            ).order_by(models.IntegrationRequest.created_at.desc()).all()
+            return JSONResponse({"records": [integration_request_response(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.patch("/integration-requests/{request_id}")
+    def patch_integration_request(request_id: str, payload: IntegrationRequestPatch, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = session.get(models.IntegrationRequest, request_id)
+            if row is None or row.tenant_id != _tenant_id(request):
+                return JSONResponse({"code": "not_found", "detail": f"No integration request {request_id}."}, status_code=404)
+            row.status = payload.status
+            row.updated_at = datetime.now(UTC)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(integration_request_response(row))
         finally:
             session.close()
 

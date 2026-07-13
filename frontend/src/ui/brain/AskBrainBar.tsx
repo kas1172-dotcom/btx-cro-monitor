@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { useStore } from "../../store/store.ts";
 import type { MetricId } from "../../metrics/types.ts";
 import { dispatchBrainQuestion } from "../../app/brainActions.ts";
 import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
+import type { AgentId } from "../../agents/runAgent.ts";
+import { useDeliverableTemplates } from "../../app/deliverableTemplates.ts";
 
 const ACTIONS = [
   "Plan a trip",
@@ -27,6 +29,17 @@ const PREFILLS: Record<string, string> = {
   "Capabilities assessment": "Can we actually serve the top opportunity?",
 };
 
+const ACTION_AGENT_MAP: Partial<Record<string, AgentId>> = {
+  "Plan a trip": "itinerary",
+  "Meeting brief": "meeting_brief",
+  "Weekly brief": "weekly_memo",
+  "Board deck": "board_deck",
+  "Analysis view": "analysis_annotation",
+  "Draft outreach": "outreach",
+  "Sales pitch": "sales_pitch",
+  "Capabilities assessment": "capabilities_assessment",
+};
+
 interface WorkStage {
   id: string;
   label: string;
@@ -42,6 +55,12 @@ const INITIAL_STAGES: WorkStage[] = [
 
 export function AskBrainBar({ world, large = false, seedPrompt }: { world: World; large?: boolean; seedPrompt?: string }) {
   const { askDraftPrompt } = useStore();
+  const { templates } = useDeliverableTemplates();
+  const enabledAgentIds = useMemo(() => new Set(templates.filter((template) => template.enabled).map((template) => template.agent_id)), [templates]);
+  const visibleActions = useMemo(() => ACTIONS.filter((action) => {
+    const agentId = ACTION_AGENT_MAP[action];
+    return !agentId || enabledAgentIds.has(agentId);
+  }), [enabledAgentIds]);
   const [question, setQuestion] = useState(seedPrompt ?? "");
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
@@ -182,7 +201,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         </div>
       )}
       <div className="ask-action-row">
-        {ACTIONS.map((action) => (
+        {visibleActions.map((action) => (
           <button key={action} disabled={busyAction !== null || workingQuestion !== null} onClick={() => setPendingAction(action)}>{action}</button>
         ))}
       </div>

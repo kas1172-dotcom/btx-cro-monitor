@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import type { BrainArea, SavedBrainNote } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import type { ActivityLogEntry, BrainMemoryNote, MemoryState } from "./types.ts";
+import { BACKEND_ENDPOINT, upsertBackendDeliverable } from "../app/backendApi.ts";
 
 const STORAGE_KEY = "btx.revenueBrain.memory.v1";
 
@@ -72,6 +73,17 @@ export function saveDeliverable(deliverable: Deliverable): Deliverable {
     summary: `${deliverable.sections.length} sections, ${deliverable.sources.length} provenance sources.`,
   });
   persist();
+  // WP1 backend owns deliverable records when configured. Notes and activity
+  // remain localStorage-backed until those memory types get backend coverage.
+  if (BACKEND_ENDPOINT) {
+    void upsertBackendDeliverable({
+      id: deliverable.id,
+      type: deliverable.type,
+      title: deliverable.title,
+      canonical_account_id: deliverable.entityIds[0] ?? null,
+      document: deliverable as unknown as Record<string, unknown>,
+    }).catch(() => undefined);
+  }
   return deliverable;
 }
 

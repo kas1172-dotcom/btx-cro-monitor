@@ -36,3 +36,85 @@ export async function backendJson<T>(path: string, init: RequestInit = {}): Prom
   }
   return response.json() as Promise<T>;
 }
+
+export interface BackendDeliverableRecord {
+  id: string;
+  type: string;
+  title: string;
+  canonical_account_id?: string | null;
+  program_id?: string | null;
+  trip_id?: string | null;
+  document: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BackendDeliverableTemplate {
+  agent_id: string;
+  label: string;
+  enabled: boolean;
+  order: number;
+  prompt_override?: string | null;
+  updated_at: string;
+}
+
+export interface BackendIntegrationRequest {
+  id: string;
+  requester_name: string;
+  integration_name: string;
+  notes?: string | null;
+  status: "pending" | "reviewed" | "dismissed";
+  created_at: string;
+  updated_at: string;
+}
+
+export async function listBackendDeliverables(): Promise<BackendDeliverableRecord[]> {
+  const response = await backendJson<{ records: BackendDeliverableRecord[] }>("/deliverables");
+  return response.records;
+}
+
+export async function upsertBackendDeliverable(input: {
+  id: string;
+  type: string;
+  title: string;
+  canonical_account_id?: string | null;
+  program_id?: string | null;
+  trip_id?: string | null;
+  document: Record<string, unknown>;
+}): Promise<BackendDeliverableRecord> {
+  return backendJson<BackendDeliverableRecord>("/deliverables", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function listBackendDeliverableTemplates(): Promise<BackendDeliverableTemplate[]> {
+  const response = await backendJson<{ records: BackendDeliverableTemplate[] }>("/deliverable-templates");
+  return response.records;
+}
+
+export async function patchBackendDeliverableTemplate(
+  agentId: string,
+  patch: Partial<Pick<BackendDeliverableTemplate, "label" | "enabled" | "order" | "prompt_override">>,
+): Promise<BackendDeliverableTemplate> {
+  return backendJson<BackendDeliverableTemplate>(`/deliverable-templates/${encodeURIComponent(agentId)}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
+export async function listBackendIntegrationRequests(): Promise<BackendIntegrationRequest[]> {
+  const response = await backendJson<{ records: BackendIntegrationRequest[] }>("/integration-requests");
+  return response.records;
+}
+
+export async function createBackendIntegrationRequest(input: {
+  requester_name: string;
+  integration_name: string;
+  notes?: string | null;
+}): Promise<BackendIntegrationRequest> {
+  return backendJson<BackendIntegrationRequest>("/integration-requests", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}

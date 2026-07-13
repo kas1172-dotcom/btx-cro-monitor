@@ -2,7 +2,7 @@
 // deterministic engine. Opportunity score + its trace, fit to the client's
 // capabilities, recent buying signals, and who to call. Every number is traceable.
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { scoreFit } from "../../engine/decision/fit.ts";
 import { groupTrace, summarizeGroups } from "../../engine/decision/explain.ts";
@@ -22,9 +22,14 @@ import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
+import { enabledTemplatesForAgents, useDeliverableTemplates } from "../../app/deliverableTemplates.ts";
+
+const DOSSIER_AGENT_IDS: AgentId[] = ["meeting_brief", "outreach", "sales_pitch", "capabilities_assessment"];
 
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
   const [busyDeliverable, setBusyDeliverable] = useState<AgentId | null>(null);
+  const { templates } = useDeliverableTemplates();
+  const dossierTemplates = useMemo(() => enabledTemplatesForAgents(templates, DOSSIER_AGENT_IDS), [templates]);
   const company = world.companies.find((c) => c.id === companyId);
   if (!company) return null;
   const activeCompany = company;
@@ -87,10 +92,16 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
       <section className="dossier-actions">
         <h4>Create deliverable</h4>
         <div className="dossier-action-row">
-          <button onClick={() => void createDeliverable("meeting_brief")} disabled={busyDeliverable !== null}>{busyDeliverable === "meeting_brief" ? "Creating..." : "Meeting brief"}</button>
-          <button onClick={() => void createDeliverable("outreach")} disabled={busyDeliverable !== null}>{busyDeliverable === "outreach" ? "Creating..." : "Outreach"}</button>
-          <button onClick={() => void createDeliverable("sales_pitch")} disabled={busyDeliverable !== null}>{busyDeliverable === "sales_pitch" ? "Creating..." : "Sales pitch"}</button>
-          <button onClick={() => void createDeliverable("capabilities_assessment")} disabled={busyDeliverable !== null}>{busyDeliverable === "capabilities_assessment" ? "Creating..." : "Capabilities assessment"}</button>
+          {dossierTemplates.map((template) => (
+            <button
+              key={template.agent_id}
+              onClick={() => void createDeliverable(template.agent_id)}
+              disabled={busyDeliverable !== null}
+            >
+              {busyDeliverable === template.agent_id ? "Creating..." : template.label}
+            </button>
+          ))}
+          {dossierTemplates.length === 0 && <p className="muted">No account deliverable templates are enabled.</p>}
         </div>
       </section>
 
