@@ -3,7 +3,7 @@ import type { MemoryState } from "../memory/types.ts";
 
 export type CoreTab = "brief" | "work_queue" | "accounts" | "ask";
 export type AnalyticalTab = "map" | "analysis" | "capacity" | "programs";
-export type UtilityTab = "settings";
+export type UtilityTab = "deliverables" | "settings";
 export type TabId = CoreTab | AnalyticalTab | UtilityTab;
 
 export interface SurfaceSpec {
@@ -29,12 +29,13 @@ export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
 ];
 
 export const UTILITY_SURFACES: SurfaceSpec[] = [
+  { id: "deliverables", label: "Deliverable Editor", group: "utility", componentId: "surface-deliverable-library", title: "Browse, preview, edit, download, and send saved deliverables." },
   { id: "settings", label: "Settings", group: "utility", componentId: "surface-settings", title: "Memory, source admin, configuration, integrations, and engine tuning." },
 ];
 
 export const ALL_SURFACES = [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES];
 
-export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"];
+export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "deliverables", "settings"];
 
 export const TAB_LABELS: Record<TabId, string> = {
   brief: "Today's Brief",
@@ -45,6 +46,7 @@ export const TAB_LABELS: Record<TabId, string> = {
   analysis: "Analysis",
   capacity: "Capacity",
   programs: "Programs",
+  deliverables: "Deliverable Editor",
   settings: "Settings",
 };
 
@@ -69,6 +71,8 @@ export function countForSurface(surface: TabId, world: World | null, memory: Mem
       return world.analysis.valid.filter((signal) =>
         signal.event_type.includes("contract") || signal.event_type.includes("award") || signal.scope === "program"
       ).length;
+    case "deliverables":
+      return memory?.deliverables.length;
     case "settings":
       return memory ? memory.activity.length + memory.notes.length : undefined;
   }

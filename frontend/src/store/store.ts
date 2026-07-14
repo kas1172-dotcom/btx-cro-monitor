@@ -26,6 +26,7 @@ export interface UiState {
   activeTab: TabId;
   brainResponse: BrainResponse | null;
   activeDeliverable: Deliverable | null;
+  activeDeliverableOrigin: "generation" | "library" | null;
   activeAnalysisSpec: ChartSpec | null;
   askDraftPrompt: string;
   tourRequested: boolean;
@@ -54,6 +55,7 @@ let state: UiState = {
   activeTab: "brief",
   brainResponse: null,
   activeDeliverable: null,
+  activeDeliverableOrigin: null,
   activeAnalysisSpec: null,
   askDraftPrompt: "",
   tourRequested: false,
@@ -62,6 +64,11 @@ const listeners = new Set<() => void>();
 
 export function setState(patch: Partial<UiState>): void {
   const nextPatch = { ...patch };
+  if (patch.activeDeliverable !== undefined) {
+    nextPatch.activeDeliverableOrigin = patch.activeDeliverable
+      ? (patch.activeDeliverableOrigin ?? "generation")
+      : null;
+  }
   if (patch.activeTab !== undefined) {
     nextPatch.activeHome = patch.activeTab === "brief";
     nextPatch.activeSettings = patch.activeTab === "settings";
@@ -133,6 +140,10 @@ export function goHome(): void {
 }
 
 export function closeDeliverable(): void {
+  if (state.activeDeliverableOrigin === "library") {
+    setState({ activeDeliverable: null, activeTab: "deliverables" });
+    return;
+  }
   setState({ activeDeliverable: null });
 }
 
@@ -150,6 +161,7 @@ export function resetUiState(): void {
     activeTab: "brief",
     brainResponse: null,
     activeDeliverable: null,
+    activeDeliverableOrigin: null,
     activeAnalysisSpec: null,
     askDraftPrompt: "",
     tourRequested: false,
