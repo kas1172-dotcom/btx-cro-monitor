@@ -1,12 +1,13 @@
 import type { World } from "../app/useWorld.ts";
-import type { BrainArea, ContextSource, QuestionIntent } from "./types.ts";
+import type { TabId } from "../app/surfaces.ts";
+import type { ContextSource, QuestionIntent } from "./types.ts";
 import type { Company } from "../engine/brain/entities.ts";
 import type { Prospect } from "../app/intelligence.ts";
 
 export interface RetrievedContext {
   question: string;
   intent: QuestionIntent;
-  activatedBrainAreas: BrainArea[];
+  activatedTabs: TabId[];
   city: string | null;
   topProspects: Prospect[];
   atRiskAccounts: Company[];
@@ -16,7 +17,7 @@ export interface RetrievedContext {
   openDealCount: number;
 }
 
-export function retrieveContext(question: string, intent: QuestionIntent, activatedBrainAreas: BrainArea[], world: World): RetrievedContext {
+export function retrieveContext(question: string, intent: QuestionIntent, activatedTabs: TabId[], world: World): RetrievedContext {
   const q = question.toLowerCase();
   const city = [...new Set(world.companies.map((c) => c.location.city))].find((c) => q.includes(c.toLowerCase())) ?? world.city;
   const prospectPool = city ? world.prospects.filter((p) => p.company.location.city === city) : world.prospects;
@@ -36,18 +37,18 @@ export function retrieveContext(question: string, intent: QuestionIntent, activa
   const signalReason = world.snapshot?.publicSignals.source_mode === "artifact"
     ? `Real monitor-engine signals from ${world.snapshot.publicSignals.artifact_path}, run ${world.snapshot.publicSignals.run_at}.`
     : "Validated market signals and source quotes.";
-  if (activatedBrainAreas.includes("market")) contextUsed.push({ source: signalSource, reason: signalReason });
-  if (activatedBrainAreas.includes("customer")) contextUsed.push({ source: "companies.json + contacts.json", reason: "Account roster, relationships, and contacts." });
-  if (activatedBrainAreas.includes("revenue")) contextUsed.push({ source: "opportunities.json + scoring trace", reason: "Pipeline, opportunity scores, risk scores, and recommendations." });
-  if (activatedBrainAreas.includes("capability")) contextUsed.push({ source: "client-profile.json + erp_capacity.json", reason: "BTX capabilities and demo capacity snapshot." });
-  if (activatedBrainAreas.includes("geographic")) contextUsed.push({ source: "companies.json + facilities.json", reason: "Addresses and map coordinates." });
-  if (activatedBrainAreas.includes("decision")) contextUsed.push({ source: "recommendation engine", reason: "Prioritized deterministic actions." });
-  if (activatedBrainAreas.includes("workflow")) contextUsed.push({ source: "workflow simulator", reason: "Demo-only task and outreach actions." });
+  if (activatedTabs.includes("programs") || activatedTabs.includes("brief")) contextUsed.push({ source: signalSource, reason: signalReason });
+  if (activatedTabs.includes("accounts")) contextUsed.push({ source: "companies.json + contacts.json", reason: "Account roster, relationships, and contacts." });
+  if (activatedTabs.includes("analysis")) contextUsed.push({ source: "opportunities.json + scoring trace", reason: "Pipeline, opportunity scores, risk scores, and recommendations." });
+  if (activatedTabs.includes("capacity")) contextUsed.push({ source: "client-profile.json + erp_capacity.json", reason: "BTX capabilities and demo capacity snapshot." });
+  if (activatedTabs.includes("map")) contextUsed.push({ source: "companies.json + facilities.json", reason: "Addresses and map coordinates." });
+  if (activatedTabs.includes("settings")) contextUsed.push({ source: "recommendation engine", reason: "Prioritized deterministic actions." });
+  if (activatedTabs.includes("work_queue")) contextUsed.push({ source: "workflow simulator", reason: "Demo-only task and outreach actions." });
 
   return {
     question,
     intent,
-    activatedBrainAreas,
+    activatedTabs,
     city,
     topProspects,
     atRiskAccounts,

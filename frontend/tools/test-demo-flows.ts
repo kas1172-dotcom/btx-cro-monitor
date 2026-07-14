@@ -198,28 +198,28 @@ const artifactWorld = await loadArtifactFixtureWorld();
 const hybridWorld = await loadHybridFixtureWorld();
 
 assert(!world.companies.some((company) => company.name === PROFILE.name), "Client company must not appear as a scored account");
-assert(AREA_MARKET_SCOPING.geographic && AREA_MARKET_SCOPING.market, "Map and signal views must be market-scoped");
-assert(!AREA_MARKET_SCOPING.revenue && !AREA_MARKET_SCOPING.decision && !AREA_MARKET_SCOPING.customer, "Home, memory, and current business must not be market-scoped");
-assert(!isMarketScopedView({ activeBrainArea: "geographic", brainResponse: null, activeDeliverable: { id: "doc" }, activeAnalysisSpec: null }), "Deliverables must hide market dropdown and use all-markets scope");
+assert(AREA_MARKET_SCOPING.map && AREA_MARKET_SCOPING.programs, "Map and program views must be market-scoped");
+assert(!AREA_MARKET_SCOPING.analysis && !AREA_MARKET_SCOPING.settings && !AREA_MARKET_SCOPING.accounts, "Analysis, settings, and accounts must not be market-scoped");
+assert(!isMarketScopedView({ activeTab: "map", brainResponse: null, activeDeliverable: { id: "doc" }, activeAnalysisSpec: null }), "Deliverables must hide market dropdown and use all-markets scope");
 
 const questions = [
-  ["What defense funding signals should BTX care about?", "market"],
-  ["I'm in Austin next week. Who should I talk to?", "geographic"],
-  ["Which deals are at risk this quarter?", "revenue"],
-  ["What should sales focus on based on what we can actually produce?", "capability"],
-  ["What should I care about this week?", "market"],
-  ["Who should I meet in San Antonio?", "geographic"],
-  ["Show me Houston targets", "geographic"],
-  ["What account has the biggest risk?", "revenue"],
-  ["Give me a production fit focus", "capability"],
-  ["Create a board summary", "revenue"],
-  ["Draft a note for the best prospect", "workflow"],
+  ["What defense funding signals should BTX care about?", "programs"],
+  ["I'm in Austin next week. Who should I talk to?", "map"],
+  ["Which deals are at risk this quarter?", "analysis"],
+  ["What should sales focus on based on what we can actually produce?", "capacity"],
+  ["What should I care about this week?", "brief"],
+  ["Who should I meet in San Antonio?", "map"],
+  ["Show me Houston targets", "map"],
+  ["What account has the biggest risk?", "analysis"],
+  ["Give me a production fit focus", "capacity"],
+  ["Create a board summary", "analysis"],
+  ["Draft a note for the best prospect", "work_queue"],
 ] as const;
 
 for (const [question, expectedArea] of questions) {
   const response = processBrainQuestion(question, world);
   assert(response.directAnswer.length > 0, `${question} returned no answer`);
-  assert(response.activatedBrainAreas.includes(expectedArea), `${question} did not activate ${expectedArea}`);
+  assert(response.activatedTabs.includes(expectedArea), `${question} did not activate ${expectedArea}`);
   assert(response.contextUsed.length > 0, `${question} missing context provenance`);
   const responseText = [
     response.directAnswer,

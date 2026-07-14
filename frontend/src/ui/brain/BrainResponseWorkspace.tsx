@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import type { BrainResponse } from "../../brain/types.ts";
-import { BRAIN_AREA_LABELS } from "../../brain/types.ts";
+import { TAB_LABELS } from "../../app/surfaces.ts";
 import type { World } from "../../app/useWorld.ts";
 import { OpportunityCards } from "./OpportunityCards.tsx";
 import { SignalFeed } from "../feed/SignalFeed.tsx";
@@ -11,7 +11,7 @@ export function BrainResponseWorkspace({ response, world }: { response: BrainRes
   return (
     <div className="brain-response">
       <div className="brain-response-head">
-        <span>{response.activatedBrainAreas.map((area) => BRAIN_AREA_LABELS[area]).join(" + ")}</span>
+        <span>{response.activatedTabs.map((area) => TAB_LABELS[area]).join(" + ")}</span>
         <h1>{response.directAnswer}</h1>
       </div>
       <section>

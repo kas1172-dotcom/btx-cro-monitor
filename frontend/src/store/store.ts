@@ -5,10 +5,10 @@
 // "what is the user looking at."
 
 import { useSyncExternalStore } from "react";
-import type { BrainArea, BrainResponse } from "../brain/types.ts";
+import type { BrainResponse } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import type { ChartSpec } from "../metrics/types.ts";
-import { surfaceFromBrainArea, type SurfaceId } from "../app/surfaces.ts";
+import type { TabId } from "../app/surfaces.ts";
 
 export type View = "home" | "current" | "prospecting" | "map" | "dashboard" | "graph" | "feed" | "operating" | "integrations";
 export type SettingsSection = "general" | "memory" | "engine" | "prompts" | "sources" | "integrations";
@@ -23,8 +23,7 @@ export interface UiState {
   activeHome: boolean;
   activeSettings: boolean;
   activeSettingsSection: SettingsSection;
-  activeSurface: SurfaceId;
-  activeBrainArea: BrainArea;
+  activeTab: TabId;
   brainResponse: BrainResponse | null;
   activeDeliverable: Deliverable | null;
   activeAnalysisSpec: ChartSpec | null;
@@ -52,8 +51,7 @@ let state: UiState = {
   activeHome: true,
   activeSettings: false,
   activeSettingsSection: "general",
-  activeSurface: "brief",
-  activeBrainArea: "revenue",
+  activeTab: "brief",
   brainResponse: null,
   activeDeliverable: null,
   activeAnalysisSpec: null,
@@ -64,23 +62,17 @@ const listeners = new Set<() => void>();
 
 export function setState(patch: Partial<UiState>): void {
   const nextPatch = { ...patch };
-  if (patch.activeBrainArea !== undefined && patch.activeHome === undefined) {
-    nextPatch.activeHome = false;
+  if (patch.activeTab !== undefined) {
+    nextPatch.activeHome = patch.activeTab === "brief";
+    nextPatch.activeSettings = patch.activeTab === "settings";
   }
-  if (patch.activeBrainArea !== undefined && patch.activeSurface === undefined) {
-    nextPatch.activeSurface = surfaceFromBrainArea(patch.activeBrainArea);
+  if (patch.activeHome === true && patch.activeTab === undefined) {
+    nextPatch.activeTab = "brief";
   }
-  if (patch.activeSurface !== undefined) {
-    nextPatch.activeHome = patch.activeSurface === "brief";
-    nextPatch.activeSettings = patch.activeSurface === "settings";
+  if (patch.activeSettings === true && patch.activeTab === undefined) {
+    nextPatch.activeTab = "settings";
   }
-  if (patch.activeHome === true && patch.activeSurface === undefined) {
-    nextPatch.activeSurface = "brief";
-  }
-  if (patch.activeSettings === true && patch.activeSurface === undefined) {
-    nextPatch.activeSurface = "settings";
-  }
-  if ((patch.activeBrainArea !== undefined || patch.activeHome) && patch.activeSettings === undefined) {
+  if ((patch.activeTab !== undefined || patch.activeHome) && patch.activeSettings === undefined) {
     nextPatch.activeSettings = false;
   }
   state = { ...state, ...nextPatch };
@@ -113,7 +105,7 @@ export function waitForState(
 
 export function openCopilotWithPrompt(prompt: string): void {
   setState({
-    activeSurface: "ask",
+    activeTab: "ask",
     askDraftPrompt: prompt,
     copilotPrompt: prompt,
     copilotPromptId: state.copilotPromptId + 1,
@@ -132,7 +124,7 @@ export function goHome(): void {
   setState({
     activeHome: true,
     activeSettings: false,
-    activeSurface: "brief",
+    activeTab: "brief",
     brainResponse: null,
     activeDeliverable: null,
     activeAnalysisSpec: null,
@@ -155,8 +147,7 @@ export function resetUiState(): void {
     activeHome: true,
     activeSettings: false,
     activeSettingsSection: "general",
-    activeSurface: "brief",
-    activeBrainArea: "revenue",
+    activeTab: "brief",
     brainResponse: null,
     activeDeliverable: null,
     activeAnalysisSpec: null,

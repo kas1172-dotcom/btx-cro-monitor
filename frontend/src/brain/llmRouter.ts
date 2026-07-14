@@ -2,7 +2,8 @@ import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import { classifyQuestion } from "./classifyQuestion.ts";
 import type { Classification } from "./classifyQuestion.ts";
-import type { BrainArea, QuestionIntent } from "./types.ts";
+import { TAB_IDS, type TabId } from "../app/surfaces.ts";
+import type { QuestionIntent } from "./types.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { backendHeaders } from "../app/backendApi.ts";
 
@@ -17,11 +18,9 @@ const INTENTS: QuestionIntent[] = [
   "outreach",
   "general",
 ];
-const AREAS: BrainArea[] = ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"];
-
 const RouterResult = z.object({
   intent: z.enum(INTENTS),
-  activatedBrainAreas: z.array(z.enum(AREAS)).min(1),
+  activatedTabs: z.array(z.enum(TAB_IDS)).min(1),
   entities: z.array(z.string()).default([]),
   deliverableType: z.enum(["itinerary", "meeting_brief", "board_deck", "weekly_memo", "analysis_view", "outreach", "sales_pitch", "capabilities_assessment"]).optional(),
   params: z.record(z.string(), z.unknown()).default({}),
@@ -39,7 +38,7 @@ function routerSystem(world: World): string {
   const cities = [...new Set(world.companies.map((c) => c.location.city))].join(", ");
   return `Route a CRO question for the BTX Revenue Brain. Return strict JSON only.
 Allowed intents: ${INTENTS.join(", ")}.
-Allowed brain areas: ${AREAS.join(", ")}.
+Allowed tabs: ${TAB_IDS.join(", ")}.
 Known account names: ${names}.
 Known cities: ${cities}.
 Do not answer the user. Do not compute scores or numbers. Extract only routing metadata present in the question or known names.`;
@@ -78,7 +77,7 @@ export async function routeBrainQuestion(question: string, world: World): Promis
     if (!parsed.success) throw new Error(parsed.error.message);
     return {
       intent: parsed.data.intent,
-      activatedBrainAreas: parsed.data.activatedBrainAreas,
+      activatedTabs: parsed.data.activatedTabs,
       routedBy: "llm",
       entities: parsed.data.entities,
       deliverableType: parsed.data.deliverableType,

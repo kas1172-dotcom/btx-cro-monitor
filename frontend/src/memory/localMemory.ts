@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
-import type { BrainArea, SavedBrainNote } from "../brain/types.ts";
+import type { TabId } from "../app/surfaces.ts";
+import type { SavedBrainNote } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import type { ActivityLogEntry, BrainMemoryNote, MemoryState } from "./types.ts";
 
@@ -83,12 +84,12 @@ export function clearMemory(): void {
 export function recordSimulatedAction(input: {
   title: string;
   summary: string;
-  brainArea?: BrainArea;
+  brainArea?: TabId;
   entityIds?: string[];
 }): ActivityLogEntry {
   const entry = addActivity({
     kind: "simulated_action",
-    brainArea: input.brainArea ?? "workflow",
+    brainArea: input.brainArea ?? "work_queue",
     entityIds: input.entityIds ?? [],
     title: input.title,
     summary: input.summary,
@@ -106,8 +107,8 @@ export function useMemory(): MemoryState {
   return useSyncExternalStore(subscribe, () => memory);
 }
 
-export function memoryCountsByArea(): Partial<Record<BrainArea, number>> {
-  const counts: Partial<Record<BrainArea, number>> = {};
+export function memoryCountsByArea(): Partial<Record<TabId, number>> {
+  const counts: Partial<Record<TabId, number>> = {};
   for (const item of [...memory.notes, ...memory.deliverables, ...memory.activity]) {
     counts[item.brainArea] = (counts[item.brainArea] ?? 0) + 1;
   }

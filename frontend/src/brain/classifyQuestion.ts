@@ -1,8 +1,9 @@
-import type { BrainArea, QuestionIntent } from "./types.ts";
+import type { TabId } from "../app/surfaces.ts";
+import type { QuestionIntent } from "./types.ts";
 
 export interface Classification {
   intent: QuestionIntent;
-  activatedBrainAreas: BrainArea[];
+  activatedTabs: TabId[];
 }
 
 const GEO = ["austin", "dallas", "houston", "san antonio", "waco", "visit", "trip", "nearby", "map", "where", "talk to"];
@@ -18,11 +19,11 @@ function has(q: string, terms: string[]): boolean {
 
 export function classifyQuestion(question: string): Classification {
   const q = question.toLowerCase();
-  if (has(q, OUTREACH)) return { intent: "outreach", activatedBrainAreas: ["workflow", "customer", "revenue"] };
-  if (has(q, GEO)) return { intent: "geographic_prospecting", activatedBrainAreas: ["geographic", "customer", "market", "capability", "revenue"] };
-  if (has(q, MARKET)) return { intent: "market_signals", activatedBrainAreas: ["market", "capability", "revenue", "customer"] };
-  if (has(q, RISK)) return { intent: "account_risk", activatedBrainAreas: ["revenue", "customer", "decision"] };
-  if (has(q, CAPABILITY)) return { intent: "capabilities", activatedBrainAreas: ["capability", "revenue", "market"] };
-  if (has(q, BRIEF)) return { intent: "weekly_brief", activatedBrainAreas: ["market", "revenue", "customer", "capability"] };
-  return { intent: "sales_focus", activatedBrainAreas: ["revenue", "customer", "market"] };
+  if (has(q, OUTREACH)) return { intent: "outreach", activatedTabs: ["work_queue", "accounts", "analysis"] };
+  if (has(q, GEO)) return { intent: "geographic_prospecting", activatedTabs: ["map", "accounts", "programs", "capacity", "analysis"] };
+  if (has(q, MARKET)) return { intent: "market_signals", activatedTabs: ["programs", "capacity", "analysis", "accounts"] };
+  if (has(q, RISK)) return { intent: "account_risk", activatedTabs: ["analysis", "accounts", "settings"] };
+  if (has(q, CAPABILITY)) return { intent: "capabilities", activatedTabs: ["capacity", "analysis", "programs"] };
+  if (has(q, BRIEF)) return { intent: "weekly_brief", activatedTabs: ["brief", "programs", "analysis", "accounts", "capacity"] };
+  return { intent: "sales_focus", activatedTabs: ["analysis", "accounts", "programs"] };
 }

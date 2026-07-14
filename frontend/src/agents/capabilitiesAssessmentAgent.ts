@@ -110,7 +110,7 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
       type: "capabilities_assessment",
       title: `Capabilities Assessment - ${f.accountName}`,
       createdAt: new Date().toISOString(),
-      brainArea: "capability",
+      brainArea: "capacity",
       entityIds: ctx.entityIds,
       confidence: confidence(verdict),
       confidenceReason: `Verdict ${verdict}: based on fit ${f.fitScore}%, capacity hours, constraints, and known needs.`,

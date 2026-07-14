@@ -11,24 +11,24 @@ export function processBrainQuestion(question: string, world?: World): BrainResp
       question,
       directAnswer: "The Revenue Brain is still loading its local demo context.",
       whyThisMatters: "The brain only answers from deterministic engine data, so it waits for account, signal, opportunity, and capacity context before answering.",
-      activatedBrainAreas: ["revenue"],
+      activatedTabs: ["analysis"],
       contextUsed: [{ source: "local demo adapter", reason: "Required before deterministic scoring can run." }],
       recommendedActions: ["Wait for data to load", "Ask again from the cockpit"],
-      savedNote: { title: "Brain context unavailable", brainArea: "revenue", summary: "Question received before context loaded.", entities: [] },
+      savedNote: { title: "Brain context unavailable", brainArea: "analysis", summary: "Question received before context loaded.", entities: [] },
       suggestedNextQuestions: ["What should I care about this week?", "Who should I target in Austin?"],
       relatedOpportunities: [],
       confidence: "low",
     };
   }
   const classification = classifyQuestion(question);
-  const context = retrieveContext(question, classification.intent, classification.activatedBrainAreas, world);
+  const context = retrieveContext(question, classification.intent, classification.activatedTabs, world);
   return generateBrainResponse(context, world);
 }
 
 export async function processBrainQuestionAsync(question: string, world?: World): Promise<BrainResponse> {
   if (!world) return processBrainQuestion(question, world);
   const classification = await routeBrainQuestion(question, world);
-  const context = retrieveContext(question, classification.intent, classification.activatedBrainAreas, world);
+  const context = retrieveContext(question, classification.intent, classification.activatedTabs, world);
   const response = generateBrainResponse(context, world);
   return {
     ...response,

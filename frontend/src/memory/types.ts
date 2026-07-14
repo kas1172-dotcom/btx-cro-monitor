@@ -1,4 +1,5 @@
-import type { BrainArea, SavedBrainNote } from "../brain/types.ts";
+import type { TabId } from "../app/surfaces.ts";
+import type { SavedBrainNote } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 
 export interface BrainMemoryNote extends SavedBrainNote {
@@ -9,7 +10,7 @@ export interface BrainMemoryNote extends SavedBrainNote {
 export interface ActivityLogEntry {
   id: string;
   createdAt: string;
-  brainArea: BrainArea;
+  brainArea: TabId;
   entityIds: string[];
   title: string;
   summary: string;

@@ -89,7 +89,7 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
       type: "sales_pitch",
       title: `Sales Pitch - ${f.accountName}`,
       createdAt: new Date().toISOString(),
-      brainArea: "workflow",
+      brainArea: "work_queue",
       entityIds: ctx.entityIds,
       confidence: "high",
       confidenceReason: "High: account need, public trigger, fit, and capacity context are available.",

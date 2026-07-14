@@ -102,8 +102,8 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         routed: (response, usedFallback) => updateStage("routed", {
           status: usedFallback ? "fallback" : "done",
           label: usedFallback
-            ? `Using offline fallback · ${response.activatedBrainAreas.join(", ")}`
-            : `Routed: ${response.activatedBrainAreas.join(", ")}`,
+            ? `Using offline fallback · ${response.activatedTabs.join(", ")}`
+            : `Routed: ${response.activatedTabs.join(", ")}`,
         }),
         retrieved: (response) => updateStage("retrieved", {
           status: "done",

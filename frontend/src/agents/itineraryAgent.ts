@@ -193,7 +193,7 @@ export const itineraryAgent: DeliverableAgent<Inputs> = {
       type: "itinerary",
       title: `${ctx.facts.city} Visit Plan`,
       createdAt: new Date().toISOString(),
-      brainArea: "geographic",
+      brainArea: "map",
       entityIds: stops.map((stop) => stop.id),
       confidence: stops.length >= 6 ? "high" : "medium",
       sections: [

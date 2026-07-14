@@ -109,7 +109,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
       type: "board_deck",
       title: `${f.quarter} Revenue Review`,
       createdAt: new Date().toISOString(),
-      brainArea: "revenue",
+      brainArea: "analysis",
       entityIds: ctx.entityIds,
       confidence: "high",
       sections: [

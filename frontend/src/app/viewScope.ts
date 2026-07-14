@@ -1,22 +1,25 @@
-import type { BrainArea, BrainResponse } from "../brain/types.ts";
+import type { TabId } from "./surfaces.ts";
+import type { BrainResponse } from "../brain/types.ts";
 
-export const AREA_MARKET_SCOPING: Record<BrainArea, boolean> = {
-  market: true,
-  customer: false,
-  capability: false,
-  revenue: false,
-  geographic: true,
-  decision: false,
-  workflow: false,
+export const AREA_MARKET_SCOPING: Record<TabId, boolean> = {
+  brief: false,
+  work_queue: false,
+  accounts: false,
+  ask: false,
+  map: true,
+  analysis: false,
+  capacity: false,
+  programs: true,
+  settings: false,
 };
 
 export function isMarketScopedView(input: {
-  activeBrainArea: BrainArea;
+  activeTab: TabId;
   brainResponse: BrainResponse | null;
   activeDeliverable: unknown;
   activeAnalysisSpec: unknown;
 }): boolean {
   if (input.activeDeliverable || input.activeAnalysisSpec) return false;
-  if (input.brainResponse) return input.brainResponse.focusView === "map" || input.brainResponse.activatedBrainAreas.includes("geographic");
-  return AREA_MARKET_SCOPING[input.activeBrainArea];
+  if (input.brainResponse) return input.brainResponse.focusView === "map" || input.brainResponse.activatedTabs.includes("map");
+  return AREA_MARKET_SCOPING[input.activeTab];
 }

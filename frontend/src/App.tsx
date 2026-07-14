@@ -18,7 +18,7 @@ import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
 import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
 import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
-import { ALL_SURFACES, countForSurface, type SurfaceId } from "./app/surfaces.ts";
+import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
 
@@ -32,14 +32,14 @@ function formatRunDate(value: string | null | undefined): string {
 }
 
 export function App() {
-  const { city, activeHome, activeSettings, activeSurface, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
+  const { city, activeHome, activeSettings, activeTab, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeAnalysisSpec, tourRequested } = useStore();
   const [workItemStatus, setWorkItemStatus] = useState("");
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
-  const settingsActive = (activeSettings || activeSurface === "settings") && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const homeActive = (activeHome || activeSurface === "brief") && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const marketScoped = activeSurface === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const settingsActive = (activeSettings || activeTab === "settings") && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const homeActive = (activeHome || activeTab === "brief") && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const marketScoped = activeTab === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const viewWorld = marketScoped ? marketWorld ?? world : world;
 
   // Right-panel: dossier takes priority over context panel, one at a time.
@@ -76,7 +76,7 @@ export function App() {
       </Suspense>
     );
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
-    switch (activeSurface) {
+    switch (activeTab) {
       case "brief": return <TodayBrief world={world} />;
       case "work_queue": return <WorkQueue world={world} />;
       case "accounts": return <Account360 world={world} />;
@@ -94,18 +94,18 @@ export function App() {
     }
   };
   const counts = Object.fromEntries(
-    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"] as SurfaceId[])
+    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "settings"] as TabId[])
       .map((surface) => [surface, countForSurface(surface, world, memory)]),
-  ) as Partial<Record<SurfaceId, number>>;
+  ) as Partial<Record<TabId, number>>;
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
-  const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeSurface))?.label ?? "Cockpit";
+  const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeTab))?.label ?? "Cockpit";
 
   return (
     <AppShell
       className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
       rightW={rightW}
-      rail={<BrainSidebar activeSurface={settingsActive ? "settings" : homeActive ? "brief" : activeSurface} counts={counts} />}
+      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : activeTab} counts={counts} />}
       topbar={(
         <header className="quiet-topbar">
           <div className="surface-title">
@@ -202,7 +202,7 @@ export function App() {
                         window.setTimeout(() => {
                           closeDemoAction();
                           setWorkItemStatus("");
-                          setState({ activeSurface: "work_queue" });
+                          setState({ activeTab: "work_queue" });
                         }, 800);
                       }).catch((error) => {
                         setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
@@ -226,7 +226,7 @@ export function App() {
       )}
     >
       <section className="quiet-stage">{renderDefault()}</section>
-      {world && !homeActive && !settingsActive && activeSurface !== "ask" && <AskBrainBar world={viewWorld ?? world} />}
+      {world && !homeActive && !settingsActive && activeTab !== "ask" && <AskBrainBar world={viewWorld ?? world} />}
     </AppShell>
   );
 }

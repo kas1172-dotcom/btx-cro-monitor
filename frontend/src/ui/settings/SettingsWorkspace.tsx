@@ -369,12 +369,12 @@ function SourcesPanel() {
 }
 
 export function SettingsWorkspace() {
-  const { activeSettingsSection, activeBrainArea } = useStore();
+  const { activeSettingsSection, activeTab } = useStore();
   const active = SETTINGS_SECTIONS.find((section) => section.id === activeSettingsSection) ?? SETTINGS_SECTIONS[0];
   const copy = sectionCopy(active.id);
 
   return (
-    <section className="settings-workspace">
+    <section className="settings-workspace" data-surface-component="surface-settings">
       <SurfaceHeader eyebrow="Settings" headline={active.label} subline={active.summary} />
 
       <div className="settings-layout">
@@ -397,9 +397,9 @@ export function SettingsWorkspace() {
           </div>
           {active.id === "general" ? (
             <div className="settings-actions">
-              <button onClick={() => clearCurrentThread(activeBrainArea)}>
+              <button onClick={() => clearCurrentThread(activeTab)}>
                 <strong>Clear this chat</strong>
-                <span>Remove the Chatpil thread stored for the current rail area.</span>
+                <span>Remove the Chatpil thread stored for the current tab.</span>
               </button>
               <button onClick={clearAllThreads}>
                 <strong>Clear all chats</strong>

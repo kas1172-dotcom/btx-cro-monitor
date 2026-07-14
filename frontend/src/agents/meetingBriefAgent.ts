@@ -100,7 +100,7 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
     type: "meeting_brief",
     title: `Meeting Brief - ${f.accountName}`,
     createdAt: new Date().toISOString(),
-    brainArea: "customer",
+    brainArea: "accounts",
     entityIds: ctx.entityIds,
     confidence: "high",
     sections: [

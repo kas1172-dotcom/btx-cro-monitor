@@ -60,7 +60,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           : { accountId: activeCompany.id };
       const deliverable = await runAgent(agentId, inputs, world);
       saveDeliverable(deliverable);
-      setState({ activeDeliverable: deliverable, activeCompanyId: null, activeBrainArea: deliverable.brainArea, brainResponse: null, activeAnalysisSpec: null });
+      setState({ activeDeliverable: deliverable, activeCompanyId: null, activeTab: deliverable.brainArea, brainResponse: null, activeAnalysisSpec: null });
     } finally {
       setBusyDeliverable(null);
     }

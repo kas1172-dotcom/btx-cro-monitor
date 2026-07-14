@@ -1,5 +1,5 @@
 import type { BrainResponse } from "../../brain/types.ts";
-import { BRAIN_AREA_LABELS } from "../../brain/types.ts";
+import { TAB_LABELS } from "../../app/surfaces.ts";
 import { openDemoAction, setState } from "../../store/store.ts";
 
 export function RightContextPanel({ response }: { response: BrainResponse | null }) {
@@ -11,8 +11,8 @@ export function RightContextPanel({ response }: { response: BrainResponse | null
         <button className="right-context-close" onClick={() => setState({ brainResponse: null })} aria-label="Close context panel">×</button>
       </div>
       <section>
-        <h3>Activated Brain Areas</h3>
-        {response.activatedBrainAreas.map((area) => <p key={area}>{BRAIN_AREA_LABELS[area]}</p>)}
+        <h3>Activated tabs</h3>
+        {response.activatedTabs.map((area) => <p key={area}>{TAB_LABELS[area]}</p>)}
       </section>
       <section>
         <h3>Context Used</h3>
