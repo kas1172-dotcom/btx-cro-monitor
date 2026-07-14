@@ -14,6 +14,7 @@ const iconPaths: Record<IconName, ReactNode> = {
   capacity: <path d="M4 18h16M6 18V8l6-4 6 4v10M9 18v-6h6v6" />,
   programs: <path d="M5 4h10l4 4v12H5V4Zm9 0v5h5M8 13h8M8 17h6" />,
   deliverables: <path d="M6 3h9l4 4v14H6V3Zm9 0v5h4M9 12h7M9 16h5M4 7H2v14h12v-2" />,
+  hubspot: <path d="M7 7h6v4H7V7Zm0 8h10M17 5v6l4 2v6l-4 2-4-2v-6l4-2M4 5h9v16H4V5Z" />,
   settings: <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm0-13v3m0 13v3M4.6 4.6l2.1 2.1m10.6 10.6 2.1 2.1m2.1-14.8-2.1 2.1M6.7 17.3l-2.1 2.1M1.5 12h3m15 0h3" />,
   document: <path d="M6 3h9l4 4v14H6V3Zm9 0v5h4M9 12h7M9 16h7" />,
   empty: <path d="M5 7h14v12H5V7Zm3-4h8l2 4H6l2-4Zm3 10h2" />,

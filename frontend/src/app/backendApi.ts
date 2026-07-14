@@ -36,3 +36,76 @@ export async function backendJson<T>(path: string, init: RequestInit = {}): Prom
   }
   return response.json() as Promise<T>;
 }
+
+export interface HubSpotLookupCompany {
+  id: string;
+  hubspot_id?: string;
+  hubspot_company_id?: string;
+  name: string;
+  domains?: string[];
+  location?: { city?: string; state?: string; country?: string };
+  data_provenance?: string;
+}
+
+export interface HubSpotCompanySearchResponse {
+  data_provenance: "HubSpot";
+  records: HubSpotLookupCompany[];
+}
+
+export interface HubSpotListCreateResponse {
+  status: "verified";
+  duplicate: boolean;
+  idempotency_key?: string | null;
+  list: {
+    id: string;
+    name?: string;
+    list_type: "company" | "contact";
+    record_url: string;
+    verified: boolean;
+  };
+}
+
+export interface HubSpotListMembershipResponse {
+  status: "verified";
+  duplicate: boolean;
+  idempotency_key?: string | null;
+  list: {
+    id: string;
+    list_type: "company" | "contact";
+    record_ids: string[];
+    record_url: string;
+    verified: boolean;
+  };
+}
+
+export async function searchHubSpotCompanies(query: string, limit = 10): Promise<HubSpotCompanySearchResponse> {
+  return backendJson<HubSpotCompanySearchResponse>("/crm/company-search", {
+    method: "POST",
+    body: JSON.stringify({ query, limit }),
+  });
+}
+
+export async function createHubSpotList(input: {
+  name: string;
+  listType: "company" | "contact";
+  idempotencyKey?: string;
+}): Promise<HubSpotListCreateResponse> {
+  return backendJson<HubSpotListCreateResponse>("/crm/lists", {
+    method: "POST",
+    headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
+    body: JSON.stringify({ name: input.name, list_type: input.listType }),
+  });
+}
+
+export async function addRecordsToHubSpotList(input: {
+  listId: string;
+  listType: "company" | "contact";
+  recordIds: string[];
+  idempotencyKey?: string;
+}): Promise<HubSpotListMembershipResponse> {
+  return backendJson<HubSpotListMembershipResponse>(`/crm/lists/${encodeURIComponent(input.listId)}/records`, {
+    method: "PUT",
+    headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
+    body: JSON.stringify({ list_type: input.listType, record_ids: input.recordIds }),
+  });
+}

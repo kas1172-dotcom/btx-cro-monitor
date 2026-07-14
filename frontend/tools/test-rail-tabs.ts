@@ -61,8 +61,8 @@ const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId))
 
 assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
 assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "map,analysis,capacity,programs", "Secondary nav must contain the analytical surfaces.");
-assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "deliverables,settings", "Utility nav must expose Deliverable Editor and Settings.");
-assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,map,analysis,capacity,programs,deliverables,settings", "TabId order must stay canonical.");
+assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "deliverables,hubspot,settings", "Utility nav must expose Deliverable Editor, HubSpot, and Settings.");
+assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,map,analysis,capacity,programs,deliverables,hubspot,settings", "TabId order must stay canonical.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
 assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
 

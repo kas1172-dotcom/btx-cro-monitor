@@ -9,6 +9,7 @@ export const AREA_MARKET_SCOPING: Record<TabId, boolean> = {
   map: true,
   analysis: false,
   deliverables: false,
+  hubspot: false,
   capacity: false,
   programs: true,
   settings: false,
