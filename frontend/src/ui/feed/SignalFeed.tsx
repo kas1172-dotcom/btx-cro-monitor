@@ -13,6 +13,7 @@ import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/si
 import { provenanceForRecord } from "../../app/provenance.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
+import { EmptyState } from "../primitives.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 
 const NEWS = news as unknown as MarketEvent[];
@@ -247,6 +248,9 @@ export function SignalFeed({ world }: { world: World }) {
             </div>
           </article>
         ))}
+        {visible.length === 0 && (
+          <EmptyState headline="No signals in this filter" body="Try a different filter, or check back after the next monitor run." icon="signal" />
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
+import { EmptyState } from "../primitives.tsx";
 
 const CURRENT_STATUSES = new Set<AccountStatus>([
   "current_customer",
@@ -209,6 +210,9 @@ export function CurrentBusiness({ world }: { world: World }) {
               />
             </button>
           ))}
+          {visibleAttentionRows.length === 0 && (
+            <EmptyState headline="No accounts need attention" body="Current accounts are healthy — nothing is flagged for risk or capacity review right now." icon="accounts" />
+          )}
           {accountsNeedingAttention.length > 5 && (
             <button className="quiet-expander" onClick={() => setShowAll((value) => !value)}>
               {showAll ? "Show top 5" : `View all ${accountsNeedingAttention.length}`}

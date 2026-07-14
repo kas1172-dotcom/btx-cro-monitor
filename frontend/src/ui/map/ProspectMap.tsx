@@ -14,6 +14,7 @@ import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { buildMapMarkers, mapCenter, mappableCompanies } from "./mapModel.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
+import { AccountToken } from "../common/AccountToken.tsx";
 
 function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   const map = useMap();
@@ -91,7 +92,10 @@ export function ProspectMap({ world }: { world: World }) {
               className={p.company.id === activeCompanyId ? "map-prospect active" : "map-prospect"}
               onClick={() => setState({ activeCompanyId: p.company.id })}
             >
-              <span className="rank-badge">#{i + 1}</span>
+              <span className="map-prospect-rank">
+                <span className="rank-badge">#{i + 1}</span>
+                <AccountToken name={p.company.name} riskScore={p.score.dimensions.risk.score} size="sm" />
+              </span>
               <span className="map-prospect-main">
                 <strong>{p.company.name}</strong>
                 <em>Opp {p.opportunity} · fit {p.fit.score}% · {p.company.location.city}</em>
@@ -113,6 +117,11 @@ export function ProspectMap({ world }: { world: World }) {
         <div className="map-legend">
           <span><i className="legend-prospect" /> prospect/customer</span>
           <span><i className="legend-other" /> supplier/competitor/self</span>
+        </div>
+        <div className="map-legend">
+          <span><AccountToken name="G" riskScore={10} size="sm" /> growing</span>
+          <span><AccountToken name="A" riskScore={50} size="sm" /> at risk</span>
+          <span><AccountToken name="C" riskScore={80} size="sm" /> churned</span>
         </div>
       </aside>
     </div>

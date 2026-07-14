@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { executeHubSpotTask, type WorkItem } from "../../app/workItems.ts";
 import type { World } from "../../app/useWorld.ts";
+import { EmptyState } from "../primitives.tsx";
 
 function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -105,7 +106,7 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
           </article>
         );
       })}
-      {items.length === 0 && <div className="rail-quiet-empty">{empty}</div>}
+      {items.length === 0 && <EmptyState headline="No work items" body={empty} icon="work_queue" />}
     </div>
   );
 }

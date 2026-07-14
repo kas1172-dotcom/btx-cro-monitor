@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { TabId } from "../app/surfaces.ts";
+import { ConfidenceEdge } from "./common/ConfidenceEdge.tsx";
 
 type IconName = TabId | "document" | "empty" | "chevron" | "signal" | "user";
 
@@ -109,16 +110,19 @@ export function SignalCard({
   provenance?: { entity?: string; method?: string; confidence?: number };
   actionLabel?: string;
 }) {
+  const linked = scope === "specific_account";
   return (
-    <article className="signal-card">
-      <div className="signal-card-main">
-        <strong>{title}</strong>
-        <div className="meta-row"><ScopePill scope={scope} /><span>{source}</span>{date ? <span>{date}</span> : null}</div>
-        <p>{body}</p>
-        {provenance ? <ProvenanceStrip {...provenance} /> : null}
-      </div>
-      <a className="accent-action" href="#top" onClick={(event) => event.preventDefault()}>{actionLabel}<UiIcon name="chevron" /></a>
-    </article>
+    <ConfidenceEdge linked={linked} confidence={provenance?.confidence}>
+      <article className="signal-card">
+        <div className="signal-card-main">
+          <strong>{title}</strong>
+          <div className="meta-row"><ScopePill scope={scope} /><span>{source}</span>{date ? <span>{date}</span> : null}</div>
+          <p>{body}</p>
+          {provenance ? <ProvenanceStrip {...provenance} /> : null}
+        </div>
+        <a className="accent-action" href="#top" onClick={(event) => event.preventDefault()}>{actionLabel}<UiIcon name="chevron" /></a>
+      </article>
+    </ConfidenceEdge>
   );
 }
 
