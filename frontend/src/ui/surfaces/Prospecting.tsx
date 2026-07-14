@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { accountStatus, isProspectingAccount } from "../../brain/classification.ts";
@@ -12,6 +13,7 @@ import { ExternalLink } from "../common/ExternalLink.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 import { EmptyState } from "../primitives.tsx";
+import { ImportListModal } from "../prospecting/ImportListModal.tsx";
 
 const PROSPECT_STATUSES = new Set<AccountStatus>(["target_prospect", "new_logo"]);
 const PROSPECT_MOTIONS = new Set<BusinessMotion>(["prospect_new_business"]);
@@ -64,6 +66,7 @@ function visitReason(row: { opportunity: number; fit: number; signals: Signal[];
 
 export function Prospecting({ world }: { world: World }) {
   const { city } = useStore();
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const prospectSignals = world.analysis.valid.filter(isProspectingSignal);
   const idsFromSignals = new Set(prospectSignals.map((s) => s.subject_id));
   const prospectCompanies = world.companies.filter(
@@ -114,7 +117,7 @@ export function Prospecting({ world }: { world: World }) {
   const visitPlanTitle = selectedMarket ? `${selectedMarket} Visit Plan` : "National Target List";
 
   return (
-    <div className="prospecting-workspace">
+    <div className="prospecting-workspace" data-surface-component="surface-prospecting">
       <section className="current-head">
         <p className="eyebrow">Prospecting</p>
         <h1>Who should we pursue next?</h1>
@@ -122,6 +125,7 @@ export function Prospecting({ world }: { world: World }) {
           New-logo and target-account discovery, ranked by fit, buying signal strength, revenue potential, geography,
           contact availability, and urgency.
         </p>
+        <button className="import-list-trigger" type="button" onClick={() => setIsImportOpen(true)}>Import list</button>
       </section>
 
       <section className="current-summary">
@@ -158,7 +162,7 @@ export function Prospecting({ world }: { world: World }) {
                 : "Select a city for an in-market visit plan. For now, these are the strongest national targets from the demo data."}
             </p>
           </div>
-          <button onClick={() => setState({ view: "map" })}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
+          <button onClick={() => setState({ activeTab: "map" })}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
         </div>
         <div className="visit-plan-list">
           {visitPlanRows.map((row, index) => {
@@ -213,7 +217,7 @@ export function Prospecting({ world }: { world: World }) {
         <div className="current-panel current-panel-wide">
           <div className="panel-head">
             <h2>Top New Prospects</h2>
-            <button onClick={() => setState({ view: "map" })}>Open Map</button>
+            <button onClick={() => setState({ activeTab: "map" })}>Open Map</button>
           </div>
           {topProspects.map((row, index) => (
             <button key={row.company.id} className="prospect-card" onClick={() => setState({ activeCompanyId: row.company.id })}>
@@ -340,6 +344,7 @@ export function Prospecting({ world }: { world: World }) {
           ))}
         </div>
       </section>
+      {isImportOpen && <ImportListModal world={world} onClose={() => setIsImportOpen(false)} />}
     </div>
   );
 }

@@ -6,6 +6,7 @@ export const AREA_MARKET_SCOPING: Record<TabId, boolean> = {
   work_queue: false,
   accounts: false,
   ask: false,
+  prospecting: true,
   map: true,
   analysis: false,
   deliverables: false,

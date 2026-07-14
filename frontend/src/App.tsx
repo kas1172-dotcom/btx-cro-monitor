@@ -20,6 +20,7 @@ import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
 import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
 import { DeliverableLibrary } from "./ui/surfaces/DeliverableLibrary.tsx";
 import { HubSpotViewer } from "./ui/surfaces/HubSpotViewer.tsx";
+import { Prospecting } from "./ui/surfaces/Prospecting.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
@@ -83,6 +84,7 @@ export function App() {
       case "work_queue": return <WorkQueue world={world} />;
       case "accounts": return <Account360 world={world} />;
       case "ask": return <AskSurface world={world} />;
+      case "prospecting": return <Prospecting world={world} />;
       case "map": return viewWorld ? (
         <Suspense fallback={<div className="loading">loading map…</div>}>
           <ProspectMap world={viewWorld} />
@@ -98,7 +100,7 @@ export function App() {
     }
   };
   const counts = Object.fromEntries(
-    (["brief", "work_queue", "accounts", "ask", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"] as TabId[])
+    (["brief", "work_queue", "accounts", "ask", "prospecting", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"] as TabId[])
       .map((surface) => [surface, countForSurface(surface, world, memory)]),
   ) as Partial<Record<TabId, number>>;
 

@@ -43,6 +43,7 @@ from btx_platform.schemas import (
     EngineConfigPut,
     EngineConfigResponse,
     HubSpotCompanySearchRequest,
+    HubSpotImportRequest,
     HubSpotListAddRecordsRequest,
     HubSpotListCreateRequest,
     HubSpotTaskExecuteRequest,
@@ -262,6 +263,76 @@ def _verified_task(task: dict, *, expected_subject: str, expected_body: str) -> 
     subject = properties.get("hs_task_subject") or task.get("hs_task_subject")
     body = properties.get("hs_task_body") or task.get("hs_task_body") or ""
     return bool(task.get("id")) and subject == expected_subject and expected_body in str(body)
+
+
+def _nonempty_properties(values: dict[str, str]) -> dict[str, str]:
+    return {key: str(value).strip() for key, value in values.items() if str(value).strip()}
+
+
+def _hubspot_company_properties(values: dict[str, str]) -> dict[str, str]:
+    props = _nonempty_properties(values)
+    mapped = {
+        "name": props.get("companyName") or props.get("name"),
+        "domain": props.get("domain"),
+        "website": props.get("website"),
+        "phone": props.get("phone"),
+        "city": props.get("city"),
+        "state": props.get("state"),
+        "country": props.get("country"),
+    }
+    return {key: value for key, value in mapped.items() if value}
+
+
+def _hubspot_contact_properties(values: dict[str, str]) -> dict[str, str]:
+    props = _nonempty_properties(values)
+    first_name = props.get("firstName")
+    last_name = props.get("lastName")
+    contact_name = props.get("contactName")
+    if contact_name and not (first_name or last_name):
+        parts = contact_name.split()
+        first_name = parts[0] if parts else None
+        last_name = " ".join(parts[1:]) if len(parts) > 1 else None
+    mapped = {
+        "firstname": first_name,
+        "lastname": last_name,
+        "email": props.get("email"),
+        "phone": props.get("phone"),
+        "jobtitle": props.get("title"),
+        "company": props.get("companyName"),
+    }
+    return {key: value for key, value in mapped.items() if value}
+
+
+def _trace_id(item: dict) -> str | None:
+    value = item.get("objectWriteTraceId") or item.get("traceId")
+    if value:
+        return str(value)
+    context = item.get("context")
+    if isinstance(context, dict):
+        trace = context.get("objectWriteTraceId")
+        if isinstance(trace, list):
+            return str(trace[0]) if trace else None
+        if trace:
+            return str(trace)
+    return None
+
+
+def _batch_successes(payload: dict, fallback_trace_ids: list[str]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for index, item in enumerate(payload.get("results", [])):
+        trace = _trace_id(item) or (fallback_trace_ids[index] if index < len(fallback_trace_ids) else None)
+        if trace and item.get("id") is not None:
+            result[trace] = str(item.get("id"))
+    return result
+
+
+def _batch_failures(payload: dict) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for item in payload.get("errors", []) + payload.get("failures", []):
+        trace = _trace_id(item)
+        if trace:
+            result[trace] = item.get("message") or item.get("error") or json.dumps(item, sort_keys=True)
+    return result
 
 
 def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict, tenant_id: str = models.DEFAULT_TENANT_ID) -> None:
@@ -584,6 +655,89 @@ def create_app(
                 "record_url": _hubspot_list_record_url(list_id),
                 "verified": True,
             },
+        })
+
+    @app.post("/crm/import/prospects")
+    def import_prospects_to_hubspot(payload: HubSpotImportRequest) -> Response:
+        if not settings.hubspot_access_token:
+            return not_configured("HubSpot prospect import")
+
+        row_results: dict[str, dict] = {
+            row.row_id: {"row_id": row.row_id, "status": "pending", "company_id": None, "contact_id": None, "reason": None}
+            for row in payload.rows
+        }
+        company_inputs: list[dict] = []
+        contact_inputs: list[dict] = []
+        for row in payload.rows:
+            company_props = _hubspot_company_properties(row.company)
+            if not (company_props.get("name") or company_props.get("domain")):
+                row_results[row.row_id] = {
+                    "row_id": row.row_id,
+                    "status": "failed",
+                    "company_id": None,
+                    "contact_id": None,
+                    "reason": "Missing required company name or domain.",
+                }
+                continue
+            company_inputs.append({"objectWriteTraceId": row.row_id, "properties": company_props})
+            contact_props = _hubspot_contact_properties(row.contact or {})
+            if contact_props:
+                contact_inputs.append({"objectWriteTraceId": row.row_id, "properties": contact_props})
+
+        client = HubSpotClient(settings.hubspot_access_token)
+        try:
+            company_payload = client.create_companies_batch(company_inputs) if company_inputs else {"results": []}
+            company_successes = _batch_successes(company_payload, [item["objectWriteTraceId"] for item in company_inputs])
+            company_failures = _batch_failures(company_payload)
+        except HubSpotError as exc:
+            logger.warning("hubspot.import_companies_failed", extra={"status_code": exc.status_code})
+            for item in company_inputs:
+                row_results[item["objectWriteTraceId"]] = {
+                    **row_results[item["objectWriteTraceId"]],
+                    "status": "failed",
+                    "reason": str(exc),
+                }
+            company_successes = {}
+            company_failures = {}
+
+        for row_id, company_id in company_successes.items():
+            row_results[row_id]["company_id"] = company_id
+            row_results[row_id]["status"] = "succeeded"
+        for row_id, reason in company_failures.items():
+            row_results[row_id]["status"] = "failed"
+            row_results[row_id]["reason"] = reason
+        for item in company_inputs:
+            row_id = item["objectWriteTraceId"]
+            if row_results[row_id]["status"] == "pending":
+                row_results[row_id]["status"] = "failed"
+                row_results[row_id]["reason"] = "HubSpot returned no result for this row."
+
+        confirmed_contact_inputs = [item for item in contact_inputs if row_results[item["objectWriteTraceId"]]["status"] == "succeeded"]
+        try:
+            contact_payload = client.create_contacts_batch(confirmed_contact_inputs) if confirmed_contact_inputs else {"results": []}
+            contact_successes = _batch_successes(contact_payload, [item["objectWriteTraceId"] for item in confirmed_contact_inputs])
+            contact_failures = _batch_failures(contact_payload)
+        except HubSpotError as exc:
+            logger.warning("hubspot.import_contacts_failed", extra={"status_code": exc.status_code})
+            contact_successes = {}
+            contact_failures = {item["objectWriteTraceId"]: str(exc) for item in confirmed_contact_inputs}
+
+        for row_id, contact_id in contact_successes.items():
+            row_results[row_id]["contact_id"] = contact_id
+        for row_id, reason in contact_failures.items():
+            if row_results[row_id]["status"] == "succeeded":
+                row_results[row_id]["status"] = "partial"
+                row_results[row_id]["reason"] = f"Company created; contact failed: {reason}"
+
+        rows = list(row_results.values())
+        return JSONResponse({
+            "status": "completed",
+            "summary": {
+                "succeeded": sum(1 for row in rows if row["status"] == "succeeded"),
+                "partial": sum(1 for row in rows if row["status"] == "partial"),
+                "failed": sum(1 for row in rows if row["status"] == "failed"),
+            },
+            "rows": rows,
         })
 
     @app.post("/crm/task")

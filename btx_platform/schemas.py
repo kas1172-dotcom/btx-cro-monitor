@@ -96,6 +96,16 @@ class HubSpotListAddRecordsRequest(BaseModel):
     record_ids: list[str] = Field(min_length=1, max_length=1000)
 
 
+class HubSpotImportRow(BaseModel):
+    row_id: str = Field(min_length=1, max_length=120)
+    company: dict[str, str] = Field(default_factory=dict)
+    contact: dict[str, str] | None = None
+
+
+class HubSpotImportRequest(BaseModel):
+    rows: list[HubSpotImportRow] = Field(min_length=1, max_length=100)
+
+
 class EmailSendRequest(BaseModel):
     to: str
     subject: str

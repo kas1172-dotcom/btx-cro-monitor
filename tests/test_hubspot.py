@@ -179,6 +179,37 @@ def test_hubspot_create_list_and_add_memberships(monkeypatch):
     assert FakeHttpxClient.calls[2][2]["json"] == ["10", "11"]
 
 
+def test_hubspot_batch_create_companies_and_contacts_payload(monkeypatch):
+    FakeHttpxClient.calls = []
+    FakeHttpxClient.responses = [
+        httpx.Response(200, json={"results": [{"id": "company-1", "objectWriteTraceId": "row-1"}]}),
+        httpx.Response(200, json={"results": [{"id": "contact-1", "objectWriteTraceId": "row-1"}]}),
+    ]
+    monkeypatch.setattr("btx_platform.hubspot.httpx.Client", FakeHttpxClient)
+
+    client = HubSpotClient("token")
+    company_result = client.create_companies_batch([
+        {"objectWriteTraceId": "row-1", "properties": {"name": "Trinity Defense Components", "domain": "trinity.example"}},
+    ])
+    contact_result = client.create_contacts_batch([
+        {"objectWriteTraceId": "row-1", "properties": {"email": "buyer@trinity.example", "firstname": "Riley"}},
+    ])
+
+    assert company_result["results"][0]["id"] == "company-1"
+    assert contact_result["results"][0]["id"] == "contact-1"
+    company_call = FakeHttpxClient.calls[0]
+    contact_call = FakeHttpxClient.calls[1]
+    assert company_call[0] == "POST"
+    assert company_call[1].endswith("/crm/objects/2026-03/companies/batch/create")
+    assert contact_call[1].endswith("/crm/objects/2026-03/contacts/batch/create")
+    assert company_call[2]["json"] == {
+        "inputs": [{
+            "properties": {"name": "Trinity Defense Components", "domain": "trinity.example"},
+            "objectWriteTraceId": "row-1",
+        }],
+    }
+
+
 def test_hubspot_mappers_emit_frontend_shapes():
     owners = {"7": HubSpotOwner(id="7", name="Riley Owner", email="riley@example.com")}
     companies = map_companies(
@@ -518,6 +549,93 @@ def test_crm_list_add_requires_readback_membership(monkeypatch, tmp_path: Path):
     assert response.status_code == 502
     assert response.json()["code"] == "hubspot_error"
     assert "missing records" in response.json()["detail"]
+
+
+def test_crm_import_prospects_batches_rows_and_reports_partial_failures(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+    captured: dict[str, list[dict]] = {}
+
+    class FakeHubSpotClient:
+        def __init__(self, token: str):
+            assert token == "hubspot-token"
+
+        def create_companies_batch(self, rows):
+            captured["companies"] = rows
+            return {
+                "results": [{"id": "company-1", "objectWriteTraceId": "row-1"}],
+                "errors": [{"message": "Duplicate domain", "context": {"objectWriteTraceId": ["row-2"]}}],
+            }
+
+        def create_contacts_batch(self, rows):
+            captured["contacts"] = rows
+            return {"errors": [{"message": "Invalid email", "objectWriteTraceId": "row-1"}]}
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+
+    response = client.post(
+        "/crm/import/prospects",
+        headers=_headers(),
+        json={
+            "rows": [
+                {
+                    "row_id": "row-1",
+                    "company": {"companyName": "Trinity Defense Components", "domain": "trinity.example", "city": "Pittsburgh"},
+                    "contact": {"contactName": "Ari Lee", "email": "bad-email", "title": "Buyer"},
+                },
+                {
+                    "row_id": "row-2",
+                    "company": {"companyName": "Duplicate Defense", "domain": "duplicate.example"},
+                },
+                {
+                    "row_id": "row-3",
+                    "company": {"city": "Pittsburgh"},
+                },
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["summary"] == {"succeeded": 0, "partial": 1, "failed": 2}
+    rows = {row["row_id"]: row for row in payload["rows"]}
+    assert rows["row-1"]["status"] == "partial"
+    assert rows["row-1"]["company_id"] == "company-1"
+    assert rows["row-1"]["contact_id"] is None
+    assert "Invalid email" in rows["row-1"]["reason"]
+    assert rows["row-2"]["status"] == "failed"
+    assert rows["row-2"]["reason"] == "Duplicate domain"
+    assert rows["row-3"]["status"] == "failed"
+    assert rows["row-3"]["reason"] == "Missing required company name or domain."
+    assert captured["companies"] == [
+        {"objectWriteTraceId": "row-1", "properties": {"name": "Trinity Defense Components", "domain": "trinity.example", "city": "Pittsburgh"}},
+        {"objectWriteTraceId": "row-2", "properties": {"name": "Duplicate Defense", "domain": "duplicate.example"}},
+    ]
+    assert captured["contacts"] == [
+        {"objectWriteTraceId": "row-1", "properties": {"firstname": "Ari", "lastname": "Lee", "email": "bad-email", "jobtitle": "Buyer"}},
+    ]
+
+
+def test_crm_import_prospects_requires_hubspot_token(tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", hubspot_access_token=None)
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+
+    response = client.post(
+        "/crm/import/prospects",
+        headers=_headers(),
+        json={"rows": [{"row_id": "row-1", "company": {"companyName": "Acme"}}]},
+    )
+
+    assert response.status_code == 501
+    assert response.json()["code"] == "not_configured"
 
 
 def _create_proposed_work_item(client: TestClient, *, account_id: str = "hubspot-company-10") -> dict:
