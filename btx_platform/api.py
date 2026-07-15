@@ -401,13 +401,6 @@ def create_app(
         session_factory = make_session_factory(engine)
 
     app = FastAPI(title="BTX Engine — Integration Platform", version="0.1.0")
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_credentials=False,
-        allow_methods=["GET", "POST", "PUT", "PATCH", "OPTIONS"],
-        allow_headers=["authorization", "content-type", "x-idempotency-key", settings.signature_header],
-    )
     app.state.settings = settings
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else _default_queue(settings)
@@ -472,6 +465,16 @@ def create_app(
                 )
 
         return await call_next(request)
+
+    # Add CORS after custom middleware so it wraps auth/observability responses,
+    # including early 401/403 JSON responses returned before route handlers run.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "OPTIONS"],
+        allow_headers=["authorization", "content-type", "x-idempotency-key", settings.signature_header],
+    )
 
     @app.get("/health")
     def health() -> dict:

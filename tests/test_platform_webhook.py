@@ -122,6 +122,13 @@ def test_webhooks_exempt_from_clerk_auth_but_other_routes_are_not():
     assert client.get("/work-items").status_code == 401        # but this route still requires one
 
 
+def test_auth_rejections_include_cors_headers_for_browser_clients():
+    client, _sf, _q = _build(Settings(env="test", frontend_origins="https://kas1172-dotcom.github.io"))
+    response = client.get("/work-items", headers={"Origin": "https://kas1172-dotcom.github.io"})
+    assert response.status_code == 401
+    assert response.headers["access-control-allow-origin"] == "https://kas1172-dotcom.github.io"
+
+
 # ─── auth ───────────────────────────────────────────────────────────────────
 
 def test_bad_signature_rejected_nothing_stored():
