@@ -114,6 +114,44 @@ def test_deliverable_crud_lifecycle(tmp_path: Path):
     assert refetched.json()["updated_at"] >= refetched.json()["created_at"]
 
 
+def test_deliverable_entity_ids_round_trip_and_account_filter(tmp_path: Path):
+    client = _build(tmp_path)
+    headers = _headers()
+
+    payload = _deliverable_payload("Multi-account capabilities one-pager")
+    payload["type"] = "capabilities_assessment"
+    payload["document"]["type"] = "capabilities_assessment"
+    payload["entity_ids"] = ["hubspot-company-332413222630", "hubspot-company-77"]
+
+    created = client.post("/deliverables", headers=headers, json=payload)
+    assert created.status_code == 201
+    body = created.json()
+    deliverable_id = body["id"]
+    assert body["entity_ids"] == ["hubspot-company-332413222630", "hubspot-company-77"]
+
+    # A secondary linked account (not the canonical one) must find the deliverable.
+    by_secondary = client.get("/deliverables?account=hubspot-company-77", headers=headers)
+    assert by_secondary.status_code == 200
+    assert [record["id"] for record in by_secondary.json()["records"]] == [deliverable_id]
+
+    by_canonical = client.get("/deliverables?account=hubspot-company-332413222630", headers=headers)
+    assert [record["id"] for record in by_canonical.json()["records"]] == [deliverable_id]
+
+    unrelated = client.get("/deliverables?account=hubspot-company-999", headers=headers)
+    assert unrelated.json()["records"] == []
+
+    patched = client.patch(
+        f"/deliverables/{deliverable_id}",
+        headers=headers,
+        json={"entity_ids": ["hubspot-company-77"]},
+    )
+    assert patched.status_code == 200
+    assert patched.json()["entity_ids"] == ["hubspot-company-77"]
+
+    refetched = client.get(f"/deliverables/{deliverable_id}", headers=headers)
+    assert refetched.json()["entity_ids"] == ["hubspot-company-77"]
+
+
 def test_tenant_cannot_read_or_patch_another_tenants_deliverable(tmp_path: Path):
     client = _build(tmp_path)
     tenant_a = _headers(tenant_id="tenant-a")

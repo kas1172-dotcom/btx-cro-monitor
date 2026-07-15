@@ -224,6 +224,7 @@ class DeliverableCreate(BaseModel):
     canonical_account_id: str | None = None
     program_id: str | None = None
     trip_id: str | None = None
+    entity_ids: list[str] | None = None
     document: dict
 
     @model_validator(mode="after")
@@ -241,6 +242,7 @@ class DeliverablePatch(BaseModel):
     canonical_account_id: str | None = None
     program_id: str | None = None
     trip_id: str | None = None
+    entity_ids: list[str] | None = None
     document: dict | None = None
 
     @model_validator(mode="after")
@@ -261,6 +263,7 @@ class DeliverableResponse(BaseModel):
     canonical_account_id: str | None = None
     program_id: str | None = None
     trip_id: str | None = None
+    entity_ids: list[str] | None = None
     document: dict
     created_at: str
     updated_at: str

@@ -8,6 +8,7 @@ export interface StoredDeliverable {
   canonical_account_id: string | null;
   program_id: string | null;
   trip_id: string | null;
+  entity_ids: string[] | null;
   document: Deliverable;
   created_at: string;
   updated_at: string;
@@ -32,6 +33,7 @@ export function recordToDeliverable(record: StoredDeliverable): Deliverable {
     canonicalAccountId: record.canonical_account_id,
     programId: record.program_id,
     tripId: record.trip_id,
+    entityIds: record.entity_ids ?? record.document.entityIds ?? [],
   };
 }
 
@@ -62,6 +64,7 @@ export async function createStoredDeliverable(deliverable: Deliverable): Promise
       canonical_account_id: deliverable.canonicalAccountId ?? deliverable.entityIds[0] ?? null,
       program_id: deliverable.programId ?? null,
       trip_id: deliverable.tripId ?? null,
+      entity_ids: deliverable.entityIds.length ? deliverable.entityIds : null,
       document: documentForBackend(deliverable),
     }),
   });
@@ -76,6 +79,7 @@ export async function patchStoredDeliverable(recordId: string, deliverable: Deli
       canonical_account_id: deliverable.canonicalAccountId ?? deliverable.entityIds[0] ?? null,
       program_id: deliverable.programId ?? null,
       trip_id: deliverable.tripId ?? null,
+      entity_ids: deliverable.entityIds.length ? deliverable.entityIds : null,
       document: documentForBackend(deliverable),
     }),
   });
