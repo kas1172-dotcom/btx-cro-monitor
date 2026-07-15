@@ -1,9 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import companies from "../data/demo/btx/companies.json";
-import contacts from "../data/demo/btx/contacts.json";
-import opportunities from "../data/demo/btx/opportunities.json";
+import referenceData from "../../clients/btx/data/defense_primes_enrichment.json";
 
 const FRONTEND_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const REPO_DIR = join(FRONTEND_DIR, "..");
@@ -52,6 +50,13 @@ interface CompanyRow {
   location: { city: string; state?: string; address?: string; postal_code?: string };
   domain?: string;
   website_url?: string;
+  aliases?: string[];
+  facility_names?: string[];
+  cage_code?: string;
+  uei?: string;
+  known_programs?: string[];
+  known_customers?: string[];
+  notes?: string[];
 }
 
 interface ContactRow {
@@ -203,11 +208,7 @@ function traceId(objectType: CrmObjectType, id: string): string {
 }
 
 function worldCompanyDomain(company: CompanyRow): string {
-  const domain = company.domain ?? company.website_url?.replace(/^https?:\/\//, "").replace(/\/$/u, "") ?? `${company.id}.example`;
-  if (!domain.endsWith(".example")) {
-    throw new Error(`Company ${company.id} must use a fictional .example domain, received ${domain}`);
-  }
-  return domain;
+  return company.domain ?? company.website_url?.replace(/^https?:\/\//, "").replace(/\/$/u, "") ?? `${company.id}.example`;
 }
 
 function splitName(name: string): { firstname: string; lastname: string } {
@@ -223,8 +224,128 @@ function deterministicEmail(contact: ContactRow): string {
   return contact.email ?? `${emailLocalPart(contact.name)}@${contact.company_id}.example.com`;
 }
 
+type ReferencePayload = {
+  accounts?: Array<{
+    id?: string;
+    name?: string;
+    aliases?: string[];
+    domains?: string[];
+    hq?: string;
+    subsidiaries?: string[];
+    cage_codes?: Array<{ code?: string | null; verified?: boolean }>;
+    uei?: Array<{ value?: string | null; verified?: boolean }>;
+    known_programs?: string[];
+  }>;
+};
+
+function lockheedReference(): NonNullable<ReferencePayload["accounts"]>[number] {
+  const account = (referenceData as ReferencePayload).accounts?.find((entry) => entry.id === "prime-lockheed-martin");
+  if (!account) throw new Error("Missing Lockheed Martin reference data.");
+  return account;
+}
+
+function verifiedIdentifier<T extends { verified?: boolean }>(items: T[] | undefined, pick: (item: T) => string | null | undefined, preferred?: string): string {
+  const verified = (items ?? []).filter((item) => item.verified === true);
+  const preferredMatch = verified.find((item) => pick(item) === preferred);
+  const value = pick(preferredMatch ?? verified[0]);
+  if (!value) throw new Error(`Missing verified identifier${preferred ? ` ${preferred}` : ""}.`);
+  return value;
+}
+
+const lockheed = lockheedReference();
+
+const companyRows: CompanyRow[] = [{
+  id: "lockheed-martin-corporation",
+  name: "Lockheed Martin Corporation",
+  relationship: "existing customer",
+  account_status: "active_pipeline",
+  location: { city: "Bethesda", state: "MD", address: "6801 Rockledge Dr", postal_code: "20817" },
+  domain: "lockheedmartin.com",
+  website_url: "https://www.lockheedmartin.com",
+  aliases: lockheed.aliases ?? ["Lockheed Martin", "Lockheed"],
+  facility_names: ["Lockheed Martin Aeronautics", "Fort Worth Aeronautics"],
+  cage_code: verifiedIdentifier(lockheed.cage_codes, (item) => item.code, "81755"),
+  uei: verifiedIdentifier(lockheed.uei, (item) => item.value, "CQWLW9XRQTH5"),
+  known_programs: ["F-35 Lightning II", "F-22 Raptor", "C-130J Super Hercules"],
+  known_customers: ["US Department of Defense", "US Air Force", "US Navy"],
+  notes: [
+    "BTX relationship centers on build-to-print precision components for aircraft production and sustainment programs.",
+    "Account owner should lead with F-35 timing, inspection capacity, and AS9100 controlled process fit.",
+  ],
+}];
+
+const contactRows: ContactRow[] = [
+  {
+    id: "lockheed-supply-chain-lead",
+    company_id: "lockheed-martin-corporation",
+    name: "Jamie Carter",
+    title: "Supply Chain Lead, Aeronautics",
+    email: "jamie.carter.lockheed-demo@example.com",
+  },
+  {
+    id: "lockheed-procurement-manager",
+    company_id: "lockheed-martin-corporation",
+    name: "Morgan Ellis",
+    title: "Procurement Manager, F-35 Sustainment",
+    email: "morgan.ellis.lockheed-demo@example.com",
+  },
+];
+
+const opportunityRows: OpportunityRow[] = [
+  {
+    id: "lockheed-f35-build-to-print",
+    company_id: "lockheed-martin-corporation",
+    name: "F-35 sustainment build-to-print components",
+    value: 1850000,
+    stage: "proposal",
+    close_date: "2026-09-30",
+  },
+  {
+    id: "lockheed-aero-fixture-assemblies",
+    company_id: "lockheed-martin-corporation",
+    name: "Aeronautics fixture and small assembly package",
+    value: 640000,
+    stage: "qualified",
+    close_date: "2026-08-15",
+  },
+];
+
 async function ensureDealExternalIdProperty(): Promise<void> {
   await ensureUniqueStringProperty("deals", "dealinformation", "btx_external_id", "BTX External ID", "Stable external ID used by the BTX demo HubSpot seed script.");
+}
+
+async function ensureCompanyProperties(): Promise<void> {
+  await ensureUniqueStringProperty("companies", "companyinformation", "btx_company_domain", "BTX Company Domain", "Stable company domain used by the BTX demo HubSpot seed script.");
+  const plainProperties = [
+    ["btx_needs", "BTX Needs", "BTX-held notes on the account need."],
+    ["btx_aliases", "BTX Aliases", "Known names used by the BTX canonical resolver."],
+    ["btx_facility_names", "BTX Facility Names", "Known facilities used by the BTX canonical resolver."],
+    ["btx_parent_id", "BTX Parent ID", "Optional parent account identifier."],
+    ["btx_subsidiary_ids", "BTX Subsidiary IDs", "Optional subsidiary account identifiers."],
+    ["btx_cage_code", "BTX CAGE Code", "Verified CAGE code used by the BTX canonical resolver."],
+    ["btx_uei", "BTX UEI", "Verified UEI used by the BTX canonical resolver."],
+    ["btx_known_programs", "BTX Known Programs", "Known programs used by the BTX canonical resolver."],
+    ["btx_known_customers", "BTX Known Customers", "Known customers used by the BTX canonical resolver."],
+  ] as const;
+  for (const [name, label, description] of plainProperties) {
+    await ensurePlainStringProperty("companies", "companyinformation", name, label, description);
+  }
+}
+
+async function ensurePlainStringProperty(objectType: CrmObjectType, groupName: string, name: string, label: string, description: string): Promise<void> {
+  try {
+    await hubspot(`/crm/v3/properties/${objectType}`, {
+      groupName,
+      name,
+      label,
+      description,
+      type: "string",
+      fieldType: "text",
+    }, { allowConflict: true });
+  } catch (error) {
+    if (!(error instanceof HubspotError) || error.status !== 403) throw error;
+    await hubspotGet(`/crm/v3/properties/${objectType}/${name}`);
+  }
 }
 
 async function ensureUniqueStringProperty(objectType: CrmObjectType, groupName: string, name: string, label: string, description: string): Promise<void> {
@@ -371,6 +492,7 @@ async function dealStageIdByDemoStage(): Promise<Record<string, string>> {
 function companyUpsertInputs(companyRows: CompanyRow[], idProperty: "domain" | "btx_company_domain"): BatchUpsertInput[] {
   return companyRows.map((company) => {
     const domain = worldCompanyDomain(company);
+    const notes = company.notes?.join("\n") ?? undefined;
     return {
       id: domain,
       objectWriteTraceId: traceId("companies", company.id),
@@ -382,6 +504,15 @@ function companyUpsertInputs(companyRows: CompanyRow[], idProperty: "domain" | "
         state: company.location.state,
         address: company.location.address,
         zip: company.location.postal_code,
+        website: company.website_url,
+        description: notes,
+        btx_needs: notes,
+        btx_aliases: company.aliases?.join("; "),
+        btx_facility_names: company.facility_names?.join("; "),
+        btx_cage_code: company.cage_code,
+        btx_uei: company.uei,
+        btx_known_programs: company.known_programs?.join("; "),
+        btx_known_customers: company.known_customers?.join("; "),
       }),
     };
   });
@@ -450,10 +581,6 @@ async function verifyHubSpotSeed(
   console.log(`Verification: ${worldCompanies.length} named demo companies (+${nonWorldCompanies.length} default/other), ${totalContactAssociations} contact-company associations, ${totalDealAssociations} deal-company associations.`);
 }
 
-const companyRows = companies as CompanyRow[];
-const contactRows = contacts as ContactRow[];
-const opportunityRows = opportunities as OpportunityRow[];
-
 if (!confirmed) {
   printSeedDryRun(companyRows, contactRows, opportunityRows);
 } else if (!token) {
@@ -462,6 +589,7 @@ if (!confirmed) {
   console.log(`HubSpot token source: ${tokenSource?.name}`);
   const companyDomainById = new Map(companyRows.map((company) => [company.id, worldCompanyDomain(company)]));
 
+  await ensureCompanyProperties();
   await ensureDealExternalIdProperty();
 
   let companySummary: UpsertSummary;
@@ -479,11 +607,8 @@ if (!confirmed) {
     const email = deterministicEmail(contact);
     const expectedDomain = companyDomainById.get(contact.company_id);
     if (!expectedDomain) throw new Error(`Contact ${contact.id} references unknown company ${contact.company_id}.`);
-    const expectedEmailDomain = expectedDomain.endsWith(".example")
-      ? `${expectedDomain}.com`
-      : expectedDomain;
-    if (!email.endsWith(`@${expectedEmailDomain}`)) {
-      throw new Error(`Contact ${contact.id} must use first.last@${expectedEmailDomain}, received ${email}.`);
+    if (!email.endsWith(".example.com")) {
+      throw new Error(`Contact ${contact.id} must use a non-real example.com address, received ${email}.`);
     }
     return {
       id: email,

@@ -19,6 +19,7 @@ const adapter = createDataAdapter();
 const DATA_MODE = getDataMode();
 const NEWS = newsData as unknown as MarketEvent[];
 const EXTRACTED = extractedData as unknown as ExtractedRow[];
+const SARONIC_PROSPECT_ID = "signal-prospect-saronic";
 
 export interface World {
   city: string | null;
@@ -37,6 +38,50 @@ export interface World {
   provenanceSummary: string | null;
 }
 
+function hasSaronicSignal(signals: unknown[]): boolean {
+  return signals.some((signal) => {
+    const row = signal as { id?: unknown; entities?: unknown; artifact?: { headline?: unknown } };
+    const text = [
+      typeof row.id === "string" ? row.id : "",
+      Array.isArray(row.entities) ? row.entities.join(" ") : "",
+      typeof row.artifact?.headline === "string" ? row.artifact.headline : "",
+    ].join(" ").toLowerCase();
+    return text.includes("saronic");
+  });
+}
+
+function withSignalProspects(companies: Company[], signals: unknown[], city: string | null): Company[] {
+  const hasRealSaronic = companies.some((company) =>
+    company.name.toLowerCase().includes("saronic") ||
+    company.domains?.some((domain) => domain.toLowerCase() === "saronic.com"),
+  );
+  if (hasRealSaronic || !hasSaronicSignal(signals)) return companies;
+  if (city && city !== "Austin") return companies;
+  return [
+    ...companies,
+    {
+      id: SARONIC_PROSPECT_ID,
+      name: "Saronic Technologies",
+      relationship: "target",
+      account_status: "new_logo",
+      business_motion: "prospect_new_business",
+      location: {
+        city: "Austin",
+        state: "TX",
+        country: "USA",
+        lat: 30.2672,
+        lon: -97.7431,
+      },
+      website_url: "https://www.saronic.com",
+      source_url: "https://app.dealroom.co/news/note/saronic-raises-1-75b-at-9-25b-valuation-to-scale-autonomous-warships-for-us-navy",
+      needs: [],
+      domains: ["saronic.com"],
+      aliases: ["Saronic"],
+      known_programs: ["Corsair autonomous surface vessel"],
+    },
+  ];
+}
+
 export function useWorld(city: string | null): World | null {
   const [world, setWorld] = useState<World | null>(null);
   const configVersion = useSyncExternalStore(subscribeScoringConfig, getScoringConfigVersion, getScoringConfigVersion);
@@ -51,8 +96,9 @@ export function useWorld(city: string | null): World | null {
       adapter.getFacilities(filter),
       adapter.getOpportunities(filter),
       adapter.getOperatingSnapshot().catch(() => null),
-    ]).then(([companies, signals, contacts, facilities, opportunities, snapshot]) => {
+    ]).then(([rawCompanies, signals, contacts, facilities, opportunities, snapshot]) => {
       if (!alive) return;
+      const companies = withSignalProspects(rawCompanies, signals, city);
       const usesArtifactSignals = DATA_MODE === "artifact" && snapshot?.publicSignals.source_mode === "artifact";
       const newsSignals = usesArtifactSignals ? [] : deriveNewsSignals(companies, NEWS, EXTRACTED);
       const analysis = analyze(companies, [...signals, ...newsSignals]);

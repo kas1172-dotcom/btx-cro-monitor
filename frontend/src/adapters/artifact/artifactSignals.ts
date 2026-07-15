@@ -1,4 +1,5 @@
 import type { Company } from "../../engine/brain/entities.ts";
+import pinnedSignalsData from "../../../../clients/btx/pinned_signals.json";
 import { PORTFOLIO_SIGNAL_SUBJECT_ID, type Signal } from "../../engine/signals/contract.ts";
 import {
   canonicalAccountsFromCompanies,
@@ -63,6 +64,10 @@ export interface ArtifactRunOutput {
   entity_index?: unknown;
 }
 
+interface PinnedSignalPayload {
+  items?: ArtifactItem[];
+}
+
 export interface ArtifactArchive {
   runs?: Array<{ run_id?: unknown; run_at?: unknown; items?: ArtifactItem[] }>;
   pinned?: unknown;
@@ -73,6 +78,10 @@ export interface ArtifactMappingResult {
   runAt: string;
   latestPublishedAt: string | null;
   sourceCount: number;
+}
+
+interface ArtifactBuildOptions {
+  includePinnedSignals?: boolean;
 }
 
 function text(value: unknown, fallback = ""): string {
@@ -168,13 +177,21 @@ export function assertArtifactRunOutput(value: unknown): asserts value is Artifa
   if (!text(payload.meta.run_at)) throw new Error("artifact run_output missing meta.run_at");
 }
 
-export function buildArtifactSignals(runOutput: unknown, companies: Company[]): ArtifactMappingResult {
+export function buildArtifactSignals(runOutput: unknown, companies: Company[], options: ArtifactBuildOptions = {}): ArtifactMappingResult {
   assertArtifactRunOutput(runOutput);
   const runAt = text(runOutput.meta?.run_at);
   const signals: Signal[] = [];
   const canonicalAccounts = canonicalAccountsFromCompanies(companies);
+  const pinnedItems = options.includePinnedSignals ? (pinnedSignalsData as PinnedSignalPayload).items ?? [] : [];
+  const seenItemIds = new Set<string>();
+  const mergedItems = [...pinnedItems, ...(runOutput.items ?? [])].filter((item) => {
+    const itemId = text(item.item_id);
+    if (!itemId || seenItemIds.has(itemId)) return false;
+    seenItemIds.add(itemId);
+    return true;
+  });
 
-  for (const item of runOutput.items ?? []) {
+  for (const item of mergedItems) {
     const itemId = text(item.item_id);
     const headline = text(item.raw_title) || text(item.title);
     const sourceName = text(item.source_id, "Monitor engine artifact");

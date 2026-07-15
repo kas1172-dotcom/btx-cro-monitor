@@ -1,0 +1,120 @@
+{
+  "items": [
+    {
+      "item_id": "pinned-lockheed-f35-lot-18-19",
+      "title": "Lockheed, Pentagon finalize deal for 296 F-35s",
+      "raw_title": "Lockheed, Pentagon finalize deal for 296 F-35s",
+      "url": "https://breakingdefense.com/2025/09/lockheed-pentagon-finalize-deal-for-296-f-35s/",
+      "source_id": "Breaking Defense",
+      "published_at": "2025-09-29T12:00:00Z",
+      "collected_at": "2026-07-15T00:00:00Z",
+      "tier": 1,
+      "per_edition": {
+        "bd": {
+          "relevance_score": 95,
+          "so_what": "Lockheed Martin and the F-35 Joint Program Office finalized the Lots 18 and 19 airframe deal, covering 296 aircraft. For BTX, this is a production and sustainment planning signal tied to a verified Lockheed Martin account, CAGE 81755, and the F-35 Lightning II program.",
+          "now_what": "Prepare the Lockheed call around F-35 timing, build-to-print capacity, inspection load, and where BTX can support precision components without overpromising.",
+          "categories": ["Contract Award", "Subcontracting Opportunity"]
+        },
+        "exec": {
+          "relevance_score": 88,
+          "so_what": "The F-35 Lots 18 and 19 agreement keeps Lockheed production demand visible and gives BTX a timely reason to review account coverage, capacity, and open follow-up.",
+          "now_what": "Assign the account owner to prepare a call brief and confirm whether current BTX capacity can support near-term F-35 related work.",
+          "categories": ["Contract Award"]
+        }
+      },
+      "dollar_amount": {
+        "raw_text": "$24.3 billion",
+        "value": 24300000000,
+        "currency": "USD"
+      },
+      "confidence_note": "Pinned for demo presence with real source attribution. Account resolution still depends on canonical CAGE and program matching.",
+      "entities": [
+        { "name": "Lockheed Martin Corporation", "type": "company" },
+        { "name": "F-35 Lightning II", "type": "program" },
+        { "name": "81755", "type": "identifier" },
+        { "name": "CQWLW9XRQTH5", "type": "identifier" }
+      ],
+      "enrichment": {
+        "facts": [
+          {
+            "enricher_id": "pinned-source",
+            "entity": "Lockheed Martin Corporation",
+            "label": "CAGE",
+            "value": "81755",
+            "kind": "text",
+            "url": "https://cage.report/SAM/81755"
+          },
+          {
+            "enricher_id": "pinned-source",
+            "entity": "Lockheed Martin Corporation",
+            "label": "UEI",
+            "value": "CQWLW9XRQTH5",
+            "kind": "text",
+            "url": "https://sam.gov"
+          }
+        ],
+        "queried_entities": ["Lockheed Martin Corporation"]
+      }
+    },
+    {
+      "item_id": "pinned-saronic-corsair-series-d",
+      "title": "Saronic raises $1.75B at $9.25B valuation to scale autonomous warships for US Navy",
+      "raw_title": "Saronic raises $1.75B at $9.25B valuation to scale autonomous warships for US Navy",
+      "url": "https://app.dealroom.co/news/note/saronic-raises-1-75b-at-9-25b-valuation-to-scale-autonomous-warships-for-us-navy",
+      "source_id": "Dealroom.co",
+      "published_at": "2026-03-15T12:00:00Z",
+      "collected_at": "2026-07-15T00:00:00Z",
+      "tier": 1,
+      "per_edition": {
+        "bd": {
+          "relevance_score": 92,
+          "so_what": "Austin-based Saronic raised $1.75 billion at a $9.25 billion valuation and is scaling autonomous maritime vessels from Corsair through larger ship classes. The same source cites a $392 million US Navy production contract, creating a visible supply-chain scaling signal but not a verified BTX account match.",
+          "now_what": "Qualify Saronic as a net-new Austin prospect. Confirm CAGE, procurement contact, production timing, and which precision components or assemblies are externally sourced before scoring fit as verified.",
+          "categories": ["Funding", "Contract Award", "Prospecting"]
+        },
+        "exec": {
+          "relevance_score": 82,
+          "so_what": "Saronic combines major private funding, Navy demand, Austin presence, and rapid shipbuilding scale-up. The opportunity is promising, but BTX lacks qualification evidence.",
+          "now_what": "Create a qualification work item and draft outreach that asks about manufacturing bottlenecks, supplier qualification, and near-term component needs.",
+          "categories": ["Prospecting"]
+        }
+      },
+      "dollar_amount": {
+        "raw_text": "$1.75 billion",
+        "value": 1750000000,
+        "currency": "USD"
+      },
+      "confidence_note": "Pinned for demo presence with real source attribution. Saronic remains an unlinked prospect because no verified BTX account, CAGE, or contact is present.",
+      "entities": [
+        { "name": "Saronic", "type": "company" },
+        { "name": "Corsair", "type": "program" },
+        { "name": "Austin TX", "type": "place" },
+        { "name": "US Navy", "type": "agency" }
+      ],
+      "enrichment": {
+        "facts": [
+          {
+            "enricher_id": "pinned-source",
+            "entity": "Saronic",
+            "label": "Series D",
+            "value": "$1.75 billion at $9.25 billion valuation",
+            "kind": "money",
+            "number": 1750000000,
+            "url": "https://app.dealroom.co/news/note/saronic-raises-1-75b-at-9-25b-valuation-to-scale-autonomous-warships-for-us-navy"
+          },
+          {
+            "enricher_id": "pinned-source",
+            "entity": "Saronic",
+            "label": "Navy production contract",
+            "value": "$392 million",
+            "kind": "money",
+            "number": 392000000,
+            "url": "https://www.workboat.com/saronic-secures-additional-1-75-billion-for-shipyard-expansion-and-autonomy"
+          }
+        ],
+        "queried_entities": ["Saronic"]
+      }
+    }
+  ]
+}

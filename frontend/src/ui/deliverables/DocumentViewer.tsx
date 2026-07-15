@@ -25,6 +25,7 @@ import { uiTokens } from "../../app/uiTokens.ts";
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const copilotEndpoint = env?.VITE_COPILOT_ENDPOINT ?? processEnv?.VITE_COPILOT_ENDPOINT;
+const EDITOR_BANNED_VOCABULARY = ["demo", "snapshot", "simulated", "deterministic", "Revenue Brain"];
 
 interface TaskTarget {
   company?: Company;
@@ -142,7 +143,13 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       return;
     }
     try {
-      const text = await requestSectionRevision({ endpoint, deliverable: current, section: target, instruction });
+      const text = await requestSectionRevision({
+        endpoint,
+        deliverable: current,
+        section: target,
+        instruction,
+        bannedVocabulary: EDITOR_BANNED_VOCABULARY,
+      });
       setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text }]);
     } catch (error) {
       setSuggestions((items) => [...items, {

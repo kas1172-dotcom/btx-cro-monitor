@@ -245,10 +245,10 @@ function requireRecord<T>(value: T | undefined, message: string): T {
 
 function printCleanupDryRun(companyRows: CompanyRow[], contactRows: ContactRow[], opportunityRows: OpportunityRow[]): void {
   console.log("HubSpot cleanup dry-run. Pass --confirm to write to HubSpot.");
-  console.log(`Would update/backfill ${companyRows.length} canonical companies: ${companyRows.map((company) => company.name).join(", ")}`);
-  console.log(`Would verify/repoint ${contactRows.length} contact->company associations for: ${contactRows.map((contact) => contact.name).join(", ")}`);
-  console.log(`Would verify/repoint ${opportunityRows.length} deal->company associations for: ${opportunityRows.map((opportunity) => opportunity.name).join(", ")}`);
-  console.log(`Would archive up to ${companyRows.length} nameless duplicate companies matching: ${companyRows.map((company) => `${worldCompanyDomain(company)}.com`).join(", ")}`);
+  console.log(`Would archive ${companyRows.length} previously seeded fake companies: ${companyRows.map((company) => company.name).join(", ")}`);
+  console.log(`Would archive ${contactRows.length} contacts from the old fake seed set: ${contactRows.map((contact) => contact.name).join(", ")}`);
+  console.log(`Would archive ${opportunityRows.length} deals from the old fake seed set: ${opportunityRows.map((opportunity) => opportunity.name).join(", ")}`);
+  console.log("Would leave all records outside the known old BTX seed identifiers untouched.");
 }
 
 const companyRows = companies as CompanyRow[];
@@ -261,85 +261,31 @@ if (!confirmed) {
   console.log("HubSpot cleanup skipped: set HUBSPOT_ACCESS_TOKEN or BTX_HUBSPOT_ACCESS_TOKEN.");
 } else {
   console.log(`HubSpot token source: ${tokenSource?.name}`);
-  const companyById = new Map(companyRows.map((company) => [company.id, company]));
-  const worldDomains = new Set(companyRows.map(worldCompanyDomain));
-  const autoCompanyDomainByWorldDomain = new Map(companyRows.map((company) => [worldCompanyDomain(company), `${worldCompanyDomain(company)}.com`]));
+  const fakeDomains = new Set(companyRows.flatMap((company) => {
+    const domain = worldCompanyDomain(company);
+    return [domain, `${domain}.com`];
+  }));
+  const fakeCompanyNames = new Set(companyRows.map((company) => company.name));
+  const fakeEmails = contactRows.map(deterministicEmail);
+  const fakeDealExternalIds = opportunityRows.map((opportunity) => opportunity.id);
 
   const allCompanies = await searchAll("companies", ["name", "domain", "btx_company_domain", "createdate"]);
-  const canonicalByCompanyId = new Map<string, CrmObject>();
-  const duplicateByCompanyId = new Map<string, CrmObject>();
+  const companiesToArchive = allCompanies.filter((record) => {
+    const domain = record.properties.domain ?? "";
+    const btxDomain = record.properties.btx_company_domain ?? "";
+    const name = record.properties.name ?? "";
+    return fakeDomains.has(domain) || fakeDomains.has(btxDomain) || fakeCompanyNames.has(name);
+  });
+  const contactsToArchive = [...(await batchReadByIdProperty("contacts", "email", fakeEmails, ["email", "firstname", "lastname"])).values()];
+  const dealsToArchive = [...(await batchReadByIdProperty("deals", "btx_external_id", fakeDealExternalIds, ["btx_external_id", "dealname"])).values()];
 
-  for (const company of companyRows) {
-    const domain = worldCompanyDomain(company);
-    const canonical = allCompanies.find((record) =>
-      record.properties.domain === domain
-      && record.properties.name === company.name
-    );
-    if (canonical) canonicalByCompanyId.set(company.id, canonical);
+  await archiveObjects("deals", dealsToArchive.map((record) => record.id));
+  await archiveObjects("contacts", contactsToArchive.map((record) => record.id));
+  await archiveObjects("companies", companiesToArchive.map((record) => record.id));
 
-    const autoDomain = autoCompanyDomainByWorldDomain.get(domain);
-    const duplicate = allCompanies.find((record) =>
-      !record.properties.name
-      && record.properties.domain === autoDomain
-    );
-    if (duplicate) duplicateByCompanyId.set(company.id, duplicate);
-  }
-
-  for (const company of companyRows) {
-    requireRecord(canonicalByCompanyId.get(company.id), `Missing canonical named company for ${company.id}.`);
-  }
-
-  await batchUpdate("companies", companyRows.map((company) => ({
-    id: requireRecord(canonicalByCompanyId.get(company.id), `Missing canonical named company for ${company.id}.`).id,
-    properties: companyProperties(company),
-  })));
-
-  const contactByEmail = await batchReadByIdProperty("contacts", "email", contactRows.map(deterministicEmail), ["email", "firstname", "lastname"]);
-  const dealByExternalId = await batchReadByIdProperty("deals", "btx_external_id", opportunityRows.map((opportunity) => opportunity.id), ["btx_external_id", "dealname"]);
-  for (const contact of contactRows) requireRecord(contactByEmail.get(deterministicEmail(contact)), `Missing contact ${contact.id}.`);
-  for (const opportunity of opportunityRows) requireRecord(dealByExternalId.get(opportunity.id), `Missing deal ${opportunity.id}.`);
-
-  const contactIds = contactRows.map((contact) => requireRecord(contactByEmail.get(deterministicEmail(contact)), `Missing contact ${contact.id}.`).id);
-  const dealIds = opportunityRows.map((opportunity) => requireRecord(dealByExternalId.get(opportunity.id), `Missing deal ${opportunity.id}.`).id);
-  const contactAssociations = await readAssociations("contacts", "companies", contactIds);
-  const dealAssociations = await readAssociations("deals", "companies", dealIds);
-
-  const contactAssociationsToCreate: Array<{ fromId: string; toId: string }> = [];
-  const contactAssociationsToRemove: Array<{ fromId: string; toId: string }> = [];
-  for (const contact of contactRows) {
-    const contactRecord = requireRecord(contactByEmail.get(deterministicEmail(contact)), `Missing contact ${contact.id}.`);
-    const canonical = requireRecord(canonicalByCompanyId.get(contact.company_id), `Missing canonical company for ${contact.company_id}.`);
-    const current = contactAssociations.get(contactRecord.id) ?? new Set<string>();
-    if (!current.has(canonical.id)) contactAssociationsToCreate.push({ fromId: contactRecord.id, toId: canonical.id });
-    for (const companyId of current) {
-      if (companyId !== canonical.id) contactAssociationsToRemove.push({ fromId: contactRecord.id, toId: companyId });
-    }
-  }
-
-  const dealAssociationsToCreate: Array<{ fromId: string; toId: string }> = [];
-  const dealAssociationsToRemove: Array<{ fromId: string; toId: string }> = [];
-  for (const opportunity of opportunityRows) {
-    const dealRecord = requireRecord(dealByExternalId.get(opportunity.id), `Missing deal ${opportunity.id}.`);
-    const canonical = requireRecord(canonicalByCompanyId.get(opportunity.company_id), `Missing canonical company for ${opportunity.company_id}.`);
-    const current = dealAssociations.get(dealRecord.id) ?? new Set<string>();
-    if (!current.has(canonical.id)) dealAssociationsToCreate.push({ fromId: dealRecord.id, toId: canonical.id });
-    for (const companyId of current) {
-      if (companyId !== canonical.id) dealAssociationsToRemove.push({ fromId: dealRecord.id, toId: companyId });
-    }
-  }
-
-  await createDefaultAssociations("contacts", "companies", contactAssociationsToCreate);
-  await createDefaultAssociations("deals", "companies", dealAssociationsToCreate);
-  await archiveAssociations("contacts", "companies", contactAssociationsToRemove);
-  await archiveAssociations("deals", "companies", dealAssociationsToRemove);
-
-  const duplicateIds = [...duplicateByCompanyId.values()].map((record) => record.id);
-  await archiveObjects("companies", duplicateIds);
-
-  console.log("HubSpot repair complete.");
-  console.log(`Canonical companies backfilled: ${companyRows.length}`);
-  console.log(`Contact associations created: ${contactAssociationsToCreate.length}, removed: ${contactAssociationsToRemove.length}`);
-  console.log(`Deal associations created: ${dealAssociationsToCreate.length}, removed: ${dealAssociationsToRemove.length}`);
-  console.log(`Nameless duplicate companies archived: ${duplicateIds.length}`);
-  console.log(`Other companies left untouched: ${allCompanies.filter((company) => !worldDomains.has(company.properties.domain ?? "") && company.properties.name).length}`);
+  console.log("HubSpot cleanup complete.");
+  console.log(`Fake seeded companies archived: ${companiesToArchive.length}`);
+  console.log(`Fake seeded contacts archived: ${contactsToArchive.length}`);
+  console.log(`Fake seeded deals archived: ${dealsToArchive.length}`);
+  console.log(`Other companies left untouched: ${allCompanies.length - companiesToArchive.length}`);
 }

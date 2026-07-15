@@ -109,7 +109,7 @@ export class ArtifactDataAdapter implements DataAdapter {
     const companies = await this.accountProvider.getCompanies();
     for (const candidate of await this.artifactCandidates()) {
       try {
-        const artifact = buildArtifactSignals(candidate.runOutput, companies);
+        const artifact = buildArtifactSignals(candidate.runOutput, companies, { includePinnedSignals: true });
         if (!artifact.signals.length) {
           errors.push(`${candidate.source} artifact parsed, but no valid signal rows mapped.`);
           continue;

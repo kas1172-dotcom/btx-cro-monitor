@@ -30,6 +30,7 @@ from monitor_engine.feedback import (
 )
 from monitor_engine.models import (
     ArchivedRun,
+    AnalyzedItem,
     ClientConfig,
     DeepAnalysisSectionInfo,
     EditionInfo,
@@ -97,6 +98,17 @@ def _site_config(config: ClientConfig) -> SiteConfig:
         enrichers=[EnricherInfo(id=e.id, label=e.label) for e in config.enrichers],
         account_map_url=None,
     )
+
+
+def _load_pinned_items(config_path: Path) -> list[AnalyzedItem]:
+    path = config_path.parent / "pinned_signals.json"
+    if not path.exists():
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    items = payload.get("items", [])
+    if not isinstance(items, list):
+        raise ValueError(f"{path} must contain an items array")
+    return [AnalyzedItem.model_validate(item) for item in items]
 
 
 def run_pipeline(
@@ -228,6 +240,12 @@ def run_pipeline(
         analyzed = apply_to_analyzed(analyzed, feedback)
         logger.info("Feedback: suppressed %d, pinned %d item(s)",
                     before - len(analyzed), len(feedback.pin_urls))
+
+    pinned_items = _load_pinned_items(config_path)
+    if pinned_items:
+        pinned_ids = {item.item_id for item in pinned_items}
+        analyzed = pinned_items + [item for item in analyzed if item.item_id not in pinned_ids]
+        logger.info("Pinned signals: added %d item(s)", len(pinned_items))
 
     # ── Cross-API enrichment + entity graph ──────────────────────────────
     # Resolve each item's entities against other APIs (config-driven), then link

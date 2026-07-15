@@ -10,8 +10,8 @@ function titleCase(value: string): string {
 export function WorkItemSourceNote({ source, error }: { source: "backend" | "derived"; error: string | null }) {
   if (source === "backend") return <div className="live-inline-status">Work items: backend API</div>;
   return (
-    <div className={error ? "live-inline-status error" : "live-inline-status"}>
-      {error ? `Backend work-item API unavailable; showing derived queue. ${error}` : "Work items: derived from current world until backend data is available."}
+    <div className={error ? "live-inline-status error" : "live-inline-status"} title={error ?? undefined}>
+      {error ? "Backend work-item API unavailable; showing derived queue." : "Work items: derived from current world until backend data is available."}
     </div>
   );
 }
@@ -48,7 +48,10 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
     <div className="work-item-list">
       {items.map((item) => {
         const evidence = linkedEvidence(item, world);
-        const canExecute = item.type === "account_action" && item.status !== "done" && item.status !== "dismissed";
+        const canExecute = ["account_action", "meeting_brief", "outreach_draft", "research_task", "qualified_opportunity"]
+          .includes(item.type)
+          && item.status !== "done"
+          && item.status !== "dismissed";
         return (
           <article key={item.id} className="work-item-row">
             <div>

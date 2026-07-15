@@ -1,16 +1,22 @@
 import { useMemo, useState } from "react";
 import news from "../../../data/demo/btx/news.json";
+import { importProspectsToHubSpot } from "../../app/backendApi.ts";
 import { CONFIG } from "../../app/config.ts";
+import { saveStoredDeliverable } from "../../app/deliverablesApi.ts";
 import type { World } from "../../app/useWorld.ts";
+import { createWorkItem } from "../../app/workItems.ts";
 import type { MarketEvent } from "../../engine/brain/entities.ts";
 import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
 import { PORTFOLIO_SIGNAL_SUBJECT_ID, SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
 import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
+import { runAgent } from "../../agents/runAgent.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
 import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
+import { saveDeliverable } from "../../memory/localMemory.ts";
+import { setState } from "../../store/store.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState } from "../primitives.tsx";
@@ -72,6 +78,9 @@ function motionForSignal(world: World, signal: Signal): MotionLabel {
 }
 
 function whyItMatters(world: World, signal: Signal): string {
+  if (isSaronicSignal(signal)) {
+    return "Funded Navy supplier with Austin manufacturing context, but no BTX account, CAGE, or contact evidence yet.";
+  }
   if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a CRM account without canonical identity evidence.";
   const company = world.companies.find((c) => c.id === signal.subject_id);
   const rec = world.analysis.recById.get(signal.subject_id);
@@ -84,6 +93,16 @@ function whyItMatters(world: World, signal: Signal): string {
   if (impact.dimensions.includes("risk") || impact.dimensions.includes("capacityRisk")) return `This signal can affect delivery, capacity, supplier, or account risk.`;
   if (openPipeline > 0) return `${money(openPipeline)} in open pipeline is attached to this account.`;
   return `This signal is validated evidence for monitoring ${company?.name ?? "the account"}.`;
+}
+
+function isLockheedSignal(signal: Signal): boolean {
+  const text = `${signal.id} ${signal.entities.join(" ")} ${signal.artifact?.headline ?? ""}`.toLowerCase();
+  return text.includes("lockheed") && text.includes("f-35");
+}
+
+function isSaronicSignal(signal: Signal): boolean {
+  const text = `${signal.id} ${signal.entities.join(" ")} ${signal.artifact?.headline ?? ""}`.toLowerCase();
+  return text.includes("saronic");
 }
 
 function filterRow(filter: Filter, row: SignalRow): boolean {
@@ -127,8 +146,101 @@ interface SignalRow {
 export function SignalFeed({ world }: { world: World }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("priority");
+  const [busySignalId, setBusySignalId] = useState<string | null>(null);
+  const [confirmingSaronicId, setConfirmingSaronicId] = useState<string | null>(null);
+  const [statusBySignalId, setStatusBySignalId] = useState<Record<string, string>>({});
   const newsById = new Map(NEWS.map((item) => [`news-sig-${item.id}`, item]));
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
+
+  function setSignalStatus(signalId: string, value: string): void {
+    setStatusBySignalId((current) => ({ ...current, [signalId]: value }));
+  }
+
+  async function createLockheedPrep(signal: Signal): Promise<void> {
+    const company = world.companies.find((item) => item.id === signal.subject_id || item.canonical_account_id === signal.subject_id);
+    if (!company) {
+      setSignalStatus(signal.id, "Lockheed account is not available in live CRM yet.");
+      return;
+    }
+    setBusySignalId(signal.id);
+    setSignalStatus(signal.id, "Creating meeting brief and work item...");
+    try {
+      const deliverable = await runAgent("meeting_brief", {
+        accountId: company.id,
+        instructions: `Prepare for Lockheed call re F-35 lot 19. Use this source signal: ${signalHeadline(signal)}. Evidence: ${signal.source_quote}`,
+      }, world);
+      const local = saveDeliverable(deliverable);
+      let artifactRef = signal.artifact?.item_id ?? signal.id;
+      try {
+        const stored = await saveStoredDeliverable(local);
+        artifactRef = stored.id;
+      } catch {
+        artifactRef = local.id;
+      }
+      await createWorkItem({
+        title: "Prep for Lockheed call re F-35 lot 19",
+        accountName: company.name,
+        accountId: company.id,
+        sourceSignalIds: [signal.id],
+        type: "meeting_brief",
+        priority: "high",
+        evidence: artifactRef,
+      });
+      setState({ activeDeliverable: local, activeTab: "deliverables", activeCompanyId: null, brainResponse: null, activeAnalysisSpec: null });
+      setSignalStatus(signal.id, "Meeting brief and work item created. Open Work Queue to create the HubSpot task.");
+    } catch (error) {
+      setSignalStatus(signal.id, error instanceof Error ? error.message : "Could not create Lockheed prep item.");
+    } finally {
+      setBusySignalId(null);
+    }
+  }
+
+  async function createSaronicProspect(signal: Signal): Promise<void> {
+    setBusySignalId(signal.id);
+    setSignalStatus(signal.id, "Creating Saronic account and work items...");
+    try {
+      const response = await importProspectsToHubSpot([{
+        row_id: "saronic-technologies",
+        company: {
+          companyName: "Saronic Technologies",
+          domain: "saronic.com",
+          website: "https://www.saronic.com",
+          city: "Austin",
+          state: "TX",
+          country: "USA",
+        },
+      }]);
+      const row = response.rows[0];
+      if (!row || row.status === "failed" || !row.company_id) {
+        throw new Error(row?.reason ?? "HubSpot did not return a Saronic company id.");
+      }
+      const accountId = `hubspot-company-${row.company_id}`;
+      await createWorkItem({
+        title: "Qualify Saronic",
+        accountName: "Saronic Technologies",
+        accountId,
+        sourceSignalIds: [signal.id],
+        type: "research_task",
+        priority: "high",
+        evidence: "Missing evidence: CAGE, contact, qualified fit, and sourced component need.",
+      });
+      await createWorkItem({
+        title: "Draft intro outreach for Saronic",
+        accountName: "Saronic Technologies",
+        accountId,
+        sourceSignalIds: [signal.id],
+        type: "outreach_draft",
+        priority: "normal",
+        evidence: signal.artifact?.item_id ?? signal.id,
+      });
+      setConfirmingSaronicId(null);
+      setSignalStatus(signal.id, `Saronic company ${row.company_id} and two work items created.`);
+    } catch (error) {
+      setSignalStatus(signal.id, error instanceof Error ? error.message : "Could not create Saronic prospect.");
+    } finally {
+      setBusySignalId(null);
+    }
+  }
 
   const rows = useMemo<SignalRow[]>(() => {
     return world.analysis.valid.map((signal) => {
@@ -238,6 +350,15 @@ export function SignalFeed({ world }: { world: World }) {
               </div>
               {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor-engine artifact" : "No source link in static demo snapshot"}</em>}
             </div>
+            {isSaronicSignal(row.signal) && (
+              <div className="qualification-gaps">
+                <strong>Needs qualification</strong>
+                <span>No CAGE match</span>
+                <span>No BTX contact</span>
+                <span>Fit unconfirmed</span>
+                <span>Supplier need not verified</span>
+              </div>
+            )}
 
             <div className="signal-actions">
               <AskChatpilButton label="Explain" prompt={expandSignalPrompt(row.signal, row.companyName)} />
@@ -245,7 +366,34 @@ export function SignalFeed({ world }: { world: World }) {
                 label="What should I do?"
                 prompt={nextActionPrompt(row.companyName, `Signal inbox item. Event ${row.signal.event_type}. Motion ${row.motion}. Score impact ${row.impact.text}. Recommended action: ${row.actionText}. Evidence: ${row.signal.source_quote}`)}
               />
+              {isLockheedSignal(row.signal) && row.signal.scope === "specific_account" && (
+                <button type="button" onClick={() => void createLockheedPrep(row.signal)} disabled={busySignalId === row.signal.id}>
+                  {busySignalId === row.signal.id ? "Creating..." : "Create call prep"}
+                </button>
+              )}
+              {isSaronicSignal(row.signal) && (
+                <button type="button" onClick={() => setConfirmingSaronicId(row.signal.id)} disabled={busySignalId === row.signal.id}>
+                  Create Saronic prospect
+                </button>
+              )}
             </div>
+            {statusBySignalId[row.signal.id] && <div className="live-inline-status">{statusBySignalId[row.signal.id]}</div>}
+            {confirmingSaronicId === row.signal.id && (
+              <div className="signal-confirm-panel">
+                <strong>Confirm HubSpot write</strong>
+                <span>Company: Saronic Technologies</span>
+                <span>Domain: saronic.com</span>
+                <span>Location: Austin, TX</span>
+                <span>Known evidence: $1.75B raise, $9.25B valuation, $392M Navy production contract, autonomous maritime vessels.</span>
+                <span>Left empty on purpose: CAGE, contact, fit, and qualified supplier need.</span>
+                <div>
+                  <button type="button" onClick={() => void createSaronicProspect(row.signal)} disabled={busySignalId === row.signal.id}>
+                    Confirm and create
+                  </button>
+                  <button type="button" onClick={() => setConfirmingSaronicId(null)}>Cancel</button>
+                </div>
+              </div>
+            )}
           </article>
         ))}
         {visible.length === 0 && (
