@@ -4,6 +4,7 @@ node_modules
 frontend/node_modules
 frontend/dist
 clients/*/artifacts/*
+!clients/btx/artifacts/*.json
 btx_platform.db
 
 __pycache__/
