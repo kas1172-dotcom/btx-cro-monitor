@@ -26,3 +26,9 @@ frontend/memo_archive/
 # OS / editor
 .DS_Store
 .ai/
+
+# Local AI-tool config and vendored skill libraries — not product code.
+.agents/
+.claude/
+.codex/
+skills-lock.json

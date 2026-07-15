@@ -4,6 +4,11 @@ name: CI
 # pytest. No network/paid API calls — Anthropic-backed test paths are mocked
 # (see tools/test-*.ts and tests/test_*.py). Configure this as a required
 # status check under Settings -> Branches -> Branch protection rules for main.
+#
+# Every non-browser `test:*` script in frontend/package.json belongs in the
+# frontend job below. Browser-driven suites (test:e2e, test:mobile) launch
+# Playwright/Chromium and live in e2e.yml instead, gated behind RUN_E2E so
+# ordinary PRs aren't blocked on browser flake.
 on:
   pull_request:
     branches: [main]
@@ -68,6 +73,18 @@ jobs:
 
       - name: test:deliverables
         run: npm run test:deliverables
+
+      - name: test:deliverable-library
+        run: npm run test:deliverable-library
+
+      - name: test:wizard
+        run: npm run test:wizard
+
+      - name: test:hubspot-viewer
+        run: npm run test:hubspot-viewer
+
+      - name: test:import-list
+        run: npm run test:import-list
 
   backend:
     runs-on: ubuntu-latest

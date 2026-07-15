@@ -1,4 +1,11 @@
-# BTX CRO Product — Read-Only Audit Report
+# BTX CRO Product — Read-Only Audit Report (2026-07-07)
+
+> **Superseded.** This snapshot predates the WP0–WP12 branch consolidation
+> (tab-id navigation, canonical Deliverable model, Steel & Signal design
+> system, and everything merged after it). It no longer reflects current
+> `main`. Kept for historical record only — do not treat as current status.
+> For the current state of the deliverable-wizard work specifically, see
+> `docs/WIZARD_STACK_RECONCILE.md`.
 
 Audit date: 2026-07-07. Branch: `brain-v2`. Auditor scope: verify which planned
 work has actually landed in code (behavior verified, not docs/comments), with
