@@ -137,7 +137,17 @@ export class ArtifactDataAdapter implements DataAdapter {
     if (!artifact || !artifact.signals.length) return this.demo.getSignals(filter);
     if (!filter?.city) return artifact.signals;
     const ids = new Set((await this.getCompanies(filter)).map((company) => company.id));
-    return artifact.signals.filter((signal) => ids.has(signal.subject_id));
+    const city = filter.city.toLowerCase();
+    return artifact.signals.filter((signal) => {
+      if (ids.has(signal.subject_id)) return true;
+      const text = [
+        signal.artifact?.headline,
+        signal.artifact?.analysis_text,
+        signal.source_quote,
+        signal.entities.join(" "),
+      ].filter(Boolean).join(" ").toLowerCase();
+      return text.includes(city);
+    });
   }
 
   async getContacts(filter?: RegionFilter): Promise<Contact[]> {

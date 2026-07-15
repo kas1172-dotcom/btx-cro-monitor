@@ -10,6 +10,12 @@ import { setState } from "../../store/store.ts";
 import { ScopePill } from "../primitives.tsx";
 
 type WizardStep = "pick" | "confirm" | "preview" | "saved";
+const WIZARD_STEPS: Array<{ id: WizardStep; label: string }> = [
+  { id: "pick", label: "Template" },
+  { id: "confirm", label: "Inputs" },
+  { id: "preview", label: "Preview" },
+  { id: "saved", label: "Save" },
+];
 
 interface DeliverableWizardProps {
   world: World;
@@ -28,6 +34,10 @@ function blockExcerpt(deliverable: Deliverable): Array<{ heading: string; text: 
         : `${section.blocks.length} block${section.blocks.length === 1 ? "" : "s"}`;
     return { heading: section.heading, text };
   });
+}
+
+function stepPosition(step: WizardStep): number {
+  return Math.max(0, WIZARD_STEPS.findIndex((item) => item.id === step));
 }
 
 export function DeliverableWizard({ world, initialAccountId, onClose }: DeliverableWizardProps) {
@@ -119,23 +129,33 @@ export function DeliverableWizard({ world, initialAccountId, onClose }: Delivera
       <div className="demo-action-modal deliverable-wizard" role="dialog" aria-modal="true" aria-label="New deliverable">
         <button className="deliverable-wizard-close" onClick={onClose} aria-label="Close">×</button>
         <p className="eyebrow">New deliverable</p>
+        <div className="deliverable-wizard-progress" aria-label="Deliverable wizard progress">
+          {WIZARD_STEPS.map((item, index) => (
+            <span key={item.id} className={index <= stepPosition(step) ? "active" : ""}>{item.label}</span>
+          ))}
+        </div>
 
         {error && <div className="deliverable-wizard-error" role="alert">{error}</div>}
         {notice && <div className="deliverable-wizard-notice" role="status">{notice}</div>}
 
         {step === "pick" && (
           <>
-            <h2>Pick a template</h2>
+            <h2>Build a demo-ready deliverable</h2>
+            <p className="deliverable-wizard-hint">
+              Choose the artifact you want to show, then confirm the source-backed inputs before anything is generated.
+            </p>
             <div className="deliverable-wizard-options">
               {DELIVERABLE_TEMPLATE_OPTIONS.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   className={agentId === item.id ? "selected" : ""}
+                  aria-pressed={agentId === item.id}
                   onClick={() => pickTemplate(item.id)}
                 >
                   <strong>{item.label}</strong>
                   <span>{item.description}</span>
+                  {agentId === item.id && <em>Selected</em>}
                 </button>
               ))}
             </div>
@@ -150,7 +170,7 @@ export function DeliverableWizard({ world, initialAccountId, onClose }: Delivera
           <>
             <h2>{option.label}</h2>
             <p className="deliverable-wizard-hint">
-              Confirm the inputs below. Each value shows where it came from; nothing is generated until you ask for a preview.
+              Confirm the account, evidence, and emphasis. Each value shows where it came from.
             </p>
             {option.requiresAccount && (
               <label className="deliverable-wizard-field">
@@ -174,11 +194,11 @@ export function DeliverableWizard({ world, initialAccountId, onClose }: Delivera
               ))}
             </div>
             <label className="deliverable-wizard-instructions">
-              Instructions
+              Emphasis
               <textarea
                 value={instructions}
                 onChange={(event) => setInstructions(event.target.value)}
-                placeholder="Optional: emphasize, include, or avoid anything..."
+                placeholder="Optional: emphasize, include, or avoid anything."
               />
             </label>
             <div className="demo-action-modal-actions">
@@ -194,10 +214,10 @@ export function DeliverableWizard({ world, initialAccountId, onClose }: Delivera
           <>
             <h2>{preview.title}</h2>
             <p className="deliverable-wizard-hint">
-              Preview only — nothing is saved until you confirm. Confidence: {preview.confidence}
+              Preview only. Nothing is saved until you confirm. Confidence: {preview.confidence}
               {preview.confidenceReason ? ` (${preview.confidenceReason})` : ""}.
             </p>
-            <div className="deliverable-wizard-preview">
+            <div className="deliverable-wizard-preview-document">
               {blockExcerpt(preview).map((section) => (
                 <div key={section.heading} className="deliverable-wizard-preview-section">
                   <strong>{section.heading}</strong>

@@ -3,6 +3,7 @@ import { deliverableToMarkdown } from "./markdown.ts";
 import { calendarStartFromDeliverable } from "../app/dateDefaults.ts";
 import type { World } from "../app/useWorld.ts";
 import { renderSteelSignalDocument } from "./steelSignalTemplates.tsx";
+import { PROFILE } from "../app/config.ts";
 
 export type DownloadFormat = "markdown" | "docx" | "pdf" | "pptx" | "xlsx" | "csv" | "ics";
 
@@ -56,59 +57,252 @@ function emailBody(deliverable: Deliverable): string {
   return body?.blocks.map(blockText).join("\n\n") ?? "";
 }
 
-export async function downloadDocx(deliverable: Deliverable): Promise<void> {
+type DocxModule = typeof import("docx");
+
+const DOCX_COLORS = {
+  navy: "12263A",
+  teal: "0F766E",
+  tealSoft: "E6F4F1",
+  ink: "17212B",
+  muted: "5B6770",
+  line: "D8DEE6",
+  panel: "F6F8FA",
+  white: "FFFFFF",
+  olive: "6F7657",
+};
+
+function metaLabel(deliverable: Deliverable): string {
+  const form = deliverable.form ?? deliverable.type;
+  const audience = deliverable.audience ?? "internal";
+  return `${audience} ${form.replace(/_/g, " ")} · ${deliverable.confidence} confidence`;
+}
+
+function docxTextParagraph(docx: DocxModule, text: string) {
+  const { Paragraph, TextRun } = docx;
+  return new Paragraph({
+    style: "BodyText",
+    children: [new TextRun(text || " ")],
+  });
+}
+
+function docxSectionHeading(docx: DocxModule, heading: string) {
+  const { HeadingLevel, Paragraph, TextRun } = docx;
+  return new Paragraph({
+    heading: HeadingLevel.HEADING_2,
+    style: "BTXHeading2",
+    children: [new TextRun({ text: heading, bold: true })],
+  });
+}
+
+function docxBlock(docx: DocxModule, block: DeliverableBlock) {
   const {
-    Document,
-    HeadingLevel,
-    Packer,
+    BorderStyle,
     Paragraph,
+    ShadingType,
     Table,
     TableCell,
     TableRow,
     TextRun,
     WidthType,
-  } = await import("docx");
+  } = docx;
+  if (block.kind === "text") {
+    return block.text.split("\n").filter((line, index, lines) => line.trim() || index === lines.length - 1)
+      .map((line) => docxTextParagraph(docx, line));
+  }
+  if (block.kind === "table") {
+    const border = { style: BorderStyle.SINGLE, color: DOCX_COLORS.line, size: 4 };
+    return [new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border },
+      rows: [
+        new TableRow({
+          tableHeader: true,
+          children: block.columns.map((column) => new TableCell({
+            shading: { type: ShadingType.CLEAR, fill: DOCX_COLORS.navy, color: DOCX_COLORS.navy },
+            margins: { top: 120, bottom: 120, left: 120, right: 120 },
+            children: [new Paragraph({ children: [new TextRun({ text: column, bold: true, color: DOCX_COLORS.white, size: 19, font: "Arial" })] })],
+          })),
+        }),
+        ...block.rows.map((row, rowIndex) => new TableRow({
+          children: row.map((cell) => new TableCell({
+            shading: rowIndex % 2 === 0 ? { type: ShadingType.CLEAR, fill: DOCX_COLORS.panel, color: DOCX_COLORS.panel } : undefined,
+            margins: { top: 120, bottom: 120, left: 120, right: 120 },
+            children: [new Paragraph({ style: "BodyText", children: [new TextRun(String(cell))] })],
+          })),
+        })),
+      ],
+    })];
+  }
+  return [docxTextParagraph(docx, blockText(block))];
+}
+
+export function buildDocxDocument(deliverable: Deliverable, docx: DocxModule) {
+  const {
+    AlignmentType,
+    BorderStyle,
+    Document,
+    HeadingLevel,
+    Paragraph,
+    Table,
+    TextRun,
+  } = docx;
   const sections = exportSections(deliverable);
+  const title = deliverable.form === "email" ? emailSubject(deliverable) : deliverable.title;
   const children: any[] = [
-    new Paragraph({ text: deliverable.form === "email" ? emailSubject(deliverable) : deliverable.title, heading: HeadingLevel.TITLE }),
+    new Paragraph({
+      style: "BTXBrand",
+      children: [new TextRun({ text: "BTX Revenue Brain", bold: true, color: DOCX_COLORS.teal, size: 20, font: "Arial" })],
+    }),
+    new Paragraph({
+      heading: HeadingLevel.TITLE,
+      style: "BTXTitle",
+      children: [new TextRun({ text: title, bold: true })],
+    }),
+    new Paragraph({
+      style: "BTXMeta",
+      children: [new TextRun(metaLabel(deliverable))],
+    }),
   ];
+
+  if (deliverable.confidenceReason) {
+    children.push(
+      new Paragraph({
+        style: "BTXCalloutLabel",
+        children: [new TextRun({ text: "Confidence", bold: true, color: DOCX_COLORS.teal })],
+      }),
+      new Paragraph({
+        style: "BTXCallout",
+        children: [new TextRun(deliverable.confidenceReason)],
+      }),
+    );
+  }
 
   for (const section of sections) {
     if (deliverable.form !== "email" || section.id !== "body") {
-      children.push(new Paragraph({ text: section.heading, heading: HeadingLevel.HEADING_2 }));
+      children.push(docxSectionHeading(docx, section.heading));
     }
     for (const block of section.blocks) {
-      if (block.kind === "text") {
-        for (const line of block.text.split("\n")) {
-          children.push(new Paragraph({ children: [new TextRun(line)] }));
-        }
-      } else if (block.kind === "table") {
-        children.push(new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: [
-            new TableRow({ children: block.columns.map((column) => new TableCell({ children: [new Paragraph({ text: column })] })) }),
-            ...block.rows.map((row) => new TableRow({ children: row.map((cell) => new TableCell({ children: [new Paragraph({ text: cell })] })) })),
-          ],
-        }));
-      } else {
-        children.push(new Paragraph({ text: blockText(block) }));
-      }
+      children.push(...docxBlock(docx, block));
     }
   }
-  children.push(new Paragraph({ text: "BTX Precision", style: "Footer" }));
 
-  const doc = new Document({
-    sections: [{ children }],
+  children.push(
+    new Paragraph({ style: "BTXDivider", thematicBreak: true }),
+    new Paragraph({
+      style: "BTXFooter",
+      children: [
+        new TextRun({ text: PROFILE.name, bold: true }),
+        new TextRun(" · Generated from cockpit evidence and saved program memory"),
+      ],
+    }),
+  );
+
+  return new Document({
+    creator: PROFILE.name,
+    title,
+    description: `${PROFILE.name} deliverable generated by BTX Revenue Brain`,
     styles: {
-      paragraphStyles: [{
-        id: "Footer",
-        name: "Footer",
-        basedOn: "Normal",
-        run: { color: "6f7657", size: 18 },
-      }],
+      default: {
+        document: {
+          run: { font: "Arial", size: 21, color: DOCX_COLORS.ink },
+          paragraph: { spacing: { after: 120, line: 276 } },
+        },
+        title: {
+          run: { font: "Arial", size: 40, bold: true, color: DOCX_COLORS.navy },
+          paragraph: { spacing: { before: 60, after: 80 } },
+        },
+        heading2: {
+          run: { font: "Arial", size: 25, bold: true, color: DOCX_COLORS.teal },
+          paragraph: { spacing: { before: 260, after: 80 }, keepNext: true },
+        },
+      },
+      paragraphStyles: [
+        {
+          id: "BTXBrand",
+          name: "BTX Brand",
+          basedOn: "Normal",
+          run: { font: "Arial", size: 20, bold: true, color: DOCX_COLORS.teal, allCaps: true },
+          paragraph: { spacing: { after: 80 } },
+        },
+        {
+          id: "BTXTitle",
+          name: "BTX Title",
+          basedOn: "Title",
+          next: "BTXMeta",
+          run: { font: "Arial", size: 40, bold: true, color: DOCX_COLORS.navy },
+          paragraph: { spacing: { after: 80 }, keepNext: true },
+        },
+        {
+          id: "BTXMeta",
+          name: "BTX Meta",
+          basedOn: "Normal",
+          run: { font: "Arial", size: 18, color: DOCX_COLORS.muted },
+          paragraph: { spacing: { after: 220 }, border: { bottom: { style: BorderStyle.SINGLE, color: DOCX_COLORS.line, size: 6, space: 8 } } },
+        },
+        {
+          id: "BTXHeading2",
+          name: "BTX Heading 2",
+          basedOn: "Heading2",
+          next: "BodyText",
+          run: { font: "Arial", size: 25, bold: true, color: DOCX_COLORS.teal },
+          paragraph: { spacing: { before: 260, after: 80 }, keepNext: true },
+        },
+        {
+          id: "BTXCalloutLabel",
+          name: "BTX Callout Label",
+          basedOn: "Normal",
+          run: { font: "Arial", size: 17, bold: true, color: DOCX_COLORS.teal, allCaps: true },
+          paragraph: {
+            shading: { type: "clear", fill: DOCX_COLORS.tealSoft, color: DOCX_COLORS.tealSoft },
+            border: { top: { style: BorderStyle.SINGLE, color: DOCX_COLORS.line, size: 4, space: 8 }, left: { style: BorderStyle.SINGLE, color: DOCX_COLORS.teal, size: 16, space: 8 } },
+            spacing: { before: 80, after: 20 },
+          },
+        },
+        {
+          id: "BTXCallout",
+          name: "BTX Callout",
+          basedOn: "Normal",
+          run: { font: "Arial", size: 20, color: DOCX_COLORS.ink },
+          paragraph: {
+            shading: { type: "clear", fill: DOCX_COLORS.tealSoft, color: DOCX_COLORS.tealSoft },
+            border: { left: { style: BorderStyle.SINGLE, color: DOCX_COLORS.teal, size: 16, space: 8 }, bottom: { style: BorderStyle.SINGLE, color: DOCX_COLORS.line, size: 4, space: 8 } },
+            spacing: { after: 180, line: 276 },
+          },
+        },
+        {
+          id: "BodyText",
+          name: "BTX Body",
+          basedOn: "Normal",
+          run: { font: "Arial", size: 21, color: DOCX_COLORS.ink },
+          paragraph: { spacing: { after: 120, line: 276 } },
+        },
+        {
+          id: "BTXDivider",
+          name: "BTX Divider",
+          basedOn: "Normal",
+          paragraph: { spacing: { before: 160, after: 80 } },
+        },
+        {
+          id: "BTXFooter",
+          name: "BTX Footer",
+          basedOn: "Normal",
+          run: { font: "Arial", color: DOCX_COLORS.olive, size: 18 },
+          paragraph: { alignment: AlignmentType.LEFT, spacing: { before: 80 } },
+        },
+      ],
     },
+    sections: [{
+      properties: {
+        page: { margin: { top: 900, right: 900, bottom: 900, left: 900 } },
+      },
+      children,
+    }],
   });
-  const blob = await Packer.toBlob(doc);
+}
+
+export async function downloadDocx(deliverable: Deliverable): Promise<void> {
+  const docx = await import("docx");
+  const blob = await docx.Packer.toBlob(buildDocxDocument(deliverable, docx));
   downloadFile(`${slugTitle(deliverable)}.docx`, blob, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 }
 

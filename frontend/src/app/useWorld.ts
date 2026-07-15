@@ -74,7 +74,7 @@ function withSignalProspects(companies: Company[], signals: unknown[], city: str
       },
       website_url: "https://www.saronic.com",
       source_url: "https://app.dealroom.co/news/note/saronic-raises-1-75b-at-9-25b-valuation-to-scale-autonomous-warships-for-us-navy",
-      needs: [],
+      needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "ITAR"],
       domains: ["saronic.com"],
       aliases: ["Saronic"],
       known_programs: ["Corsair autonomous surface vessel"],

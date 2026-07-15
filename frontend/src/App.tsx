@@ -241,7 +241,7 @@ export function App() {
       )}
     >
       <section className="quiet-stage">{renderDefault()}</section>
-      {world && !homeActive && !settingsActive && activeTab !== "ask" && <AskBrainBar world={viewWorld ?? world} />}
+      {world && !homeActive && !settingsActive && activeTab !== "ask" && activeTab !== "deliverables" && <AskBrainBar world={viewWorld ?? world} />}
     </AppShell>
   );
 }

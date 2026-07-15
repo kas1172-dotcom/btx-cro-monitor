@@ -45,6 +45,22 @@ function isProspectingSignal(signal: Signal): boolean {
   );
 }
 
+function signalMatchesCompany(signal: Signal, company: Company): boolean {
+  if (signal.subject_id === company.id || signal.subject_id === company.canonical_account_id) return true;
+  const haystack = [
+    signal.artifact?.headline,
+    signal.source_quote,
+    signal.subject_id,
+    signal.entities.join(" "),
+  ].filter(Boolean).join(" ").toLowerCase();
+  const needles = [
+    company.name,
+    ...(company.aliases ?? []),
+    ...(company.domains ?? []),
+  ].map((value) => value.toLowerCase().replace(/^www\./, ""));
+  return needles.some((needle) => needle && haystack.includes(needle));
+}
+
 function whyNow(signals: Signal[]): string {
   const top = signals[0];
   if (!top) return "No recent buying signal, but the account fits the target profile.";
@@ -81,7 +97,7 @@ export function Prospecting({ world }: { world: World }) {
       const score = world.analysis.byId.get(company.id);
       const rankedProspect = world.prospects.find((p) => p.company.id === company.id);
       const signals = prospectSignals
-        .filter((s) => s.subject_id === company.id)
+        .filter((s) => signalMatchesCompany(s, company))
         .sort((a, b) => b.confidence - a.confidence);
       const contact = world.contacts.find((c) => c.company_id === company.id);
       const revenue = world.opportunities
@@ -104,7 +120,7 @@ export function Prospecting({ world }: { world: World }) {
     : prospectRows
   ).slice(0, 5);
   const buyingSignals = prospectSignals
-    .filter((s) => prospectIds.has(s.subject_id))
+    .filter((signal) => prospectRows.some((row) => signalMatchesCompany(signal, row.company)) || prospectIds.has(signal.subject_id))
     .sort((a, b) => b.confidence - a.confidence)
     .slice(0, 10);
   const outreachQueue = prospectRows.filter((row) => row.contact).slice(0, 8);

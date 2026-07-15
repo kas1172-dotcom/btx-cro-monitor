@@ -1,7 +1,13 @@
+import { execFileSync } from "node:child_process";
+import { rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import * as docx from "docx";
 import { buildBoardDeck, buildSalesPitch } from "../src/deliverables/deck/pptx.ts";
 import { assertNoEmDash, steelSignal } from "../src/deliverables/designTokens.ts";
+import { buildDocxDocument } from "../src/deliverables/export.ts";
 import {
   Figure,
   ProvenanceCard,
@@ -206,6 +212,22 @@ assert(pitchBuffer.subarray(0, 2).toString() === "PK", "sales pitch should be a 
 assert(boardBuffer.length > 10_000, "board deck pptx should not be empty");
 assert(pitchBuffer.length > 10_000, "sales pitch pptx should not be empty");
 
+const docxBuffer = await docx.Packer.toBuffer(buildDocxDocument(baseDeliverable("sales_pitch", "Sales Pitch"), docx));
+assert(docxBuffer.subarray(0, 2).toString() === "PK", "sales pitch docx should be a valid docx zip");
+assert(docxBuffer.length > 8_000, "sales pitch docx should not be empty");
+const docxPath = join(tmpdir(), `btx-sales-pitch-${Date.now()}.docx`);
+writeFileSync(docxPath, docxBuffer);
+try {
+  const stylesXml = execFileSync("unzip", ["-p", docxPath, "word/styles.xml"], { encoding: "utf8" });
+  const documentXml = execFileSync("unzip", ["-p", docxPath, "word/document.xml"], { encoding: "utf8" });
+  assert(stylesXml.includes("BTXTitle"), "docx export should include BTX title style");
+  assert(stylesXml.includes("BTXHeading2"), "docx export should include BTX section-heading style");
+  assert(!stylesXml.includes("Times New Roman"), "docx export should not depend on Word's Times New Roman default");
+  assert(documentXml.includes("BTX Revenue Brain"), "docx export should include the BTX brand line");
+} finally {
+  rmSync(docxPath, { force: true });
+}
+
 assertNoEmDash([caps, outreach, newsletter, figure, provenance].join("\n"));
 
-console.log("deliverable templates ok: Steel & Signal tokens, primitives, templates, invariants, pptx buffers");
+console.log("deliverable templates ok: Steel & Signal tokens, primitives, templates, invariants, pptx/docx buffers");
