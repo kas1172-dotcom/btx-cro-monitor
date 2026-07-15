@@ -35,6 +35,17 @@ function formatRunDate(value: string | null | undefined): string {
   return new Date(value).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
+function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" | "warning"; label: string; value: string } | null {
+  if (!world) return null;
+  if (world.dataSource && !world.loadErrors.length) {
+    return { tone: "success", label: "Live source", value: world.dataSource };
+  }
+  if ((world.dataMode === "hybrid" || world.dataMode === "live") && world.loadErrors.length) {
+    return { tone: "warning", label: "CRM status", value: "using demo fallback" };
+  }
+  return null;
+}
+
 export function App() {
   const { city, activeHome, activeSettings, activeTab, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested } = useStore();
   const [workItemStatus, setWorkItemStatus] = useState("");
@@ -107,6 +118,7 @@ export function App() {
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
   const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeTab))?.label ?? "Cockpit";
+  const backendStatus = liveDataStatus(world);
 
   return (
     <AppShell
@@ -123,12 +135,7 @@ export function App() {
             {world?.dataMode === "hybrid" && world.provenanceSummary && (
               <StatusChip label="Data provenance" value={`${world.provenanceSources.length} sources`} />
             )}
-            {world?.dataSource && !world.loadErrors.length && (
-              <StatusChip tone="success" label="Live source" value={world.dataSource} />
-            )}
-            {world?.loadErrors.length ? (
-              <StatusChip tone="danger" label="Live data issue" value={world.loadErrors[0]} />
-            ) : null}
+            {backendStatus ? <StatusChip tone={backendStatus.tone} label={backendStatus.label} value={backendStatus.value} /> : null}
             {world?.snapshot?.publicSignals.source_mode === "artifact" && (
               <StatusChip tone={world.snapshot.publicSignals.stale ? "warning" : "info"} label="Monitor run" value={formatRunDate(world.snapshot.publicSignals.run_at)} />
             )}

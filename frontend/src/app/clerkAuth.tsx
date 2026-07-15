@@ -2,7 +2,16 @@ import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, UserButton, useUs
 import type React from "react";
 
 const env = (import.meta as ImportMeta & { env?: { VITE_CLERK_PUBLISHABLE_KEY?: string } }).env;
-export const CLERK_PUBLISHABLE_KEY = env?.VITE_CLERK_PUBLISHABLE_KEY?.trim() ?? "";
+const RAW_CLERK_PUBLISHABLE_KEY = env?.VITE_CLERK_PUBLISHABLE_KEY?.trim() ?? "";
+
+function isUsableClerkPublishableKey(value: string): boolean {
+  if (!value || value.includes("REPLACE_WITH")) return false;
+  return value.startsWith("pk_test_") || value.startsWith("pk_live_");
+}
+
+export const CLERK_PUBLISHABLE_KEY = isUsableClerkPublishableKey(RAW_CLERK_PUBLISHABLE_KEY)
+  ? RAW_CLERK_PUBLISHABLE_KEY
+  : "";
 
 /**
  * Gate the app behind Clerk sign-in. If no publishable key is configured
@@ -28,12 +37,7 @@ export function CockpitAuthGate({ children }: { children: React.ReactNode }) {
 
 export function CockpitAuthStatus() {
   if (!CLERK_PUBLISHABLE_KEY) {
-    return (
-      <div className="clerk-auth-status not-configured" role="status">
-        <span>Auth</span>
-        <strong>Clerk not configured</strong>
-      </div>
-    );
+    return null;
   }
   return (
     <SignedIn>

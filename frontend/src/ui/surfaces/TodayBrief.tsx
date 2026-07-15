@@ -1,6 +1,4 @@
 import type { ReactNode } from "react";
-import { PROFILE } from "../../app/config.ts";
-import { greetingForTime } from "../../app/greeting.ts";
 import { setState } from "../../store/store.ts";
 import type { World } from "../../app/useWorld.ts";
 import { useWorkItems, type WorkItem } from "../../app/workItems.ts";
@@ -86,6 +84,36 @@ function signalToBriefItem(world: World, signal: Signal): BriefItem {
   };
 }
 
+function saronicProspectBriefItem(world: World): BriefItem | null {
+  const company = world.companies.find((candidate) => candidate.name.toLowerCase().includes("saronic"));
+  if (!company) return null;
+  return {
+    id: `prospect-${company.id}`,
+    title: `${company.name}: qualify the Austin prospect before outreach`,
+    reason: "Prospecting signal needs qualification before it becomes a CRM action.",
+    meta: "Prospecting - Austin visit plan",
+    link: { label: "Open prospecting", surface: "prospecting" },
+    seed: `Build a qualification plan for ${company.name} before outreach.`,
+  };
+}
+
+function demoPriority(signal: Signal): number {
+  const text = [
+    signal.id,
+    signal.artifact?.headline,
+    signal.source_quote,
+    signal.subject_id,
+    signal.entities.join(" "),
+  ].filter(Boolean).join(" ").toLowerCase();
+  if (text.includes("lockheed") || text.includes("f-35")) return 0;
+  if (text.includes("saronic") || text.includes("corsair")) return 1;
+  return 2;
+}
+
+function briefItemSearchText(item: BriefItem): string {
+  return [item.title, item.reason, item.meta, item.seed].map(String).join(" ").toLowerCase();
+}
+
 function isThisWeek(value: string | null | undefined, anchor = new Date()): boolean {
   if (!value) return false;
   const date = new Date(value);
@@ -100,15 +128,40 @@ function isThisWeek(value: string | null | undefined, anchor = new Date()): bool
 export function TodayBrief({ world }: { world: World }) {
   const attention = useWorkItems(world, "needs_attention");
   const approval = useWorkItems(world, "needs_approval");
-  const selectedSignalIds = new Set(attention.items.flatMap((item) => item.source_signal_ids));
+  const signalById = new Map(world.analysis.valid.map((signal) => [signal.id, signal]));
+  const selectedSignalIds = new Set(
+    attention.items
+      .flatMap((item) => item.source_signal_ids)
+      .filter((id) => {
+        const signal = signalById.get(id);
+        return !signal || demoPriority(signal) > 1;
+      }),
+  );
   const topSignals = [...world.analysis.valid]
     .filter((signal) => !selectedSignalIds.has(signal.id))
-    .sort((a, b) => b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at))
+    .sort((a, b) => demoPriority(a) - demoPriority(b) || b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at))
+    .slice(0, 8);
+  const signalBriefs = topSignals.map((signal) => signalToBriefItem(world, signal));
+  const attentionBriefs = attention.items.map((item) => workItemToBriefItem(world, item));
+  const lockheedSignal = signalBriefs.find((item) => {
+    const text = briefItemSearchText(item);
+    return text.includes("lockheed") || text.includes("f-35");
+  });
+  const saronicSignal = signalBriefs.find((item) => {
+    const text = briefItemSearchText(item);
+    return text.includes("saronic") || text.includes("corsair");
+  });
+  const saronicWork = attentionBriefs.find((item) => briefItemSearchText(item).includes("saronic"));
+  const saronicProspect = saronicProspectBriefItem(world);
+  const reservedBriefs = [lockheedSignal, saronicSignal ?? saronicWork ?? saronicProspect].filter((item): item is BriefItem => Boolean(item));
+  const seenBriefIds = new Set<string>();
+  const miniBrief = [...reservedBriefs, ...signalBriefs, ...attentionBriefs]
+    .filter((item) => {
+      if (seenBriefIds.has(item.id)) return false;
+      seenBriefIds.add(item.id);
+      return true;
+    })
     .slice(0, 5);
-  const miniBrief = [
-    ...attention.items.map((item) => workItemToBriefItem(world, item)),
-    ...topSignals.map((signal) => signalToBriefItem(world, signal)),
-  ].slice(0, 5);
   const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
   const deadlineCount = [
     ...attention.items.map((item) => item.due_date),
@@ -120,8 +173,8 @@ export function TodayBrief({ world }: { world: World }) {
     <section className="surface-page today-brief-page" data-surface-component="surface-todays-brief">
       <SurfaceHeader
         eyebrow="Daily briefing"
-        headline={greetingForTime(new Date(), PROFILE.sender_name)}
-        subline="The highest-signal account work, approval waits, and near-term dates from the current operating world."
+        headline="Today's BTX demo path"
+        subline="Start with the Lockheed account action, then qualify Saronic as the net-new prospect."
       />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
 

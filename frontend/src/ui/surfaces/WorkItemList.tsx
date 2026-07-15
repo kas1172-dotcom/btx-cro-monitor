@@ -10,8 +10,8 @@ function titleCase(value: string): string {
 export function WorkItemSourceNote({ source, error }: { source: "backend" | "derived"; error: string | null }) {
   if (source === "backend") return <div className="live-inline-status">Work items: backend API</div>;
   return (
-    <div className={error ? "live-inline-status error" : "live-inline-status"} title={error ?? undefined}>
-      {error ? "Backend work-item API unavailable; showing derived queue." : "Work items: derived from current world until backend data is available."}
+    <div className="live-inline-status" title={error ?? undefined}>
+      {error ? "Demo queue: generated from the current signals for rehearsal." : "Work items: derived from current world until backend data is available."}
     </div>
   );
 }
