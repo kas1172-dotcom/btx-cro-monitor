@@ -1,4 +1,4 @@
-name: Discovery Validation
+name: 90 Discovery Validation
 
 # Live run of the source-discovery agent against real briefs. Makes real network
 # + Anthropic API calls (costs spend), so it is manual-only — never on push/PR.

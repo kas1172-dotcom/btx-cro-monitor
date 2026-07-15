@@ -37,9 +37,9 @@ The Pages build intentionally does not bundle a shared backend bearer token. Bro
 
 ## Workflow Behavior
 
-- `.github/workflows/monitor.yml` remains manual-dispatch only.
+- `.github/workflows/monitor.yml` (`10 Monitor Pipeline`) remains manual-dispatch only.
 - The monitor pipeline writes JSON artifacts into `clients/btx/artifacts/`.
-- `.github/workflows/pages.yml` builds `frontend/` and assembles the Pages artifact in `_site/`.
+- `.github/actions/deploy-pages/action.yml` builds `frontend/` and assembles the Pages artifact in `_site/`.
 - The cockpit is copied to `_site/cockpit/`.
 - `run_output.json`, `archive.json`, and `map_targets.json` are copied to `_site/btx/`.
 - Pages deployments are serialized by the `pages` concurrency group.
@@ -55,4 +55,4 @@ VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
 VITE_ARTIFACT_BASE_URL=../btx
 ```
 
-Run **Deploy Pages** from the Actions tab to republish without re-running the monitor pipeline.
+Run **30 Deploy Frontend Cockpit** from the Actions tab to republish without re-running the monitor pipeline.

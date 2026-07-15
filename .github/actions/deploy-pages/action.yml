@@ -1,0 +1,110 @@
+name: Deploy Pages
+description: Build the cockpit, assemble the Pages artifact, and deploy it.
+
+inputs:
+  vite_backend_endpoint:
+    description: Backend endpoint exposed to the Vite build.
+    required: true
+  vite_cockpit_password:
+    description: Demo cockpit password to hash into the static build.
+    required: true
+  vite_clerk_publishable_key:
+    description: Browser-safe Clerk publishable key.
+    required: true
+
+outputs:
+  page_url:
+    description: Deployed GitHub Pages URL.
+    value: ${{ steps.deploy.outputs.page_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        # Publish the latest tip of the branch, including artifacts committed by
+        # an earlier job in the same workflow run.
+        ref: ${{ github.ref_name }}
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Build Enterprise Brain cockpit
+      working-directory: frontend
+      shell: bash
+      env:
+        VITE_DATA_MODE: hybrid
+        VITE_BACKEND_ENDPOINT: ${{ inputs.vite_backend_endpoint }}
+        VITE_COPILOT_ENDPOINT: ${{ inputs.vite_backend_endpoint }}/llm
+        VITE_ARTIFACT_BASE_URL: ../btx
+        VITE_CLERK_PUBLISHABLE_KEY: ${{ inputs.vite_clerk_publishable_key }}
+        COCKPIT_PASSWORD: ${{ inputs.vite_cockpit_password }}
+      run: |
+        if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$COCKPIT_PASSWORD" ] || [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ]; then
+          echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_COCKPIT_PASSWORD, VITE_CLERK_PUBLISHABLE_KEY"
+          exit 1
+        fi
+        export VITE_COCKPIT_PASSWORD_HASH="$(printf '%s' "$COCKPIT_PASSWORD" | sha256sum | awk '{print $1}')"
+        npm ci
+        npm run build
+
+    - name: Assemble site
+      shell: bash
+      run: |
+        rm -rf _site && mkdir -p _site/cockpit _site/btx
+        cp -r frontend/dist/. _site/cockpit/
+        for artifact in run_output.json archive.json map_targets.json; do
+          test -f "clients/btx/artifacts/$artifact"
+          cp "clients/btx/artifacts/$artifact" "_site/btx/$artifact"
+        done
+        cat > _site/index.html <<'HTML'
+        <!doctype html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>BTX CRO Monitor</title>
+            <style>
+              body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172033; background: #f6f7f9; }
+              main { max-width: 760px; margin: 14vh auto; padding: 0 24px; }
+              h1 { font-size: clamp(2rem, 6vw, 4rem); line-height: 1; margin: 0 0 16px; }
+              p { color: #526071; font-size: 1.05rem; line-height: 1.6; }
+              nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+              a { border: 1px solid #cdd5df; border-radius: 8px; color: #172033; padding: 12px 16px; text-decoration: none; background: #fff; }
+              a:first-child { background: #172033; border-color: #172033; color: #fff; }
+            </style>
+          </head>
+          <body>
+            <main>
+              <h1>BTX CRO Monitor</h1>
+              <p>The live backend-connected cockpit is published from this repository. Monitor JSON artifacts are available under <code>/btx/</code> for the cockpit.</p>
+              <nav aria-label="BTX pages">
+                <a href="./cockpit/">Open cockpit</a>
+                <a href="./btx/run_output.json">View monitor JSON</a>
+              </nav>
+            </main>
+          </body>
+        </html>
+        HTML
+
+    - name: Configure Pages
+      uses: actions/configure-pages@v5
+      with:
+        enablement: true
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: _site
+
+    - name: Deploy to GitHub Pages
+      id: deploy
+      uses: actions/deploy-pages@v4
