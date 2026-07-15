@@ -243,6 +243,7 @@ def _deliverable_response(row: models.Deliverable) -> dict:
         canonical_account_id=row.canonical_account_id,
         program_id=row.program_id,
         trip_id=row.trip_id,
+        entity_ids=row.entity_ids,
         document=row.document,
         created_at=row.created_at.isoformat(),
         updated_at=row.updated_at.isoformat(),
@@ -983,6 +984,7 @@ def create_app(
                 canonical_account_id=payload.canonical_account_id,
                 program_id=payload.program_id,
                 trip_id=payload.trip_id,
+                entity_ids=payload.entity_ids,
                 document=payload.document,
             )
             session.add(row)
@@ -1002,11 +1004,15 @@ def create_app(
         session = session_factory()
         try:
             query = session.query(models.Deliverable).filter(models.Deliverable.tenant_id == _tenant_id(request))
-            if account:
-                query = query.filter(models.Deliverable.canonical_account_id == account)
             if type:
                 query = query.filter(models.Deliverable.type == type)
             rows = query.order_by(models.Deliverable.updated_at.desc(), models.Deliverable.created_at.desc()).all()
+            if account:
+                # entity_ids is a JSON list; membership is checked in Python for cross-dialect behavior.
+                rows = [
+                    row for row in rows
+                    if row.canonical_account_id == account or (row.entity_ids and account in row.entity_ids)
+                ]
             return JSONResponse({"records": [_deliverable_response(row) for row in rows]})
         finally:
             session.close()
@@ -1040,6 +1046,8 @@ def create_app(
                 row.program_id = payload.program_id
             if "trip_id" in fields:
                 row.trip_id = payload.trip_id
+            if "entity_ids" in fields:
+                row.entity_ids = payload.entity_ids
             if "document" in fields and payload.document is not None:
                 row.document = payload.document
             row.updated_at = datetime.now(UTC)

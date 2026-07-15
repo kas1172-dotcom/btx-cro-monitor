@@ -176,6 +176,7 @@ class Deliverable(Base):
     canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     program_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     trip_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    entity_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     document: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)

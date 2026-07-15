@@ -81,12 +81,20 @@ def test_deliverables_migration_downgrade_one_step_removes_table(tmp_path: Path)
     command.upgrade(config, "head")
     engine = make_engine(f"sqlite:///{db_path}")
     assert "deliverables" in set(inspect(engine).get_table_names())
+    columns = {column["name"] for column in inspect(engine).get_columns("deliverables")}
+    assert "entity_ids" in columns
 
     command.downgrade(config, "-1")
     engine = make_engine(f"sqlite:///{db_path}")
-    tables_after_down_one = set(inspect(engine).get_table_names())
-    assert "deliverables" not in tables_after_down_one
-    assert "work_items" in tables_after_down_one
+    assert "deliverables" in set(inspect(engine).get_table_names())
+    columns_after_down_one = {column["name"] for column in inspect(engine).get_columns("deliverables")}
+    assert "entity_ids" not in columns_after_down_one
+
+    command.downgrade(config, "-1")
+    engine = make_engine(f"sqlite:///{db_path}")
+    tables_after_down_two = set(inspect(engine).get_table_names())
+    assert "deliverables" not in tables_after_down_two
+    assert "work_items" in tables_after_down_two
 
     command.upgrade(config, "head")
     engine = make_engine(f"sqlite:///{db_path}")
