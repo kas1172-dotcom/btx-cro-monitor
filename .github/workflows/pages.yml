@@ -1,9 +1,12 @@
 name: Deploy Pages
 
-# Publishes the committed client dashboards to GitHub Pages. Not auto-triggered:
-# it runs either as the final step of the Monitor Pipeline (called via
-# workflow_call after a run commits fresh artifacts) or on its own when manually
-# dispatched to republish without re-running the pipeline.
+# Reusable Pages-publish step, not a standalone button. It is called by three
+# workflows depending on what triggered the publish:
+#   - "Update demo (bake + deploy)" — the one-button full refresh
+#   - "Deploy Frontend Cockpit"     — redeploy the built frontend only, no rebake
+#   - "Monitor Pipeline"            — final step after a fresh artifact run
+# To manually republish without re-running any of those, use "Deploy Frontend
+# Cockpit" from the Actions tab — not this workflow directly.
 on:
   workflow_call:
     secrets:
@@ -13,7 +16,6 @@ on:
         required: true
       VITE_CLERK_PUBLISHABLE_KEY:
         required: false
-  workflow_dispatch:
 
 permissions:
   contents: read

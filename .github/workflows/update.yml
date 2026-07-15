@@ -1,9 +1,13 @@
 # ★ THE ONE BUTTON ★
 # Refreshes the LLM artifacts (dossier prose + signals extracted from news),
 # then rebuilds and deploys the site. Run this whenever you want the live demo
-# fully up to date — it is the only workflow you normally need to touch.
-# (The other workflows — Monitor Pipeline, Discovery Validation — belong to the
-# old Python cockpit and are not part of the demo.)
+# fully up to date — it is the workflow you normally reach for.
+#
+# This does NOT re-run "Monitor Pipeline" (fresh signal collection from
+# sources) — run that separately first if the underlying signals are stale;
+# it publishes to Pages itself when it finishes. "Discovery Validation" is
+# unrelated maintenance tooling for onboarding a new client's source config,
+# not part of the demo-refresh flow.
 name: Update demo (bake + deploy)
 
 on:
