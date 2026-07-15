@@ -4,6 +4,9 @@ primary_region = "iad"
 [build]
   dockerfile = "Dockerfile"
 
+[deploy]
+  release_command = "alembic upgrade head"
+
 [processes]
   app = "uvicorn btx_platform.asgi:app --host 0.0.0.0 --port 8000"
   worker = "celery -A btx_platform.workers.celery_app worker --loglevel=info"
