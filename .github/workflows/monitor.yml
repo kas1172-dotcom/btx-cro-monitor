@@ -1,4 +1,4 @@
-name: Monitor Pipeline
+name: 10 Monitor Pipeline
 
 on:
   # Manual trigger ONLY — nothing runs automatically. The pipeline (collect →
@@ -207,8 +207,8 @@ jobs:
 
   # ── Publish ─────────────────────────────────────────────────────────────
   # Final step of the one-button pipeline: once the run job has committed fresh
-  # artifacts, publish all dashboards to Pages. Reuses the Deploy Pages workflow
-  # so the deploy logic lives in exactly one place.
+  # artifacts, publish all dashboards to Pages. Reuses the internal deploy-pages
+  # action so the deploy logic lives in exactly one place.
   deploy:
     needs: run
     # Publish whenever the pipeline actually ran — even if one client failed, the
@@ -217,5 +217,18 @@ jobs:
     # deployments to main, so attempting it from a feature branch just fails the
     # run. Skipped if the test gate blocked the run or the run was cancelled.
     if: ${{ !cancelled() && github.ref_name == 'main' && (needs.run.result == 'success' || needs.run.result == 'failure') }}
-    uses: ./.github/workflows/pages.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - id: deploy-pages
+        uses: ./.github/actions/deploy-pages
+        with:
+          vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
+          vite_cockpit_password: ${{ secrets.VITE_COCKPIT_PASSWORD }}
+          vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}

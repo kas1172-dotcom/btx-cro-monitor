@@ -1,9 +1,9 @@
-name: Deploy Frontend Cockpit
+name: 30 Deploy Frontend Cockpit
 
 # Manual redeploy of the built frontend to Pages, without re-baking LLM
 # artifacts or re-running the monitor pipeline. Use this after merging a
 # frontend-only change to main, or to republish with unchanged data. For a
-# full data refresh use "Update demo (bake + deploy)" instead.
+# full data refresh use "20 Update Demo" instead.
 on:
   workflow_dispatch:
 
@@ -14,5 +14,18 @@ permissions:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/pages.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - id: deploy-pages
+        uses: ./.github/actions/deploy-pages
+        with:
+          vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
+          vite_cockpit_password: ${{ secrets.VITE_COCKPIT_PASSWORD }}
+          vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}

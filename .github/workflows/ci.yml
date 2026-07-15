@@ -1,14 +1,12 @@
-name: CI
+name: 01 CI
 
-# Gates every PR into main: frontend typecheck/build/test suites + backend
-# pytest. No network/paid API calls — Anthropic-backed test paths are mocked
-# (see tools/test-*.ts and tests/test_*.py). Configure this as a required
-# status check under Settings -> Branches -> Branch protection rules for main.
+# Gates every PR into main: frontend typecheck/build/test suites, backend
+# pytest, and an optional browser E2E smoke job. No network/paid API calls are
+# made by the default jobs; Anthropic-backed test paths are mocked.
 #
-# Every non-browser `test:*` script in frontend/package.json belongs in the
-# frontend job below. Browser-driven suites (test:e2e, test:mobile) launch
-# Playwright/Chromium and live in e2e.yml instead, gated behind RUN_E2E so
-# ordinary PRs aren't blocked on browser flake.
+# Browser E2E is skipped by default. Set repository variable RUN_E2E=1 to enable
+# it; this keeps ordinary PRs fast while preserving a single CI workflow in the
+# Actions tab.
 on:
   pull_request:
     branches: [main]
@@ -103,3 +101,52 @@ jobs:
 
       - name: pytest
         run: python3 -m pytest -q
+
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        if: vars.RUN_E2E == '1'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install deps
+        if: vars.RUN_E2E == '1'
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: vars.RUN_E2E == '1'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E suite
+        if: vars.RUN_E2E == '1'
+        run: npm run test:e2e
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          E2E_CLERK_EMAIL: ${{ secrets.E2E_CLERK_EMAIL }}
+          E2E_CLERK_PASSWORD: ${{ secrets.E2E_CLERK_PASSWORD }}
+          E2E_CLERK_LOGIN: ${{ vars.E2E_CLERK_LOGIN }}
+          E2E_HUBSPOT_TEST_PORTAL: ${{ secrets.E2E_HUBSPOT_TEST_PORTAL }}
+          E2E_BACKEND_ENDPOINT: ${{ secrets.E2E_BACKEND_ENDPOINT }}
+          E2E_CLERK_SESSION_TOKEN: ${{ secrets.E2E_CLERK_SESSION_TOKEN }}
+
+      - name: Upload screenshots
+        if: always() && vars.RUN_E2E == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: /tmp/btx-e2e-smoke
+          retention-days: 14
+
+      - name: E2E skipped
+        if: vars.RUN_E2E != '1'
+        run: echo "E2E skipped by default. Set repository variable RUN_E2E=1 to enable browser E2E."

@@ -274,7 +274,7 @@ Do not add a shared backend bearer token to the Pages build. Set
 the cockpit gates itself behind Clerk sign-in and sends each user's own
 session token on backend calls.
 
-After those secrets are set, run the **Deploy Frontend Cockpit** workflow from
+After those secrets are set, run the **30 Deploy Frontend Cockpit** workflow from
 the Actions tab. The cockpit will publish at:
 
 ```text
@@ -293,34 +293,32 @@ build; it identifies the Clerk instance and is not a secret.
 
 ## CI (WP10-C)
 
-`.github/workflows/ci.yml` runs on every PR into `main` and on push to `main`:
+`.github/workflows/ci.yml` (`01 CI`) runs on every PR into `main` and on push to `main`:
 frontend typecheck, build, and the fast test suites (`test:metrics`,
 `test:rail`, `test:settings`, `test:flows`, `test:tour`, `test:phase0`,
 `test:identity`, `test:map`, `test:live-adapter`, `test:deliverables`), plus
 backend `pytest`.
 
-`.github/workflows/e2e.yml` runs the Playwright browser suite
-(`frontend/tools/test-e2e-playwright.ts`) on the same triggers: builds the
-cockpit, boots it, signs in through Clerk (if configured), and walks the four
-core surfaces at desktop + mobile viewports. It always passes even without
-Clerk secrets configured — it exercises the app's no-auth fallback in that
-case — but only proves the real sign-in flow once these **optional** repo
-secrets are set: `VITE_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_EMAIL`,
-`E2E_CLERK_PASSWORD` (a dedicated test user's credentials, not a real BTX
-user). The HubSpot task-loop tier additionally needs `E2E_HUBSPOT_TEST_PORTAL=1`,
-`E2E_BACKEND_ENDPOINT` (a live backend, e.g. the staging deploy above), and
-`E2E_CLERK_SESSION_TOKEN` (a session token minted for the test user against
-that backend) — without them it skips that tier with a clear log line rather
-than failing.
+The same workflow also contains an optional `e2e` job for the Playwright
+browser suite (`frontend/tools/test-e2e-playwright.ts`). It is skipped by
+default; set repo variable `RUN_E2E=1` to build the cockpit, boot it, sign in
+through Clerk when configured, and walk the four core surfaces at desktop and
+mobile viewports. Real sign-in coverage needs these **optional** repo secrets:
+`VITE_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_EMAIL`, `E2E_CLERK_PASSWORD` (a
+dedicated test user's credentials, not a real BTX user). The HubSpot task-loop
+tier additionally needs `E2E_HUBSPOT_TEST_PORTAL=1`, `E2E_BACKEND_ENDPOINT` (a
+live backend, e.g. the staging deploy above), and `E2E_CLERK_SESSION_TOKEN` (a
+session token minted for the test user against that backend).
 
 **Required GitHub settings** (maintainer, one-time): Settings → Branches →
 add a branch protection rule for `main` → enable "Require status checks to
-pass before merging" → select the `frontend` and `backend` jobs from the `CI`
-workflow, and the `e2e` job from the `E2E` workflow, as required checks.
+pass before merging" → select the `frontend` and `backend` jobs from the
+`01 CI` workflow. Add the `e2e` job only if `RUN_E2E=1` is enabled for routine
+PRs.
 
 ## Staging deploy (WP10-C)
 
-`.github/workflows/deploy-staging.yml` is **manual-only** (`workflow_dispatch`,
+`.github/workflows/deploy-staging.yml` (`40 Deploy Backend (Staging)`) is **manual-only** (`workflow_dispatch`,
 never triggered by push/PR) and targets a separate, non-public Fly app —
 **production auto-deploy is intentionally not enabled by this task; `fly
 deploy` against `btx-platform` stays a manual step you run yourself**

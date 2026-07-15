@@ -1,14 +1,13 @@
-# ★ THE ONE BUTTON ★
 # Refreshes the LLM artifacts (dossier prose + signals extracted from news),
 # then rebuilds and deploys the site. Run this whenever you want the live demo
-# fully up to date — it is the workflow you normally reach for.
+# fully up to date after the underlying monitor artifacts are current.
 #
 # This does NOT re-run "Monitor Pipeline" (fresh signal collection from
 # sources) — run that separately first if the underlying signals are stale;
 # it publishes to Pages itself when it finishes. "Discovery Validation" is
 # unrelated maintenance tooling for onboarding a new client's source config,
 # not part of the demo-refresh flow.
-name: Update demo (bake + deploy)
+name: 20 Update Demo
 
 on:
   workflow_dispatch: {}
@@ -20,9 +19,27 @@ permissions:
 
 jobs:
   bake:
-    uses: ./.github/workflows/insights.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bake-llm-artifacts
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
   deploy:
     needs: bake
-    uses: ./.github/workflows/pages.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - id: deploy-pages
+        uses: ./.github/actions/deploy-pages
+        with:
+          vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
+          vite_cockpit_password: ${{ secrets.VITE_COCKPIT_PASSWORD }}
+          vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}

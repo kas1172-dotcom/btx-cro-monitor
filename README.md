@@ -143,56 +143,36 @@ This writes `map_targets.json` only. Rendering happens in the React cockpit.
 
 ## GitHub Actions
 
-10 workflows under `.github/workflows/`. Two run automatically on every PR/push
-to `main`; everything else is manual-dispatch only, run from the Actions tab.
+The Actions tab is intentionally short: six visible workflows, named so they
+sort in the order an operator usually needs them. Reusable bake/deploy logic
+lives under `.github/actions/` and does not appear as a separate button.
 
-**Automatic (PR/push gates):**
+**Automatic gate:**
 
-- **CI** (`ci.yml`) — frontend typecheck/build/every non-browser test suite,
-  plus backend pytest. Required status check for `main`.
-- **E2E** (`e2e.yml`) — browser smoke test across the four core surfaces.
-  Skipped by default (set repo variable `RUN_E2E=1` to enable); kept off ci.yml
-  because it installs a real Chromium browser and is slower.
+- **01 CI** (`ci.yml`) — runs on PRs and pushes to `main`. It includes frontend
+  typecheck/build/test suites, backend pytest, and an optional `e2e` job. The
+  browser E2E job is skipped unless repo variable `RUN_E2E=1` is set.
 
-**Manual — day-to-day demo refresh:**
+**Manual run order:**
 
-- **Update demo (bake + deploy)** (`update.yml`) — ★ the one button you
-  normally need. Refreshes LLM-baked artifacts (dossier prose, extracted
-  signals) then rebuilds and publishes the cockpit. Does **not** re-collect
-  fresh signals from sources — run Monitor Pipeline first if those are stale.
-- **Deploy Frontend Cockpit** (`deploy-frontend.yml`) — rebuilds and publishes
-  the frontend only, no re-baking. Use after merging a frontend-only change.
-- **Bake LLM artifacts** (`insights.yml`) — refreshes dossier prose and
-  extracted signals and commits them, without deploying. Also runs as the
-  first step of "Update demo."
+1. **10 Monitor Pipeline** (`monitor.yml`) — run first when source signals are
+   stale. It tests, collects/analyzes data, writes `run_output.json`,
+   `archive.json`, and `map_targets.json`, commits artifacts, then publishes
+   Pages.
+2. **20 Update Demo** (`update.yml`) — run after Monitor Pipeline, or by itself
+   when the source artifacts are already current. It bakes LLM prose/extracted
+   signals, commits them, and deploys the cockpit.
+3. **30 Deploy Frontend Cockpit** (`deploy-frontend.yml`) — run only after a
+   frontend-only change when data/LLM artifacts do not need refreshing.
+4. **40 Deploy Backend (Staging)** (`deploy-staging.yml`) — run only when the
+   Fly staging backend needs a deploy. It requires typing `staging`.
+5. **90 Discovery Validation** (`discovery-validate.yml`) — maintenance only,
+   for validating a new or changed client source config.
 
-**Manual — data pipeline:**
-
-- **Monitor Pipeline** (`monitor.yml`) — the test gate, then collect →
-  analyze → write JSON artifacts (`run_output.json`, `archive.json`,
-  `map_targets.json`) → commit → publish to Pages. Run this when the
-  underlying signals themselves need refreshing, not just the LLM prose.
-- **Discovery Validation** (`discovery-validate.yml`) — unrelated maintenance
-  tool for onboarding a new client: runs the source-discovery agent live
-  against a client's intake and reports coverage against the hand-built
-  `config.json`. Not part of the demo-refresh flow.
-
-**Manual — backend:**
-
-- **Deploy Backend (Staging)** (`deploy-staging.yml`) — deploys `btx_platform`
-  to a separate Fly staging app. Requires typing `staging` to confirm and a
-  one-time staging app + secrets setup (see the workflow header). Production
-  backend deploys stay a manual `fly deploy` per `docs/DEPLOY_BACKEND.md` —
-  there is no one-click production backend deploy.
-
-**Manual — other:**
-
-- **Weekly Revenue Brain Memo** (`weekly-memo.yml`) — generates and commits
-  the weekly memo archive under `frontend/memo_archive/`. Cron trigger is
-  disabled pending client validation of the cadence.
-
-`pages.yml` ("Deploy Pages") is not in this list — it is reusable publish logic
-called by the three deploy workflows above, not something you run directly.
+Removed from the Actions tab: standalone **Bake LLM artifacts**, standalone
+**Deploy Pages**, separate **E2E**, and **Weekly Revenue Brain Memo**. The bake
+and Pages steps are still used internally; E2E is now an optional CI job; the
+weekly memo button was dormant manual-only workflow clutter.
 
 Enable Pages in the repo UI with Settings → Pages → Source: **GitHub Actions**.
 
