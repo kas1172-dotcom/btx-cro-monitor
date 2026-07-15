@@ -112,6 +112,12 @@ export function DeliverableLibrary({ world }: { world: World }) {
   }, [items]);
   const typeOptions = useMemo(() => [...new Set(items.map((item) => item.deliverable.type))].sort(), [items]);
 
+  function handleWizardSaved(deliverable: Deliverable) {
+    setAccountFilter("all");
+    setTypeFilter("all");
+    setStatus(`Saved “${deliverable.title}” to the deliverable library.`);
+  }
+
   return (
     <section className="surface-page deliverable-library" data-surface-component="surface-deliverable-library">
       <SurfaceHeader
@@ -176,6 +182,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
       {isWizardOpen && (
         <DeliverableWizard
           world={world}
+          onSaved={handleWizardSaved}
           onClose={() => {
             setIsWizardOpen(false);
             void refresh();

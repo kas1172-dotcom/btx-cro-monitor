@@ -3271,6 +3271,9 @@ button, input, select, textarea { font: inherit; }
   background: rgba(var(--accent-rgb), .12);
   color: var(--accent-text);
 }
+.deliverable-wizard-actions {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) minmax(0, .85fr);
+}
 .deliverable-wizard-error {
   border: 1px solid rgba(var(--danger-rgb), 0.5);
   background: rgba(var(--danger-rgb), 0.12);

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
-import { saveStoredDeliverable, hasDeliverablesBackend } from "../../app/deliverablesApi.ts";
+import { saveStoredDeliverable, hasDeliverablesBackend, recordToDeliverable } from "../../app/deliverablesApi.ts";
 import { DELIVERABLE_TEMPLATE_OPTIONS, deliverableTemplateOption } from "../../agents/deliverableRegistry.ts";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { buildWizardPrefill, validatePrefillProvenance, type WizardPrefill } from "../../deliverables/wizardPrefill.ts";
@@ -20,6 +20,7 @@ const WIZARD_STEPS: Array<{ id: WizardStep; label: string }> = [
 interface DeliverableWizardProps {
   world: World;
   initialAccountId?: string;
+  onSaved?(deliverable: Deliverable): void;
   onClose(): void;
 }
 
@@ -40,7 +41,7 @@ function stepPosition(step: WizardStep): number {
   return Math.max(0, WIZARD_STEPS.findIndex((item) => item.id === step));
 }
 
-export function DeliverableWizard({ world, initialAccountId, onClose }: DeliverableWizardProps) {
+export function DeliverableWizard({ world, initialAccountId, onSaved, onClose }: DeliverableWizardProps) {
   const [step, setStep] = useState<WizardStep>("pick");
   const [agentId, setAgentId] = useState<AgentId>("meeting_brief");
   const [accountId, setAccountId] = useState(initialAccountId ?? world.companies[0]?.id ?? "");
@@ -92,17 +93,21 @@ export function DeliverableWizard({ world, initialAccountId, onClose }: Delivera
     setBusy(true);
     setError(null);
     try {
+      const localSaved = saveDeliverable(preview);
+      setPreview(localSaved);
+      onSaved?.(localSaved);
       if (hasDeliverablesBackend()) {
         try {
-          const record = await saveStoredDeliverable(preview);
-          setPreview({ ...preview, backendRecordId: record.id });
+          const record = await saveStoredDeliverable(localSaved);
+          const persisted = recordToDeliverable(record);
+          saveDeliverable(persisted);
+          setPreview(persisted);
+          onSaved?.(persisted);
           setNotice(null);
         } catch {
-          saveDeliverable(preview);
           setNotice("Saved locally — backend program memory is unavailable.");
         }
       } else {
-        saveDeliverable(preview);
         setNotice("Saved locally — backend program memory is not configured.");
       }
       setStep("saved");
@@ -233,7 +238,7 @@ export function DeliverableWizard({ world, initialAccountId, onClose }: Delivera
                 ))}
               </ul>
             </div>
-            <div className="demo-action-modal-actions">
+            <div className="demo-action-modal-actions deliverable-wizard-actions">
               <button type="button" onClick={() => void saveToLibrary()} disabled={busy}>
                 {busy ? "Saving..." : "Save to library"}
               </button>
