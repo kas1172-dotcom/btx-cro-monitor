@@ -36,6 +36,15 @@ jobs:
       - name: Deploy to Fly.io (staging app only)
         uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Verify Fly.io token
+        run: |
+          if [ -z "$FLY_API_TOKEN" ]; then
+            echo "::error::Missing repo secret FLY_API_TOKEN. Create one in GitHub Settings -> Secrets and variables -> Actions with Fly deploy access to btx-platform-staging."
+            exit 1
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
       - name: Run migrations against staging
         run: flyctl ssh console --app btx-platform-staging -C "alembic upgrade head"
         env:
