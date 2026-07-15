@@ -24,6 +24,7 @@ import { Prospecting } from "./ui/surfaces/Prospecting.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
+import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
@@ -150,6 +151,7 @@ export function App() {
                 ))}
               </select>
             </label>}
+            <CockpitAuthStatus />
           </div>
         </header>
       )}

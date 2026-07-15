@@ -1,4 +1,4 @@
-import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 import type React from "react";
 
 const env = (import.meta as ImportMeta & { env?: { VITE_CLERK_PUBLISHABLE_KEY?: string } }).env;
@@ -23,5 +23,35 @@ export function CockpitAuthGate({ children }: { children: React.ReactNode }) {
         <RedirectToSignIn />
       </SignedOut>
     </ClerkProvider>
+  );
+}
+
+export function CockpitAuthStatus() {
+  if (!CLERK_PUBLISHABLE_KEY) {
+    return (
+      <div className="clerk-auth-status not-configured" role="status">
+        <span>Auth</span>
+        <strong>Clerk not configured</strong>
+      </div>
+    );
+  }
+  return (
+    <SignedIn>
+      <CockpitAuthStatusInner />
+    </SignedIn>
+  );
+}
+
+function CockpitAuthStatusInner() {
+  const { isLoaded, user } = useUser();
+  const identity = !isLoaded
+    ? "Checking session"
+    : user?.primaryEmailAddress?.emailAddress ?? user?.fullName ?? "Signed in";
+  return (
+    <div className="clerk-auth-status" role="status" aria-label="Clerk sign-in status">
+      <span>Clerk</span>
+      <strong>{identity}</strong>
+      <UserButton />
+    </div>
   );
 }
