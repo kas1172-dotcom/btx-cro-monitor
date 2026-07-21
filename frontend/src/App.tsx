@@ -21,6 +21,7 @@ import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx
 import { DeliverableLibrary } from "./ui/surfaces/DeliverableLibrary.tsx";
 import { HubSpotViewer } from "./ui/surfaces/HubSpotViewer.tsx";
 import { Prospecting } from "./ui/surfaces/Prospecting.tsx";
+import { TripPlanner } from "./ui/surfaces/TripPlanner.tsx";
 import { DeliverableWizard } from "./ui/deliverables/DeliverableWizard.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
@@ -100,6 +101,7 @@ export function App() {
       case "accounts": return <Account360 world={world} />;
       case "ask": return <AskSurface world={world} />;
       case "prospecting": return <Prospecting world={world} />;
+      case "trip_planner": return <TripPlanner world={world} />;
       case "map": return viewWorld ? (
         <Suspense fallback={<div className="loading">loading map…</div>}>
           <ProspectMap world={viewWorld} />
@@ -115,8 +117,7 @@ export function App() {
     }
   };
   const counts = Object.fromEntries(
-    (["brief", "work_queue", "accounts", "ask", "prospecting", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"] as TabId[])
-      .map((surface) => [surface, countForSurface(surface, world, memory)]),
+    ALL_SURFACES.map((surface) => [surface.id, countForSurface(surface.id, world, memory)]),
   ) as Partial<Record<TabId, number>>;
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;

@@ -55,7 +55,7 @@ const richAccount = world.companies.find((company) =>
 assert(richAccount, "Demo data must contain an account with a contact and a validated signal.");
 
 // 1. Every wizard template generates a valid deliverable from its prefill.
-assert(DELIVERABLE_TEMPLATE_OPTIONS.length === 6, "Wizard must expose exactly the six templates.");
+assert(DELIVERABLE_TEMPLATE_OPTIONS.length === 8, "Wizard must expose the eight canonical demo templates.");
 for (const option of DELIVERABLE_TEMPLATE_OPTIONS) {
   const prefill = buildWizardPrefill(option.id, world, option.requiresAccount ? richAccount!.id : undefined);
   const violations = validatePrefillProvenance(prefill.fields);

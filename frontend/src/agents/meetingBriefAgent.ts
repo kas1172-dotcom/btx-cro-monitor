@@ -5,6 +5,7 @@ import { PROFILE } from "../app/config.ts";
 import { scoreFit } from "../engine/decision/fit.ts";
 import { healthLabel, pipelineHealth } from "../engine/decision/health.ts";
 import { actionLabel } from "../app/actionLabels.ts";
+import { displayLabel } from "../app/displayLabels.ts";
 import { signalEvidenceForCompany, signalFigureContext } from "../app/signalProvenance.ts";
 import { provenanceForRecord } from "../app/provenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
@@ -115,7 +116,7 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
         id: "relationship",
         heading: "Relationship & History",
         blocks: [
-          { kind: "table", columns: ["Status", "Contact", "Open pipeline", "Pipeline health", "Source"], rows: [[String(f.accountStatus), String(f.contact), money(Number(f.openPipelineValue)), String(f.pipelineHealth), `${f.contactSource} / ${f.opportunitySource}`]] },
+          { kind: "table", columns: ["Status", "Contact", "Open pipeline", "Pipeline health", "Source"], rows: [[displayLabel(String(f.accountStatus)), String(f.contact), money(Number(f.openPipelineValue)), String(f.pipelineHealth), `${f.contactSource} / ${f.opportunitySource}`]] },
         ],
       },
       {

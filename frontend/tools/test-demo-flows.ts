@@ -198,7 +198,7 @@ const artifactWorld = await loadArtifactFixtureWorld();
 const hybridWorld = await loadHybridFixtureWorld();
 
 assert(!world.companies.some((company) => company.name === PROFILE.name), "Client company must not appear as a scored account");
-assert(AREA_MARKET_SCOPING.map && AREA_MARKET_SCOPING.programs, "Map and program views must be market-scoped");
+assert(AREA_MARKET_SCOPING.map && AREA_MARKET_SCOPING.trip_planner && AREA_MARKET_SCOPING.programs, "Map, Trip Planner, and program views must be market-scoped");
 assert(!AREA_MARKET_SCOPING.analysis && !AREA_MARKET_SCOPING.settings && !AREA_MARKET_SCOPING.accounts, "Analysis, settings, and accounts must not be market-scoped");
 assert(!isMarketScopedView({ activeTab: "map", brainResponse: null, activeDeliverable: { id: "doc" }, activeAnalysisSpec: null }), "Deliverables must hide market dropdown and use all-markets scope");
 
@@ -241,8 +241,15 @@ assert(maxScore <= 97, `score cap exceeded: ${maxScore}`);
 const itinerary = await runAgent("itinerary", { city: "Austin", startDate: "2026-07-07", endDate: "2026-07-09", focus: "mixed" }, world);
 assert(itinerary.entityIds.length >= 6, "Austin itinerary has fewer than 6 stops");
 assert(itinerary.sources.length > 0, "Austin itinerary missing provenance");
+assert(itinerary.brainArea === "trip_planner", "Itinerary must belong to the Trip Planner tab.");
 const mapStops = itinerary.sections.flatMap((section) => section.blocks).filter((block) => block.kind === "map-ref").flatMap((block) => block.stops ?? []);
 assert(mapStops.every((stop) => !/^\d+\.\s/.test(stop.label)), "Itinerary map labels must not duplicate pin numbers");
+const firstStopBrief = await runAgent("meeting_brief", { accountId: itinerary.entityIds[0] }, world);
+const tripBrief = await runAgent("trip_brief", { itinerary, meetingBriefs: [firstStopBrief], logistics: "Confirm meeting owners before departure." }, world);
+assert(tripBrief.brainArea === "trip_planner" && tripBrief.sections.some((section) => section.id === "itinerary-logistics"), "Trip brief must compile itinerary logistics.");
+
+const analysisAnnotation = await runAgent("analysis_annotation", { metric: "revenue", quarter: "Q2 2026", instructions: "Annotate the saved heatmap figure." }, world);
+assert(analysisAnnotation.type === "analysis_view" && analysisAnnotation.brainArea === "analysis", "Analysis annotation must save as an analysis deliverable.");
 
 const memo = await runAgent("weekly_memo", { title: "Weekly CRO Memo" }, world);
 assert(memo.sections.length >= 4, "Weekly memo missing sections");
@@ -282,7 +289,7 @@ assert(DELIVERABLE_DOWNLOAD_FORMATS.itinerary.includes("ics"), "Itinerary missin
 assert(DELIVERABLE_DOWNLOAD_FORMATS.analysis_view.includes("xlsx") && DELIVERABLE_DOWNLOAD_FORMATS.analysis_view.includes("csv"), "Analysis view missing spreadsheet downloads");
 assert(DELIVERABLE_DOWNLOAD_FORMATS.board_deck.includes("pptx"), "Board deck missing PPTX download");
 assert(instructedOutreach.sources.some((source) => source.source === "user instructions" && source.reason.includes("ITAR")), "Deliverable instructions were not recorded in provenance");
-const deliverableText = [itinerary, memo, outreach]
+const deliverableText = [itinerary, tripBrief, analysisAnnotation, memo, outreach]
   .flatMap((deliverable) => deliverable.sections)
   .flatMap((section) => section.blocks)
   .map((block) => {

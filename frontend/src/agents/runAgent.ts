@@ -11,6 +11,7 @@ import { outreachAgent } from "./outreachAgent.ts";
 import { analysisAnnotationAgent } from "./analysisAnnotationAgent.ts";
 import { salesPitchAgent } from "./salesPitchAgent.ts";
 import { capabilitiesAssessmentAgent } from "./capabilitiesAssessmentAgent.ts";
+import { tripBriefAgent } from "./tripBriefAgent.ts";
 
 const AGENTS = {
   weekly_memo: weeklyMemoAgent,
@@ -21,6 +22,7 @@ const AGENTS = {
   analysis_annotation: analysisAnnotationAgent,
   sales_pitch: salesPitchAgent,
   capabilities_assessment: capabilitiesAssessmentAgent,
+  trip_brief: tripBriefAgent,
 };
 
 export type AgentId = keyof typeof AGENTS;

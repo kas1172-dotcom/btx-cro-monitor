@@ -21,6 +21,8 @@ import {
   type DownloadFormat,
 } from "../../deliverables/export.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
+import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
+import type { ChartSpec } from "../../metrics/types.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -38,6 +40,10 @@ type TaskDialog =
   | { status: "creating"; subject: string; body: string; target: TaskTarget }
   | { status: "created"; subject: string; body: string; target: TaskTarget; id: string; recordUrl: string }
   | { status: "error"; subject: string; body: string; target: TaskTarget; error: string };
+
+function isChartSpec(value: unknown): value is ChartSpec {
+  return Boolean(value) && typeof value === "object" && typeof (value as { metric?: unknown }).metric === "string" && typeof (value as { viz?: unknown }).viz === "string";
+}
 
 function editableSections(sections: DeliverableSection[]): DeliverableSection[] {
   return sections.map((section) => ({
@@ -340,7 +346,16 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
                 </table>
               );
             }
-            if (block.kind === "chart-spec") return <pre key={`${section.id}-${index}`}>{JSON.stringify(block.spec, null, 2)}</pre>;
+            if (block.kind === "chart-spec") {
+              return (
+                <div key={`${section.id}-${index}`} className="document-chart-figure">
+                  <strong>{block.title}</strong>
+                  {world && isChartSpec(block.spec)
+                    ? <AnalysisFigure spec={block.spec} world={world} interactive={false} />
+                    : <pre>{JSON.stringify(block.spec, null, 2)}</pre>}
+                </div>
+              );
+            }
             if (block.kind === "map-ref" && block.stops?.length) {
               const center: [number, number] = [
                 block.stops.reduce((sum, stop) => sum + stop.lat, 0) / block.stops.length,

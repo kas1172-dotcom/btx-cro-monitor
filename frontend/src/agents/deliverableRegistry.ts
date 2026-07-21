@@ -3,8 +3,6 @@ import type { AgentId } from "./runAgent.ts";
 /**
  * The template catalog the deliverable wizard exposes. Each entry maps to a
  * registered deliverable agent; the wizard never invents templates of its own.
- * Itinerary and analysis-annotation agents stay out of this catalog — they
- * belong to the trip-planner and figure-hub workflows.
  */
 export interface DeliverableTemplateOption {
   id: AgentId;
@@ -53,6 +51,20 @@ export const DELIVERABLE_TEMPLATE_OPTIONS: DeliverableTemplateOption[] = [
     label: "Newsletter memo",
     description: "An internal newsletter-style memo on what changed and where attention should go.",
     requiresAccount: false,
+  },
+  {
+    id: "itinerary",
+    label: "Field itinerary",
+    description: "A calendar-ready market visit plan with map stops and per-stop talking points.",
+    requiresAccount: false,
+    defaultInstructions: "Keep the trip practical and prioritize validated account context.",
+  },
+  {
+    id: "analysis_annotation",
+    label: "Analysis figure",
+    description: "A saved analysis annotation with a figure spec for spreadsheet, PDF, and CSV export.",
+    requiresAccount: false,
+    requiresQuarter: true,
   },
 ];
 

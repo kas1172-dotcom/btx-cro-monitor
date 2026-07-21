@@ -1,7 +1,7 @@
 import type { World } from "../app/useWorld.ts";
 import type { AgentId } from "../agents/runAgent.ts";
 import { deliverableTemplateOption } from "../agents/deliverableRegistry.ts";
-import { latestCompletedQuarter } from "../app/dateDefaults.ts";
+import { defaultDateAnchor, defaultTripWindow, latestCompletedQuarter } from "../app/dateDefaults.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../app/signalProvenance.ts";
 import type { Signal } from "../engine/signals/contract.ts";
 
@@ -133,7 +133,7 @@ export function buildWizardPrefill(agentId: AgentId, world: World, accountId?: s
   }
 
   if (option.requiresQuarter) {
-    const quarter = latestCompletedQuarter();
+    const quarter = latestCompletedQuarter(defaultDateAnchor(world));
     inputs.quarter = quarter;
     fields.push({
       field: "quarter",
@@ -149,6 +149,55 @@ export function buildWizardPrefill(agentId: AgentId, world: World, accountId?: s
   if (option.defaultInstructions) inputs.instructions = option.defaultInstructions;
   if (agentId === "board_deck") inputs.audience = "board";
   if (agentId === "weekly_memo") inputs.title = "Weekly CRO Memo";
+  if (agentId === "itinerary") {
+    const tripWindow = defaultTripWindow(defaultDateAnchor(world));
+    const city = world.city ?? world.companies.find((company) => company.location.city)?.location.city ?? "Austin";
+    inputs.city = city;
+    inputs.startDate = tripWindow.startDate;
+    inputs.endDate = tripWindow.endDate;
+    inputs.focus = "mixed";
+    fields.push(
+      {
+        field: "city",
+        label: "Market",
+        value: city,
+        scope: "market",
+        source: "Account geography",
+        method: "market_cluster_default",
+        confidence: null,
+      },
+      {
+        field: "dateWindow",
+        label: "Trip window",
+        value: `${tripWindow.startDate} to ${tripWindow.endDate}`,
+        scope: "market",
+        source: "Monitor run date",
+        method: "next_available_window",
+        confidence: null,
+      },
+      {
+        field: "focus",
+        label: "Focus",
+        value: "Mixed prospect and customer coverage",
+        scope: "market",
+        source: MARKET_SOURCE,
+        method: "market_default",
+        confidence: null,
+      },
+    );
+  }
+  if (agentId === "analysis_annotation") {
+    inputs.metric = "revenue";
+    fields.push({
+      field: "metric",
+      label: "Metric",
+      value: "Revenue",
+      scope: "market",
+      source: "Metric catalog",
+      method: "default_metric",
+      confidence: null,
+    });
+  }
 
   return { agentId, inputs, fields };
 }

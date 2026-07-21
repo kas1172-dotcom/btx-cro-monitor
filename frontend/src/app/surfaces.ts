@@ -2,7 +2,7 @@ import type { World } from "./useWorld.ts";
 import type { MemoryState } from "../memory/types.ts";
 
 export type CoreTab = "brief" | "work_queue" | "accounts" | "ask";
-export type AnalyticalTab = "prospecting" | "map" | "analysis" | "capacity" | "programs";
+export type AnalyticalTab = "prospecting" | "trip_planner" | "map" | "analysis" | "capacity" | "programs";
 export type UtilityTab = "deliverables" | "hubspot" | "settings";
 export type TabId = CoreTab | AnalyticalTab | UtilityTab;
 
@@ -23,6 +23,7 @@ export const CORE_SURFACES: SurfaceSpec[] = [
 
 export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
   { id: "prospecting", label: "Prospecting", group: "analytical", componentId: "surface-prospecting", title: "New business targets, buying signals, outreach queues, and list imports." },
+  { id: "trip_planner", label: "Trip Planner", group: "analytical", componentId: "surface-trip-planner", title: "Field itinerary planning with map context, account fit, and calendar-ready deliverables." },
   { id: "map", label: "Map", group: "analytical", componentId: "surface-map", title: "Geographic account and prospect map." },
   { id: "analysis", label: "Analysis", group: "analytical", componentId: "surface-analysis-dashboard", title: "Pipeline, bookings, backlog, book-to-bill, win/loss, and utilization analysis." },
   { id: "capacity", label: "Capacity", group: "analytical", componentId: "surface-capacity-assessment", title: "Machining capacity against backlog and demand." },
@@ -37,7 +38,7 @@ export const UTILITY_SURFACES: SurfaceSpec[] = [
 
 export const ALL_SURFACES = [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES];
 
-export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "prospecting", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"];
+export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "prospecting", "trip_planner", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"];
 
 export const TAB_LABELS: Record<TabId, string> = {
   brief: "Today's Brief",
@@ -45,6 +46,7 @@ export const TAB_LABELS: Record<TabId, string> = {
   accounts: "Accounts",
   ask: "Ask",
   prospecting: "Prospecting",
+  trip_planner: "Trip Planner",
   map: "Map",
   analysis: "Analysis",
   capacity: "Capacity",
@@ -67,6 +69,8 @@ export function countForSurface(surface: TabId, world: World | null, memory: Mem
       return undefined;
     case "prospecting":
       return world.companies.filter((company) => company.business_motion === "prospect_new_business" || company.account_status === "target_prospect" || company.account_status === "new_logo").length;
+    case "trip_planner":
+      return memory?.deliverables.filter((deliverable) => deliverable.type === "itinerary").length ?? world.prospects.length;
     case "map":
       return world.prospects.length;
     case "analysis":
