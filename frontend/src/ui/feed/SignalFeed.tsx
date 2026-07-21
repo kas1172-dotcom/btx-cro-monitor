@@ -94,12 +94,18 @@ function whyItMatters(world: World, signal: Signal): string {
 
 function isLockheedSignal(signal: Signal): boolean {
   const text = `${signal.id} ${signal.entities.join(" ")} ${signal.artifact?.headline ?? ""}`.toLowerCase();
-  return text.includes("lockheed") && text.includes("f-35");
+  return text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s");
 }
 
 function isSaronicSignal(signal: Signal): boolean {
   const text = `${signal.id} ${signal.entities.join(" ")} ${signal.artifact?.headline ?? ""}`.toLowerCase();
   return text.includes("saronic");
+}
+
+function journeyPriority(signal: Signal): number {
+  if (isLockheedSignal(signal)) return 0;
+  if (isSaronicSignal(signal)) return 1;
+  return 2;
 }
 
 function filterRow(filter: Filter, row: SignalRow): boolean {
@@ -257,7 +263,7 @@ export function SignalFeed({ world }: { world: World }) {
   const visible = rows
     .filter((row) => filterRow(filter, row))
     .sort((a, b) => {
-      if (sort === "priority") return PRIORITY_RANK[b.priority] - PRIORITY_RANK[a.priority] || b.impact.total - a.impact.total;
+      if (sort === "priority") return journeyPriority(a.signal) - journeyPriority(b.signal) || PRIORITY_RANK[b.priority] - PRIORITY_RANK[a.priority] || b.impact.total - a.impact.total;
       if (sort === "newest") return b.signal.detected_at.localeCompare(a.signal.detected_at);
       if (sort === "confidence") return b.signal.confidence - a.signal.confidence;
       return b.impact.total - a.impact.total || b.signal.confidence - a.signal.confidence;

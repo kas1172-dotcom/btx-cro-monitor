@@ -1,5 +1,18 @@
 [
   {
+    "account_id": "lockheed-martin-aeronautics",
+    "crm_account_name": "Lockheed Martin Aeronautics",
+    "owner": "Marcus Lee",
+    "account_tier": "Strategic",
+    "last_activity_at": "2026-07-15T12:00:00.000Z",
+    "next_step": "Prepare F-35 lot 19 capacity review and confirm inspection requirements",
+    "relationship_health": "active",
+    "open_pipeline_value": 2450000,
+    "source_type": "seeded_baseline",
+    "source_name": "Seeded CRM baseline",
+    "source_mode": "seeded_baseline"
+  },
+  {
     "account_id": "lonestar-aero-systems",
     "crm_account_name": "Lonestar Aero Systems",
     "owner": "Marcus Lee",

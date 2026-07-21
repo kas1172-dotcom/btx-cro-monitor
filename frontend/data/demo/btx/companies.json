@@ -1,5 +1,49 @@
 [
   {
+    "id": "lockheed-martin-aeronautics",
+    "name": "Lockheed Martin Aeronautics",
+    "canonical_account_id": "lockheed-martin-aeronautics",
+    "relationship": "customer",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "location": {
+      "city": "Fort Worth",
+      "lat": 32.7596,
+      "lon": -97.3422,
+      "address": "1 Lockheed Blvd",
+      "state": "TX",
+      "postal_code": "76108",
+      "country": "USA"
+    },
+    "domain": "lockheedmartin.com",
+    "website_url": "https://www.lockheedmartin.com",
+    "linkedin_url": "https://www.linkedin.com/company/lockheed-martin",
+    "source_url": "https://cage.report/SAM/81755",
+    "needs": [
+      "5-axis CNC",
+      "AS9100",
+      "ITAR",
+      "build-to-print",
+      "inspection"
+    ],
+    "aliases": [
+      "Lockheed Martin Corporation",
+      "Lockheed Martin",
+      "Lockheed"
+    ],
+    "domains": [
+      "lockheedmartin.com"
+    ],
+    "known_programs": [
+      "F-35 Lightning II"
+    ],
+    "cage_code": "81755",
+    "uei": "CQWLW9XRQTH5",
+    "source_type": "seeded_baseline",
+    "source_name": "Seeded CRM baseline",
+    "source_mode": "seeded_baseline"
+  },
+  {
     "id": "lonestar-aero-systems",
     "name": "Lonestar Aero Systems",
     "relationship": "customer",

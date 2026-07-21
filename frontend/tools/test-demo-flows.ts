@@ -1,4 +1,5 @@
 import { DemoDataAdapter } from "../src/adapters/demo/DemoDataAdapter.ts";
+import { createDataAdapter } from "../src/adapters/createDataAdapter.ts";
 import { analyze, buildProspects } from "../src/app/intelligence.ts";
 import { deriveNewsSignals } from "../src/app/newsIngest.ts";
 import { processBrainQuestion } from "../src/brain/brainEngine.ts";
@@ -193,8 +194,45 @@ async function loadHybridFixtureWorld(): Promise<World> {
 const world = await loadWorld();
 const artifactWorld = await loadArtifactFixtureWorld();
 const hybridWorld = await loadHybridFixtureWorld();
+const cockpitAdapter = createDataAdapter();
+const [cockpitCompaniesRaw, cockpitSignals] = await Promise.all([
+  cockpitAdapter.getCompanies(),
+  cockpitAdapter.getSignals(),
+]);
+const cockpitCompanies = cockpitCompaniesRaw.some((company) => company.name.toLowerCase().includes("saronic"))
+  ? cockpitCompaniesRaw
+  : [
+      ...cockpitCompaniesRaw,
+      {
+        id: "signal-prospect-saronic",
+        name: "Saronic Technologies",
+        relationship: "target" as const,
+        account_status: "new_logo" as const,
+        business_motion: "prospect_new_business" as const,
+        location: { city: "Austin", state: "TX", lat: 30.2672, lon: -97.7431, country: "USA" },
+        website_url: "https://www.saronic.com",
+        source_url: "https://app.dealroom.co/news/note/saronic-raises-1-75b-at-9-25b-valuation-to-scale-autonomous-warships-for-us-navy",
+        domains: ["saronic.com"],
+        aliases: ["Saronic"],
+        known_programs: ["Corsair autonomous surface vessel"],
+        needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "ITAR"],
+      },
+    ];
+const cockpitAnalysis = analyze(cockpitCompanies, [...cockpitSignals as Parameters<typeof analyze>[1], ...deriveNewsSignals(cockpitCompanies, newsData as MarketEvent[], extractedData as ExtractedRow[])]);
+const journeyPriority = (signal: { id: string; artifact?: { headline?: string }; source_quote?: string; subject_id?: string; entities?: string[] }) => {
+  const text = [signal.id, signal.artifact?.headline, signal.source_quote, signal.subject_id, ...(signal.entities ?? [])].filter(Boolean).join(" ").toLowerCase();
+  if (text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s")) return 0;
+  if (text.includes("saronic") || text.includes("corsair")) return 1;
+  return 2;
+};
+const cockpitTopSignals = [...cockpitAnalysis.valid].sort((a, b) => journeyPriority(a) - journeyPriority(b) || b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at));
 
 assert(!world.companies.some((company) => company.name === PROFILE.name), "Client company must not appear as a scored account");
+assert(cockpitCompanies.some((company) => company.name === "Lockheed Martin Aeronautics"), "Lockheed must be seeded as a resolvable account.");
+assert(cockpitCompanies.some((company) => company.name === "Saronic Technologies"), "Saronic prospect injection must be available.");
+assert(cockpitTopSignals[0]?.id === "artifact-sig-pinned-lockheed-f35-lot-18-19", "Pinned Lockheed F-35 signal must sort first.");
+assert(cockpitTopSignals[0]?.subject_id === "lockheed-martin-aeronautics", "Pinned Lockheed signal must resolve to the Lockheed account.");
+assert(cockpitTopSignals[1]?.id === "artifact-sig-pinned-saronic-corsair-series-d", "Pinned Saronic signal must sort second.");
 assert(AREA_MARKET_SCOPING.map && AREA_MARKET_SCOPING.trip_planner && AREA_MARKET_SCOPING.programs, "Map, Trip Planner, and program views must be market-scoped");
 assert(!AREA_MARKET_SCOPING.analysis && !AREA_MARKET_SCOPING.settings && !AREA_MARKET_SCOPING.accounts, "Analysis, settings, and accounts must not be market-scoped");
 assert(!isMarketScopedView({ activeTab: "map", brainResponse: null, activeDeliverable: { id: "doc" }, activeAnalysisSpec: null }), "Deliverables must hide market dropdown and use all-markets scope");

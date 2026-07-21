@@ -105,7 +105,7 @@ function demoPriority(signal: Signal): number {
     signal.subject_id,
     signal.entities.join(" "),
   ].filter(Boolean).join(" ").toLowerCase();
-  if (text.includes("lockheed") || text.includes("f-35")) return 0;
+  if (text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s")) return 0;
   if (text.includes("saronic") || text.includes("corsair")) return 1;
   return 2;
 }

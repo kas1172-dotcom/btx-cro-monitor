@@ -1,5 +1,21 @@
 [
   {
+    "id": "opp-lockheed-f35-001",
+    "company_id": "lockheed-martin-aeronautics",
+    "name": "F-35 lot 19 precision bracket capacity review",
+    "account_status": "current_customer",
+    "business_motion": "grow_existing_business",
+    "value": 2450000,
+    "stage": "qualified",
+    "source_url": "https://cage.report/SAM/81755",
+    "contract_url": "https://breakingdefense.com/2025/09/lockheed-pentagon-finalize-deal-for-296-f-35s/",
+    "document_url": "https://demo.btx.example/documents/opportunities/lockheed-f35-lot19.pdf",
+    "close_date": "2026-09-30",
+    "source_type": "seeded_baseline",
+    "source_name": "Seeded CRM baseline",
+    "source_mode": "seeded_baseline"
+  },
+  {
     "id": "opp-0001",
     "company_id": "lonestar-aero-systems",
     "name": "T408 structural fitting",

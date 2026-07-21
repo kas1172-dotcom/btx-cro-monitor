@@ -1,5 +1,15 @@
 [
   {
+    "id": "con-lockheed-0001",
+    "company_id": "lockheed-martin-aeronautics",
+    "name": "Dana Whitaker",
+    "title": "Supplier Development Lead, F-35 Production",
+    "email": "dana.whitaker@lockheedmartin.example.com",
+    "source_type": "seeded_baseline",
+    "source_name": "Seeded CRM baseline",
+    "source_mode": "seeded_baseline"
+  },
+  {
     "id": "con-0001",
     "company_id": "lonestar-aero-systems",
     "name": "Hannah Price",
