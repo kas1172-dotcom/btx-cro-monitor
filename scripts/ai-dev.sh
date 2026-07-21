@@ -214,7 +214,7 @@ You are my senior product, architecture, and code reviewer.
 Read:
 - AGENTS.md if it exists
 - CLAUDE.md if it exists
-- docs/AI_DECISIONS.md if it exists
+- docs/WIZARD_STACK_RECONCILE.md if architecture-porting context is needed
 - $RUN_DIR/request.md
 - git diff
 
@@ -264,7 +264,7 @@ You are my senior product architect and prompt compiler for Codex.
 Read:
 - AGENTS.md
 - CLAUDE.md
-- docs/AI_DECISIONS.md if it exists
+- docs/WIZARD_STACK_RECONCILE.md if architecture-porting context is needed
 - $RUN_DIR/request.md
 
 Do not write application code.
@@ -338,7 +338,7 @@ You are my senior product, architecture, and code reviewer.
 Review:
 - AGENTS.md
 - CLAUDE.md
-- docs/AI_DECISIONS.md if it exists
+- docs/WIZARD_STACK_RECONCILE.md if architecture-porting context is needed
 - $RUN_DIR/request.md
 - $RUN_DIR/codex-prompt.md
 - $RUN_DIR/test-log.md if it exists

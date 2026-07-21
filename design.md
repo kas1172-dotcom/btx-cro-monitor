@@ -119,5 +119,5 @@ export theme (decks, PDFs, PPTX, the retention/earnings heat map export). This i
 intentionally a different visual system for a different artifact class and is
 excluded from the raw-hex guard and from the "every surface" retrofit requirement
 in this pass. Do not consolidate the two without a separate, deliberate decision —
-see the follow-up already flagged in `docs/IA_RESTRUCTURE_PLAN.html`'s Analysis
+see the current cockpit structure in `docs/DEMO_SCRIPT.md` and `docs/WIZARD_STACK_RECONCILE.md`'s Analysis
 section.
