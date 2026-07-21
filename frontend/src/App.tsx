@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { useStore, setState, closeDemoAction, goHome, clearTourRequest } from "./store/store.ts";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useStore, setState, closeDemoAction, goHome, clearTourRequest, closeDeliverableWizard } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES } from "./app/config.ts";
 import { Dossier } from "./ui/company/Dossier.tsx";
@@ -21,10 +21,12 @@ import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx
 import { DeliverableLibrary } from "./ui/surfaces/DeliverableLibrary.tsx";
 import { HubSpotViewer } from "./ui/surfaces/HubSpotViewer.tsx";
 import { Prospecting } from "./ui/surfaces/Prospecting.tsx";
+import { DeliverableWizard } from "./ui/deliverables/DeliverableWizard.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
 import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
+import type { Deliverable } from "./deliverables/types.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
@@ -47,8 +49,9 @@ function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" |
 }
 
 export function App() {
-  const { city, activeHome, activeSettings, activeTab, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested } = useStore();
+  const { city, activeHome, activeSettings, activeTab, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested, deliverableWizardRequest } = useStore();
   const [workItemStatus, setWorkItemStatus] = useState("");
+  const handledWizardSaveIds = useRef(new Set<number>());
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global — dashboard, graph, and the dossier
@@ -119,6 +122,44 @@ export function App() {
   const rightPanelOpen = dossierOpen || contextPanelOpen;
   const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeTab))?.label ?? "Cockpit";
   const backendStatus = liveDataStatus(world);
+
+  async function handleWizardCommitted(deliverable: Deliverable) {
+    const request = deliverableWizardRequest;
+    if (!request?.afterSave || handledWizardSaveIds.current.has(request.id)) return;
+    handledWizardSaveIds.current.add(request.id);
+    if (request.afterSave.kind === "create_work_item") {
+      const artifactRef = deliverable.backendRecordId ?? deliverable.id;
+      setWorkItemStatus("Creating work item...");
+      try {
+        await createWorkItem({ ...request.afterSave.draft, evidence: artifactRef });
+        if (request.afterSave.openDeliverable) {
+          closeDeliverableWizard();
+          setState({
+            activeDeliverable: deliverable,
+            activeDeliverableOrigin: "generation",
+            activeTab: "deliverables",
+            activeCompanyId: null,
+            brainResponse: null,
+            activeAnalysisSpec: null,
+          });
+        }
+        setWorkItemStatus("Created work item.");
+      } catch (error) {
+        setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
+        if (request.afterSave.openDeliverable) {
+          closeDeliverableWizard();
+          setState({
+            activeDeliverable: deliverable,
+            activeDeliverableOrigin: "generation",
+            activeTab: "deliverables",
+            activeCompanyId: null,
+            brainResponse: null,
+            activeAnalysisSpec: null,
+          });
+        }
+      }
+    }
+  }
 
   return (
     <AppShell
@@ -236,6 +277,18 @@ export function App() {
           )}
           {tourRequested && world && (
             <TourHud world={world} autoStart onDismiss={clearTourRequest} />
+          )}
+          {world && deliverableWizardRequest && (
+            <DeliverableWizard
+              key={deliverableWizardRequest.id}
+              world={world}
+              initialAgentId={deliverableWizardRequest.agentId}
+              initialAccountId={deliverableWizardRequest.accountId}
+              initialInstructions={deliverableWizardRequest.instructions}
+              startStep={deliverableWizardRequest.startStep}
+              onCommitted={handleWizardCommitted}
+              onClose={closeDeliverableWizard}
+            />
           )}
         </>
       )}

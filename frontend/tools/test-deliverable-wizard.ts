@@ -5,6 +5,7 @@ import { recordToDeliverable, type StoredDeliverable } from "../src/app/delivera
 import { DELIVERABLE_TEMPLATE_OPTIONS } from "../src/agents/deliverableRegistry.ts";
 import { runAgent } from "../src/agents/runAgent.ts";
 import { buildWizardPrefill, isAccountScopedSignal, validatePrefillProvenance } from "../src/deliverables/wizardPrefill.ts";
+import { closeDeliverableWizard, getState, openDeliverableWizard, resetUiState } from "../src/store/store.ts";
 import newsData from "../data/demo/btx/news.json";
 import extractedData from "../data/demo/btx/extracted-signals.json";
 import type { World } from "../src/app/useWorld.ts";
@@ -119,5 +120,33 @@ const roundTripped = recordToDeliverable(stored);
 assert(roundTripped.entityIds.join(",") === `${richAccount!.id},hubspot-company-secondary`, "entity_ids column must round-trip to entityIds.");
 assert(roundTripped.backendRecordId === "record-32-char-id", "Round trip must keep the backend record id.");
 assert(roundTripped.canonicalAccountId === richAccount!.id, "Round trip must keep the canonical account id.");
+
+// 6. Any surface can request a prefilled wizard without creating another route/model.
+resetUiState();
+openDeliverableWizard({
+  agentId: "meeting_brief",
+  accountId: richAccount!.id,
+  startStep: "confirm",
+  instructions: "Prepare for Lockheed call re F-35 lot 19.",
+  afterSave: {
+    kind: "create_work_item",
+    openDeliverable: true,
+    draft: {
+      title: "Prep for Lockheed call re F-35 lot 19",
+      accountName: richAccount!.name,
+      accountId: richAccount!.id,
+      sourceSignalIds: ["sig-lockheed-f35"],
+      type: "meeting_brief",
+      priority: "high",
+    },
+  },
+});
+const request = getState().deliverableWizardRequest;
+assert(request?.agentId === "meeting_brief", "Wizard request must carry the prefilled agent.");
+assert(request?.accountId === richAccount!.id, "Wizard request must carry the resolved account.");
+assert(request?.startStep === "confirm", "Wizard request must support starting on confirm.");
+assert(request?.afterSave?.draft.title === "Prep for Lockheed call re F-35 lot 19", "Wizard request must preserve the post-save work item.");
+closeDeliverableWizard();
+assert(getState().deliverableWizardRequest === null, "Wizard request must clear on close.");
 
 console.log(`deliverable wizard ok: ${DELIVERABLE_TEMPLATE_OPTIONS.length} templates generate with enforced provenance; entity_ids round-trips`);

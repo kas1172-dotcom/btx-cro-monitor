@@ -2,21 +2,18 @@ import { useMemo, useState } from "react";
 import news from "../../../data/demo/btx/news.json";
 import { importProspectsToHubSpot } from "../../app/backendApi.ts";
 import { CONFIG } from "../../app/config.ts";
-import { saveStoredDeliverable } from "../../app/deliverablesApi.ts";
 import type { World } from "../../app/useWorld.ts";
 import { createWorkItem } from "../../app/workItems.ts";
 import type { MarketEvent } from "../../engine/brain/entities.ts";
 import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
 import { PORTFOLIO_SIGNAL_SUBJECT_ID, SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
 import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
-import { runAgent } from "../../agents/runAgent.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
 import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
-import { saveDeliverable } from "../../memory/localMemory.ts";
-import { setState } from "../../store/store.ts";
+import { openDeliverableWizard } from "../../store/store.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState } from "../primitives.tsx";
@@ -157,43 +154,31 @@ export function SignalFeed({ world }: { world: World }) {
     setStatusBySignalId((current) => ({ ...current, [signalId]: value }));
   }
 
-  async function createLockheedPrep(signal: Signal): Promise<void> {
+  function createLockheedPrep(signal: Signal): void {
     const company = world.companies.find((item) => item.id === signal.subject_id || item.canonical_account_id === signal.subject_id);
     if (!company) {
       setSignalStatus(signal.id, "Lockheed account is not available in live CRM yet.");
       return;
     }
-    setBusySignalId(signal.id);
-    setSignalStatus(signal.id, "Creating meeting brief and work item...");
-    try {
-      const deliverable = await runAgent("meeting_brief", {
-        accountId: company.id,
-        instructions: `Prepare for Lockheed call re F-35 lot 19. Use this source signal: ${signalHeadline(signal)}. Evidence: ${signal.source_quote}`,
-      }, world);
-      const local = saveDeliverable(deliverable);
-      let artifactRef = signal.artifact?.item_id ?? signal.id;
-      try {
-        const stored = await saveStoredDeliverable(local);
-        artifactRef = stored.id;
-      } catch {
-        artifactRef = local.id;
-      }
-      await createWorkItem({
-        title: "Prep for Lockheed call re F-35 lot 19",
-        accountName: company.name,
-        accountId: company.id,
-        sourceSignalIds: [signal.id],
-        type: "meeting_brief",
-        priority: "high",
-        evidence: artifactRef,
-      });
-      setState({ activeDeliverable: local, activeTab: "deliverables", activeCompanyId: null, brainResponse: null, activeAnalysisSpec: null });
-      setSignalStatus(signal.id, "Meeting brief and work item created. Open Work Queue to create the HubSpot task.");
-    } catch (error) {
-      setSignalStatus(signal.id, error instanceof Error ? error.message : "Could not create Lockheed prep item.");
-    } finally {
-      setBusySignalId(null);
-    }
+    setSignalStatus(signal.id, "Opening sourced meeting-brief wizard...");
+    openDeliverableWizard({
+      agentId: "meeting_brief",
+      accountId: company.id,
+      startStep: "confirm",
+      instructions: `Prepare for Lockheed call re F-35 lot 19. Use this source signal: ${signalHeadline(signal)}. Evidence: ${signal.source_quote}`,
+      afterSave: {
+        kind: "create_work_item",
+        openDeliverable: true,
+        draft: {
+          title: "Prep for Lockheed call re F-35 lot 19",
+          accountName: company.name,
+          accountId: company.id,
+          sourceSignalIds: [signal.id],
+          type: "meeting_brief",
+          priority: "high",
+        },
+      },
+    });
   }
 
   async function createSaronicProspect(signal: Signal): Promise<void> {

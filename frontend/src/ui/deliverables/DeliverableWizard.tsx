@@ -7,10 +7,10 @@ import { buildWizardPrefill, validatePrefillProvenance, type WizardPrefill } fro
 import type { Deliverable } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
+import type { DeliverableWizardStep } from "../../store/store.ts";
 import { ScopePill } from "../primitives.tsx";
 
-type WizardStep = "pick" | "confirm" | "preview" | "saved";
-const WIZARD_STEPS: Array<{ id: WizardStep; label: string }> = [
+const WIZARD_STEPS: Array<{ id: DeliverableWizardStep; label: string }> = [
   { id: "pick", label: "Template" },
   { id: "confirm", label: "Inputs" },
   { id: "preview", label: "Preview" },
@@ -19,8 +19,12 @@ const WIZARD_STEPS: Array<{ id: WizardStep; label: string }> = [
 
 interface DeliverableWizardProps {
   world: World;
+  initialAgentId?: AgentId;
   initialAccountId?: string;
+  initialInstructions?: string;
+  startStep?: DeliverableWizardStep;
   onSaved?(deliverable: Deliverable): void;
+  onCommitted?(deliverable: Deliverable): void | Promise<void>;
   onClose(): void;
 }
 
@@ -37,15 +41,25 @@ function blockExcerpt(deliverable: Deliverable): Array<{ heading: string; text: 
   });
 }
 
-function stepPosition(step: WizardStep): number {
+function stepPosition(step: DeliverableWizardStep): number {
   return Math.max(0, WIZARD_STEPS.findIndex((item) => item.id === step));
 }
 
-export function DeliverableWizard({ world, initialAccountId, onSaved, onClose }: DeliverableWizardProps) {
-  const [step, setStep] = useState<WizardStep>("pick");
-  const [agentId, setAgentId] = useState<AgentId>("meeting_brief");
+export function DeliverableWizard({
+  world,
+  initialAgentId = "meeting_brief",
+  initialAccountId,
+  initialInstructions = "",
+  startStep = "pick",
+  onSaved,
+  onCommitted,
+  onClose,
+}: DeliverableWizardProps) {
+  const initialOption = deliverableTemplateOption(initialAgentId);
+  const [step, setStep] = useState<DeliverableWizardStep>(startStep);
+  const [agentId, setAgentId] = useState<AgentId>(initialAgentId);
   const [accountId, setAccountId] = useState(initialAccountId ?? world.companies[0]?.id ?? "");
-  const [instructions, setInstructions] = useState("");
+  const [instructions, setInstructions] = useState(initialInstructions || initialOption.defaultInstructions || "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -94,6 +108,7 @@ export function DeliverableWizard({ world, initialAccountId, onSaved, onClose }:
     setError(null);
     try {
       const localSaved = saveDeliverable(preview);
+      let committed = localSaved;
       setPreview(localSaved);
       onSaved?.(localSaved);
       if (hasDeliverablesBackend()) {
@@ -101,6 +116,7 @@ export function DeliverableWizard({ world, initialAccountId, onSaved, onClose }:
           const record = await saveStoredDeliverable(localSaved);
           const persisted = recordToDeliverable(record);
           saveDeliverable(persisted);
+          committed = persisted;
           setPreview(persisted);
           onSaved?.(persisted);
           setNotice(null);
@@ -108,8 +124,9 @@ export function DeliverableWizard({ world, initialAccountId, onSaved, onClose }:
           setNotice("Saved locally — backend program memory is unavailable.");
         }
       } else {
-        setNotice("Saved locally — backend program memory is not configured.");
+          setNotice("Saved locally — backend program memory is not configured.");
       }
+      await onCommitted?.(committed);
       setStep("saved");
     } finally {
       setBusy(false);

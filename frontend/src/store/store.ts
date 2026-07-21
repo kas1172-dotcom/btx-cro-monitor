@@ -9,9 +9,25 @@ import type { BrainResponse } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import type { ChartSpec } from "../metrics/types.ts";
 import type { TabId } from "../app/surfaces.ts";
+import type { AgentId } from "../agents/runAgent.ts";
+import type { WorkItemDraft } from "../app/workItems.ts";
 
 export type View = "home" | "current" | "prospecting" | "map" | "dashboard" | "graph" | "feed" | "operating" | "integrations";
 export type SettingsSection = "general" | "memory" | "engine" | "prompts" | "sources" | "integrations";
+export type DeliverableWizardStep = "pick" | "confirm" | "preview" | "saved";
+
+export interface DeliverableWizardRequest {
+  id: number;
+  agentId?: AgentId;
+  accountId?: string;
+  instructions?: string;
+  startStep?: DeliverableWizardStep;
+  afterSave?: {
+    kind: "create_work_item";
+    draft: WorkItemDraft;
+    openDeliverable: boolean;
+  };
+}
 
 export interface UiState {
   city: string | null;
@@ -30,6 +46,7 @@ export interface UiState {
   activeAnalysisSpec: ChartSpec | null;
   askDraftPrompt: string;
   tourRequested: boolean;
+  deliverableWizardRequest: DeliverableWizardRequest | null;
 }
 
 export interface DemoActionNotice {
@@ -59,6 +76,7 @@ let state: UiState = {
   activeAnalysisSpec: null,
   askDraftPrompt: "",
   tourRequested: false,
+  deliverableWizardRequest: null,
 };
 const listeners = new Set<() => void>();
 
@@ -127,6 +145,14 @@ export function closeDemoAction(): void {
   setState({ demoAction: null });
 }
 
+export function openDeliverableWizard(request: Omit<DeliverableWizardRequest, "id"> = {}): void {
+  setState({ deliverableWizardRequest: { ...request, id: Date.now() } });
+}
+
+export function closeDeliverableWizard(): void {
+  setState({ deliverableWizardRequest: null });
+}
+
 export function goHome(): void {
   setState({
     activeHome: true,
@@ -165,6 +191,7 @@ export function resetUiState(): void {
     activeAnalysisSpec: null,
     askDraftPrompt: "",
     tourRequested: false,
+    deliverableWizardRequest: null,
   };
   listeners.forEach((l) => l());
 }

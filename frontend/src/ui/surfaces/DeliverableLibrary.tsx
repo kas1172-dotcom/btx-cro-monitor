@@ -8,8 +8,7 @@ import {
 } from "../../app/deliverablesApi.ts";
 import type { Deliverable, DeliverableType } from "../../deliverables/types.ts";
 import { useMemory } from "../../memory/localMemory.ts";
-import { setState } from "../../store/store.ts";
-import { DeliverableWizard } from "../deliverables/DeliverableWizard.tsx";
+import { openDeliverableWizard, setState } from "../../store/store.ts";
 import { EmptyState, ListRow, SurfaceHeader } from "../primitives.tsx";
 
 export interface LibraryItem {
@@ -75,7 +74,6 @@ export function DeliverableLibrary({ world }: { world: World }) {
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   async function refresh() {
     if (!hasDeliverablesBackend()) {
@@ -112,12 +110,6 @@ export function DeliverableLibrary({ world }: { world: World }) {
   }, [items]);
   const typeOptions = useMemo(() => [...new Set(items.map((item) => item.deliverable.type))].sort(), [items]);
 
-  function handleWizardSaved(deliverable: Deliverable) {
-    setAccountFilter("all");
-    setTypeFilter("all");
-    setStatus(`Saved “${deliverable.title}” to the deliverable library.`);
-  }
-
   return (
     <section className="surface-page deliverable-library" data-surface-component="surface-deliverable-library">
       <SurfaceHeader
@@ -142,7 +134,16 @@ export function DeliverableLibrary({ world }: { world: World }) {
           </select>
         </label>
         <button onClick={() => void refresh()} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button>
-        <button className="library-new-deliverable" onClick={() => setIsWizardOpen(true)}>New deliverable</button>
+        <button
+          className="library-new-deliverable"
+          onClick={() => {
+            setAccountFilter("all");
+            setTypeFilter("all");
+            openDeliverableWizard();
+          }}
+        >
+          New deliverable
+        </button>
         <p>{visible.length} of {items.length} deliverables</p>
       </div>
 
@@ -176,17 +177,6 @@ export function DeliverableLibrary({ world }: { world: World }) {
           icon="document"
           headline={items.length ? "No deliverables match these filters" : "No saved deliverables yet"}
           body={items.length ? "Adjust the account or type filter to widen the list." : "Use New deliverable to build one from a template, or save one from another tab."}
-        />
-      )}
-
-      {isWizardOpen && (
-        <DeliverableWizard
-          world={world}
-          onSaved={handleWizardSaved}
-          onClose={() => {
-            setIsWizardOpen(false);
-            void refresh();
-          }}
         />
       )}
     </section>
