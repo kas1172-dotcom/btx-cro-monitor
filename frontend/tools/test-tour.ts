@@ -37,7 +37,6 @@ async function loadWorld(city: string | null = null): Promise<World> {
     snapshot,
     dataSource: null,
     loadErrors: [],
-    dataMode: "demo",
     provenanceSources: [],
     provenanceSummary: null,
   };

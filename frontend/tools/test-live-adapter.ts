@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { normalizeCompanies, normalizeContacts, normalizeOpportunities } from "../src/adapters/live/LiveDataAdapter.ts";
+import { normalizeCompanies, normalizeContacts, normalizeOpportunities } from "../src/adapters/CockpitDataAdapter.ts";
 
 const companies = normalizeCompanies({
   data_provenance: "HubSpot",

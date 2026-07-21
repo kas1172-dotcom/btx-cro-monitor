@@ -194,7 +194,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               <span>
                 <strong>{company.name}</strong>
                 <em>{titleCase(accountStatus(company))} · {getBusinessMotionLabel(businessMotionForAccount(company))}</em>
-                {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(company)} />}
+                <ProvenanceBadge label={provenanceForRecord(company)} />
               </span>
               <span>
                 {whyAccountMatters(world, company)}
@@ -226,7 +226,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               <h2>{selectedRow.company.name}</h2>
             </div>
             <p>{whyAccountMatters(world, selectedRow.company)}</p>
-            {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(selectedRow.company)} />}
+            <ProvenanceBadge label={provenanceForRecord(selectedRow.company)} />
             <RankingWhy explanation={rankingExplanation(world, selectedRow.company, { rank: accountsNeedingAttention.findIndex((row) => row.company.id === selectedRow.company.id) + 1, dimension: "risk" })} />
             <span className="current-score">
               {riskLine(selectedRow.score?.dimensions.risk.score ?? 0, selectedRow.score?.dimensions.capacityRisk.score ?? 0)}
@@ -263,7 +263,7 @@ export function CurrentBusiness({ world }: { world: World }) {
             <button key={company.id} className="current-mini-row" onClick={() => setState({ activeCompanyId: company.id })}>
               <strong>{company.name}</strong>
               <span>{getBusinessMotionLabel(motion)}</span>
-              {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(company)} />}
+              <ProvenanceBadge label={provenanceForRecord(company)} />
               {formatAddress(company.location) && <span>{formatAddress(company.location)}</span>}
               <em>Opportunity {opportunity}: {whyAccountMatters(world, company)}</em>
               <AskChatpilButton
@@ -284,7 +284,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               <strong>{nameOf(opp.company_id)}</strong>
               <span>{opp.name}</span>
               <em>{money(opp.value)}</em>
-              {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(opp)} />}
+              <ProvenanceBadge label={provenanceForRecord(opp)} />
               <span className="link-row">
                 <ExternalLink href={opp.contract_url} label="Contract" />
                 <ExternalLink href={opp.document_url} label="Document" />
@@ -301,7 +301,7 @@ export function CurrentBusiness({ world }: { world: World }) {
             <button key={signal.id} className="current-signal-row" onClick={() => setState({ activeCompanyId: signal.subject_id })}>
               <span className="sig-type">{titleCase(signal.event_type)}</span>
               <strong>{nameOf(signal.subject_id)}</strong>
-              {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(signal)} />}
+              <ProvenanceBadge label={provenanceForRecord(signal)} />
               <span>{signal.source_quote}</span>
               <span className="link-row">
                 <ExternalLink href={signal.source_url} label="Source" />

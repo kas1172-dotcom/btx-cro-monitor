@@ -1,11 +1,10 @@
-// The port the brain reads the world through. DemoDataAdapter and a future live
-// adapter (CRM / ERP / SAM.gov) should implement THIS interface, so the
-// engine can run on static snapshots now and live data later without changing
-// engine code. The engine defines the port; adapters implement it.
+// The port the brain reads the world through. The runtime cockpit adapter and
+// test fixture adapter implement this interface, so the engine runs on one
+// normalized operating contract without changing engine code.
 //
 // The optional RegionFilter is how "run the brain for the selected area" works:
 // the adapter returns only that region's data and the engine scores the subset.
-// Demo filters locally; a live adapter would issue a region-scoped API query.
+// Runtime and fixture adapters both honor this filter before scoring.
 
 import type { Company, Contact, Facility, Opportunity } from "./entities.ts";
 import type { OperatingSnapshot } from "./operatingSnapshot.ts";

@@ -109,7 +109,6 @@ const world: World = {
   },
   dataSource: null,
   loadErrors: [],
-  dataMode: "hybrid",
   provenanceSources: [],
   provenanceSummary: null,
 };

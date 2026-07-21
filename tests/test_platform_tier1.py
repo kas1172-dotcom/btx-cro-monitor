@@ -138,6 +138,18 @@ def test_latest_artifacts_public_and_reads_pipeline_output(tmp_path: Path):
     assert body["archive"]["runs"][0]["run_id"] == "r1"
 
 
+def test_operating_baseline_public_and_labeled_seeded(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+
+    response = client.get("/operating-baseline")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_provenance"] == "Seeded baseline — ERP integration pending"
+    assert body["capacity"]
+    assert body["pipeline"]["records"]
+
+
 def test_auth_rejects_malformed_bearer_token(tmp_path: Path):
     client, _sf, _settings = _build(tmp_path)
 

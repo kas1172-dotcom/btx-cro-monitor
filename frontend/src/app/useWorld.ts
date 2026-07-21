@@ -2,8 +2,8 @@
 // literal "run the brain for the selected area". Re-runs when the city changes.
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { createDataAdapter, getDataMode } from "../adapters/createDataAdapter.ts";
-import { liveAdapterStatus } from "../adapters/live/LiveDataAdapter.ts";
+import { createDataAdapter } from "../adapters/createDataAdapter.ts";
+import { cockpitAdapterStatus } from "../adapters/CockpitDataAdapter.ts";
 import { getScoringConfigVersion, subscribeScoringConfig } from "./config.ts";
 import { provenanceCounts, provenanceSummary, type ProvenanceLabel } from "./provenance.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
@@ -16,7 +16,6 @@ import type { Company, Contact, Facility, Opportunity, MarketEvent } from "../en
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 
 const adapter = createDataAdapter();
-const DATA_MODE = getDataMode();
 const NEWS = newsData as unknown as MarketEvent[];
 const EXTRACTED = extractedData as unknown as ExtractedRow[];
 const SARONIC_PROSPECT_ID = "signal-prospect-saronic";
@@ -29,11 +28,10 @@ export interface World {
   opportunities: Opportunity[];
   analysis: Analysis;
   prospects: Prospect[];
-  /** Simulated CRM / ERP-capacity / pipeline / assumptions context (demo snapshot). */
+  /** CRM, monitor, capacity, pipeline, and assumptions context. */
   snapshot: OperatingSnapshot | null;
   dataSource: string | null;
   loadErrors: string[];
-  dataMode: "demo" | "artifact" | "live" | "hybrid";
   provenanceSources: Array<{ label: ProvenanceLabel; count: number; detail: string }>;
   provenanceSummary: string | null;
 }
@@ -99,11 +97,10 @@ export function useWorld(city: string | null): World | null {
     ]).then(([rawCompanies, signals, contacts, facilities, opportunities, snapshot]) => {
       if (!alive) return;
       const companies = withSignalProspects(rawCompanies, signals, city);
-      const usesArtifactSignals = DATA_MODE === "artifact" && snapshot?.publicSignals.source_mode === "artifact";
-      const newsSignals = usesArtifactSignals ? [] : deriveNewsSignals(companies, NEWS, EXTRACTED);
+      const newsSignals = deriveNewsSignals(companies, NEWS, EXTRACTED);
       const analysis = analyze(companies, [...signals, ...newsSignals]);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
-      const liveStatus = DATA_MODE === "live" ? liveAdapterStatus() : { errors: [], provenance: null };
+      const adapterStatus = cockpitAdapterStatus();
       const draft = {
         city,
         companies,
@@ -113,14 +110,13 @@ export function useWorld(city: string | null): World | null {
         analysis,
         prospects,
         snapshot,
-        dataSource: DATA_MODE === "live" ? liveStatus.provenance ?? "Live CRM" : null,
-        loadErrors: DATA_MODE === "live" || DATA_MODE === "hybrid" ? liveAdapterStatus().errors : [],
-        dataMode: DATA_MODE,
+        dataSource: adapterStatus.provenance,
+        loadErrors: adapterStatus.errors,
         provenanceSources: [] as Array<{ label: ProvenanceLabel; count: number; detail: string }>,
         provenanceSummary: null as string | null,
       };
-      draft.provenanceSources = DATA_MODE === "hybrid" ? provenanceCounts(draft) : [];
-      draft.provenanceSummary = DATA_MODE === "hybrid" ? provenanceSummary(draft) : null;
+      draft.provenanceSources = provenanceCounts(draft);
+      draft.provenanceSummary = provenanceSummary(draft);
       setWorld({
         ...draft,
       });

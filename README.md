@@ -32,14 +32,13 @@ FastAPI backend on Fly.io
 HubSpot / LLM / pipeline / settings
 ```
 
-The cockpit supports these data modes:
+The cockpit has one runtime data path:
 
-- `hybrid` — production demo default: HubSpot CRM reads, monitor JSON signals, demo fallback for not-yet-integrated operating context.
-- `live` — backend-only mode for CRM reads and other live backend integrations.
-- `artifact` — monitor artifact mode for static signal consumption.
-- `demo` — deterministic local/test scaffolding from `frontend/data/demo/btx/`.
+- HubSpot CRM reads through the FastAPI backend.
+- Monitor-engine market signals from `clients/btx/artifacts/*.json`, served by the backend or Pages.
+- A backend-served seeded operating baseline for capacity, facilities, pipeline, and assumptions until the ERP integration is connected.
 
-Demo mode and demo fixtures are intentionally kept for local development and tests.
+Fixture JSON under `frontend/data/demo/btx/` is retained for tests and local development scaffolding only.
 
 ## Local Frontend
 
@@ -53,7 +52,6 @@ Production-equivalent local build:
 
 ```bash
 cd frontend
-VITE_DATA_MODE=hybrid \
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev \
 VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm \
 VITE_ARTIFACT_BASE_URL=../btx \
@@ -62,7 +60,7 @@ npm run build
 
 The browser build never holds a shared backend secret. Instead it gates the app behind Clerk sign-in (`VITE_CLERK_PUBLISHABLE_KEY`) and sends each signed-in user's session token on every backend call; the backend validates that token per-request against Clerk's JWKS.
 
-In `hybrid` mode, monitor artifacts are treated as real market/portfolio signals unless the interim text-fit guard can link them strongly to an account. Weak matches stay unlinked and do not change account scores.
+Monitor output is treated as real market/portfolio signal evidence unless the interim text-fit guard can link it strongly to an account. Weak matches stay unlinked and do not change account scores.
 
 ## Local Backend
 

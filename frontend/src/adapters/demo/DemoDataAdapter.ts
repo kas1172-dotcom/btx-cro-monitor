@@ -25,8 +25,17 @@ const ALL_OPPORTUNITIES = opportunitiesData as unknown as Opportunity[];
 const CRM = crmData as CrmSnapshotRecord[];
 const CAPACITY = capacityData as CapacitySnapshotRecord[];
 const PIPELINE = pipelineData as PipelineSnapshot;
-const INTEGRATIONS = integrationsData as IntegrationRecord[];
-const ASSUMPTIONS = assumptionsData as AssumptionsSnapshot;
+const INTEGRATIONS = (integrationsData as Array<Partial<IntegrationRecord> & { demo_file?: string }>).map((item) => ({
+  id: item.id ?? "fixture",
+  name: item.name ?? "Fixture",
+  category: item.category ?? "Fixture data",
+  status: (item.status === "future" ? "future" : "available") as IntegrationRecord["status"],
+  source_ref: item.demo_file ?? "frontend/data/demo/btx/",
+  production_method: item.production_method ?? "Fixture JSON",
+  description: item.description ?? "",
+  source_kind: "seeded" as const,
+}));
+const ASSUMPTIONS = assumptionsData as unknown as AssumptionsSnapshot;
 const NEWS = newsData as Array<{ published_date?: string }>;
 
 export class DemoDataAdapter implements DataAdapter {
@@ -69,18 +78,31 @@ export class DemoDataAdapter implements DataAdapter {
       .at(-1) ?? null;
 
     return {
-      crm: CRM,
-      capacity: CAPACITY,
-      pipeline: PIPELINE,
+      crm: CRM.map((row) => ({ ...row, source_type: "seeded_baseline", source_name: "Seeded baseline — ERP integration pending", source_mode: "seeded_baseline" })),
+      capacity: CAPACITY.map((row) => ({ ...row, source_type: "seeded_baseline", source_name: "Seeded baseline — ERP integration pending", source_mode: "seeded_baseline" })),
+      pipeline: {
+        ...PIPELINE,
+        source_type: "seeded_baseline",
+        source_name: "Seeded baseline — ERP integration pending",
+        source_mode: "seeded_baseline",
+        records: PIPELINE.records.map((row) => ({ ...row, source_type: "seeded_baseline", source_name: "Seeded baseline — ERP integration pending", source_mode: "seeded_baseline" })),
+      },
       integrations: INTEGRATIONS,
-      assumptions: ASSUMPTIONS,
+      assumptions: {
+        ...ASSUMPTIONS,
+        source_type: "seeded_baseline",
+        source_name: "Seeded baseline — ERP integration pending",
+        source_mode: "seeded_baseline",
+        is_seeded_baseline: true,
+        summary: "Seeded baseline — ERP integration pending",
+      },
       publicSignals: {
         signal_count: ALL_SIGNALS.length,
         news_count: NEWS.length,
         latest_signal_at: latestSignal,
         latest_news_date: latestNews,
-        source_name: "Simulated Market Signal Feed + Public News Snapshot",
-        source_mode: "static_snapshot",
+        source_name: "Seeded signals + public news",
+        source_mode: "seeded_signals",
       },
     };
   }

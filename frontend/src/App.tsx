@@ -40,13 +40,8 @@ function formatRunDate(value: string | null | undefined): string {
 
 function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" | "warning"; label: string; value: string } | null {
   if (!world) return null;
-  if (world.dataSource && !world.loadErrors.length) {
-    return { tone: "success", label: "Live source", value: world.dataSource };
-  }
-  if ((world.dataMode === "hybrid" || world.dataMode === "live") && world.loadErrors.length) {
-    return { tone: "warning", label: "CRM status", value: "using demo fallback" };
-  }
-  return null;
+  if (world.loadErrors.length) return { tone: "warning", label: "Source status", value: "using seeded baseline" };
+  return { tone: "success", label: "Source status", value: world.dataSource ?? "backend connected" };
 }
 
 export function App() {
@@ -174,15 +169,15 @@ export function App() {
             <strong>{surfaceTitle}</strong>
           </div>
           <div className="topbar-status">
-            {world?.dataMode === "hybrid" && world.provenanceSummary && (
+            {world?.provenanceSummary && (
               <StatusChip label="Data provenance" value={`${world.provenanceSources.length} sources`} />
             )}
             {backendStatus ? <StatusChip tone={backendStatus.tone} label={backendStatus.label} value={backendStatus.value} /> : null}
-            {world?.snapshot?.publicSignals.source_mode === "artifact" && (
+            {world?.snapshot?.publicSignals.run_at && (
               <StatusChip tone={world.snapshot.publicSignals.stale ? "warning" : "info"} label="Monitor run" value={formatRunDate(world.snapshot.publicSignals.run_at)} />
             )}
-            {world?.snapshot?.publicSignals.source_mode === "artifact_fallback" && (
-              <StatusChip tone="warning" label="Artifact fallback" value={world.snapshot.publicSignals.notice ?? "Using demo signals"} />
+            {world?.snapshot?.publicSignals.notice && (
+              <StatusChip tone="warning" label="Monitor status" value={world.snapshot.publicSignals.notice} />
             )}
             {marketScoped && <label className="cockpit-city-picker">
               <span>Market</span>

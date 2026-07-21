@@ -3,7 +3,7 @@ import type { IntegrationRecord } from "../../engine/brain/operatingSnapshot.ts"
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 
 const STATUS_LABEL: Record<IntegrationRecord["status"], string> = {
-  demo_connected: "Demo connected",
+  connected: "Connected",
   available: "Available",
   not_connected: "Not connected",
   future: "Future",
@@ -27,9 +27,8 @@ export function OperatingSnapshot() {
 
   if (!snapshot) return <div className="loading">loading operating snapshot…</div>;
 
-  const connected = snapshot.integrations.filter((i) => i.status === "demo_connected");
+  const connected = snapshot.integrations.filter((i) => i.status === "connected");
   const available = snapshot.integrations.filter((i) => i.status === "available");
-  const usingArtifacts = snapshot.publicSignals.source_mode === "artifact";
 
   return (
     <div className="operating">
@@ -37,9 +36,7 @@ export function OperatingSnapshot() {
         <p className="eyebrow">Operating snapshot</p>
         <h1>What data is the brain using right now?</h1>
         <p>
-          {usingArtifacts
-            ? "Market signals are real monitor-engine artifacts. CRM, capacity, pipeline, contacts, and accounts remain simulated demo snapshots until a client provides authenticated operating data."
-            : "This page shows the simulated, API-shaped data currently feeding the demo brain. In production, authenticated adapters would replace these static snapshots while preserving the same operating contract."}
+          Backend CRM records, monitor-engine market output, and the seeded operating baseline feed one runtime adapter. Capacity remains labeled as ERP pending until a live ERP source is connected.
         </p>
       </section>
 
@@ -48,31 +45,31 @@ export function OperatingSnapshot() {
           <span>CRM accounts</span>
           <strong>{snapshot.crm.length}</strong>
           <em>{snapshot.crm[0]?.source_name ?? "CRM snapshot"}</em>
-          <ProvenanceBadge label={snapshot.crm[0]?.source_name === "Demo fallback" ? "Demo" : "CRM"} />
+          <ProvenanceBadge label="CRM" />
         </div>
         <div>
           <span>Capacity sources</span>
           <strong>{snapshot.capacity.length}</strong>
           <em>{snapshot.capacity[0]?.source_name ?? "ERP snapshot"}</em>
-          <ProvenanceBadge label="Demo" />
+          <ProvenanceBadge label="Seeded baseline" />
         </div>
         <div>
           <span>Public signals</span>
           <strong>{snapshot.publicSignals.signal_count}</strong>
-          <em>{usingArtifacts ? "real monitor-engine artifacts" : `${snapshot.publicSignals.news_count} public news events`}</em>
-          <ProvenanceBadge label={usingArtifacts ? "Monitor" : "Demo"} />
+          <em>{snapshot.publicSignals.news_count} monitor/public events</em>
+          <ProvenanceBadge label="Monitor" />
         </div>
         <div>
-          <span>Demo as of</span>
+          <span>Baseline as of</span>
           <strong>{snapshot.assumptions.as_of}</strong>
-          <em>Static demo disclosure</em>
+          <em>ERP integration pending</em>
         </div>
       </section>
 
       <section className="operating-grid">
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>CRM Snapshot</h2>
+            <h2>CRM View</h2>
           </div>
           {snapshot.crm.map((row) => (
             <div key={row.account_id} className="operating-row">
@@ -86,7 +83,7 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Capacity / ERP Snapshot</h2>
+            <h2>Capacity / ERP Baseline</h2>
           </div>
           {snapshot.capacity.map((row) => (
             <div key={row.facility_id} className="operating-row">
@@ -100,7 +97,7 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Pipeline / Contracts Snapshot</h2>
+            <h2>Pipeline / Contracts Baseline</h2>
           </div>
           <div className="operating-callout">
             <strong>{money(snapshot.pipeline.summary.open_pipeline_value)} open pipeline</strong>
@@ -118,17 +115,15 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Public Signals Snapshot</h2>
+            <h2>Public Signals</h2>
           </div>
           <div className="operating-callout">
             <strong>{snapshot.publicSignals.signal_count} scored market signals</strong>
-            <span>{usingArtifacts ? `Run ${dateLabel(snapshot.publicSignals.run_at ?? null)} · ${snapshot.publicSignals.archive_run_count ?? 0} archived runs` : `${snapshot.publicSignals.news_count} public events shaped for extraction`}</span>
+            <span>{snapshot.publicSignals.run_at ? `Run ${dateLabel(snapshot.publicSignals.run_at ?? null)} · ${snapshot.publicSignals.archive_run_count ?? 0} archived runs` : `${snapshot.publicSignals.news_count} public events shaped for extraction`}</span>
             <em>Latest signal {dateLabel(snapshot.publicSignals.latest_signal_at)} · latest news {dateLabel(snapshot.publicSignals.latest_news_date)}</em>
           </div>
           <p className="operating-copy">
-            {usingArtifacts
-              ? `These real monitor-engine artifact signals are validated as market context. Until identity matching is canonical, weak account matches stay portfolio-level and do not affect account scores. Source artifact: ${snapshot.publicSignals.artifact_path}.`
-              : "These static public market and contract signals are validated before they affect scores, alerts, recommendations, and Chatpil explanations."}
+            Monitor signals are validated as market context. Weak account matches stay portfolio-level and do not affect account scores. Source: {snapshot.publicSignals.artifact_path ?? snapshot.publicSignals.source_name}.
           </p>
         </div>
 
@@ -142,28 +137,28 @@ export function OperatingSnapshot() {
                 <span className={`status-dot status-${item.status}`} />
                 <strong>{item.name}</strong>
                 <em>{item.category} · {STATUS_LABEL[item.status]}</em>
-                <small>{item.demo_file}</small>
+                <small>{item.source_ref}</small>
               </div>
             ))}
           </div>
           <p className="operating-copy">
-            {connected.length} demo-connected sources are active in this static snapshot. {available.length} public source is listed as available for a future adapter.
+            {connected.length} connected source{connected.length === 1 ? "" : "s"} and {available.length} seeded source{available.length === 1 ? "" : "s"} are active.
           </p>
         </div>
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Data Freshness / Demo Disclosure</h2>
+            <h2>Data Freshness / Source Disclosure</h2>
           </div>
-          {snapshot.publicSignals.source_mode === "artifact" && (
+          {snapshot.publicSignals.run_at && (
             <div className={snapshot.publicSignals.stale ? "operating-callout warn" : "operating-callout"}>
               <strong>Monitor-engine run: {dateLabel(snapshot.publicSignals.run_at ?? null)}</strong>
-              <span>{snapshot.publicSignals.stale ? "Artifact data is older than 7 days." : "Artifact signal data is fresh."}</span>
+              <span>{snapshot.publicSignals.stale ? "Monitor output is older than 7 days." : "Monitor signal data is fresh."}</span>
             </div>
           )}
-          {snapshot.publicSignals.source_mode === "artifact_fallback" && (
+          {snapshot.publicSignals.notice && (
             <div className="operating-callout warn">
-              <strong>Artifact fallback active</strong>
+              <strong>Monitor status</strong>
               <span>{snapshot.publicSignals.notice}</span>
             </div>
           )}

@@ -2,7 +2,7 @@ import type { Company, Contact, Facility, Opportunity } from "../engine/brain/en
 import type { Signal } from "../engine/signals/contract.ts";
 import type { World } from "./useWorld.ts";
 
-export type ProvenanceLabel = "CRM" | "Monitor" | "Demo";
+export type ProvenanceLabel = "CRM" | "Monitor" | "Seeded baseline";
 
 type ProvenanceRecord = {
   data_provenance?: string;
@@ -16,13 +16,13 @@ function sourceName(record: ProvenanceRecord): string {
 }
 
 export function provenanceForRecord(record: Company | Contact | Facility | Opportunity | Signal | null | undefined): ProvenanceLabel {
-  if (!record) return "Demo";
+  if (!record) return "Seeded baseline";
   const meta = record as ProvenanceRecord;
   if (meta.artifact) return "Monitor";
   const text = sourceName(meta);
   if (text.includes("hubspot") || text.includes("crm") || text.includes("live")) return "CRM";
   if (text.includes("monitor") || text.includes("artifact")) return "Monitor";
-  return "Demo";
+  return "Seeded baseline";
 }
 
 export function provenanceCounts(world: World): Array<{ label: ProvenanceLabel; count: number; detail: string }> {
@@ -32,14 +32,14 @@ export function provenanceCounts(world: World): Array<{ label: ProvenanceLabel; 
     ...world.opportunities.filter((item) => provenanceForRecord(item) === "CRM").map((item) => item.id),
   ]);
   const monitorIds = new Set(world.analysis.valid.filter((item) => provenanceForRecord(item) === "Monitor").map((item) => item.id));
-  const demoIds = new Set([
-    ...world.facilities.filter((item) => provenanceForRecord(item) === "Demo").map((item) => item.id),
+  const seededIds = new Set([
+    ...world.facilities.filter((item) => provenanceForRecord(item) === "Seeded baseline").map((item) => item.id),
     ...(world.snapshot?.capacity ?? []).map((item) => item.facility_id),
   ]);
   return [
     { label: "CRM", count: crmIds.size, detail: "real CRM" },
     { label: "Monitor", count: monitorIds.size, detail: "real signals" },
-    { label: "Demo", count: demoIds.size, detail: "fallback" },
+    { label: "Seeded baseline", count: seededIds.size, detail: "ERP pending" },
   ];
 }
 

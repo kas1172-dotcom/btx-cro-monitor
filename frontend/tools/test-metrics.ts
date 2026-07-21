@@ -46,7 +46,6 @@ async function loadWorld(): Promise<World> {
     snapshot,
     dataSource: null,
     loadErrors: [],
-    dataMode: "demo",
     provenanceSources: [],
     provenanceSummary: null,
   };

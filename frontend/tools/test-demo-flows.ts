@@ -43,7 +43,6 @@ async function loadWorld(city: string | null = null): Promise<World> {
     snapshot,
     dataSource: null,
     loadErrors: [],
-    dataMode: "demo",
     provenanceSources: [],
     provenanceSummary: null,
   };
@@ -105,7 +104,6 @@ async function loadArtifactFixtureWorld(): Promise<World> {
     },
     dataSource: null,
     loadErrors: [],
-    dataMode: "artifact",
     provenanceSources: [],
     provenanceSummary: null,
   };
@@ -184,7 +182,6 @@ async function loadHybridFixtureWorld(): Promise<World> {
     },
     dataSource: null,
     loadErrors: [],
-    dataMode: "hybrid",
     provenanceSources: [],
     provenanceSummary: null,
   };
@@ -277,7 +274,7 @@ const hybridBriefText = hybridBrief.sections
   .join(" ");
 assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "CRM"), "Hybrid meeting brief missing real CRM account grounding");
 assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "monitor-engine artifacts"), "Hybrid meeting brief missing real monitor signal grounding");
-assert(hybridBriefText.includes("Demo fallback") || hybridBrief.sources.some((source) => source.source === "Demo fallback"), "Hybrid meeting brief missing demo fallback disclosure");
+assert(hybridBriefText.includes("Seeded baseline") || hybridBrief.sources.some((source) => source.source === "Seeded baseline"), "CRM-grounded meeting brief missing seeded baseline disclosure");
 
 const outreach = await runAgent("outreach", {}, world);
 const instructedOutreach = await runAgent("outreach", { instructions: "Lead with ITAR angle" }, world);
@@ -301,4 +298,4 @@ const deliverableText = [itinerary, tripBrief, analysisAnnotation, memo, outreac
   .join(" ");
 assert(!/\b[a-z]+_[a-z_]+\b/.test(deliverableText), `Rendered deliverables leaked snake_case: ${deliverableText.match(/\b[a-z]+_[a-z_]+\b/)?.[0]}`);
 
-console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, hybrid brief cited CRM + monitor, outreach ${outreach.sections.length} sections`);
+console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, CRM brief cited CRM + monitor, outreach ${outreach.sections.length} sections`);

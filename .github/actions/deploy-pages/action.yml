@@ -41,7 +41,6 @@ runs:
       working-directory: frontend
       shell: bash
       env:
-        VITE_DATA_MODE: hybrid
         VITE_BACKEND_ENDPOINT: ${{ inputs.vite_backend_endpoint }}
         VITE_COPILOT_ENDPOINT: ${{ inputs.vite_backend_endpoint }}/llm
         VITE_ARTIFACT_BASE_URL: ../btx

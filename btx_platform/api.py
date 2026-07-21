@@ -58,7 +58,7 @@ from btx_platform.schemas import (
 
 logger = logging.getLogger(__name__)
 CRM_CACHE_TTL_SECONDS = 300
-PUBLIC_PATHS = {"/health", "/artifacts/latest"}
+PUBLIC_PATHS = {"/health", "/artifacts/latest", "/operating-baseline"}
 # Mutating routes require at least "analyst"; a viewer can read but not write.
 MUTATING_ROUTE_MIN_ROLE = "analyst"
 MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
@@ -82,6 +82,11 @@ def _three_business_days_from_now() -> str:
         if current.weekday() < 5:
             remaining -= 1
     return current.isoformat().replace("+00:00", "Z")
+
+
+def _baseline_json(name: str) -> object:
+    path = Path(__file__).resolve().parents[1] / "frontend" / "data" / "demo" / "btx" / name
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _hubspot_id(value: str | None, prefix: str) -> str | None:
@@ -522,6 +527,19 @@ def create_app(
             "archive_path": str(archive_path),
             "run_output": run_output,
             "archive": archive,
+        })
+
+    @app.get("/operating-baseline")
+    def operating_baseline() -> Response:
+        return JSONResponse({
+            "data_provenance": "Seeded baseline — ERP integration pending",
+            "crm": _baseline_json("crm.json"),
+            "capacity": _baseline_json("erp_capacity.json"),
+            "pipeline": _baseline_json("pipeline.json"),
+            "integrations": _baseline_json("integrations.json"),
+            "assumptions": _baseline_json("assumptions.json"),
+            "facilities": _baseline_json("facilities.json"),
+            "opportunities": _baseline_json("opportunities.json"),
         })
 
     def not_configured(service: str) -> JSONResponse:

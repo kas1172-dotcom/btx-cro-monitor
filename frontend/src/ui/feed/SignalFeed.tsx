@@ -241,7 +241,7 @@ export function SignalFeed({ world }: { world: World }) {
         companyRelationship: portfolio ? "unlinked" : company?.relationship ?? "unknown",
         address: company ? formatAddress(company.location) : null,
         headline: signal.artifact ? signalHeadline(signal) : article?.headline ?? titleCase(signal.event_type),
-        source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Simulated Market Signal Feed",
+        source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Seeded Market Signal Feed",
         sourceDate: signal.artifact ? signalSourceDate(signal) : article?.published_date ?? signal.detected_at.slice(0, 10),
         sourceUrl: signal.artifact?.source_url ?? article?.source_url ?? signal.source_url,
         documentUrl: article?.document_url ?? signal.document_url,
@@ -339,7 +339,7 @@ export function SignalFeed({ world }: { world: World }) {
                 <p>{row.source} · {row.sourceDate}</p>
               </div>
               <div className="card-badge-row">
-                {world.dataMode === "hybrid" && <ProvenanceBadge label={provenanceForRecord(row.signal)} />}
+                <ProvenanceBadge label={provenanceForRecord(row.signal)} />
                 <span className={`motion-pill motion-${row.motion.replace(/\s+/g, "-").toLowerCase()}`}>{row.motion}</span>
               </div>
             </div>

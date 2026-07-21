@@ -190,11 +190,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
 
   function openTaskFlow() {
     const draft = createTaskDraft();
-    if ((world?.dataMode === "hybrid" || world?.dataMode === "live")) {
-      if (!BACKEND_ENDPOINT) {
-        setTaskDialog({ ...draft, status: "error", error: "Backend is not configured; live CRM task creation is unavailable." });
-        return;
-      }
+    if (BACKEND_ENDPOINT) {
       setTaskDialog({ ...draft, status: "confirm" });
       return;
     }

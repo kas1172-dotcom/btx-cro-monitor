@@ -41,7 +41,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 function dotClass(status: string): string {
-  if (status === "ok") return "status-demo_connected";
+  if (status === "ok") return "status-connected";
   if (status === "not_configured" || status === "missing") return "status-not_connected";
   return "status-available"; // stale/invalid/degraded — attention, not failure
 }
@@ -99,7 +99,7 @@ export function PlatformHealthWidget() {
     <div className="platform-health-widget">
       <div className="detail-head">
         <p className="eyebrow">Platform health</p>
-        <span className={`integration-status status-${health.status === "ok" ? "demo_connected" : "not_connected"}`}>
+          <span className={`integration-status status-${health.status === "ok" ? "connected" : "not_connected"}`}>
           {STATUS_LABEL[health.status]}
         </span>
       </div>
@@ -121,7 +121,7 @@ export function PlatformHealthWidget() {
           </li>
         ))}
         <li>
-          <span className={`status-dot ${health.db ? "status-demo_connected" : "status-not_connected"}`} />
+          <span className={`status-dot ${health.db ? "status-connected" : "status-not_connected"}`} />
           <span>
             <strong>Database</strong>
             <em>{health.db ? "Reachable" : "Unreachable"}</em>

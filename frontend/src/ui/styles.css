@@ -376,7 +376,7 @@ button, input, select, textarea { font: inherit; }
 }
 .prov-crm { color: var(--good); border-color: rgba(var(--success-rgb), .45); background: rgba(var(--success-rgb), .08); }
 .prov-monitor { color: var(--accent); border-color: rgba(var(--accent-rgb), .45); background: rgba(var(--accent-rgb), .08); }
-.prov-demo { color: var(--warn); border-color: rgba(var(--warning-rgb), .45); background: rgba(var(--warning-rgb), .08); }
+.prov-seeded-baseline { color: var(--warn); border-color: rgba(var(--warning-rgb), .45); background: rgba(var(--warning-rgb), .08); }
 
 /* Confidence gradient: how sure we are an account link is real, distinct from
    provenance-badge's "where did this come from". Solid/full-opacity/teal for
@@ -419,7 +419,7 @@ button, input, select, textarea { font: inherit; }
   border-color: rgba(var(--danger-rgb), .65);
   background: rgba(var(--danger-rgb), .12);
 }
-.hybrid-inline-status {
+.source-inline-status {
   width: fit-content;
   max-width: 100%;
   margin-top: 10px;
@@ -433,8 +433,8 @@ button, input, select, textarea { font: inherit; }
   background: rgba(var(--accent-rgb), .06);
   font-size: 12px;
 }
-.hybrid-inline-status span { color: var(--accent); text-transform: uppercase; letter-spacing: .4px; font-size: 10px; }
-.hybrid-inline-status strong { color: var(--text); }
+.source-inline-status span { color: var(--accent); text-transform: uppercase; letter-spacing: .4px; font-size: 10px; }
+.source-inline-status strong { color: var(--text); }
 .quiet-stage { flex: 1 1 auto; min-height: 0; position: relative; overflow-y: auto; }
 
 .surface-page {
@@ -2004,7 +2004,7 @@ button, input, select, textarea { font: inherit; }
 .integration-card strong, .integration-card em { display: block; }
 .integration-card em { color: var(--muted); font-size: 12px; font-style: normal; margin-top: 2px; }
 .status-dot { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 999px; background: var(--muted); }
-.status-demo_connected { background: var(--good); }
+.status-connected { background: var(--good); }
 .status-available { background: var(--accent); }
 .status-not_connected { background: var(--warn); }
 .status-future { background: var(--muted); }

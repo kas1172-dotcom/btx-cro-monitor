@@ -1,23 +1,23 @@
 export interface SnapshotProvenance {
-  source_type: "demo";
+  source_type: string;
   source_name: string;
-  source_mode: "static_snapshot";
+  source_mode: string;
 }
 
 export interface IntegrationRecord {
   id: string;
   name: string;
   category: string;
-  status: "demo_connected" | "available" | "not_connected" | "future";
-  demo_file: string;
+  status: "connected" | "available" | "not_connected" | "future";
+  source_ref: string;
   production_method: string;
   description: string;
-  is_demo: boolean;
+  source_kind: "live" | "monitor" | "seeded" | "planned";
 }
 
 export interface AssumptionsSnapshot extends SnapshotProvenance {
   as_of: string;
-  is_static_demo: boolean;
+  is_seeded_baseline: boolean;
   summary: string;
   assumptions: string[];
 }
@@ -73,7 +73,7 @@ export interface OperatingSnapshot {
     latest_signal_at: string | null;
     latest_news_date: string | null;
     source_name: string;
-    source_mode: "static_snapshot" | "artifact" | "artifact_fallback";
+    source_mode: string;
     run_at?: string | null;
     archive_run_count?: number;
     artifact_path?: string;
