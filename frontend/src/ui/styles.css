@@ -777,9 +777,8 @@ button, input, select, textarea { font: inherit; }
 }
 .work-item-row, .signal-mini-list article {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
   border: 1px solid var(--card-border);
   border-radius: 8px;
   background: var(--card);
@@ -794,6 +793,57 @@ button, input, select, textarea { font: inherit; }
   color: var(--muted);
   font-style: normal;
   font-size: 12px;
+}
+.work-item-summary {
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: minmax(96px, .18fr) minmax(220px, 1fr) minmax(180px, .45fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+.work-item-summary strong,
+.work-item-summary em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.work-item-kind,
+.work-item-confidence {
+  width: fit-content;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.work-item-summary button,
+.visit-plan-meta button,
+.prospect-card-score button,
+.signal-primary-action button,
+.signal-row-expander {
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+}
+.work-item-summary button:hover,
+.visit-plan-meta button:hover,
+.prospect-card-score button:hover,
+.signal-primary-action button:hover,
+.signal-row-expander:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.work-item-detail {
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
 }
 .work-item-state {
   display: grid;
@@ -1659,8 +1709,9 @@ button, input, select, textarea { font: inherit; }
 .visit-plan-list { display: grid; gap: 10px; }
 .visit-plan-card {
   display: grid; grid-template-columns: auto minmax(280px, 1fr) minmax(150px, auto);
-  gap: 12px; align-items: start;
-  background: rgba(var(--page-rgb), .42); border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+  gap: 12px; align-items: center;
+  min-height: 66px;
+  background: rgba(var(--page-rgb), .42); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px;
 }
 .visit-plan-card strong { display: block; font-size: 16px; }
 .visit-plan-card em, .visit-plan-card small {
@@ -1668,11 +1719,12 @@ button, input, select, textarea { font: inherit; }
 }
 .visit-plan-card p { margin: 7px 0 0; color: var(--text); }
 .visit-plan-card b { color: var(--accent); font-weight: var(--font-semibold); }
-.visit-plan-meta { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.visit-plan-meta { display: flex; gap: 6px; align-items: center; justify-content: flex-end; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .prospect-card {
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start;
   width: 100%; text-align: left; background: transparent; color: var(--text);
-  border: 0; border-top: 1px solid var(--line); padding: 12px 4px; cursor: pointer;
+  border: 0; border-top: 1px solid var(--line); padding: 9px 4px;
+  min-height: 58px;
 }
 .prospect-card:hover, .outreach-row:hover { background: var(--panel-2); }
 .prospect-card-main { display: grid; gap: 5px; min-width: 0; }
@@ -1681,7 +1733,14 @@ button, input, select, textarea { font: inherit; }
   color: var(--muted); font-size: 12px; font-style: normal;
 }
 .prospect-card-main b { color: var(--text); font-weight: var(--font-semibold); }
-.prospect-card-score { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; white-space: nowrap; }
+.prospect-card-score { display: flex; align-items: center; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+.compact-scan-card .scan-detail-panel {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
 .outreach-row {
   display: grid; gap: 3px; width: 100%; text-align: left; background: transparent; color: var(--text);
   border: 0; border-top: 1px solid var(--line); padding: 10px 4px; cursor: pointer;
@@ -2217,7 +2276,56 @@ button, input, select, textarea { font: inherit; }
 .signal-list { display: grid; gap: 12px; }
 .signal-inbox-card {
   background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent);
-  border-radius: 8px; padding: 16px; box-shadow: 0 8px 24px rgba(var(--page-rgb), .14);
+  border-radius: 8px; padding: 10px 12px; box-shadow: 0 8px 24px rgba(var(--page-rgb), .14);
+}
+.signal-inbox-card-pinned {
+  border-left-color: var(--good);
+  background: linear-gradient(90deg, rgba(var(--success-rgb), .08), var(--panel));
+}
+.signal-summary-line {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(130px, .18fr) minmax(220px, .42fr) minmax(260px, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+.signal-summary-main,
+.signal-summary-why {
+  min-width: 0;
+}
+.signal-summary-main strong,
+.signal-summary-main span,
+.signal-summary-why {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.signal-summary-main span,
+.signal-summary-why {
+  color: var(--muted);
+  font-size: 12px;
+}
+.confidence-chip {
+  width: fit-content;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+}
+.signal-primary-action {
+  display: flex;
+  justify-content: flex-end;
+}
+.signal-row-expander {
+  margin-top: 6px;
+}
+.signal-detail-panel {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
 }
 .signal-card-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .signal-card-head h2 { margin: 3px 0 4px; font-size: 18px; line-height: 1.2; }

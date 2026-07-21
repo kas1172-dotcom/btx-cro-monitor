@@ -148,6 +148,7 @@ export function SignalFeed({ world }: { world: World }) {
   const [sort, setSort] = useState<Sort>("priority");
   const [busySignalId, setBusySignalId] = useState<string | null>(null);
   const [confirmingSaronicId, setConfirmingSaronicId] = useState<string | null>(null);
+  const [expandedSignalId, setExpandedSignalId] = useState<string | null>(null);
   const [statusBySignalId, setStatusBySignalId] = useState<Record<string, string>>({});
   const newsById = new Map(NEWS.map((item) => [`news-sig-${item.id}`, item]));
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
@@ -305,10 +306,49 @@ export function SignalFeed({ world }: { world: World }) {
       </div>
 
       <div className="signal-list">
-        {visible.map((row) => (
-          <article key={row.signal.id} className="signal-inbox-card">
-            <div className="signal-card-head">
-              <div>
+        {visible.map((row) => {
+          const expanded = expandedSignalId === row.signal.id || confirmingSaronicId === row.signal.id;
+          const primaryAction = isLockheedSignal(row.signal) && row.signal.scope === "specific_account"
+            ? (
+                <button type="button" onClick={() => void createLockheedPrep(row.signal)} disabled={busySignalId === row.signal.id}>
+                  {busySignalId === row.signal.id ? "Creating..." : "Create call prep"}
+                </button>
+              )
+            : isSaronicSignal(row.signal)
+              ? (
+                  <button type="button" onClick={() => setConfirmingSaronicId(row.signal.id)} disabled={busySignalId === row.signal.id}>
+                    Create prospect
+                  </button>
+                )
+              : (
+                  <button type="button" onClick={() => setExpandedSignalId(expanded ? null : row.signal.id)}>
+                    {expanded ? "Hide details" : "Details"}
+                  </button>
+                );
+          return (
+          <article key={row.signal.id} className={`signal-inbox-card ${isLockheedSignal(row.signal) || isSaronicSignal(row.signal) ? "signal-inbox-card-pinned" : ""}`}>
+            <div className="signal-summary-line">
+              <span className="sig-type">{titleCase(row.signal.event_type)}</span>
+              <div className="signal-summary-main">
+                <strong>{row.companyName}</strong>
+                <span>{row.headline}</span>
+              </div>
+              <span className="signal-summary-why">{row.why}</span>
+              <span className="confidence-chip">{(row.signal.confidence * 100).toFixed(0)}%</span>
+              <div className="signal-primary-action">{primaryAction}</div>
+            </div>
+            <button
+              type="button"
+              className="signal-row-expander"
+              onClick={() => setExpandedSignalId(expanded ? null : row.signal.id)}
+              aria-expanded={expanded}
+            >
+              {expanded ? "Collapse reasoning" : "Show reasoning"}
+            </button>
+            {expanded && (
+              <div className="signal-detail-panel">
+                <div className="signal-card-head">
+                  <div>
                 <span className="sig-type">{titleCase(row.signal.event_type)}</span>
                 <h2>{row.headline}</h2>
                 <p>{row.source} · {row.sourceDate}</p>
@@ -360,23 +400,15 @@ export function SignalFeed({ world }: { world: World }) {
               </div>
             )}
 
-            <div className="signal-actions">
+                <div className="signal-actions">
               <AskChatpilButton label="Explain" prompt={expandSignalPrompt(row.signal, row.companyName)} />
               <AskChatpilButton
                 label="What should I do?"
                 prompt={nextActionPrompt(row.companyName, `Signal inbox item. Event ${row.signal.event_type}. Motion ${row.motion}. Score impact ${row.impact.text}. Recommended action: ${row.actionText}. Evidence: ${row.signal.source_quote}`)}
               />
-              {isLockheedSignal(row.signal) && row.signal.scope === "specific_account" && (
-                <button type="button" onClick={() => void createLockheedPrep(row.signal)} disabled={busySignalId === row.signal.id}>
-                  {busySignalId === row.signal.id ? "Creating..." : "Create call prep"}
-                </button>
-              )}
-              {isSaronicSignal(row.signal) && (
-                <button type="button" onClick={() => setConfirmingSaronicId(row.signal.id)} disabled={busySignalId === row.signal.id}>
-                  Create Saronic prospect
-                </button>
-              )}
-            </div>
+                </div>
+              </div>
+            )}
             {statusBySignalId[row.signal.id] && <div className="live-inline-status">{statusBySignalId[row.signal.id]}</div>}
             {confirmingSaronicId === row.signal.id && (
               <div className="signal-confirm-panel">
@@ -395,7 +427,8 @@ export function SignalFeed({ world }: { world: World }) {
               </div>
             )}
           </article>
-        ))}
+        );
+        })}
         {visible.length === 0 && (
           <EmptyState headline="No signals in this filter" body="Try a different filter, or check back after the next monitor run." icon="signal" />
         )}

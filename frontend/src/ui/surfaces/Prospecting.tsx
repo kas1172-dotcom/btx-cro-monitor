@@ -83,6 +83,7 @@ function visitReason(row: { opportunity: number; fit: number; signals: Signal[];
 export function Prospecting({ world }: { world: World }) {
   const { city } = useStore();
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [expandedProspectId, setExpandedProspectId] = useState<string | null>(null);
   const prospectSignals = world.analysis.valid.filter(isProspectingSignal);
   const idsFromSignals = new Set(prospectSignals.map((s) => s.subject_id));
   const prospectCompanies = world.companies.filter(
@@ -183,47 +184,54 @@ export function Prospecting({ world }: { world: World }) {
         <div className="visit-plan-list">
           {visitPlanRows.map((row, index) => {
             const evidence = row.signals[0]?.source_quote ?? "No validated signal attached in demo data.";
+            const expanded = expandedProspectId === `visit-${row.company.id}`;
             return (
-              <div key={row.company.id} className="visit-plan-card">
+              <article key={row.company.id} className="visit-plan-card compact-scan-card">
                 <span className="rank-badge">#{index + 1}</span>
                 <div>
                   <strong>{row.company.name}</strong>
-                  <em>{formatAddress(row.company.location) ?? row.company.location.city}</em>
-                  <p>{visitReason(row)}</p>
-                  <p><b>Talking point:</b> {recommendedOutreach(row.company, row.contact?.name)}</p>
-                  <small>{evidence}</small>
-                  <div className="link-row">
-                    {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Source" />}
-                    <AskChatpilButton
-                      label="Draft outreach"
-                      prompt={outreachPrompt(row.company, `Visit plan stop in ${row.company.location.city}. Why visit: ${visitReason(row)} Evidence: ${evidence}. Contact: ${row.contact?.name ?? "not available"}.`)}
-                    />
-                    <DemoActionButton
-                      label="Create CRM Task"
-                      action={{
-                        action: "crm_task",
-                        title: "Create CRM Task",
-                        accountName: row.company.name,
-                        evidence,
-                      }}
-                    />
-                    <DemoActionButton
-                      label="Add to Follow-up"
-                      action={{
-                        action: "follow_up",
-                        title: "Add to Follow-up",
-                        accountName: row.company.name,
-                        evidence,
-                      }}
-                    />
-                  </div>
+                  <em>{row.company.location.city} · {visitReason(row)}</em>
+                  {expanded && (
+                    <div className="scan-detail-panel">
+                      <p><b>Address:</b> {formatAddress(row.company.location) ?? row.company.location.city}</p>
+                      <p><b>Talking point:</b> {recommendedOutreach(row.company, row.contact?.name)}</p>
+                      <small>{evidence}</small>
+                      <div className="link-row">
+                        {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Source" />}
+                        <AskChatpilButton
+                          label="Draft outreach"
+                          prompt={outreachPrompt(row.company, `Visit plan stop in ${row.company.location.city}. Why visit: ${visitReason(row)} Evidence: ${evidence}. Contact: ${row.contact?.name ?? "not available"}.`)}
+                        />
+                        <DemoActionButton
+                          label="Create CRM Task"
+                          action={{
+                            action: "crm_task",
+                            title: "Create CRM Task",
+                            accountName: row.company.name,
+                            evidence,
+                          }}
+                        />
+                        <DemoActionButton
+                          label="Add to Follow-up"
+                          action={{
+                            action: "follow_up",
+                            title: "Add to Follow-up",
+                            accountName: row.company.name,
+                            evidence,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="visit-plan-meta">
                   <span>Fit {row.fit}%</span>
                   <span>Opportunity {row.opportunity}</span>
-                  <span>{row.contact ? row.contact.name : "Find contact"}</span>
+                  <button type="button" onClick={() => setExpandedProspectId(expanded ? null : `visit-${row.company.id}`)}>
+                    {expanded ? "Hide" : "Details"}
+                  </button>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -235,44 +243,54 @@ export function Prospecting({ world }: { world: World }) {
             <h2>Top New Prospects</h2>
             <button onClick={() => setState({ activeTab: "map" })}>Open Map</button>
           </div>
-          {topProspects.map((row, index) => (
-            <button key={row.company.id} className="prospect-card" onClick={() => setState({ activeCompanyId: row.company.id })}>
+          {topProspects.map((row, index) => {
+            const expanded = expandedProspectId === row.company.id;
+            return (
+            <article key={row.company.id} className="prospect-card compact-scan-card">
               <span className="rank-badge">#{index + 1}</span>
               <span className="prospect-card-main">
                 <strong>{row.company.name}</strong>
-                <em>{row.company.location.city} · {titleCase(accountStatus(row.company))}</em>
-                {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
-                <RankingWhy explanation={rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit })} />
-                <span><b>Why this company?</b> Fit {row.fit}% with opportunity {row.opportunity}; estimated revenue {money(row.revenue)}.</span>
-                <span><b>Why now?</b> {whyNow(row.signals)}</span>
-                <span><b>Next:</b> {recommendedOutreach(row.company, row.contact?.name)}</span>
-                <span className="link-row">
-                  {companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}
-                  {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Top signal source" />}
-                </span>
+                <em>{row.company.location.city} · fit {row.fit}% · signal {signalStrength(row.signals)} · {row.contact ? "contact ready" : "find contact"}</em>
+                {expanded && (
+                  <div className="scan-detail-panel">
+                    {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
+                    <RankingWhy explanation={rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit })} />
+                    <span><b>Why this company?</b> Fit {row.fit}% with opportunity {row.opportunity}; estimated revenue {money(row.revenue)}.</span>
+                    <span><b>Why now?</b> {whyNow(row.signals)}</span>
+                    <span><b>Next:</b> {recommendedOutreach(row.company, row.contact?.name)}</span>
+                    <span className="link-row">
+                      {companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}
+                      {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Top signal source" />}
+                    </span>
+                    <AskChatpilButton
+                      label="Explain ranking"
+                      prompt={explainRankingPrompt(row.company.name, `Prospecting rank #${index + 1}. ${rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit }).summary} Estimated revenue ${money(row.revenue)}, signal strength ${signalStrength(row.signals)}, contact ${row.contact?.name ?? "not available"}.`)}
+                    />
+                    <AskChatpilButton
+                      label="Draft outreach"
+                      prompt={outreachPrompt(row.company, `Prospecting card. Why now: ${whyNow(row.signals)} Contact: ${row.contact?.name ?? "not available"}. Fit ${row.fit}%, opportunity ${row.opportunity}.`)}
+                    />
+                    <DemoActionButton
+                      label="Create CRM Task"
+                      action={{
+                        action: "crm_task",
+                        title: "Create CRM Task",
+                        accountName: row.company.name,
+                        evidence: row.signals[0]?.source_quote,
+                      }}
+                    />
+                  </div>
+                )}
               </span>
               <span className="prospect-card-score">
-                Signal {signalStrength(row.signals)} · {row.contact ? "Contact ready" : "Find contact"}
-                <AskChatpilButton
-                  label="Explain ranking"
-                  prompt={explainRankingPrompt(row.company.name, `Prospecting rank #${index + 1}. ${rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit }).summary} Estimated revenue ${money(row.revenue)}, signal strength ${signalStrength(row.signals)}, contact ${row.contact?.name ?? "not available"}.`)}
-                />
-                <AskChatpilButton
-                  label="Draft outreach"
-                  prompt={outreachPrompt(row.company, `Prospecting card. Why now: ${whyNow(row.signals)} Contact: ${row.contact?.name ?? "not available"}. Fit ${row.fit}%, opportunity ${row.opportunity}.`)}
-                />
-                <DemoActionButton
-                  label="Create CRM Task"
-                  action={{
-                    action: "crm_task",
-                    title: "Create CRM Task",
-                    accountName: row.company.name,
-                    evidence: row.signals[0]?.source_quote,
-                  }}
-                />
+                <button type="button" onClick={() => setState({ activeCompanyId: row.company.id })}>Open dossier</button>
+                <button type="button" onClick={() => setExpandedProspectId(expanded ? null : row.company.id)}>
+                  {expanded ? "Hide" : "Details"}
+                </button>
               </span>
-            </button>
-          ))}
+            </article>
+            );
+          })}
           {topProspects.length === 0 && (
             <EmptyState headline="No new prospects" body="No accounts currently match the prospecting filters for this market." icon="accounts" />
           )}

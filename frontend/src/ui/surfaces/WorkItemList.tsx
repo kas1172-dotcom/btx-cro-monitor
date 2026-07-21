@@ -38,6 +38,7 @@ function linkedEvidence(item: WorkItem, world: World | undefined): { text: strin
 
 export function WorkItemList({ items, empty = "No work items yet.", world }: { items: WorkItem[]; empty?: string; world?: World }) {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [statusById, setStatusById] = useState<Record<string, string>>({});
 
   function setStatus(id: string, value: string): void {
@@ -52,19 +53,29 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
           .includes(item.type)
           && item.status !== "done"
           && item.status !== "dismissed";
+        const expanded = expandedId === item.id || confirmingId === item.id;
         return (
           <article key={item.id} className="work-item-row">
-            <div>
+            <div className="work-item-summary">
+              <span className="work-item-kind">{titleCase(item.type)}</span>
               <strong>{item.recommended_action}</strong>
-              <span>{titleCase(item.type)} · {titleCase(item.status)} · {titleCase(item.priority)}</span>
-              <em>
-                {item.owner ? `Owner ${item.owner}` : "No owner"}
-                {item.due_date ? ` · due ${item.due_date}` : ""}
-                {item.source_signal_ids.length ? ` · ${item.source_signal_ids.length} evidence signal${item.source_signal_ids.length === 1 ? "" : "s"}` : ""}
-              </em>
-              {item.external_record_url && <a className="external-link" href={item.external_record_url} target="_blank" rel="noreferrer">Open in HubSpot</a>}
-              {item.execution_error && <em className="work-item-error">{item.execution_error}</em>}
-              {statusById[item.id] && <em className={statusById[item.id].startsWith("Verified") ? "work-item-success" : "work-item-error"}>{statusById[item.id]}</em>}
+              <em>{accountName(world, item.canonical_account_id)} · {titleCase(item.priority)} · {item.due_date ? `due ${item.due_date}` : "due not set"}</em>
+              <span className="work-item-confidence">{titleCase(item.approval_state)}</span>
+              <button type="button" onClick={() => setExpandedId(expanded ? null : item.id)}>
+                {expanded ? "Hide" : "Details"}
+              </button>
+            </div>
+            {expanded && (
+              <div className="work-item-detail">
+                <span>{titleCase(item.status)} · {titleCase(item.execution_state)}</span>
+                <em>
+                  {item.owner ? `Owner ${item.owner}` : "No owner"}
+                  {item.source_signal_ids.length ? ` · ${item.source_signal_ids.length} evidence signal${item.source_signal_ids.length === 1 ? "" : "s"}` : ""}
+                </em>
+                <em>Evidence: {evidence.text}</em>
+                {item.external_record_url && <a className="external-link" href={item.external_record_url} target="_blank" rel="noreferrer">Open in HubSpot</a>}
+                {item.execution_error && <em className="work-item-error">{item.execution_error}</em>}
+                {statusById[item.id] && <em className={statusById[item.id].startsWith("Verified") ? "work-item-success" : "work-item-error"}>{statusById[item.id]}</em>}
               {confirmingId === item.id && (
                 <div className="work-item-confirm">
                   <strong>Confirm HubSpot task</strong>
@@ -101,11 +112,8 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
                   Create HubSpot task
                 </button>
               )}
-            </div>
-            <div className="work-item-state">
-              <span>{titleCase(item.approval_state)}</span>
-              <span>{titleCase(item.execution_state)}</span>
-            </div>
+              </div>
+            )}
           </article>
         );
       })}
