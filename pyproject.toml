@@ -18,6 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "httpx2>=2.7",            # preferred Starlette TestClient transport
 ]
 # Integration platform backend (Engine #1). Kept optional so the static
 # monitor_engine install stays lean; install with `pip install -e ".[platform]"`.

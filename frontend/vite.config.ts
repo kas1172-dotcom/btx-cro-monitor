@@ -16,12 +16,15 @@ export default defineConfig(({ command }) => ({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          leaflet: ["leaflet", "react-leaflet"],
-          flow: ["@xyflow/react"],
-          docx: ["docx"],
-          exceljs: ["exceljs"],
-          pptx: ["pptxgenjs"],
+        manualChunks(id) {
+          const path = id.replace(/\\/g, "/");
+          if (path.includes("/node_modules/@clerk/")) return "clerk";
+          if (path.includes("/node_modules/@xyflow/")) return "flow";
+          if (path.includes("/node_modules/leaflet/") || path.includes("/node_modules/react-leaflet/")) return "leaflet";
+          if (path.includes("/node_modules/docx/")) return "docx";
+          if (path.includes("/node_modules/exceljs/")) return "exceljs";
+          if (path.includes("/node_modules/pptxgenjs/")) return "pptx";
+          return undefined;
         },
       },
     },

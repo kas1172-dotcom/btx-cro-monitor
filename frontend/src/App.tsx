@@ -9,20 +9,10 @@ import { AskBrainBar } from "./ui/brain/AskBrainBar.tsx";
 import { RightContextPanel } from "./ui/brain/RightContextPanel.tsx";
 import { TourHud } from "./ui/brain/TourHud.tsx";
 import { useMemory } from "./memory/localMemory.ts";
-import { AnalysisView } from "./ui/analysis/AnalysisView.tsx";
-import { SettingsWorkspace } from "./ui/settings/SettingsWorkspace.tsx";
 import { TodayBrief } from "./ui/surfaces/TodayBrief.tsx";
 import { WorkQueue } from "./ui/surfaces/WorkQueue.tsx";
 import { Account360 } from "./ui/surfaces/Account360.tsx";
 import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
-import { AnalysisDashboard } from "./ui/surfaces/AnalysisDashboard.tsx";
-import { CapacityAssessment } from "./ui/surfaces/CapacityAssessment.tsx";
-import { ProgramContractTracker } from "./ui/surfaces/ProgramContractTracker.tsx";
-import { DeliverableLibrary } from "./ui/surfaces/DeliverableLibrary.tsx";
-import { HubSpotViewer } from "./ui/surfaces/HubSpotViewer.tsx";
-import { Prospecting } from "./ui/surfaces/Prospecting.tsx";
-import { TripPlanner } from "./ui/surfaces/TripPlanner.tsx";
-import { DeliverableWizard } from "./ui/deliverables/DeliverableWizard.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
@@ -30,8 +20,18 @@ import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
 import type { Deliverable } from "./deliverables/types.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
+const AnalysisView = lazy(() => import("./ui/analysis/AnalysisView.tsx").then((module) => ({ default: module.AnalysisView })));
+const SettingsWorkspace = lazy(() => import("./ui/settings/SettingsWorkspace.tsx").then((module) => ({ default: module.SettingsWorkspace })));
+const AnalysisDashboard = lazy(() => import("./ui/surfaces/AnalysisDashboard.tsx").then((module) => ({ default: module.AnalysisDashboard })));
+const CapacityAssessment = lazy(() => import("./ui/surfaces/CapacityAssessment.tsx").then((module) => ({ default: module.CapacityAssessment })));
+const ProgramContractTracker = lazy(() => import("./ui/surfaces/ProgramContractTracker.tsx").then((module) => ({ default: module.ProgramContractTracker })));
+const DeliverableLibrary = lazy(() => import("./ui/surfaces/DeliverableLibrary.tsx").then((module) => ({ default: module.DeliverableLibrary })));
+const HubSpotViewer = lazy(() => import("./ui/surfaces/HubSpotViewer.tsx").then((module) => ({ default: module.HubSpotViewer })));
+const Prospecting = lazy(() => import("./ui/surfaces/Prospecting.tsx").then((module) => ({ default: module.Prospecting })));
+const TripPlanner = lazy(() => import("./ui/surfaces/TripPlanner.tsx").then((module) => ({ default: module.TripPlanner })));
 const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
 const DocumentViewer = lazy(() => import("./ui/deliverables/DocumentViewer.tsx").then((module) => ({ default: module.DocumentViewer })));
+const DeliverableWizard = lazy(() => import("./ui/deliverables/DeliverableWizard.tsx").then((module) => ({ default: module.DeliverableWizard })));
 
 function formatRunDate(value: string | null | undefined): string {
   if (!value) return "not available";
@@ -81,9 +81,17 @@ export function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [activeCompanyId, brainResponse]);
   const renderDefault = () => {
-    if (settingsActive) return <SettingsWorkspace />;
+    if (settingsActive) return (
+      <Suspense fallback={<div className="loading">loading settings...</div>}>
+        <SettingsWorkspace />
+      </Suspense>
+    );
     if (!world) return <div className="loading">loading…</div>;
-    if (activeAnalysisSpec) return <AnalysisView world={world} initialSpec={activeAnalysisSpec} />;
+    if (activeAnalysisSpec) return (
+      <Suspense fallback={<div className="loading">loading analysis...</div>}>
+        <AnalysisView world={world} initialSpec={activeAnalysisSpec} />
+      </Suspense>
+    );
     if (activeDeliverable) return (
       <Suspense fallback={<div className="loading">loading deliverable…</div>}>
         <DocumentViewer deliverable={activeDeliverable} world={world} openedFrom={activeDeliverableOrigin ?? "generation"} />
@@ -95,19 +103,51 @@ export function App() {
       case "work_queue": return <WorkQueue world={world} />;
       case "accounts": return <Account360 world={world} />;
       case "ask": return <AskSurface world={world} />;
-      case "prospecting": return <Prospecting world={world} />;
-      case "trip_planner": return <TripPlanner world={world} />;
+      case "prospecting": return (
+        <Suspense fallback={<div className="loading">loading prospecting...</div>}>
+          <Prospecting world={world} />
+        </Suspense>
+      );
+      case "trip_planner": return (
+        <Suspense fallback={<div className="loading">loading trip planner...</div>}>
+          <TripPlanner world={world} />
+        </Suspense>
+      );
       case "map": return viewWorld ? (
         <Suspense fallback={<div className="loading">loading map…</div>}>
           <ProspectMap world={viewWorld} />
         </Suspense>
       ) : <div className="loading">loading map…</div>;
-      case "analysis": return <AnalysisDashboard world={world} />;
-      case "capacity": return <CapacityAssessment world={world} />;
-      case "programs": return <ProgramContractTracker world={world} />;
-      case "deliverables": return <DeliverableLibrary world={world} />;
-      case "hubspot": return <HubSpotViewer world={world} />;
-      case "settings": return <SettingsWorkspace />;
+      case "analysis": return (
+        <Suspense fallback={<div className="loading">loading analysis...</div>}>
+          <AnalysisDashboard world={world} />
+        </Suspense>
+      );
+      case "capacity": return (
+        <Suspense fallback={<div className="loading">loading capacity...</div>}>
+          <CapacityAssessment world={world} />
+        </Suspense>
+      );
+      case "programs": return (
+        <Suspense fallback={<div className="loading">loading programs...</div>}>
+          <ProgramContractTracker world={world} />
+        </Suspense>
+      );
+      case "deliverables": return (
+        <Suspense fallback={<div className="loading">loading deliverables...</div>}>
+          <DeliverableLibrary world={world} />
+        </Suspense>
+      );
+      case "hubspot": return (
+        <Suspense fallback={<div className="loading">loading HubSpot...</div>}>
+          <HubSpotViewer world={world} />
+        </Suspense>
+      );
+      case "settings": return (
+        <Suspense fallback={<div className="loading">loading settings...</div>}>
+          <SettingsWorkspace />
+        </Suspense>
+      );
       default: return <TodayBrief world={world} />;
     }
   };
@@ -275,16 +315,18 @@ export function App() {
             <TourHud world={world} autoStart onDismiss={clearTourRequest} />
           )}
           {world && deliverableWizardRequest && (
-            <DeliverableWizard
-              key={deliverableWizardRequest.id}
-              world={world}
-              initialAgentId={deliverableWizardRequest.agentId}
-              initialAccountId={deliverableWizardRequest.accountId}
-              initialInstructions={deliverableWizardRequest.instructions}
-              startStep={deliverableWizardRequest.startStep}
-              onCommitted={handleWizardCommitted}
-              onClose={closeDeliverableWizard}
-            />
+            <Suspense fallback={<div className="loading">loading wizard...</div>}>
+              <DeliverableWizard
+                key={deliverableWizardRequest.id}
+                world={world}
+                initialAgentId={deliverableWizardRequest.agentId}
+                initialAccountId={deliverableWizardRequest.accountId}
+                initialInstructions={deliverableWizardRequest.instructions}
+                startStep={deliverableWizardRequest.startStep}
+                onCommitted={handleWizardCommitted}
+                onClose={closeDeliverableWizard}
+              />
+            </Suspense>
           )}
         </>
       )}
