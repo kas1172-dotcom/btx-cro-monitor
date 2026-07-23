@@ -58,6 +58,8 @@ function emailBody(deliverable: Deliverable): string {
 }
 
 type DocxModule = typeof import("docx");
+type XlsxCell = import("write-excel-file/browser").Cell;
+type XlsxSheetData = import("write-excel-file/browser").SheetData;
 
 const DOCX_COLORS = {
   navy: "12263A",
@@ -340,28 +342,39 @@ function openPrintWindow(_title: string, html: string): void {
 }
 
 export async function downloadXlsx(deliverable: Deliverable): Promise<void> {
-  const ExcelJS = await import("exceljs");
-  const workbook = new ExcelJS.default.Workbook();
-  workbook.creator = "BTX Precision";
-  const sheet = workbook.addWorksheet("Deliverable");
-  sheet.addRow([deliverable.title]);
+  const { default: writeXlsxFile } = await import("write-excel-file/browser");
+  const deliverableSheet: XlsxSheetData = [[xlsxHeading(deliverable.title)]];
   for (const section of exportSections(deliverable)) {
-    sheet.addRow([]);
-    sheet.addRow([section.heading]);
+    deliverableSheet.push([]);
+    deliverableSheet.push([xlsxSubheading(section.heading)]);
     for (const block of section.blocks) {
       if (block.kind === "table") {
-        sheet.addRow(block.columns);
-        block.rows.forEach((row) => sheet.addRow(row));
+        deliverableSheet.push(block.columns.map((column) => xlsxColumn(column)));
+        block.rows.forEach((row) => deliverableSheet.push(row));
       } else {
-        sheet.addRow([blockText(block)]);
+        deliverableSheet.push([blockText(block)]);
       }
     }
   }
-  const provenance = workbook.addWorksheet("Provenance");
-  provenance.addRow(["Source", "Reason", "Records"]);
-  deliverable.sources.forEach((source) => provenance.addRow([source.source, source.reason, source.records.join(", ")]));
-  const buffer = await workbook.xlsx.writeBuffer();
-  downloadFile(`${slugTitle(deliverable)}.xlsx`, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  const provenanceSheet: XlsxSheetData = [[xlsxColumn("Source"), xlsxColumn("Reason"), xlsxColumn("Records")]];
+  deliverable.sources.forEach((source) => provenanceSheet.push([source.source, source.reason, source.records.join(", ")]));
+  const blob = await writeXlsxFile([
+    { sheet: "Deliverable", data: deliverableSheet, columns: [{ width: 36 }, { width: 28 }, { width: 28 }, { width: 28 }] },
+    { sheet: "Provenance", data: provenanceSheet, columns: [{ width: 28 }, { width: 44 }, { width: 44 }] },
+  ]).toBlob();
+  downloadFile(`${slugTitle(deliverable)}.xlsx`, blob, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+}
+
+function xlsxHeading(value: string): XlsxCell {
+  return { value, fontWeight: "bold", fontSize: 16, textColor: "12263A", wrap: true };
+}
+
+function xlsxSubheading(value: string): XlsxCell {
+  return { value, fontWeight: "bold", textColor: "0F766E", wrap: true };
+}
+
+function xlsxColumn(value: string): XlsxCell {
+  return { value, fontWeight: "bold", backgroundColor: "E6F4F1", wrap: true };
 }
 
 export function downloadCsv(deliverable: Deliverable): void {

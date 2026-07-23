@@ -82,7 +82,7 @@ async function desktopSmoke(browser: Browser): Promise<void> {
 
 async function assertLazyBundles(): Promise<void> {
   const html = await readFile("dist/index.html", "utf8");
-  for (const forbidden of ["leaflet", "exceljs", "pptx", "docx", "DocumentViewer", "ProspectMap"]) {
+  for (const forbidden of ["leaflet", "write-excel-file", "xlsx", "pptx", "docx", "DocumentViewer", "ProspectMap"]) {
     assert(!html.includes(forbidden), `Initial HTML eagerly references lazy chunk: ${forbidden}`);
   }
 }

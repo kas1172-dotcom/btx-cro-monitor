@@ -22,7 +22,7 @@ export default defineConfig(({ command }) => ({
           if (path.includes("/node_modules/@xyflow/")) return "flow";
           if (path.includes("/node_modules/leaflet/") || path.includes("/node_modules/react-leaflet/")) return "leaflet";
           if (path.includes("/node_modules/docx/")) return "docx";
-          if (path.includes("/node_modules/exceljs/")) return "exceljs";
+          if (path.includes("/node_modules/write-excel-file/") || path.includes("/node_modules/fflate/")) return "xlsx";
           if (path.includes("/node_modules/pptxgenjs/")) return "pptx";
           return undefined;
         },
