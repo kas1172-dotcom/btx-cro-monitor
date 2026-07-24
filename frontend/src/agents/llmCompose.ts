@@ -2,6 +2,15 @@ import type { Deliverable, DeliverableSection, ValidationResult } from "../deliv
 import type { AgentContext, SectionSpec } from "./contract.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { backendHeaders } from "../app/backendApi.ts";
+import { VOICE_RULES_PROMPT, findVoiceViolations } from "../app/voiceRules.ts";
+
+function deliverableProse(deliverable: Deliverable): string {
+  return deliverable.sections
+    .flatMap((section) => section.blocks)
+    .filter((block) => block.kind === "text")
+    .map((block) => block.text)
+    .join(" ");
+}
 import { COPILOT_ENDPOINT, checkAiStatus, llmUnavailableLabel, markAiLive, markAiOffline } from "../app/aiStatus.ts";
 
 interface LlmSection {
@@ -76,7 +85,9 @@ Gold outreach example: "Hi Maya, I saw your team is adding production work aroun
 Gold memo example: "Verdict: protect the account with the highest delivery risk while keeping sales focused on the strongest current opportunity. Evidence: the open pipeline is concentrated in a few accounts, the top opportunity has a clear public trigger, and the top risk has account-specific delivery evidence. Action: assign one owner to each item this week."
 Gold brief example: "This account is worth a focused meeting because the public evidence points to active production need and BTX has matching certified capability. Lead with the capability fit, confirm timing and qualification requirements, and do not overstate capacity until the production window is confirmed."
 Gold pitch example: "Your team is balancing new production demand with qualified supplier capacity. BTX Precision helps aerospace and defense manufacturers move machined work through AS9100 and ITAR disciplined production, with 5-axis capacity and build-to-print execution. The reason to talk now is simple: public activity suggests timing matters, and a short fit call can confirm materials, certifications, drawings, and schedule before anyone overpromises. Bring one current print package; BTX will tell you plainly where it can help and where it cannot."
-Gold capabilities assessment example: "Inference: the account likely needs certified machined support tied to a current program. Fit is strong on 5-axis and AS9100, weaker on electronics assembly. Capacity is available but constrained by inspection queue, so the verdict is pursue-with-caution until drawings, timing, and inspection load are confirmed."`;
+Gold capabilities assessment example: "Inference: the account likely needs certified machined support tied to a current program. Fit is strong on 5-axis and AS9100, weaker on electronics assembly. Capacity is available but constrained by inspection queue, so the verdict is pursue-with-caution until drawings, timing, and inspection load are confirmed."
+
+${VOICE_RULES_PROMPT}`;
 
   const payload = {
     agentId: input.agentId,
@@ -94,6 +105,11 @@ Gold capabilities assessment example: "Inference: the account likely needs certi
   if (!grounding.ok) {
     if (!retry) return composeOnce(input, true);
     return { ok: false, reason: `grounding check rejected unsupported claims: ${grounding.violations.join("; ")}` };
+  }
+  const voice = findVoiceViolations(deliverableProse(candidate));
+  if (voice.length) {
+    if (!retry) return composeOnce(input, true);
+    return { ok: false, reason: `voice check rejected output: ${voice.join("; ")}` };
   }
   const validation = input.validate(candidate, input.ctx);
   if (!validation.valid) {
@@ -114,7 +130,9 @@ async function critiqueAndRevise(input: {
   const system = `Critique and revise CRO deliverable prose.
 Rubric: answer-first, every claim evidenced, no generic filler, each section has a clear so-what.
 Use only the provided facts and existing draft. Preserve every numeric value exactly.
-Return strict JSON only: {"sections":[{"id":"section-id","text":"revised prose"}]}.`;
+Return strict JSON only: {"sections":[{"id":"section-id","text":"revised prose"}]}.
+
+${VOICE_RULES_PROMPT}`;
   const parsed = await callJson(system, JSON.stringify({
     agentId: input.agentId,
     facts: input.ctx.facts,
@@ -129,6 +147,7 @@ Return strict JSON only: {"sections":[{"id":"section-id","text":"revised prose"}
   const revised = applyLlmSections(draft.deliverable, parsed.sections);
   const grounding = checkGrounding(revised, input.ctx);
   if (!grounding.ok) return { ok: false, reason: `critique pass introduced unsupported claims: ${grounding.violations.join("; ")}` };
+  if (findVoiceViolations(deliverableProse(revised)).length) return { ok: false, reason: "critique pass broke the voice rules" };
   const validation = input.validate(revised, input.ctx);
   return validation.valid
     ? { ok: true, deliverable: revised }

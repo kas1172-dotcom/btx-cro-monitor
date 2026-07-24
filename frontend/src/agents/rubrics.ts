@@ -1,4 +1,10 @@
-export const AGENT_RUBRICS = {
+// Every rubric carries a short voice reminder. The full BTX voice rules and the
+// banned lists live in ../app/voiceRules.ts and are also folded into the
+// composition system prompt (see llmCompose.ts).
+const VOICE_REMINDER =
+  " Follow the BTX voice: answer first, plain verbs, exact numbers from source, no banned marketing words, no em dashes.";
+
+const BASE_RUBRICS = {
   weekly_memo:
     "Open with a verdict, then the strongest evidence, then what the CRO should do. Keep recommendations concise, specific, and sourced.",
   meeting_brief:
@@ -18,3 +24,7 @@ export const AGENT_RUBRICS = {
   capabilities_assessment:
     "Write an internal should-we-chase-this assessment. Label inference, show fit line by line, be honest about gaps and constraints, and make the verdict vary with fit and capacity.",
 } as const;
+
+export const AGENT_RUBRICS = Object.fromEntries(
+  Object.entries(BASE_RUBRICS).map(([id, rubric]) => [id, rubric + VOICE_REMINDER]),
+) as Record<keyof typeof BASE_RUBRICS, string>;

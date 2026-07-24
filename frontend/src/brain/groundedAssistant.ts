@@ -6,6 +6,7 @@ import { deriveWorkItems } from "../app/workItems.ts";
 import { backendHeaders } from "../app/backendApi.ts";
 import { COPILOT_ENDPOINT, checkAiStatus, markAiLive, markAiOffline } from "../app/aiStatus.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
+import { VOICE_RULES_PROMPT } from "../app/voiceRules.ts";
 import type { BrainChatMessage, BrainResponse } from "./types.ts";
 
 export interface GroundedAssistantResult {
@@ -120,6 +121,8 @@ function systemPrompt(context: string): string {
     "For Saronic Technologies, be explicit that it needs qualification when asked about pursuit rationale.",
     "Keep answers concise, conversational, and action-first.",
     "When recommending a next step, phrase it as something the user should confirm, never as an action you already performed.",
+    "",
+    VOICE_RULES_PROMPT,
     "",
     context,
   ].join("\n");

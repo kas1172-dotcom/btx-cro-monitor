@@ -61,8 +61,9 @@ end of the day", "Needless to say".
 - `check:voice` scans user-visible strings, deliverable templates, and the LLM system
   prompts in `frontend/src/agents/` and `frontend/src/brain/` for the words in section 2,
   the openers in section 3, and em or en dashes. A hit fails the build.
-- The canonical banned lists live in `frontend/tools/voiceRules.ts` and mirror this file.
-  When this file changes, that module changes with it.
+- The canonical banned lists live in `frontend/src/app/voiceRules.ts` and mirror this file.
+  The composition prompts, the editor rewrite, the Ask assistant, and the check:voice
+  linter all import from there. When this file changes, that module changes with it.
 - An explicit allowlist file `frontend/tools/voice-allowlist.txt` holds the few legitimate
   exceptions (for example a real product or company name that contains a banned substring).
   The allowlist is reviewed, not a dumping ground.
