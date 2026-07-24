@@ -1,4 +1,4 @@
-// ChatPill brain — the CRO's chief-of-staff layer over the rules-based engine.
+// ChatPill brain - the CRO's chief-of-staff layer over the rules-based engine.
 // LLM path: proxy call with a grounded context snapshot, personal-assistant behavior,
 // action-dispatch offers, and full error isolation.
 // Offline path: rule-based resolver. No debug text ever renders in the thread.
@@ -13,77 +13,27 @@ import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { setState } from "../store/store.ts";
 import { backendHeaders } from "../app/backendApi.ts";
 import { TAB_IDS, type TabId } from "../app/surfaces.ts";
-
-const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
-const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
-const ENDPOINT = env?.VITE_COPILOT_ENDPOINT ?? processEnv?.VITE_COPILOT_ENDPOINT;
-
-// ── Live/offline state — driven by health-check results ──────────────────────
-
-type LiveStatus = "unknown" | "live" | "offline";
-let _liveStatus: LiveStatus = "unknown";
-let _liveListeners = new Set<() => void>();
-let _healthCheckPromise: Promise<boolean> | null = null;
-
-function notifyLiveListeners() {
-  _liveListeners.forEach((l) => l());
-}
+import {
+  COPILOT_ENDPOINT,
+  checkAiStatus,
+  getAiStatusSnapshot,
+  markAiLive,
+  markAiOffline,
+  subscribeAiStatus,
+  type AiLiveState,
+} from "../app/aiStatus.ts";
 
 export function subscribeToLiveStatus(fn: () => void): () => void {
-  _liveListeners.add(fn);
-  return () => _liveListeners.delete(fn);
+  return subscribeAiStatus(fn);
 }
 
-export function getLiveStatus(): LiveStatus {
-  return _liveStatus;
-}
-
-async function healthCheck(): Promise<boolean> {
-  if (!ENDPOINT) return false;
-  try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 5000);
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: await backendHeaders({ "content-type": "application/json" }),
-      signal: ctrl.signal,
-      body: JSON.stringify({
-        model: LLM_MODELS.chatpil,
-        system: "Reply with the single word: ok",
-        messages: [{ role: "user", content: "ping" }],
-      }),
-    });
-    clearTimeout(timer);
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      console.error(`[Chatpil health-check] HTTP ${res.status}:`, body);
-      return false;
-    }
-    const data = (await res.json()) as { text?: string; error?: string };
-    if (data.error) {
-      console.error("[Chatpil health-check] API error:", data.error);
-      return false;
-    }
-    return typeof data.text === "string" && data.text.length > 0;
-  } catch (e) {
-    console.error("[Chatpil health-check] failed:", e);
-    return false;
-  }
+export function getLiveStatus(): AiLiveState {
+  return getAiStatusSnapshot().state;
 }
 
 export async function runHealthCheck(): Promise<boolean> {
-  if (!ENDPOINT) {
-    if (_liveStatus !== "offline") { _liveStatus = "offline"; notifyLiveListeners(); }
-    return false;
-  }
-  if (_healthCheckPromise) return _healthCheckPromise;
-  _healthCheckPromise = healthCheck().then((ok) => {
-    _healthCheckPromise = null;
-    const next: LiveStatus = ok ? "live" : "offline";
-    if (_liveStatus !== next) { _liveStatus = next; notifyLiveListeners(); }
-    return ok;
-  });
-  return _healthCheckPromise;
+  const status = await checkAiStatus();
+  return status.state === "live";
 }
 
 // ── Action-dispatch: map intent to store actions ──────────────────────────────
@@ -139,7 +89,7 @@ function offersForContext(world: World): ChatpilOffer[] {
   }
   const topProspect = world.prospects[0];
   if (topProspect) {
-    offers.push({ label: `Draft outreach — ${topProspect.company.name}`, action: "run_agent", payload: `outreach:${topProspect.company.id}` });
+    offers.push({ label: `Draft outreach - ${topProspect.company.name}`, action: "run_agent", payload: `outreach:${topProspect.company.id}` });
   }
   return offers.slice(0, 2);
 }
@@ -161,7 +111,7 @@ export function engineContext(world: World): string {
     const ph = pipelineHealth(world.opportunities.filter((o) => o.company_id === persp.subject_id));
     const pipelineHealthText = ph === null ? healthLabel(ph) : `${ph} (${healthLabel(ph)})`;
     lines.push(
-      `${PROFILE.name} (self) — risk ${d.risk}, opportunity ${d.opportunity}, capacityRisk ${d.capacityRisk}, competitivePressure ${d.competitivePressure}, pipelineHealth ${pipelineHealthText}.`,
+      `${PROFILE.name} (self) - risk ${d.risk}, opportunity ${d.opportunity}, capacityRisk ${d.capacityRisk}, competitivePressure ${d.competitivePressure}, pipelineHealth ${pipelineHealthText}.`,
     );
   }
   lines.push("LEADERBOARD (top accounts; all four objective scores so you can explain any ranking):");
@@ -184,7 +134,7 @@ export function engineContext(world: World): string {
     );
   lines.push("ACTIVE ALERTS:");
   for (const a of world.analysis.alerts.slice(0, 6))
-    lines.push(`- ${nameOf(a.subject_id)}: ${a.dimension} ${a.score} (${a.severity}) — ${a.reason}`);
+    lines.push(`- ${nameOf(a.subject_id)}: ${a.dimension} ${a.score} (${a.severity}) - ${a.reason}`);
 
   const open = world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost");
   const pipeline = open.reduce((s, o) => s + o.value, 0);
@@ -212,7 +162,7 @@ ${CURRENT_VS_PROSPECTING}
 
 BEHAVIORAL RULES:
 - Answer the question directly from context. At the end of your answer, include a compact "based on: …" line citing the specific facts used (keep it to one line, comma-separated).
-- When natural, close with ONE useful offer as a question (e.g. "Want me to draft the outreach?" or "Should I pull the capabilities assessment?") — mark it clearly with "OFFER:" at the start of the line so the UI can render it as a button.
+- When natural, close with ONE useful offer as a question (e.g. "Want me to draft the outreach?" or "Should I pull the capabilities assessment?") - mark it clearly with "OFFER:" at the start of the line so the UI can render it as a button.
 - Navigation: if the user says "open X" or "show me Y", respond with "ACTION:open_dossier:<company_id>" or "ACTION:open_area:<tab>" on its own line, then confirm in one sentence what you did.
 Allowed tabs: ${TAB_IDS.join(", ")}.
 - Know your limits: if a question asks for data not in the context (European churn, pricing history, etc.), say exactly: "That data isn't in my context. What I do have: [list 1-2 relevant things that ARE available]." Never fabricate.
@@ -259,17 +209,20 @@ export async function askJarvis(
     return { role: "assistant", content: actionResult, actionConfirmation: actionResult };
   }
 
-  if (!ENDPOINT) {
-    return { role: "assistant", content: deterministicAnswer(last, world) };
-  }
-
-  // Ensure health is known
-  const isLive = _liveStatus === "live" || (await runHealthCheck());
-  if (!isLive) {
+  if (!COPILOT_ENDPOINT) {
     return {
       role: "assistant",
       content: deterministicAnswer(last, world),
-      offlineNote: "Assistant offline — using local answers (proxy unreachable)",
+      offlineNote: "Assistant offline, using local answers. VITE_COPILOT_ENDPOINT is not configured.",
+    };
+  }
+
+  const aiStatus = await checkAiStatus();
+  if (aiStatus.state !== "live") {
+    return {
+      role: "assistant",
+      content: deterministicAnswer(last, world),
+      offlineNote: `Assistant offline, using local answers. ${aiStatus.reason ?? "AI status check failed"}`,
     };
   }
 
@@ -280,7 +233,7 @@ export async function askJarvis(
     // Build the message list for the API: strip internal metadata fields
     const apiMessages = history.map((m) => ({ role: m.role, content: m.content }));
 
-    const res = await fetch(ENDPOINT, {
+    const res = await fetch(COPILOT_ENDPOINT, {
       method: "POST",
       headers: await backendHeaders({ "content-type": "application/json" }),
       signal: ctrl.signal,
@@ -295,12 +248,11 @@ export async function askJarvis(
     if (!res.ok) {
       const errBody = await res.text().catch(() => "");
       console.error(`[Chatpil] proxy HTTP ${res.status}:`, errBody);
-      // Mark offline
-      if (_liveStatus !== "offline") { _liveStatus = "offline"; notifyLiveListeners(); }
+      markAiOffline(`proxy returned ${res.status}`);
       return {
         role: "assistant",
         content: deterministicAnswer(last, world),
-        offlineNote: `Assistant offline — using local answers (proxy returned ${res.status})`,
+        offlineNote: `Assistant offline, using local answers. Proxy returned ${res.status}.`,
       };
     }
 
@@ -308,16 +260,15 @@ export async function askJarvis(
 
     if (data.error || !data.text || looksLikeDebugText(data.text)) {
       console.error("[Chatpil] suspicious response:", data);
-      if (_liveStatus !== "offline") { _liveStatus = "offline"; notifyLiveListeners(); }
+      markAiOffline("invalid response received");
       return {
         role: "assistant",
         content: deterministicAnswer(last, world),
-        offlineNote: "Assistant offline — using local answers (invalid response received)",
+        offlineNote: "Assistant offline, using local answers. Invalid response received.",
       };
     }
 
-    // Mark live on success
-    if (_liveStatus !== "live") { _liveStatus = "live"; notifyLiveListeners(); }
+    markAiLive(LLM_MODELS.chatpil);
 
     // Parse the structured response
     return parseAssistantReply(data.text, world);
@@ -325,13 +276,13 @@ export async function askJarvis(
   } catch (e) {
     const isTimeout = e instanceof Error && e.name === "AbortError";
     console.error("[Chatpil] call failed:", e);
-    if (_liveStatus !== "offline") { _liveStatus = "offline"; notifyLiveListeners(); }
+    markAiOffline(isTimeout ? "response timed out" : "network error");
     return {
       role: "assistant",
       content: deterministicAnswer(last, world),
       offlineNote: isTimeout
-        ? "Assistant offline — using local answers (response timed out)"
-        : "Assistant offline — using local answers (network error)",
+        ? "Assistant offline, using local answers. Response timed out."
+        : "Assistant offline, using local answers. Network error.",
     };
   }
 }
@@ -374,12 +325,12 @@ function parseAssistantReply(raw: string, world: World): Msg {
   return { role: "assistant", content, offer, actionConfirmation };
 }
 
-/** Proactive opening brief — deterministic so it works without LLM. */
+/** Proactive opening brief - deterministic so it works without LLM. */
 export function openingBrief(world: World): string {
   const nameOf = nameIn(world);
   const top = world.analysis.recommendations.filter((r) => r.priority === "high").slice(0, 3);
   if (top.length === 0)
-    return `Nothing urgent across ${world.companies.length} accounts — pipeline looks steady. Ask me anything.`;
+    return `Nothing urgent across ${world.companies.length} accounts - pipeline looks steady. Ask me anything.`;
   const items = top.map((r) => `${actionLabel(r.action)}: ${nameOf(r.subject_id)}`).join("; ");
   return `${top.length} thing${top.length > 1 ? "s" : ""} need your attention: ${items}. Ask me for details or a call plan.`;
 }

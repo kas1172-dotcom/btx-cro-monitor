@@ -29,7 +29,7 @@ fly auth login
 Create a Clerk application (clerk.com) if you don't have one yet. Single-tenant
 is fine to start. From its dashboard, copy the publishable key (frontend,
 non-secret) and the secret key (backend only), and note the instance's issuer
-URL (Frontend API URL under API Keys — looks like
+URL (Frontend API URL under API Keys - looks like
 `https://<your-instance>.clerk.accounts.dev`).
 
 Create or gather these secrets before deploy:
@@ -154,7 +154,7 @@ BTX_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@localhost:15432/DBNAME" \
 Keep the proxy process open until Alembic completes.
 
 With `BTX_ENV=prod`, the app refuses to start against a database that hasn't
-had this run — it raises `SchemaNotMigrated` instead of silently creating
+had this run - it raises `SchemaNotMigrated` instead of silently creating
 tables from model metadata (that fallback is dev/test-only).
 
 8. Deploy. `fly.toml` defines two processes from the same image: `app`
@@ -270,7 +270,7 @@ VITE_COCKPIT_PASSWORD=<demo access password>
 ```
 
 Do not add a shared backend bearer token to the Pages build. Set
-`VITE_CLERK_PUBLISHABLE_KEY` as a GitHub Actions secret/variable instead —
+`VITE_CLERK_PUBLISHABLE_KEY` as a GitHub Actions secret/variable instead -
 the cockpit gates itself behind Clerk sign-in and sends each user's own
 session token on backend calls.
 
@@ -287,7 +287,7 @@ If you need to update the allowed frontend origin on Fly later, run:
 fly secrets set --app btx-platform BTX_FRONTEND_ORIGINS="https://kas1172-dotcom.github.io"
 ```
 
-Never put `CLERK_SECRET_KEY` in a `VITE_` variable or any frontend build — it
+Never put `CLERK_SECRET_KEY` in a `VITE_` variable or any frontend build - it
 is backend-only. Only `VITE_CLERK_PUBLISHABLE_KEY` belongs in the frontend
 build; it identifies the Clerk instance and is not a secret.
 
@@ -319,7 +319,7 @@ PRs.
 ## Staging deploy (WP10-C)
 
 `.github/workflows/deploy-staging.yml` (`40 Deploy Backend (Staging)`) is **manual-only** (`workflow_dispatch`,
-never triggered by push/PR) and targets a separate, non-public Fly app —
+never triggered by push/PR) and targets a separate, non-public Fly app -
 **production auto-deploy is intentionally not enabled by this task; `fly
 deploy` against `btx-platform` stays a manual step you run yourself**
 (Section 6 above). One-time setup before the staging workflow can run:

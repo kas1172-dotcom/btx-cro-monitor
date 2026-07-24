@@ -2,7 +2,7 @@
 Client feedback ingestion.
 
 Reads a committed ``feedback.json`` and applies it as deterministic adjustments
-to one run — the in-architecture way to "incorporate client feedback" without a
+to one run - the in-architecture way to "incorporate client feedback" without a
 backend, database, or learning loop. Feedback becomes config the next run obeys:
 
   mute_terms     → keyword_prefilter.exclude   (drop matching items pre-analysis)
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 def load_feedback(path: Path) -> Feedback:
     """Load a client's feedback file, or an empty Feedback if it is absent.
-    A malformed file is logged and treated as empty rather than failing the run —
+    A malformed file is logged and treated as empty rather than failing the run -
     feedback must never be able to break the pipeline."""
     if not path.exists():
         return Feedback()

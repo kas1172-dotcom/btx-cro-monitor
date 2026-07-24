@@ -96,7 +96,7 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
       entityIds: [company.id],
       sources: [
         { source: "companies.json", records: [company.id], reason: "Account needs, segment, and relationship." },
-        { source: signals.some((signal) => signal.artifact) ? "monitor-engine artifacts" : "signals.json + news.json", records: signals.map((item) => item.id), reason: signals.some((signal) => signal.artifact) ? "Real monitor-engine evidence used to infer need, with source dates and artifact provenance." : "Recent evidence used to infer need." },
+        { source: signals.some((signal) => signal.artifact) ? "Monitor engine evidence" : "signals.json + news.json", records: signals.map((item) => item.id), reason: signals.some((signal) => signal.artifact) ? "Monitor engine evidence used to infer need, with source dates." : "Recent evidence used to infer need." },
         { source: "opportunities.json", records: opportunities.map((item) => item.id), reason: "Program and pipeline context." },
         { source: "erp_capacity.json", records: relevantCapacity.map((item) => item.facility_id), reason: "Capacity availability, lead time, and constraints." },
       ],

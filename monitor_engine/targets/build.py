@@ -2,7 +2,7 @@
 
 Pulls accounts from every configured source, scores each for fit against the
 client profile, and writes:
-  map_targets.json  — MapData artifact (the contract the page reads)
+  map_targets.json  - MapData artifact (the contract the page reads)
 """
 from __future__ import annotations
 

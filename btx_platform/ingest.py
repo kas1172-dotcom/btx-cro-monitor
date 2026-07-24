@@ -1,4 +1,4 @@
-"""Inbound ingest service — the heart of the webhook receiver.
+"""Inbound ingest service - the heart of the webhook receiver.
 
 Pure of HTTP so it is unit-testable directly: given a DB session, a queue, the
 connection, and the raw request, it verifies → validates → dedupes → persists

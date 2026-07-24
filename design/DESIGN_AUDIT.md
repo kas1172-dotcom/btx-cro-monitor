@@ -1,4 +1,4 @@
-# Design system audit — frontend/src/ui
+# Design system audit - frontend/src/ui
 
 Audited against `design.md`. Read-only findings before any retrofit work; each
 item below states current state, verdict, and what (if anything) this pass fixes.
@@ -13,17 +13,17 @@ custom property, not a color. No action needed.
 ## 2. `styles.css` token structure
 
 **Two `:root` blocks exist.**
-- Block A (lines 1–17): the 16 locked cockpit tokens, exactly matching
+- Block A (lines 1-17): the 16 locked cockpit tokens, exactly matching
   `uiTokens.ts`. This is the canonical set `design.md` documents.
-- Block B (~lines 2567–2585): a second `:root` reintroducing 16 `--ss-*`
+- Block B (~lines 2567-2585): a second `:root` reintroducing 16 `--ss-*`
   prefixed hex values (navy, teal, steel, ink, muted, bg, panel, white, ice,
-  line, tint, prov-border, prov-ink, green, amber, red) — a **light-mode**
+  line, tint, prov-border, prov-ink, green, amber, red) - a **light-mode**
   palette for the separate deliverable/document export theme
   (`frontend/src/deliverables/steelSignalTemplates.tsx`), not the live cockpit.
   Some values duplicate locked tokens (teal, amber); most are new and scoped
   only to document rendering.
 
-**Verdict:** not a violation — it's a legitimately separate theme for a
+**Verdict:** not a violation - it's a legitimately separate theme for a
 different artifact class (see `design.md`'s "Known, deliberate exception").
 **Action this pass:** add an explicit comment banner around Block B in
 `styles.css` making the exception unambiguous to future readers, and exclude
@@ -34,8 +34,8 @@ visually indistinguishable.
 
 All component CSS correctly uses `var(--font-regular)` (400) / `var(--font-semibold)`
 (600) except two hardcoded literals:
-- `styles.css:1340` — `.brand-sub { font-weight: 400; ... }`
-- `styles.css:1901` — `.copilot-head small { font-weight: 400; ... }`
+- `styles.css:1340` - `.brand-sub { font-weight: 400; ... }`
+- `styles.css:1901` - `.copilot-head small { font-weight: 400; ... }`
 
 Both are value-correct (400 is an allowed weight) but bypass the variable.
 **Action this pass:** switch both to `var(--font-regular)` for strict
@@ -77,7 +77,7 @@ integration/platform connection health, not account health.
 
 **Action this pass:** new `AccountToken` component (design.md §3), deriving
 growing/at-risk/churned from the existing `CompanyScore.dimensions.risk.score`
-(no new backend data needed) — wired into Account 360's account list and the
+(no new backend data needed) - wired into Account 360's account list and the
 Map's markers/legend.
 
 ## 7. Empty states
@@ -90,7 +90,7 @@ correctly icon+headline+body everywhere it's used: `TodayBrief.tsx`,
 
 **Action this pass:** add `EmptyState` to any of the above that can reach a
 genuinely empty condition with today's data (verified per-surface during
-retrofit — not every listed surface necessarily has a reachable empty state).
+retrofit - not every listed surface necessarily has a reachable empty state).
 
 ## 8. Surface inventory (retrofit scope for Step 2)
 
@@ -109,7 +109,7 @@ retrofit — not every listed surface necessarily has a reachable empty state).
 
 ## 9. App shell
 
-Already fully on-system — `AppShell`, `BrainSidebar`, and `App.tsx`'s topbar
+Already fully on-system - `AppShell`, `BrainSidebar`, and `App.tsx`'s topbar
 composition use CSS classes/vars exclusively. No action needed beyond whatever
 new components (status rings, confidence edges) get composed into it.
 
@@ -117,9 +117,9 @@ new components (status rings, confidence edges) get composed into it.
 
 No `design.md` existed before this pass (now created). `design/reference/`
 contains only WP9 deliverable-template assets (specs, generator scripts,
-sample renders) — unrelated to this cockpit restyle. `design/samples/ui/`
+sample renders) - unrelated to this cockpit restyle. `design/samples/ui/`
 already contains reference screenshots (`account-360-*`, `analysis-*`,
-`todays-brief-*`, `work-queue-*` at desktop+mobile) from prior work — reused
+`todays-brief-*`, `work-queue-*` at desktop+mobile) from prior work - reused
 as the baseline to diff this pass's new screenshots against.
 
 ## Summary punch list
@@ -152,29 +152,29 @@ as more surgical/behavioral than a style retrofit:
 - `CurrentBusiness.tsx`: Recommended Actions, Expansion Opportunities, open
   pipeline/won contracts, Risk Signals panels.
 - `Dossier.tsx`: open opportunities, facilities, signals panels (contacts
-  already has a bare-text guard at line 224 — candidate to upgrade alongside
+  already has a bare-text guard at line 224 - candidate to upgrade alongside
   the rest).
 Recommend a follow-up pass auditing each for whether it can genuinely reach
 zero items with real data (not just demo fixtures) before adding guards.
 
 Also noted while capturing screenshots: `ProspectMap.tsx` never sets
 `data-surface-component="surface-map"` on its root (unlike every other
-surface) — a pre-existing gap, not introduced by this pass, worth a one-line
+surface) - a pre-existing gap, not introduced by this pass, worth a one-line
 fix in a future PR so browser-automated tooling can target it consistently
 (`.map-shell` works as a stand-in selector today).
 
 ## Verification (Step 4)
 
-- `npm run build` — pass.
-- `npm run typecheck` — pass.
+- `npm run build` - pass.
+- `npm run typecheck` - pass.
 - All frontend test suites (`test:metrics`, `test:rail`, `test:settings`,
   `test:flows`, `test:tour`, `test:phase0`, `test:identity`, `test:map`,
-  `test:live-adapter`, `test:deliverables`) — pass.
-- `npm run check:design` — pass (verified the guard actually catches a
+  `test:live-adapter`, `test:deliverables`) - pass.
+- `npm run check:design` - pass (verified the guard actually catches a
   violation by injecting a temporary raw hex, confirming the script fails,
   then reverting).
 
-Grep proof — zero raw hex under `frontend/src/ui/` outside `styles.css`:
+Grep proof - zero raw hex under `frontend/src/ui/` outside `styles.css`:
 
 ```
 $ grep -rEn "#[0-9A-Fa-f]{3,8}\b" src/ui --include="*.tsx" --include="*.ts" | grep -v "/styles.css"
@@ -183,7 +183,7 @@ $ grep -rEn "#[0-9A-Fa-f]{3,8}\b" src/ui --include="*.tsx" --include="*.ts" | gr
 
 Screenshots saved to `design/samples/ui/`: `todays-brief-{desktop,mobile}.png`,
 `account-360-{desktop,mobile}.png`, `analysis-{desktop,mobile}.png`,
-`work-queue-{desktop,mobile}.png`, `map-{desktop,mobile}.png` — captured
+`work-queue-{desktop,mobile}.png`, `map-{desktop,mobile}.png` - captured
 against `VITE_DATA_MODE=demo` so accounts/map are populated for review (the
 default hybrid-mode preview build has no live backend and renders these two
 surfaces' correctly-working empty states instead).

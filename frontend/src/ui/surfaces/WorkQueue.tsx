@@ -22,8 +22,8 @@ export function WorkQueue({ world }: { world: World }) {
     <section className="surface-page" data-surface-component="surface-work-queue">
       <SurfaceHeader
         eyebrow="Work queue"
-        headline={`${items.length} durable work items across account actions, approvals, deliverables, and outcomes.`}
-        subline="Each row carries status, owner, evidence, approval state, and execution history."
+        headline={`${items.length} work items across account actions, approvals, deliverables, and outcomes.`}
+        subline="Each row shows status, owner, evidence, approval state, and execution history."
       />
       <WorkItemSourceNote source={allItems.source} error={allItems.error} />
       <div className="surface-toolbar">

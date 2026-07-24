@@ -16,7 +16,7 @@ export const CLERK_PUBLISHABLE_KEY = isUsableClerkPublishableKey(RAW_CLERK_PUBLI
 /**
  * Gate the app behind Clerk sign-in. If no publishable key is configured
  * (local demo builds with no backend/auth), render children unguarded rather
- * than crash — the backend will independently 401 anything real.
+ * than crash - the backend will independently 401 anything real.
  *
  * backendApi.ts reads the session token from the global `window.Clerk`
  * singleton that ClerkProvider installs, rather than through a hook, since

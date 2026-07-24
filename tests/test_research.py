@@ -1,5 +1,5 @@
 """Tests for the agentic research pass (analysis/research.py). The Anthropic
-client and all HTTP are mocked — no network, no API calls."""
+client and all HTTP are mocked - no network, no API calls."""
 from __future__ import annotations
 
 from datetime import datetime, timezone

@@ -1,7 +1,7 @@
 // Validation layer (Zod). Nothing enters the decision engine without clearing
 // this. One schema is the single source of truth for a Signal's shape; the
 // confidence gate is applied on top. Rejects malformed data and low-confidence
-// signals — which matters most for the LLM-extracted signals from news.
+// signals - which matters most for the LLM-extracted signals from news.
 
 import { z } from "zod";
 import type { Signal } from "../signals/contract.ts";

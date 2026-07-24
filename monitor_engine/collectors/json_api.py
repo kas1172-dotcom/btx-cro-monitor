@@ -89,8 +89,8 @@ def _append_query_param(url: str, key: str, value: str) -> str:
 def _build_item_url(raw: dict, source: JsonApiSource) -> str:
     """
     Determine the item URL, in priority order:
-      1. url_template — substitute record fields (skip item if any are missing/empty)
-      2. mapped url field — resolved against base_url if it's a relative path
+      1. url_template - substitute record fields (skip item if any are missing/empty)
+      2. mapped url field - resolved against base_url if it's a relative path
     Returns "" when no usable URL can be built (caller skips the item).
     """
     if source.url_template:
@@ -119,7 +119,7 @@ def _parse_date(value: str | None) -> tuple[datetime | None, bool]:
     """
     Returns (dt, parse_failed).
     parse_failed=True when value was non-empty but no parser could interpret it.
-    Rule: never guess or fabricate — return (None, True) on any ambiguity.
+    Rule: never guess or fabricate - return (None, True) on any ambiguity.
     """
     if not value:
         return None, False

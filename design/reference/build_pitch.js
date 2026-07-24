@@ -7,7 +7,7 @@ function bg(s,c){s.background={color:c};}
 function footer(s,n){s.addText([{text:"BTX Precision Machining",options:{bold:true,color:MUTED}},{text:"   ·   Sales pitch · illustrative sample",options:{color:MUTED}}],{x:M,y:H-0.42,w:9,h:0.3,fontFace:BODY,fontSize:9,margin:0,valign:"middle"});s.addText(String(n),{x:W-1.1,y:H-0.42,w:0.5,h:0.3,fontFace:BODY,fontSize:9,color:MUTED,align:"right",margin:0,valign:"middle"});}
 function head(s,eb,t){s.addShape(p.ShapeType.ellipse,{x:M,y:M,w:0.26,h:0.26,fill:{color:TEAL}});s.addText(eb.toUpperCase(),{x:M+0.4,y:M-0.03,w:10,h:0.3,fontFace:BODY,fontSize:11,bold:true,color:TEAL,charSpacing:2,margin:0,valign:"middle"});s.addText(t,{x:M,y:M+0.32,w:W-2*M,h:0.7,fontFace:HEAD,fontSize:30,bold:true,color:INK,margin:0});}
 
-// SLIDE 1 — value prop cover
+// SLIDE 1 - value prop cover
 let s=p.addSlide();bg(s,NAVY);
 s.addShape(p.ShapeType.ellipse,{x:M,y:1.9,w:0.5,h:0.5,fill:{color:TEAL}});
 s.addText("BTX",{x:M,y:1.9,w:0.5,h:0.5,fontFace:HEAD,fontSize:15,bold:true,color:NAVY,align:"center",valign:"middle",margin:0});
@@ -17,7 +17,7 @@ s.addText("Build-to-print spares for lot-19, delivered on a 99.2% on-time record
 s.addText("Prepared for a supply-chain introduction · Confidential",{x:M,y:6.5,w:11,h:0.3,fontFace:BODY,fontSize:11,color:"8AA0B6",margin:0});
 s.addNotes("Value-prop cover for a specific prospect. One sentence: who we are and why now.");
 
-// SLIDE 2 — two projections
+// SLIDE 2 - two projections
 s=p.addSlide();bg(s,BG);
 head(s,"The case in figures","What this partnership is worth to both sides");
 // internal chart
@@ -40,7 +40,7 @@ s.addText([{text:"Figure 2.  ",options:{bold:true,color:INK}},{text:"Projected v
 footer(s,2);
 s.addNotes("Two projections side by side: internal (revenue to BTX) and external (value to client). Both illustrative; captions summarize each.");
 
-// SLIDE 3 — the ask
+// SLIDE 3 - the ask
 s=p.addSlide();bg(s,BG);
 head(s,"The ask","A 20-minute introduction");
 const steps=[["1","Intro call","Walk your build-to-print spares scope and our current capacity windows."],["2","Capability review","Share AS9100 / ITAR docs, sample first articles, and quality record."],["3","Pilot package","Quote a first lot-19 spares package against your priority parts."]];

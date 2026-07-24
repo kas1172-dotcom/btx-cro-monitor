@@ -1,5 +1,5 @@
 """Tests for the cross-API enrichment stage, the generic connector, and the
-entity graph. All HTTP is mocked — no network."""
+entity graph. All HTTP is mocked - no network."""
 from __future__ import annotations
 
 from datetime import datetime, timezone

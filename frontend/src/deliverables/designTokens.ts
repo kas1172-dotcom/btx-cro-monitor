@@ -78,11 +78,11 @@ export const steelSignal = {
 export type SteelSignalTokens = typeof steelSignal;
 
 export function stripEmDashes(text: string): string {
-  return text.replace(/—/g, ";").replace(/–/g, " to ");
+  return text.replace(/[\u2013\u2014]/g, "-");
 }
 
 export function assertNoEmDash(text: string): void {
-  if (/[—–]/.test(text)) {
+  if (/[\u2013\u2014]/.test(text)) {
     throw new Error("Steel & Signal deliverables cannot contain em or en dashes.");
   }
 }

@@ -160,7 +160,7 @@ class TestDedupItems:
         assert len(dedup_items(items)) == 2
 
 
-# ─── compute_diff — core cases ────────────────────────────────────────────
+# ─── compute_diff - core cases ────────────────────────────────────────────
 
 class TestComputeDiffEmpty:
     def test_both_empty(self):
@@ -186,7 +186,7 @@ class TestComputeDiffEmpty:
         assert "gone-t2" in diff.dropped
 
 
-# ─── compute_diff — tier classification ───────────────────────────────────
+# ─── compute_diff - tier classification ───────────────────────────────────
 
 class TestComputeDiffTierClassification:
     def test_unchanged_tier1_item_not_in_new_lists(self):
@@ -234,7 +234,7 @@ class TestComputeDiffTierClassification:
         assert "low" not in diff.dropped
 
 
-# ─── compute_diff — escalations ───────────────────────────────────────────
+# ─── compute_diff - escalations ───────────────────────────────────────────
 
 class TestComputeDiffEscalation:
     def test_escalation_tier2_to_tier1(self):
@@ -274,7 +274,7 @@ class TestComputeDiffEscalation:
         assert set(diff.new_tier_2) == {"b"}
 
 
-# ─── compute_diff — dropped ───────────────────────────────────────────────
+# ─── compute_diff - dropped ───────────────────────────────────────────────
 
 class TestComputeDiffDropped:
     def test_tier1_item_absent_from_current_is_dropped(self):
@@ -305,7 +305,7 @@ class TestComputeDiffDropped:
         assert "old-id" not in diff.dropped
 
 
-# ─── compute_diff — URL normalization for cross-run matching ──────────────
+# ─── compute_diff - URL normalization for cross-run matching ──────────────
 
 class TestComputeDiffUrlNormalization:
     def test_tracking_params_do_not_create_spurious_new_entry(self):
@@ -326,7 +326,7 @@ class TestComputeDiffUrlNormalization:
         assert diff.escalated[0].current_tier == 1
 
 
-# ─── compute_diff — deadline_imminent ─────────────────────────────────────
+# ─── compute_diff - deadline_imminent ─────────────────────────────────────
 
 class TestComputeDiffDeadline:
     def test_deadline_today_is_imminent(self):
@@ -449,7 +449,7 @@ class TestUpdateArchive:
             archive = update_archive(archive, _run(f"r{i}", items), max_runs=2)
 
         pinned_count_before = len(archive.pinned)
-        # Now add item_v2 (same URL after normalization) — should not add a second pin
+        # Now add item_v2 (same URL after normalization) - should not add a second pin
         archive = update_archive(archive, _run("r3", []), max_runs=2)
         # Manually test that update_archive doesn't double-pin the same URL
         # (both id-v1 and the same URL won't be pinned twice)

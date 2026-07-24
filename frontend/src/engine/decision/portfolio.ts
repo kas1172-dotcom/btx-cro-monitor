@@ -1,5 +1,5 @@
 // Portfolio-level decision logic: score many subjects, rank them, and derive
-// alerts from deterministic thresholds. Still NO AI — same inputs, same output.
+// alerts from deterministic thresholds. Still NO AI - same inputs, same output.
 // Alert thresholds live in the same versioned config as the weights.
 
 import { scoreSubject } from "./score.ts";
@@ -30,7 +30,7 @@ export interface Alert {
   dimension: ScoreDimension;
   score: number;
   severity: "elevated" | "high";
-  /** The single biggest signal behind this dimension — the headline of the trace. */
+  /** The single biggest signal behind this dimension - the headline of the trace. */
   reason: string;
 }
 

@@ -89,7 +89,7 @@
     },
     "paid_sources": {
       "type": "array",
-      "description": "Flags for authenticated sources. The API key is supplied out-of-band and stored as a repo secret — never in this file.",
+      "description": "Flags for authenticated sources. The API key is supplied out-of-band and stored as a repo secret - never in this file.",
       "items": {
         "type": "object",
         "additionalProperties": false,

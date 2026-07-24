@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, HttpUrl, computed_field, model_validator
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# COLLECTION — normalized item produced by any source handler
+# COLLECTION - normalized item produced by any source handler
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
@@ -33,7 +33,7 @@ class RawItem(BaseModel):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# COLLECTION HEALTH — produced by collect_all, feeds into RunMeta
+# COLLECTION HEALTH - produced by collect_all, feeds into RunMeta
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
@@ -180,7 +180,7 @@ class DeepAnalysisConfig(BaseModel):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ENRICHMENT CONFIG — generic cross-API connectors
+# ENRICHMENT CONFIG - generic cross-API connectors
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # An enricher takes entities the analyst extracted from an item and looks each
 # one up in an external API, attaching structured facts back to the item. The
@@ -214,7 +214,7 @@ class ConnectorSpec(BaseModel):
 
 class EnricherConfig(BaseModel):
     """One enrichment source: for each matching entity on an item, query an API
-    and attach facts. Generic — the client/industry specifics live in the
+    and attach facts. Generic - the client/industry specifics live in the
     client config, never in engine code."""
     id: str
     label: str
@@ -235,7 +235,7 @@ class NamedEntities(BaseModel):
 
 class ClientProfile(BaseModel):
     """Structured description of the client the monitor serves. This is config
-    CONTENT consumed by the analysis prompt — not a database — so each item's
+    CONTENT consumed by the analysis prompt - not a database - so each item's
     so-what/now-what speaks to the client's actual capabilities and goals rather
     than generically. Every field is optional; the prompt only emits the parts
     that are present. Do not infer facts beyond what is stated here."""
@@ -250,11 +250,11 @@ class ClientProfile(BaseModel):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ACCOUNT MAP CONFIG — geographic view of potential accounts
+# ACCOUNT MAP CONFIG - geographic view of potential accounts
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # A revenue/BD view: pull a list of potential accounts from one or more sources,
 # place them on a map, and score each for fit against the client profile. Generic
-# — which sources, regions, and columns are all config; client specifics live in
+# - which sources, regions, and columns are all config; client specifics live in
 # the client config + its data files, never in engine code.
 
 
@@ -337,7 +337,7 @@ class ClientConfig(BaseModel):
 class Feedback(BaseModel):
     """Client feedback that deterministically adjusts the next run.
 
-    A committed file (``clients/<name>/feedback.json``) — NOT a database and NOT
+    A committed file (``clients/<name>/feedback.json``) - NOT a database and NOT
     a learning loop. Each field is applied as a plain, reproducible rule, so the
     effect is auditable in git. An absent file (or empty lists) means no change.
     """
@@ -394,7 +394,7 @@ class ItemEnrichment(BaseModel):
 
 
 class RelatedRef(BaseModel):
-    """A pointer from one item to another that shares one or more entities —
+    """A pointer from one item to another that shares one or more entities -
     the edge of the entity graph. ``via`` lists the shared entity names."""
     item_id: str
     title: str
@@ -411,7 +411,7 @@ class EntityIndexEntry(BaseModel):
 
 
 class EditionAnalysis(BaseModel):
-    relevance_score: int          # 0–100; LLM assigns in one batch call covering all editions
+    relevance_score: int          # 0-100; LLM assigns in one batch call covering all editions
     so_what: str
     now_what: str
     categories: list[str]         # subset of edition.categories that apply
@@ -510,7 +510,7 @@ class DeepAnalysisSectionInfo(BaseModel):
 
 
 class EnricherInfo(BaseModel):
-    """Presentation projection of an enricher — id + label for the site's
+    """Presentation projection of an enricher - id + label for the site's
     'live integrations' badge and fact grouping."""
     id: str
     label: str
@@ -536,7 +536,7 @@ class RunOutput(BaseModel):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ARCHIVE — rolling history of past runs
+# ARCHIVE - rolling history of past runs
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
@@ -552,7 +552,7 @@ class Archive(BaseModel):
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ACCOUNT MAP OUTPUT — artifact consumed by the map page
+# ACCOUNT MAP OUTPUT - artifact consumed by the map page
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
@@ -566,7 +566,7 @@ class TargetAccount(BaseModel):
     geo: GeoPoint | None = None              # None → not placeable; surfaced in a list only
     geo_approx: bool = False                 # True when geo is a state-centroid fallback
     facts: list[EnrichmentFact] = []         # award $, agency, NAICS… (reuses the enrichment fact)
-    fit_score: int = 0                       # 0–100 fit against the client profile
+    fit_score: int = 0                       # 0-100 fit against the client profile
     fit_tier: Literal["hot", "warm", "cool"] = "cool"
     fit_rationale: str = ""
     serve_with: list[str] = []               # client capabilities that map to this account's need

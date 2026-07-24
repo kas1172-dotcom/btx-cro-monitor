@@ -1,5 +1,5 @@
 // The shape of the decision config. The VALUES live in a versioned JSON file
-// (data/config/scoring-weights.v1.json) that the engine receives as input —
+// (data/config/scoring-weights.v1.json) that the engine receives as input -
 // they are not hardcoded here. "Retraining" the model = shipping a new file.
 // This keeps scoring deterministic at runtime while remaining tunable offline.
 

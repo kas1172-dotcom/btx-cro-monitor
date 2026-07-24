@@ -342,7 +342,7 @@ class TestValidateFactualClaims:
         assert any("dollar_amount" in c for c in result.unverified_claims)
 
     def test_population_glued_multiplier_verifies(self):
-        # 2,000,000 extracted vs glued "2M" in source — same matcher as dollars
+        # 2,000,000 extracted vs glued "2M" in source - same matcher as dollars
         item = _analyzed(pop_raw="2M beneficiaries", pop_val=2_000_000)
         result = validate_factual_claims(
             item, _raw(title="Rule affects 2M beneficiaries", summary=None)
@@ -786,7 +786,7 @@ class TestStrictJsonSchema:
 
     def test_raw_pydantic_schema_has_numeric_constraints(self):
         # Sanity check: Field(ge=0, le=100) emits minimum/maximum, which the
-        # API rejects — proves the stripping test below is meaningful.
+        # API rejects - proves the stripping test below is meaningful.
         assert _numeric_constraint_paths(_BatchResult.model_json_schema())
 
     def test_numeric_constraints_stripped(self):
@@ -1015,7 +1015,7 @@ class TestDeepAnalysis:
         scorer = Scorer(cfg, client=client, min_call_interval=0)
         scorer.analyze([_raw("item-001")])
 
-        # classify + editorial via create (2), deep via stream (1) — all schemas strict
+        # classify + editorial via create (2), deep via stream (1) - all schemas strict
         assert client.messages.create.call_count == 2
         assert client.messages.stream.call_count == 1
         for call in (*client.messages.create.call_args_list, *client.messages.stream.call_args_list):

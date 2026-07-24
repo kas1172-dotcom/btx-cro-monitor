@@ -5,7 +5,7 @@ free variable, ``{query}``, substituted with the entity being looked up. The
 same connector backs both the enrichment stage and the agentic ``query_api``
 tool, so "integrate any API" is one well-tested code path.
 
-No client/industry knowledge lives here — the URL, body, paths, and field maps
+No client/industry knowledge lives here - the URL, body, paths, and field maps
 are all config.
 """
 from __future__ import annotations

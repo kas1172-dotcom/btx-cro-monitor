@@ -16,7 +16,7 @@ export interface RegionFilter {
 
 export interface DataAdapter {
   getCompanies(filter?: RegionFilter): Promise<Company[]>;
-  /** Raw signals — must clear the validation layer before scoring. */
+  /** Raw signals - must clear the validation layer before scoring. */
   getSignals(filter?: RegionFilter): Promise<unknown[]>;
   getContacts(filter?: RegionFilter): Promise<Contact[]>;
   getFacilities(filter?: RegionFilter): Promise<Facility[]>;

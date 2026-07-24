@@ -22,7 +22,7 @@ const MONITOR_BASE_URL = (env?.VITE_ARTIFACT_BASE_URL ?? "../btx").replace(/\/$/
 const PUBLISHED_RUN_OUTPUT_PATH = `${MONITOR_BASE_URL}/run_output.json`;
 const PUBLISHED_ARCHIVE_PATH = `${MONITOR_BASE_URL}/archive.json`;
 const BUNDLED_RUN_OUTPUT_PATH = "clients/btx/artifacts/run_output.json";
-const BASELINE_SOURCE = "Seeded baseline — ERP integration pending";
+const BASELINE_SOURCE = "Sample data - ERP integration pending";
 const STALE_DAYS = 7;
 
 const SEEDED_COMPANIES = companiesData as unknown as Company[];
@@ -39,7 +39,7 @@ const NEWS = newsData as Array<{ published_date?: string }>;
 
 const state = {
   errors: [] as string[],
-  provenance: "HubSpot + Monitor artifacts + seeded baseline",
+  provenance: "HubSpot + Monitor evidence + Sample data",
 };
 
 interface RuntimeResponse<T> {
@@ -140,7 +140,7 @@ function seededIntegrations(): IntegrationRecord[] {
     },
     {
       id: "monitor",
-      name: "Monitor artifacts",
+      name: "Monitor evidence",
       category: "Market signals",
       status: "connected",
       source_ref: PUBLISHED_RUN_OUTPUT_PATH,
@@ -149,12 +149,12 @@ function seededIntegrations(): IntegrationRecord[] {
       source_kind: "monitor",
     },
     ...SEEDED_INTEGRATIONS.map((item) => ({
-      id: item.id ?? "seeded-baseline",
-      name: item.name ?? "Seeded baseline",
+      id: item.id ?? "sample-data",
+      name: item.name ?? "Sample data",
       category: item.category ?? "Operating baseline",
       status: (item.status === "future" ? "future" : "available") as IntegrationRecord["status"],
       source_ref: item.demo_file ?? "frontend/data/demo/btx/",
-      production_method: item.production_method ?? "Backend-served seeded baseline",
+      production_method: item.production_method ?? "Backend served sample data",
       description: item.description ?? BASELINE_SOURCE,
       source_kind: "seeded" as const,
     })),
@@ -164,9 +164,9 @@ function seededIntegrations(): IntegrationRecord[] {
 function normalizeBaseline(payload: BaselinePayload): OperatingSnapshot {
   const stamp = <T extends { source_name?: string; source_type?: string; source_mode?: string }>(row: T): T => ({
     ...row,
-    source_type: "seeded_baseline",
-    source_name: BASELINE_SOURCE,
-    source_mode: "seeded_baseline",
+      source_type: "sample_data",
+      source_name: BASELINE_SOURCE,
+      source_mode: "sample_data",
   });
   return {
     crm: payload.crm.map(stamp) as CrmSnapshotRecord[],
@@ -186,7 +186,7 @@ function normalizeBaseline(payload: BaselinePayload): OperatingSnapshot {
       news_count: NEWS.length,
       latest_signal_at: SEEDED_SIGNALS.map((signal) => signal.detected_at).filter((date): date is string => Boolean(date)).sort().at(-1) ?? null,
       latest_news_date: NEWS.map((item) => item.published_date).filter((date): date is string => Boolean(date)).sort().at(-1) ?? null,
-      source_name: "Monitor artifacts",
+      source_name: "Monitor evidence",
       source_mode: "monitor_pending",
       notice: null,
     },
@@ -390,7 +390,7 @@ export class CockpitDataAdapter implements DataAdapter {
         news_count: monitor.signals.length,
         latest_signal_at: monitor.latestPublishedAt,
         latest_news_date: monitor.latestPublishedAt,
-        source_name: `Monitor artifacts (${monitor.sourceCount} sources)`,
+        source_name: `Monitor evidence (${monitor.sourceCount} sources)`,
         source_mode: "monitor_output",
         run_at: monitor.runAt,
         archive_run_count: Array.isArray(archive.runs) ? archive.runs.length : 0,

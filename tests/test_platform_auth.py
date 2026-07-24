@@ -1,5 +1,5 @@
 """Unit coverage for btx_platform.auth: role hierarchy, tenant default,
-rate limiting — independent of the full FastAPI app (see
+rate limiting - independent of the full FastAPI app (see
 test_platform_tier1.py for the end-to-end unauth/viewer/tenant-isolation
 route tests)."""
 from __future__ import annotations

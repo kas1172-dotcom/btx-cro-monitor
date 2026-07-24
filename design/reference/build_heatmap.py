@@ -13,7 +13,7 @@ GREEN="#3FA66A"; AMBER="#E0A93B"; RED="#D6533C"
 accounts = ["Lockheed Martin","Boeing","RTX","Northrop Grumman","Spirit AeroSystems",
             "Howmet Aerospace","Moog Inc.","Woodward"]
 quarters = ["Q4 FY25","Q1 FY26","Q2 FY26","Q3 FY26","Q4 FY26e","Q1 FY27e"]
-# quarterly revenue ($K) — illustrative
+# quarterly revenue ($K) - illustrative
 rev = np.array([
  [820, 910, 980,1120,1210,1300],   # Lockheed - growing
  [540, 560, 600, 640, 660, 690],    # Boeing

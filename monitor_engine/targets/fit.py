@@ -2,7 +2,7 @@
 
 Deterministic, rule-based match of a potential account against the client
 profile: which of the client's capabilities map to the account, plus its
-named customers/programs and geographic focus. No LLM, no network — so the map
+named customers/programs and geographic focus. No LLM, no network - so the map
 is reproducible and auditable in git, like the rest of the engine.
 
 Generic: reads only ClientProfile (client specifics live in config), never any
@@ -50,12 +50,12 @@ def score_fit(
     state_abbr: str | None,
     facts: list[EnrichmentFact],
 ) -> tuple[int, str, list[str], str]:
-    """Return (score 0–100, tier, serve_with, rationale).
+    """Return (score 0-100, tier, serve_with, rationale).
 
     Without a profile, everything is a neutral "warm" lead (no basis to rank).
     """
     if profile is None:
-        return 50, "warm", [], "No client profile configured — shown as a neutral lead."
+        return 50, "warm", [], "No client profile configured - shown as a neutral lead."
 
     hay = _account_text(name, segment, facts)
     serve_with = [cap for cap in profile.capabilities if _phrase_matches(cap, hay)]
@@ -81,7 +81,7 @@ def score_fit(
     elif industry_hits:
         bits.append("in a served industry (" + ", ".join(industry_hits) + ")")
     rationale = (
-        ("Strong fit — " if tier == "hot" else "Possible fit — " if tier == "warm" else "Low signal — ")
+        ("Strong fit - " if tier == "hot" else "Possible fit - " if tier == "warm" else "Low signal - ")
         + ("; ".join(bits) if bits else "no profile overlap detected")
         + "."
     )

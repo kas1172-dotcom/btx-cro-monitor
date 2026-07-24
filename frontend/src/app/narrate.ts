@@ -1,5 +1,5 @@
 // Deterministic narrator. Formats the engine's structured output into readable
-// business language — NOT AI, just better presentation of the numbers. This is
+// business language - NOT AI, just better presentation of the numbers. This is
 // the fallback the dossier uses when no baked LLM narration exists for a company,
 // so the demo always reads like a sales brief. The per-event "what this means"
 // templates carry BTX/industry framing and therefore live in data/config.
@@ -26,10 +26,10 @@ export function narrateOpportunity(
   const types = [...new Set(signals.map((s) => s.event_type))]
     .slice(0, 3)
     .map((t) => t.replace(/_/g, " "));
-  const drivers = types.length ? ` Recent activity — ${types.join(", ")} — points to new work.` : "";
+  const drivers = types.length ? ` Recent activity - ${types.join(", ")} - points to new work.` : "";
   const fitClause = fit.matched.length
     ? ` ${PROFILE.name} fits ${fit.score}%, serving ${fit.matched.slice(0, 3).join(", ")}.`
-    : ` ${PROFILE.name} has no direct capability match (${fit.score}%) — likely a teaming play.`;
+    : ` ${PROFILE.name} has no direct capability match (${fit.score}%) - likely a teaming play.`;
   const action = fit.matched.length ? ` Lead with ${fit.matched[0]}.` : "";
   return `${company.name} is ${tier} opportunity (${opportunity}).${drivers}${fitClause}${action}`;
 }

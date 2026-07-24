@@ -5,7 +5,7 @@
 import insights from "../../data/demo/btx/insights.json";
 
 export interface CompanyInsight {
-  /** LLM prose explaining "why this is a target" — grounded in the trace. */
+  /** LLM prose explaining "why this is a target" - grounded in the trace. */
   opportunity?: string;
   /** signal_id -> one-line "what this means for BTX". */
   findings?: Record<string, string>;

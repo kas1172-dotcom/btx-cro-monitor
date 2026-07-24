@@ -3,19 +3,19 @@ Deterministic tools for the source-discovery agent.
 
 The agent (an Anthropic tool-use loop, run in CI) reasons over a client's
 plain-language "coverage" briefs and proposes candidate source configs. These
-two tools are its hands and its ground truth — no LLM, no API key, fully
+two tools are its hands and its ground truth - no LLM, no API key, fully
 testable:
 
-  fetch_sample(url)    — fetch a URL and return a truncated body for the agent to
+  fetch_sample(url)    - fetch a URL and return a truncated body for the agent to
                          read (so it can infer RSS vs JSON vs HTML, item paths,
                          field names, selectors).
-  probe_source(source) — THE ORACLE: validate a proposed source against the real
+  probe_source(source) - THE ORACLE: validate a proposed source against the real
                          Source schema, run it through the actual collector, and
                          report what came back. The agent keeps a source only if
                          this returns ok=True.
 
 This makes the agent self-grading against live HTTP rather than its own
-confidence — the same loop we ran by hand to build the healthcare sources.
+confidence - the same loop we ran by hand to build the healthcare sources.
 """
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ def fetch_sample(
     timeout: int = 20,
 ) -> dict[str, Any]:
     """Fetch *url* and return a truncated body sample for the agent to inspect.
-    Never raises — network/HTTP errors are returned in the dict."""
+    Never raises - network/HTTP errors are returned in the dict."""
     session = session or make_session()
     headers = {"User-Agent": user_agent} if user_agent else {}
     try:
@@ -66,7 +66,7 @@ def probe_source(
 ) -> dict[str, Any]:
     """Validate *source* against the Source schema and run it through the real
     collector. Returns {ok, items_collected, date_parse_failures, sample, error}.
-    ok=True means the source produced at least one item — the agent's keep/drop
+    ok=True means the source produced at least one item - the agent's keep/drop
     signal. Never raises."""
     try:
         validated = _SOURCE_ADAPTER.validate_python(source)

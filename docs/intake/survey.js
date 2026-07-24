@@ -3,7 +3,7 @@
  *
  * surveyToIntake(answers) → an intake object matching the schema that
  * tooling/scaffold.py consumes (scaffold.py remains the single mapper from
- * intake → ClientConfig — the survey deliberately does NOT reimplement that).
+ * intake → ClientConfig - the survey deliberately does NOT reimplement that).
  * validateAnswers(answers) → array of human-readable error strings ([] = valid).
  *
  * Loadable in the browser (sets window.SurveyIntake) and in Node (module.exports

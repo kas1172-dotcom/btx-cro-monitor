@@ -20,7 +20,7 @@ Use this checklist for UI behaviors that are not covered by the deterministic Ty
 - FAB/Chatpil: open a dossier or context panel, confirm the Chatpil FAB shifts left so it does not cover the right panel; close the panel and confirm the FAB returns to the right edge.
 - Param popup: open "Plan a trip", confirm skeleton loading bars from a prior request are not visible behind the popup; confirm the × close button is at least 32×32px and clearly visible.
 - Overflow auditor (DEV only): in the browser console run `window.__btxAudit?.()` after navigating to each tab. No red warnings should appear. If any appear, record the selector and report.
-- Width sweep: at 1512, 1280, and 1024px — verify no column is squished to zero, no button label is cut mid-word, no table overflows its container, and no rail badge overlaps the nav icon.
+- Width sweep: at 1512, 1280, and 1024px - verify no column is squished to zero, no button label is cut mid-word, no table overflows its container, and no rail badge overlaps the nav icon.
 
 ## Artifact mode smoke test
 

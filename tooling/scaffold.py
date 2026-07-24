@@ -2,13 +2,13 @@
 Deterministic intake → draft-config scaffolder.
 
 Turns a client's structured questionnaire answers (intake.json) into the
-*deterministic* parts of a ClientConfig — branding, editions, categories,
+*deterministic* parts of a ClientConfig - branding, editions, categories,
 never-discard terms, keyword prefilter, cadence, deep-analysis sections, and
-cost caps — and leaves `sources` empty.
+cost caps - and leaves `sources` empty.
 
-The one part that is NOT deterministic — turning the client's plain-language
+The one part that is NOT deterministic - turning the client's plain-language
 "what I read / who matters" answers into working `sources[]` (real feed URLs,
-JSON paths, CSS selectors) — is returned separately as `source_briefs`, to be
+JSON paths, CSS selectors) - is returned separately as `source_briefs`, to be
 resolved by the source-discovery agent against the live connectivity oracle.
 This module performs no network calls and needs no API key; it is the testable
 glue around that agent.
@@ -52,7 +52,7 @@ _DEEP_SECTIONS: dict[str, dict[str, str]] = {
     "scenarios": {
         "label": "Scenarios to watch", "kind": "list",
         "instruction": "Two or three plausible ways this could develop over the next "
-                       "6–18 months, each phrased as a short conditional.",
+                       "6-18 months, each phrased as a short conditional.",
     },
     "recommended_actions": {
         "label": "Recommended actions", "kind": "list",
@@ -81,9 +81,9 @@ def slugify(label: str) -> str:
 def cadence_to_cron(cadence: dict[str, Any]) -> str:
     """Map a canonical cadence choice to a 5-field cron expression.
 
-    frequency: "weekly" | "weekdays" | "daily"; day (for weekly); hour_local (0–23).
+    frequency: "weekly" | "weekdays" | "daily"; day (for weekly); hour_local (0-23).
     Note: the hour is the client's local hour; the actual CI cron is UTC, so the
-    operator/agent aligns the workflow schedule separately — this value is the
+    operator/agent aligns the workflow schedule separately - this value is the
     informational cadence echoed into the config.
     """
     hour = int(cadence.get("hour_local", 7))

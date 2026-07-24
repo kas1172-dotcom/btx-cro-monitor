@@ -55,7 +55,7 @@ function pill(slide, x, y, text, color) {
   return w;
 }
 
-// =================== SLIDE 1 — COVER ===================
+// =================== SLIDE 1 - COVER ===================
 let s = p.addSlide(); bg(s, NAVY);
 s.addShape(p.ShapeType.ellipse, { x: M, y: 2.1, w: 0.5, h: 0.5, fill: { color: TEAL } });
 s.addText("BTX", { x: M, y: 2.1, w: 0.5, h: 0.5, fontFace: HEAD, fontSize: 15, bold: true, color: NAVY, align: "center", valign: "middle", margin: 0 });
@@ -68,7 +68,7 @@ s.addText([
 ], { x: M, y: 6.4, w: 11, h: 0.35, fontFace: BODY, fontSize: 12, margin: 0 });
 s.addNotes("Cover. BTX Revenue Brain quarterly board review. All figures illustrative sample data.");
 
-// =================== SLIDE 2 — EXEC SUMMARY ===================
+// =================== SLIDE 2 - EXEC SUMMARY ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Executive summary", "The quarter in four numbers");
 stat(s, M, 1.7, 2.75, "$18.4M", "Bookings", "+12% vs prior quarter", TEAL);
@@ -93,7 +93,7 @@ rows.forEach(([t, d, c]) => {
 footer(s, 2);
 s.addNotes("Executive summary: five headline metrics, then the three things that actually changed and why they matter to revenue.");
 
-// =================== SLIDE 3 — REVENUE SNAPSHOT (chart) ===================
+// =================== SLIDE 3 - REVENUE SNAPSHOT (chart) ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Revenue snapshot", "Bookings and backlog trend");
 s.addChart(p.ChartType.bar, [
@@ -121,7 +121,7 @@ provenance(s, 8.5, 5.98, W - M - 8.5, "HubSpot deals + ERP bookings", "canonical
 footer(s, 3);
 s.addNotes("Bookings vs backlog over four quarters. Point: healthy demand, capacity-limited conversion.");
 
-// =================== SLIDE 4 — ACCOUNT IN FOCUS ===================
+// =================== SLIDE 4 - ACCOUNT IN FOCUS ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Account in focus", "Lockheed Martin: F-35 sustainment");
 s.addShape(p.ShapeType.roundRect, { x: M, y: 1.75, w: 6.1, h: 3.05, rectRadius: 0.08, fill: { color: WHITE }, line: { color: PANEL, width: 1 } });
@@ -145,7 +145,7 @@ s.addText("Every account claim on this page resolves through a canonical-account
 footer(s, 4);
 s.addNotes("Account deep-dive with the signature provenance block. Fit, signal, scope pills, recommended action with owner/due, and the source relationship record.");
 
-// =================== SLIDE 5 — MARKET SIGNALS ===================
+// =================== SLIDE 5 - MARKET SIGNALS ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Market signals", "What changed, tiered by relevance");
 const sig = [
@@ -166,7 +166,7 @@ sig.forEach(([t, scope, c, prov]) => {
 footer(s, 5);
 s.addNotes("Tiered signals. Note that market-scope items are shown honestly as portfolio-level / unlinked, never pinned to a specific account without evidence.");
 
-// =================== SLIDE 6 — CAPACITY vs DEMAND ===================
+// =================== SLIDE 6 - CAPACITY vs DEMAND ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Capacity assessment", "The binding constraint on growth");
 s.addChart(p.ChartType.bar, [
@@ -193,7 +193,7 @@ s.addText([{ text: "Ask: ", options: { bold: true, color: INK } }, { text: "appr
 footer(s, 6);
 s.addNotes("Capacity is BTX's differentiator view: ties machining capacity to the demand signal. Fort Worth is the constraint; the board ask is a second shift.");
 
-// =================== SLIDE 7 — RISKS ===================
+// =================== SLIDE 7 - RISKS ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Risks & watch items", "What could bend the number");
 const risks = [
@@ -213,7 +213,7 @@ risks.forEach(([t, c, d]) => {
 footer(s, 7);
 s.addNotes("Three watch items with severity dots. Concentration and capacity are the two the board should weigh against the F-35 upside.");
 
-// =================== SLIDE 8 — RECOMMENDED ACTIONS ===================
+// =================== SLIDE 8 - RECOMMENDED ACTIONS ===================
 s = p.addSlide(); bg(s, BG);
 head(s, "Recommended actions", "What we do next, and who owns it");
 const rowsA = [
@@ -236,7 +236,7 @@ provenance(s, M, 5.7, W - 2 * M, "Generated from work-item queue", "canonical ac
 footer(s, 8);
 s.addNotes("Action table maps each recommendation to account, owner, and due date, the durable work-loop output. Provenance confirms each links to a real account.");
 
-// =================== SLIDE 9 — CLOSE ===================
+// =================== SLIDE 9 - CLOSE ===================
 s = p.addSlide(); bg(s, NAVY);
 s.addShape(p.ShapeType.ellipse, { x: M, y: 2.3, w: 0.5, h: 0.5, fill: { color: TEAL } });
 s.addText("BTX", { x: M, y: 2.3, w: 0.5, h: 0.5, fontFace: HEAD, fontSize: 15, bold: true, color: NAVY, align: "center", valign: "middle", margin: 0 });

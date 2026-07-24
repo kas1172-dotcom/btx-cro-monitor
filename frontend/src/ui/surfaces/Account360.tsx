@@ -51,8 +51,8 @@ export function Account360({ world }: { world: World }) {
   if (!selected) {
     return (
       <section className="surface-page" data-surface-component="surface-account-360">
-        <SurfaceHeader eyebrow="Accounts" headline="No canonical accounts are available." />
-        <EmptyState headline="No accounts" body="Connect a CRM source to populate canonical account records." />
+        <SurfaceHeader eyebrow="Accounts" headline="No accounts are available." />
+        <EmptyState headline="No accounts" body="Connect a CRM source to populate customer records." />
       </section>
     );
   }
@@ -67,7 +67,7 @@ export function Account360({ world }: { world: World }) {
       <SurfaceHeader
         eyebrow="Accounts / Account 360"
         headline={company.name}
-        subline={`${formatAddress(company.location) ?? company.location.city} · canonical id ${company.canonical_account_id ?? company.id}`}
+        subline={formatAddress(company.location) ?? company.location.city}
       />
 
       <div className="account360-layout">
@@ -100,7 +100,7 @@ export function Account360({ world }: { world: World }) {
           )}
 
           <section className="surface-panel">
-            <div className="panel-head"><h2>Relationship-backed signals</h2></div>
+            <div className="panel-head"><h2>Linked signals</h2></div>
             <div className="signal-mini-list">
               {selected.linkedSignals.map((signal) => (
                 <SignalCard
@@ -118,7 +118,7 @@ export function Account360({ world }: { world: World }) {
                 />
               ))}
               {selected.linkedSignals.length === 0 && (
-                <EmptyState headline="No linked signals" body="Market signals stay portfolio-level until a relationship record backs the account link." icon="signal" />
+                <EmptyState headline="No linked signals" body="Market signals stay in the Signals view until a verified account link is available." icon="signal" />
               )}
             </div>
           </section>
@@ -137,7 +137,7 @@ export function Account360({ world }: { world: World }) {
             <section className="surface-panel">
               <div className="panel-head"><h2>Capacity fit</h2></div>
               <p>{fit.matched.length ? fit.matched.join(", ") : "No direct capability overlap."}</p>
-              <p className="muted">{facilities.length} facility record{facilities.length === 1 ? "" : "s"} in the current operating snapshot.</p>
+              <p className="muted">{facilities.length} facility record{facilities.length === 1 ? "" : "s"} in the current production view.</p>
             </section>
             <section className="surface-panel">
               <div className="panel-head"><h2>Work items</h2></div>

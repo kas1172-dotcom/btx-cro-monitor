@@ -59,7 +59,7 @@ function checkStylesCssStructure(): string[] {
     if (withinCanonicalRoot || withinDocumentException) return;
     const matches = line.match(HEX_PATTERN);
     if (matches) {
-      violations.push(`styles.css:${index + 1}: ${matches.join(", ")} — "${line.trim()}"`);
+      violations.push(`styles.css:${index + 1}: ${matches.join(", ")} - "${line.trim()}"`);
     }
   });
 
@@ -79,4 +79,4 @@ if (all.length > 0) {
   process.exit(1);
 }
 
-console.log("check:design ok — no raw hex colors outside uiTokens.ts / styles.css's canonical :root block.");
+console.log("check:design ok - no raw hex colors outside uiTokens.ts / styles.css's canonical :root block.");

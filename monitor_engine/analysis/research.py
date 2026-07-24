@@ -2,11 +2,11 @@
 
 When ``deep_analysis.agentic`` is on, top-tier items get a tool-using research
 pass before the deep-analysis write-up: Claude decides what it needs to know and
-calls live tools to find out —
+calls live tools to find out -
 
-  * ``query_api``  — run any configured enricher connector with a free query
+  * ``query_api``  - run any configured enricher connector with a free query
                      (entities discovered in one source resolved against others);
-  * ``fetch_url``  — pull the text of a web page (the item's own source, or a
+  * ``fetch_url``  - pull the text of a web page (the item's own source, or a
                      link surfaced while researching).
 
 The loop is bounded by ``max_research_steps`` and fails soft: if research errors
@@ -157,7 +157,7 @@ class ResearchAgent:
             "You are an intelligence analyst doing pre-writing research on a single "
             "item. Use the tools to gather concrete, verifiable detail (figures, "
             "agencies, dates, prior context). Make at most a few targeted calls, then "
-            "STOP and reply with a tight factual brief of what you found — bullet "
+            "STOP and reply with a tight factual brief of what you found - bullet "
             "points, each grounded in a tool result and naming the source or tool. "
             "Keep facts separate from any analyst inference. Do not speculate, infer "
             "missing numbers, or fill gaps from memory; if a lookup returns nothing, "
@@ -184,7 +184,7 @@ class ResearchAgent:
                     messages=messages,
                     tools=tools,
                 )
-            except Exception as exc:  # noqa: BLE001 — research is best-effort
+            except Exception as exc:  # noqa: BLE001 - research is best-effort
                 logger.warning("Research call failed for %s: %s", item.item_id, exc)
                 break
             self._on_usage(resp.usage)

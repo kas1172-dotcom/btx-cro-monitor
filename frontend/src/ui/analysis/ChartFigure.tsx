@@ -3,6 +3,7 @@ import type { World } from "../../app/useWorld.ts";
 import { computeChart, formatMetricValue } from "../../metrics/chartSpec.ts";
 import type { ChartResult, ChartSpec } from "../../metrics/types.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
+import { humanSourceLabel, humanSourceReason } from "../../app/sourceLabels.ts";
 
 function fmt(value: number | null, unit: string): string {
   return formatMetricValue(value, unit);
@@ -83,7 +84,7 @@ export function Grid({ result, interactive = true }: { result: ChartResult; inte
           <div>Value: {fmt(selectedCell.value, result.meta.unit)}</div>
           <div className="analysis-cell-sources">
             {selectedCell.provenance.map((p) => (
-              <div key={p.source}>{p.source}: {p.reason}</div>
+              <div key={p.source}>{humanSourceLabel(p.source)}: {humanSourceReason(p.reason)}</div>
             ))}
           </div>
           <button onClick={() => setSelectedCell(null)}>Close</button>

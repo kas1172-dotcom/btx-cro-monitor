@@ -87,7 +87,7 @@ def test_tenant_cannot_read_another_tenants_work_items(tmp_path: Path):
     listed = client.get("/work-items", headers=tenant_b).json()["records"]
     assert item_id not in {item["id"] for item in listed}
 
-    # Tenant B can't reach it directly either — same 404 as a truly-missing id.
+    # Tenant B can't reach it directly either - same 404 as a truly-missing id.
     patched = client.patch(f"/work-items/{item_id}", headers=tenant_b, json={"owner": "intruder"})
     assert patched.status_code == 404
 
@@ -145,7 +145,7 @@ def test_operating_baseline_public_and_labeled_seeded(tmp_path: Path):
 
     assert response.status_code == 200
     body = response.json()
-    assert body["data_provenance"] == "Seeded baseline — ERP integration pending"
+    assert body["data_provenance"] == "Seeded baseline - ERP integration pending"
     assert body["capacity"]
     assert body["pipeline"]["records"]
 

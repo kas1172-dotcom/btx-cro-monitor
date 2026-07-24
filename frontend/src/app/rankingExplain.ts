@@ -19,7 +19,7 @@ export interface RankingExplanation {
   businessContextLine: string;
   assumptionsLine: string;
   /** One stitched sentence weaving signals + fit + CRM/ERP/pipeline. Explanation
-   *  enrichment only — the underlying scores are unchanged. */
+   *  enrichment only - the underlying scores are unchanged. */
   rationaleLine: string;
 }
 

@@ -70,7 +70,7 @@ export function saveDeliverable(deliverable: Deliverable): Deliverable {
     brainArea: deliverable.brainArea,
     entityIds: deliverable.entityIds,
     title: `Created ${deliverable.title}`,
-    summary: `${deliverable.sections.length} sections, ${deliverable.sources.length} provenance sources.`,
+    summary: `${deliverable.sections.length} sections, ${deliverable.sources.length} source records.`,
   });
   persist();
   return deliverable;

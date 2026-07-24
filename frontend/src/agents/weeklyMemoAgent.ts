@@ -88,7 +88,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
       entityIds: [topOpportunity?.company.id, topRisk?.subject_id, topSignal?.subject_id].filter((id): id is string => Boolean(id)),
       sources: [
         { source: accountSource, records: world.companies.map((c) => c.id), reason: "Account names, markets, and relationship status." },
-        { source: signalSource, records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: topSignal?.artifact ? `Real monitor-engine signal evidence from ${topSignal.artifact.source_name}, run ${topSignal.artifact.run_at}.` : "Validated market and risk evidence used in scores." },
+        { source: signalSource, records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: topSignal?.artifact ? `Monitor engine signal evidence from ${topSignal.artifact.source_name}, run ${topSignal.artifact.run_at}.` : "Validated market and risk evidence used in scores." },
         { source: opportunitySource, records: world.opportunities.map((o) => o.id).slice(0, 12), reason: "Open pipeline value and opportunity context." },
         { source: "Operating baseline", records: ["capacity", "operating_baseline"], reason: "Capacity and operating context come from the approved baseline until ERP integration is connected." },
       ],

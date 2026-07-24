@@ -221,7 +221,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
                 <option value="revenue">Revenue</option>
                 <option value="bookings">Bookings</option>
                 <option value="backlog">Backlog</option>
-                <option value="capacity_utilization">Capacity utilization</option>
+                <option value="capacity_utilization">Work-center load</option>
               </select>
             </label>
           )}

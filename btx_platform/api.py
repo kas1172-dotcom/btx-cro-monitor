@@ -1,4 +1,4 @@
-"""FastAPI application — the always-on ingress.
+"""FastAPI application - the always-on ingress.
 
 The webhook route is deliberately thin: read raw bytes, look up the connection,
 delegate to the ingest service, map errors to status codes, return fast. All
@@ -132,7 +132,7 @@ def _actor(request: Request) -> str:
     """The authenticated Clerk user driving this mutation (audit trail identity).
 
     Falls back to "system" only for routes exempt from Clerk auth (webhooks),
-    never as a way to spoof identity — the auth middleware already rejected
+    never as a way to spoof identity - the auth middleware already rejected
     any request without a verified session before a route handler runs.
     """
     auth: AuthContext | None = getattr(request.state, "auth", None)
@@ -231,7 +231,7 @@ def _get_tenant_work_item(session, item_id: str, tenant_id: str) -> models.WorkI
     """Fetch a work item scoped to *tenant_id*.
 
     A row that exists but belongs to a different tenant returns None, the same
-    as a missing row — the caller can't distinguish "not found" from "not
+    as a missing row - the caller can't distinguish "not found" from "not
     yours," which is exactly the point (no cross-tenant existence leak).
     """
     row = session.get(models.WorkItem, item_id)
@@ -397,7 +397,7 @@ def create_app(
     if session_factory is None:
         engine = make_engine(settings.database_url)
         if settings.env == "prod":
-            # Prod must never fall back to create_all() — that would drift
+            # Prod must never fall back to create_all() - that would drift
             # from what alembic/versions/ tracks. Deploy runs
             # `alembic upgrade head` before the new code serves traffic.
             assert_schema_current(engine)
@@ -405,7 +405,7 @@ def create_app(
             init_db(engine)                   # dev/test convenience
         session_factory = make_session_factory(engine)
 
-    app = FastAPI(title="BTX Engine — Integration Platform", version="0.1.0")
+    app = FastAPI(title="BTX Engine - Integration Platform", version="0.1.0")
     app.state.settings = settings
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else _default_queue(settings)
@@ -532,7 +532,7 @@ def create_app(
     @app.get("/operating-baseline")
     def operating_baseline() -> Response:
         return JSONResponse({
-            "data_provenance": "Seeded baseline — ERP integration pending",
+            "data_provenance": "Seeded baseline - ERP integration pending",
             "crm": _baseline_json("crm.json"),
             "capacity": _baseline_json("erp_capacity.json"),
             "pipeline": _baseline_json("pipeline.json"),

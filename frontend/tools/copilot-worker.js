@@ -1,4 +1,4 @@
-// Cloudflare Worker version of the Jarvis proxy — for the DEPLOYED site.
+// Cloudflare Worker version of the Jarvis proxy - for the DEPLOYED site.
 // Deploy free at cloudflare.com, set the secret, and point the app at its URL:
 //
 //   npx wrangler deploy tools/copilot-worker.js

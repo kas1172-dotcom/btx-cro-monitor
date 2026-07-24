@@ -71,7 +71,7 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
         setFailures(next);
         setPaused(true);
         setError(`Step ${tourStep + 1} failed: ${reason}`);
-        setNarration(next >= 2 ? "Tour paused after repeated failures." : "Tour paused — retry, skip, or exit.");
+        setNarration(next >= 2 ? "Tour paused after repeated failures." : "Tour paused - retry, skip, or exit.");
         setState({ askDraftPrompt: "" });
         return;
       }
@@ -79,7 +79,7 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
       if (tourStep >= TOUR_STEPS.length - 1) {
         setPlaying(false);
         setPaused(false);
-        setNarration("Tour complete — the brain remembered all of it.");
+        setNarration("Tour complete - the brain remembered all of it.");
       } else {
         setTourStep((s) => s + 1);
       }

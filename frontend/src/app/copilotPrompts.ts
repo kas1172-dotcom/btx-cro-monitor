@@ -8,17 +8,17 @@ import { USER_PROMPT_RULES } from "./promptContract.ts";
 
 function relationshipFraming(company: Company): string {
   if (company.business_motion === "manage_current_business" || company.business_motion === "grow_existing_business" || company.business_motion === "reduce_risk") {
-    return `This is a Current Business account (${company.business_motion}) — frame around protecting, expanding, or reducing risk in the existing relationship.`;
+    return `This is a Current Business account (${company.business_motion}) - frame around protecting, expanding, or reducing risk in the existing relationship.`;
   }
   if (company.account_status === "current_customer" || company.account_status === "active_pipeline" || company.account_status === "past_customer" || company.account_status === "partner") {
-    return `This is a Current Business account (${company.account_status}) — frame around protecting, expanding, or recovering the relationship.`;
+    return `This is a Current Business account (${company.account_status}) - frame around protecting, expanding, or recovering the relationship.`;
   }
   if (company.business_motion === "prospect_new_business" || company.account_status === "target_prospect" || company.account_status === "new_logo") {
-    return `This is a Prospecting account (${company.account_status ?? company.business_motion}) — frame around winning it: opportunity, fit, buying signal strength, and who to call.`;
+    return `This is a Prospecting account (${company.account_status ?? company.business_motion}) - frame around winning it: opportunity, fit, buying signal strength, and who to call.`;
   }
   return company.relationship === "customer" || company.relationship === "supplier"
-    ? "This is a Current Business account (existing relationship) — frame around protecting/expanding and any supply/capacity risk."
-    : "This is a Prospecting account (target) — frame around winning it: opportunity, fit, and who to call.";
+    ? "This is a Current Business account (existing relationship) - frame around protecting/expanding and any supply/capacity risk."
+    : "This is a Prospecting account (target) - frame around winning it: opportunity, fit, and who to call.";
 }
 
 export function explainRankingPrompt(companyName: string, context: string): string {

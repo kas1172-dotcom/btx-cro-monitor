@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useStore, setState, closeDemoAction, goHome, clearTourRequest, closeDeliverableWizard } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
 import { CITIES } from "./app/config.ts";
@@ -18,6 +18,7 @@ import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
 import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
 import type { Deliverable } from "./deliverables/types.ts";
+import { checkAiStatus, getAiStatusSnapshot, subscribeAiStatus } from "./app/aiStatus.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const AnalysisView = lazy(() => import("./ui/analysis/AnalysisView.tsx").then((module) => ({ default: module.AnalysisView })));
@@ -40,8 +41,8 @@ function formatRunDate(value: string | null | undefined): string {
 
 function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" | "warning"; label: string; value: string } | null {
   if (!world) return null;
-  if (world.loadErrors.length) return { tone: "warning", label: "Source status", value: "using seeded baseline" };
-  return { tone: "success", label: "Source status", value: world.dataSource ?? "backend connected" };
+  if (world.loadErrors.length) return { tone: "warning", label: "Data", value: "Sample data" };
+  return { tone: "success", label: "Data", value: "Live data" };
 }
 
 export function App() {
@@ -50,7 +51,8 @@ export function App() {
   const handledWizardSaveIds = useRef(new Set<number>());
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
-  const world = useWorld(null); // global — dashboard, graph, and the dossier
+  const world = useWorld(null); // global - dashboard, graph, and the dossier
+  const aiStatus = useSyncExternalStore(subscribeAiStatus, getAiStatusSnapshot, getAiStatusSnapshot);
   const settingsActive = (activeSettings || activeTab === "settings") && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const homeActive = (activeHome || activeTab === "brief") && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const marketScoped = activeTab === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
@@ -62,9 +64,13 @@ export function App() {
   const rightW = dossierOpen ? "minmax(360px, 420px)" : contextPanelOpen ? "320px" : "0px";
 
   useEffect(() => {
+    void checkAiStatus();
+  }, []);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      // Close topmost open panel only — never navigate away.
+      // Close topmost open panel only - never navigate away.
       if (activeCompanyId) {
         event.stopPropagation();
         setState({ activeCompanyId: null });
@@ -158,6 +164,9 @@ export function App() {
   const rightPanelOpen = dossierOpen || contextPanelOpen;
   const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeTab))?.label ?? "Cockpit";
   const backendStatus = liveDataStatus(world);
+  const aiChip = aiStatus.state === "live"
+    ? { tone: "success" as const, value: "live" }
+    : { tone: "warning" as const, value: "offline" };
 
   async function handleWizardCommitted(deliverable: Deliverable) {
     const request = deliverableWizardRequest;
@@ -210,9 +219,10 @@ export function App() {
           </div>
           <div className="topbar-status">
             {world?.provenanceSummary && (
-              <StatusChip label="Data provenance" value={`${world.provenanceSources.length} sources`} />
+              <StatusChip label="Sources" value={`${world.provenanceSources.length} connected`} />
             )}
             {backendStatus ? <StatusChip tone={backendStatus.tone} label={backendStatus.label} value={backendStatus.value} /> : null}
+            <StatusChip tone={aiChip.tone} label="AI" value={aiChip.value} />
             {world?.snapshot?.publicSignals.run_at && (
               <StatusChip tone={world.snapshot.publicSignals.stale ? "warning" : "info"} label="Monitor run" value={formatRunDate(world.snapshot.publicSignals.run_at)} />
             )}

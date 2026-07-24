@@ -337,18 +337,18 @@ const hybridBriefText = hybridBrief.sections
   .join(" ");
 assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "HubSpot CRM"), "Hybrid meeting brief missing real CRM account grounding");
 assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "Monitor engine"), "Hybrid meeting brief missing real monitor signal grounding");
-assert(!hybridBriefText.includes("Seeded baseline") && hybridBrief.sources.some((source) => source.source === "Operating baseline"), "CRM-grounded meeting brief should keep baseline disclosure in provenance only");
+assert(!hybridBriefText.includes("Seeded baseline") && hybridBrief.sources.some((source) => source.source === "Operating baseline"), "CRM-grounded meeting brief should keep baseline disclosure in sources only");
 
 const outreach = await runAgent("outreach", {}, world);
 const instructedOutreach = await runAgent("outreach", { instructions: "Lead with ITAR angle" }, world);
 const outreachHeadings = outreach.sections.map((section) => section.heading);
-assert(JSON.stringify(outreachHeadings) === JSON.stringify(["Recipient", "Subject", "Body", "Why This Works", "Provenance"]), `Outreach headings corrupted: ${outreachHeadings.join(", ")}`);
+assert(JSON.stringify(outreachHeadings) === JSON.stringify(["Recipient", "Subject", "Body", "Why This Works", "Sources"]), `Outreach headings corrupted: ${outreachHeadings.join(", ")}`);
 assert(!outreachHeadings.some((heading) => ["Day-by-Day Schedule", "Visit Map", "Per-Stop Briefs"].includes(heading)), "Outreach must not render itinerary sections");
 assert(DELIVERABLE_DOWNLOAD_FORMATS.outreach.includes("docx") && DELIVERABLE_DOWNLOAD_FORMATS.outreach.includes("pdf"), "Outreach missing Word/PDF downloads");
 assert(DELIVERABLE_DOWNLOAD_FORMATS.itinerary.includes("ics"), "Itinerary missing calendar download");
 assert(DELIVERABLE_DOWNLOAD_FORMATS.analysis_view.includes("xlsx") && DELIVERABLE_DOWNLOAD_FORMATS.analysis_view.includes("csv"), "Analysis view missing spreadsheet downloads");
 assert(DELIVERABLE_DOWNLOAD_FORMATS.board_deck.includes("pptx"), "Board deck missing PPTX download");
-assert(instructedOutreach.sources.some((source) => source.source === "user instructions" && source.reason.includes("ITAR")), "Deliverable instructions were not recorded in provenance");
+assert(instructedOutreach.sources.some((source) => source.source === "user instructions" && source.reason.includes("ITAR")), "Deliverable instructions were not recorded in sources");
 const deliverableText = [itinerary, tripBrief, analysisAnnotation, memo, outreach]
   .flatMap((deliverable) => deliverable.sections)
   .flatMap((section) => section.blocks)

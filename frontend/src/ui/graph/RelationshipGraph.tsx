@@ -1,4 +1,4 @@
-// Relationship graph — the network from the client's seat. BTX sits at the
+// Relationship graph - the network from the client's seat. BTX sits at the
 // center; suppliers / competitors / customers / targets radiate around it, each
 // edge and node colored by relationship, each node labeled with its headline
 // score. Pure lens on engine output; clicking a node opens the dossier. This is
@@ -47,7 +47,7 @@ function nodeStyle(rel: string, isSelf: boolean): React.CSSProperties {
 export function RelationshipGraph({ world }: { world: World }) {
   const { nodes, edges } = useMemo(() => {
     const self = world.companies.find((c) => c.relationship === "self");
-    // At ~50 companies a full star is a hairball — show self + the most active
+    // At ~50 companies a full star is a hairball - show self + the most active
     // accounts (highest score in any dimension), then lay them out by relationship.
     const relevance = (id: string) => {
       const d = world.analysis.byId.get(id)?.dimensions;

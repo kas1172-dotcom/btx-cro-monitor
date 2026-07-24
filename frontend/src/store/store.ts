@@ -1,4 +1,4 @@
-// Thin global UI store — selection/view state ONLY. Rankings, scores, prospects
+// Thin global UI store - selection/view state ONLY. Rankings, scores, prospects
 // are NEVER stored here; they are derived from engine output on demand. Keeping a
 // second copy of engine truth in the store is exactly what would let the UI drift
 // out of sync with the brain. The engine is the source of truth; this is just

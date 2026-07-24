@@ -20,7 +20,7 @@ function cardFor(prospect: Prospect, world: World): OpportunityCard {
   const breakdown: ScoreBreakdownItem[] = [
     { label: "Capability fit", value: prospect.fit.score, note: prospect.fit.matched.length ? prospect.fit.matched.slice(0, 3).join(", ") : "No matched capability", positive: prospect.fit.score >= 50 },
     { label: "Market signal", value: Math.round((prospect.topSignal?.confidence ?? 0) * 100), note: prospect.topSignal ? displayLabel(prospect.topSignal.event_type) : "No top signal", positive: Boolean(prospect.topSignal) },
-    { label: "Revenue potential", value: score.dimensions.opportunity.score, note: "Opportunity score from deterministic engine", positive: score.dimensions.opportunity.score >= 40 },
+    { label: "Revenue potential", value: score.dimensions.opportunity.score, note: "Opportunity score from the scoring engine", positive: score.dimensions.opportunity.score >= 40 },
     { label: "Production feasibility", value: Math.max(0, 100 - score.dimensions.capacityRisk.score), note: `Capacity risk ${score.dimensions.capacityRisk.score}`, positive: score.dimensions.capacityRisk.score < 50 },
   ];
   return {

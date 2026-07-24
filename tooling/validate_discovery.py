@@ -39,7 +39,7 @@ def summarize_coverage(
 ) -> dict[str, Any]:
     """Compare discovered sources against a reference (hand-built) set by domain.
 
-    Pure and deterministic — no network. Coverage is measured by how many of the
+    Pure and deterministic - no network. Coverage is measured by how many of the
     reference domains the agent also reached, since the agent may legitimately
     pick different-but-valid sources, so exact config equality is the wrong test.
     """
@@ -65,7 +65,7 @@ def summarize_coverage(
 
 def _render_report(client: str, summary: dict[str, Any], result_meta: dict[str, Any]) -> str:
     lines = [
-        f"### Discovery validation — {client}",
+        f"### Discovery validation - {client}",
         "",
         f"- briefs resolved → **{summary['discovered_count']}** sources "
         f"({summary['discovered_types']})",
@@ -99,7 +99,7 @@ def main() -> None:
 
     result = DiscoveryAgent().discover(scaffolded["source_briefs"])
 
-    # Inject and validate the finished config — a hard failure if it doesn't hold.
+    # Inject and validate the finished config - a hard failure if it doesn't hold.
     config = scaffolded["config"]
     config["sources"] = result.sources
     ClientConfig.model_validate(config)

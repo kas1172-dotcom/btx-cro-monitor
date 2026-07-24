@@ -56,7 +56,7 @@ def test_encrypt_without_key_configured_raises():
 
 def test_decrypt_if_encrypted_passes_through_legacy_plaintext():
     # A connection seeded before WP10-B (or a local dev DB) has a plain
-    # signing_secret with no enc:v1: prefix — must keep working unchanged.
+    # signing_secret with no enc:v1: prefix - must keep working unchanged.
     assert decrypt_if_encrypted("plain-secret", encryption_key=ENCRYPTION_KEY) == "plain-secret"
     assert decrypt_if_encrypted(None, encryption_key=ENCRYPTION_KEY) is None
 

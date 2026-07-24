@@ -196,7 +196,7 @@ def run_pipeline(
 
     if not skip_analysis and filtered:
         from monitor_engine.analysis.scorer import PIPELINE_MAX_CONCURRENCY, Scorer
-        # Issue LLM batches concurrently — the only thing that meaningfully cuts
+        # Issue LLM batches concurrently - the only thing that meaningfully cuts
         # wall time on large runs (cost is unchanged: same tokens).
         scorer = Scorer(config, max_concurrency=PIPELINE_MAX_CONCURRENCY)
         analyzed, editorial, cost_usd = scorer.analyze(filtered)
@@ -210,10 +210,10 @@ def run_pipeline(
     # Items went into analysis but nothing came out: every batch was
     # quarantined or every call failed.  Publishing an empty brief would
     # silently wipe the previous site, so refuse to write anything.
-    # (filtered == 0 is a quiet news week, not an error — that publishes.)
+    # (filtered == 0 is a quiet news week, not an error - that publishes.)
     if not skip_analysis and filtered and not analyzed:
         logger.error(
-            "Analysis returned 0 items from %d prefiltered items — total "
+            "Analysis returned 0 items from %d prefiltered items - total "
             "analysis failure. Leaving previous site and archive untouched.",
             len(filtered),
         )
@@ -226,7 +226,7 @@ def run_pipeline(
 
     # ── Group same-event items ───────────────────────────────────────────
     # Collapse items covering the same underlying story into one primary card
-    # (others cited as "also covered by"). Conservative — see analysis.grouping.
+    # (others cited as "also covered by"). Conservative - see analysis.grouping.
     if analyzed:
         from monitor_engine.analysis.grouping import group_related_items
         before = len(analyzed)
@@ -305,7 +305,7 @@ def run_pipeline(
     )
     logger.info("Artifact written to %s", output_dir / "run_output.json")
 
-    # ── Validate (before persisting archive — bad output must not poison history) ──
+    # ── Validate (before persisting archive - bad output must not poison history) ──
     _validate_artifact(output_dir / "run_output.json")
 
     # ── Persist archive ───────────────────────────────────────────────────

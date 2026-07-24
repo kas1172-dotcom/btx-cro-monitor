@@ -41,7 +41,7 @@ export interface Company {
   website_url?: string;
   linkedin_url?: string;
   source_url?: string;
-  /** Capability tags this company needs from a supplier — matched for fit. */
+  /** Capability tags this company needs from a supplier - matched for fit. */
   needs: string[];
   /** Stable canonical account id. CRM-backed live accounts use their adapter join key. */
   canonical_account_id?: string;

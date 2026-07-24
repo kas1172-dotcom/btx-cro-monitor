@@ -78,7 +78,7 @@ function whyItMatters(world: World, signal: Signal): string {
   if (isSaronicSignal(signal)) {
     return "Funded Navy supplier with Austin manufacturing context, but no BTX account, CAGE, or contact evidence yet.";
   }
-  if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a CRM account without canonical identity evidence.";
+  if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a CRM account without verified account evidence.";
   const company = world.companies.find((c) => c.id === signal.subject_id);
   const rec = world.analysis.recById.get(signal.subject_id);
   const impact = scoreImpact(signal.event_type);
@@ -247,7 +247,7 @@ export function SignalFeed({ world }: { world: World }) {
         companyRelationship: portfolio ? "unlinked" : company?.relationship ?? "unknown",
         address: company ? formatAddress(company.location) : null,
         headline: signal.artifact ? signalHeadline(signal) : article?.headline ?? titleCase(signal.event_type),
-        source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Seeded Market Signal Feed",
+        source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Sample signal feed",
         sourceDate: signal.artifact ? signalSourceDate(signal) : article?.published_date ?? signal.detected_at.slice(0, 10),
         sourceUrl: signal.artifact?.source_url ?? article?.source_url ?? signal.source_url,
         documentUrl: article?.document_url ?? signal.document_url,
@@ -379,7 +379,7 @@ export function SignalFeed({ world }: { world: World }) {
                 <ExternalLink href={row.sourceUrl} label="Open source" />
                 <ExternalLink href={row.documentUrl} label="Document" />
               </div>
-              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor-engine artifact" : "No source link in the current baseline"}</em>}
+              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor engine document" : "No source link in the current sample data"}</em>}
             </div>
             {isSaronicSignal(row.signal) && (
               <div className="qualification-gaps">

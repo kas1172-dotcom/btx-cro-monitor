@@ -2,9 +2,9 @@
 
 BTX Revenue Cockpit is a backend-canonical sales intelligence product for the BTX CRO. The canonical user experience is:
 
-- `frontend/` — React/Vite cockpit deployed to GitHub Pages under `/cockpit/`.
-- `btx_platform/` — FastAPI backend deployed to Fly.io for authenticated CRM, LLM proxy, pipeline control, settings, and write actions.
-- `monitor_engine/` — Python monitor engine that collects public defense/industry sources and writes JSON artifacts consumed by the cockpit.
+- `frontend/` - React/Vite cockpit deployed to GitHub Pages under `/cockpit/`.
+- `btx_platform/` - FastAPI backend deployed to Fly.io for authenticated CRM, LLM proxy, pipeline control, settings, and write actions.
+- `monitor_engine/` - Python monitor engine that collects public defense/industry sources and writes JSON artifacts consumed by the cockpit.
 
 The retired Python-generated static HTML brief/map (`index.html`, `map.html`, `sw.js`) is no longer generated, published, or committed. The monitor engine still owns the JSON data contract:
 
@@ -69,7 +69,7 @@ pip install -e ".[dev,platform]"
 uvicorn btx_platform.asgi:app --reload --port 8001
 ```
 
-Local SQLite dev creates its tables automatically on startup (`init_db`) — no
+Local SQLite dev creates its tables automatically on startup (`init_db`) - no
 migration step needed. Against Postgres (`docker-compose up postgres redis`,
 then `BTX_DATABASE_URL=postgresql+psycopg://btx:btx@localhost:5432/btx`), or
 whenever `BTX_ENV=prod`, run migrations explicitly first:
@@ -95,7 +95,7 @@ curl http://127.0.0.1:8001/engine-config/scoring_weights \
 
 `$CLERK_SESSION_TOKEN` is a session JWT for a signed-in user (copy one from your
 browser's dev tools while signed in locally, or mint one with the Clerk backend
-SDK). There is no shared backend token anymore — see `docs/DEPLOY_BACKEND.md`
+SDK). There is no shared backend token anymore - see `docs/DEPLOY_BACKEND.md`
 for how Clerk auth is configured.
 
 Fly.io deployment instructions live in `docs/DEPLOY_BACKEND.md`.
@@ -147,24 +147,24 @@ lives under `.github/actions/` and does not appear as a separate button.
 
 **Automatic gate:**
 
-- **01 CI** (`ci.yml`) — runs on PRs and pushes to `main`. It includes frontend
+- **01 CI** (`ci.yml`) - runs on PRs and pushes to `main`. It includes frontend
   typecheck/build/test suites, backend pytest, and an optional `e2e` job. The
   browser E2E job is skipped unless repo variable `RUN_E2E=1` is set.
 
 **Manual run order:**
 
-1. **10 Monitor Pipeline** (`monitor.yml`) — run first when source signals are
+1. **10 Monitor Pipeline** (`monitor.yml`) - run first when source signals are
    stale. It tests, collects/analyzes data, writes `run_output.json`,
    `archive.json`, and `map_targets.json`, commits artifacts, then publishes
    Pages.
-2. **20 Update Demo** (`update.yml`) — run after Monitor Pipeline, or by itself
+2. **20 Update Demo** (`update.yml`) - run after Monitor Pipeline, or by itself
    when the source artifacts are already current. It bakes LLM prose/extracted
    signals, commits them, and deploys the cockpit.
-3. **30 Deploy Frontend Cockpit** (`deploy-frontend.yml`) — run only after a
+3. **30 Deploy Frontend Cockpit** (`deploy-frontend.yml`) - run only after a
    frontend-only change when data/LLM artifacts do not need refreshing.
-4. **40 Deploy Backend (Staging)** (`deploy-staging.yml`) — run only when the
+4. **40 Deploy Backend (Staging)** (`deploy-staging.yml`) - run only when the
    Fly staging backend needs a deploy. It requires typing `staging`.
-5. **90 Discovery Validation** (`discovery-validate.yml`) — maintenance only,
+5. **90 Discovery Validation** (`discovery-validate.yml`) - maintenance only,
    for validating a new or changed client source config.
 
 Removed from the Actions tab: standalone **Bake LLM artifacts**, standalone

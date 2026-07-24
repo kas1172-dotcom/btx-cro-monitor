@@ -1,5 +1,5 @@
 """Phase 1 webhook receiver tests: signature, validation, dedupe, raw-store,
-fast 200, enqueue. SQLite in-memory + in-memory queue — no Postgres/Redis.
+fast 200, enqueue. SQLite in-memory + in-memory queue - no Postgres/Redis.
 
 Skips cleanly when backend deps (fastapi/sqlalchemy) aren't installed, mirroring
 the node frontend smoke tests."""
@@ -55,7 +55,7 @@ def _signed(body: dict, secret: str = SECRET) -> tuple[bytes, str]:
 
 def _post(client, conn, raw, sig=None, idem=None):
     # Webhooks authenticate with the connection's own HMAC signature, not a
-    # Clerk session — they're machine-to-machine, not a signed-in user.
+    # Clerk session - they're machine-to-machine, not a signed-in user.
     headers = {"Content-Type": "application/json"}
     if sig is not None:
         headers["X-BTX-Signature"] = sig
@@ -114,7 +114,7 @@ def test_health():
 
 def test_webhooks_exempt_from_clerk_auth_but_other_routes_are_not():
     """Webhooks authenticate via per-connection HMAC (a machine caller), not a
-    Clerk session. Confirm that exemption is scoped to /webhooks/* only — a
+    Clerk session. Confirm that exemption is scoped to /webhooks/* only - a
     genuine user-facing route with no Authorization header still 401s."""
     client, _sf, _q = _build()
     raw, sig = _signed(VALID)

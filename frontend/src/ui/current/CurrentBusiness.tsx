@@ -211,7 +211,7 @@ export function CurrentBusiness({ world }: { world: World }) {
             </button>
           ))}
           {visibleAttentionRows.length === 0 && (
-            <EmptyState headline="No accounts need attention" body="Current accounts are healthy — nothing is flagged for risk or capacity review right now." icon="accounts" />
+            <EmptyState headline="No accounts need attention" body="Current accounts are healthy - nothing is flagged for risk or capacity review right now." icon="accounts" />
           )}
           {accountsNeedingAttention.length > 5 && (
             <button className="quiet-expander" onClick={() => setShowAll((value) => !value)}>

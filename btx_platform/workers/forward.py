@@ -3,7 +3,7 @@ destination, with retries/backoff, and dead-letter it after max_attempts.
 
 Kept import-light at module scope (no Celery decorator side effects beyond
 registration) so btx_platform.workers.forward_event_sync is independently
-unit-testable without a running broker — the Celery task is a thin wrapper
+unit-testable without a running broker - the Celery task is a thin wrapper
 around it.
 """
 from __future__ import annotations
@@ -49,7 +49,7 @@ def forward_event_sync(
         connection = session.get(models.Connection, event.connection_id)
         destination = connection.destination_url if connection else None
         if not destination:
-            # No destination configured — nothing to forward to. Not a
+            # No destination configured - nothing to forward to. Not a
             # failure: plenty of connections are inbound-only sinks.
             event.status = models.STATUS_DONE
             session.commit()

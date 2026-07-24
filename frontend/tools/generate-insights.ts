@@ -1,8 +1,8 @@
 // Baked insight generator. Runs OFFLINE (in CI, where ANTHROPIC_API_KEY is a
-// repo secret) — never in the browser, never with a key on disk. For each
+// repo secret) - never in the browser, never with a key on disk. For each
 // company it sends the DETERMINISTIC engine output to Claude and asks for prose
 // that EXPLAINS it: a "why this is a target" narrative + one line per signal.
-// The model never computes or changes a score — it translates the trace.
+// The model never computes or changes a score - it translates the trace.
 //
 // Output is committed to data/demo/btx/insights.json (frozen -> deterministic demo).
 // Raw fetch, no SDK, so the project stays dependency-free (CLAUDE.md rule #5).
@@ -23,7 +23,7 @@ import type { Signal } from "../src/engine/signals/contract.ts";
 
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!API_KEY) {
-  console.error("ANTHROPIC_API_KEY is not set — this runs in CI with the repo secret.");
+  console.error("ANTHROPIC_API_KEY is not set - this runs in CI with the repo secret.");
   process.exit(1);
 }
 
@@ -85,7 +85,7 @@ async function narrate(company: Company, signals: Signal[]): Promise<Insight | n
   const prompt = [
     `Prospect: ${company.name} (${company.relationship}, ${company.location.city})`,
     `Opportunity score: ${score?.dimensions.opportunity.score ?? 0}`,
-    `Fit to ${profile.name}: ${fit.score}% — can serve: ${fit.matched.join(", ") || "none"}; gaps: ${fit.missing.join(", ") || "none"}`,
+    `Fit to ${profile.name}: ${fit.score}% - can serve: ${fit.matched.join(", ") || "none"}; gaps: ${fit.missing.join(", ") || "none"}`,
     `Score trace: ${trace || "none"}`,
     `Signals (evidence):`,
     ...signals.map((s) => `  [${s.id}] ${s.event_type}: ${s.source_quote}`),

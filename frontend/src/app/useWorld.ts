@@ -1,4 +1,4 @@
-// Loads + analyzes the world for a given region (city) through the adapter — the
+// Loads + analyzes the world for a given region (city) through the adapter - the
 // literal "run the brain for the selected area". Re-runs when the city changes.
 
 import { useEffect, useState, useSyncExternalStore } from "react";

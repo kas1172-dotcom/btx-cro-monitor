@@ -1,5 +1,5 @@
 // Portfolio dashboard: aggregates the engine output across the whole world (not
-// city-scoped). Pure rendering — every row is derived from scores/alerts/signals.
+// city-scoped). Pure rendering - every row is derived from scores/alerts/signals.
 // Clicking any row sets activeCompanyId, opening the dossier (cross-surface link
 // falls out of the shared store, no special glue).
 
@@ -90,7 +90,7 @@ export function Dashboard({ world }: { world: World }) {
         {alerts.map((a, i) => (
           <button key={i} className="alert-row" onClick={() => setState({ activeCompanyId: a.subject_id })}>
             <span className={`sev sev-${a.severity}`}>{a.severity}</span>
-            <span className="alert-main">{nameOf(a.subject_id)} — {a.dimension} {a.score}</span>
+            <span className="alert-main">{nameOf(a.subject_id)} - {a.dimension} {a.score}</span>
             <span className="muted">{a.reason}</span>
             <AskChatpilButton
               label="Explain"

@@ -20,8 +20,8 @@ export function AnalysisDashboard({ world }: { world: World }) {
     <section className="surface-page" data-surface-component="surface-analysis-dashboard">
       <SurfaceHeader
         eyebrow="Analysis dashboard"
-        headline="Pipeline, bookings, backlog, book-to-bill, win/loss, and capacity-utilization trends."
-        subline="Internal analytical views for revenue, retention, and operating exposure."
+        headline="Pipeline, bookings, backlog, win rate, and production-load trends."
+        subline="Revenue views for account planning, board updates, and client-ready figures."
       />
       <div className="account360-kpis">
         {PRIMARY_METRICS.map((metricId) => {

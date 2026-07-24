@@ -1,8 +1,8 @@
 """Clerk session authentication, RBAC, and tenant scoping.
 
 Every request (other than PUBLIC_PATHS) must carry ``Authorization: Bearer
-<clerk-session-jwt>``. The token is verified against Clerk's JWKS (RS256) —
-signature, expiry, issuer — and its claims become ``request.state.auth``.
+<clerk-session-jwt>``. The token is verified against Clerk's JWKS (RS256) -
+signature, expiry, issuer - and its claims become ``request.state.auth``.
 There is no shared secret anymore: each user gets their own signed session.
 
 Tests never call Clerk. ``ClerkVerifier`` takes a ``jwks_provider`` callable

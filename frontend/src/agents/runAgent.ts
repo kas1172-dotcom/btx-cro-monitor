@@ -60,7 +60,7 @@ export async function runAgent(id: AgentId, rawInputs: unknown, world: World): P
   deliverable.form = agent.form;
   deliverable.sources = [
     ...deliverable.sources,
-    { source: "composition path", records: [id], reason: deliverable.compositionPath ?? "Template fallback" },
+    { source: "composition path", records: [id], reason: deliverable.compositionPath ?? "Template fallback (LLM unavailable: composition status unavailable)" },
   ];
   const validation = agent.validate(deliverable, ctx);
   if (!validation.valid) {

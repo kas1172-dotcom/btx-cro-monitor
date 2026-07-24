@@ -2,12 +2,12 @@
 // about each company. This layer re-interprets the network FROM THE CLIENT'S
 // SEAT: a competitor's opportunity becomes the client's competitivePressure, a
 // supplier's risk becomes the client's capacityRisk, a customer's growth feeds
-// the client's pipeline. Still deterministic, still fully traceable — every
+// the client's pipeline. Still deterministic, still fully traceable - every
 // folded-in point records which entity and rule produced it.
 //
 // Diminishing returns apply here too (same principle as the scorer): when many
 // entities of the same relationship push the same dimension, the largest counts
-// full and the rest decay — the 4th competitor's marginal pressure is smaller
+// full and the rest decay - the 4th competitor's marginal pressure is smaller
 // than the 1st. The decay factor is the same config value.
 
 import { SCORE_DIMENSIONS } from "../signals/contract.ts";

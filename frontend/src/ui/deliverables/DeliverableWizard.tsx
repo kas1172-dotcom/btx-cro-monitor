@@ -86,7 +86,7 @@ export function DeliverableWizard({
 
   async function generatePreview() {
     if (provenanceViolations.length) {
-      setError(`Provenance check failed: ${provenanceViolations.join(" ")}`);
+      setError(`Source check failed: ${provenanceViolations.join(" ")}`);
       return;
     }
     setBusy(true);
@@ -122,10 +122,10 @@ export function DeliverableWizard({
           onSaved?.(persisted);
           setNotice(null);
         } catch {
-          setNotice("Saved locally — backend program memory is unavailable.");
+          setNotice("Saved locally - backend program memory is unavailable.");
         }
       } else {
-          setNotice("Saved locally — backend program memory is not configured.");
+          setNotice("Saved locally - backend program memory is not configured.");
       }
       await onCommitted?.(committed);
       setStep("saved");
@@ -165,7 +165,7 @@ export function DeliverableWizard({
           <>
             <h2>Build a client-ready deliverable</h2>
             <p className="deliverable-wizard-hint">
-              Choose the artifact you want to show, then confirm the source-backed inputs before anything is generated.
+              Choose the document you want to show, then confirm the source-backed inputs before anything is generated.
             </p>
             <div className="deliverable-wizard-options">
               {DELIVERABLE_TEMPLATE_OPTIONS.map((item) => (

@@ -172,7 +172,7 @@ for (const type of ["capabilities_assessment", "outreach", "weekly_memo"] as con
   assert(html.includes("BTX"), `${type} should include the BTX mark`);
   assert(html.includes(steelSignal.colors.navy), `${type} should include Steel & Signal navy`);
   assert(html.includes("SOURCE") || type === "weekly_memo", `${type} should render provenance or source block`);
-  assert(!/[—–]/.test(html), `${type} should not contain em or en dash`);
+  assert(!/[\u2013\u2014]/.test(html), `${type} should not contain em or en dash`);
 }
 
 const caps = renderSteelSignalDocument(baseDeliverable("capabilities_assessment", "Capabilities Assessment"), world);

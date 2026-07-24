@@ -1,4 +1,4 @@
-// pipelineHealth — now derived from the actual Opportunity pipeline (deals),
+// pipelineHealth - now derived from the actual Opportunity pipeline (deals),
 // not from news-signal sentiment. Healthy = lots of weighted open value in late
 // stages, few recent losses. Deterministic, no AI.
 

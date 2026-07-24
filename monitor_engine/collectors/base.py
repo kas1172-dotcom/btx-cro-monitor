@@ -82,7 +82,7 @@ class SourceHandler(ABC):
 def handler_registry(session: requests.Session) -> dict[str, SourceHandler]:
     """Map each source ``type`` to a handler instance bound to *session*.
 
-    Single source of truth for the type→handler mapping — used by collect_all,
+    Single source of truth for the type→handler mapping - used by collect_all,
     the test-mode runner, and the discovery oracle, so a new source type is wired
     in exactly one place. Imported lazily to avoid a base↔handler import cycle.
     """

@@ -1121,7 +1121,7 @@
         "blocks": [
           {
             "kind": "text",
-            "text": "Pursue revenue: Opportunity 93 with 75% fit — lead with precision machining."
+            "text": "Pursue revenue: Opportunity 93 with 75% fit - lead with precision machining."
           }
         ]
       }
@@ -1343,7 +1343,7 @@
   {
     "id": "deliv-1783188406620-analysis-annotation",
     "type": "analysis_view",
-    "title": "Revenue Annotation — Q2 2026",
+    "title": "Revenue Annotation - Q2 2026",
     "createdAt": "2026-07-04T18:06:46.620Z",
     "brainArea": "decision",
     "entityIds": [
@@ -1363,7 +1363,7 @@
         "blocks": [
           {
             "kind": "text",
-            "text": "Revenue for Q2 2026: $8.8M across 10 active accounts. Lonestar Aero Systems leads with $2.1M (24% of total). This is roughly flat 4% versus Q1 2026 ($8.5M). Top account is Lonestar Aero Systems at 24% — no single-account concentration risk."
+            "text": "Revenue for Q2 2026: $8.8M across 10 active accounts. Lonestar Aero Systems leads with $2.1M (24% of total). This is roughly flat 4% versus Q1 2026 ($8.5M). Top account is Lonestar Aero Systems at 24% - no single-account concentration risk."
           }
         ]
       }

@@ -12,14 +12,14 @@
 //    E2E_HUBSPOT_TEST_PORTAL=1 are set, i.e. a maintainer has pointed this at
 //    a live backend wired to a HubSpot test portal (the seeded portal
 //    246683028 documented in docs/DEMO_HUBSPOT_TASK.md works). CI has no such
-//    portal/credentials provisioned, so this tier skips there by design —
+//    portal/credentials provisioned, so this tier skips there by design -
 //    the same "manual credential required" boundary as deploy-staging.yml.
 import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { chromium, type Browser, type Page } from "playwright";
 
 // This suite exercises the real Clerk auth gate (WP10-A), not the legacy
-// VITE_COCKPIT_PASSWORD_HASH gate — that variable is left unset in the build.
+// VITE_COCKPIT_PASSWORD_HASH gate - that variable is left unset in the build.
 const BASE_URL = "http://127.0.0.1:4175";
 const SCREENSHOT_DIR = "/tmp/btx-e2e-smoke";
 
@@ -155,7 +155,7 @@ async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
 
   const retryButton = page.getByRole("button", { name: "Create HubSpot task" });
   if (await retryButton.count()) {
-    // Item is now done; there should be nothing left to confirm — the retry
+    // Item is now done; there should be nothing left to confirm - the retry
     // affordance only appears for account_action items still open.
     console.log("e2e: work item already completed, skipping duplicate-retry click (expected).");
   }
@@ -183,7 +183,7 @@ try {
   if (HUBSPOT_LOOP_ENABLED) {
     await runHubSpotTaskLoop(browser);
   } else {
-    console.log("e2e: E2E_HUBSPOT_TEST_PORTAL / E2E_BACKEND_ENDPOINT not set — skipping the HubSpot task loop tier.");
+    console.log("e2e: E2E_HUBSPOT_TEST_PORTAL / E2E_BACKEND_ENDPOINT not set - skipping the HubSpot task loop tier.");
   }
 } finally {
   if (browser) await browser.close();

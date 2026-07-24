@@ -49,7 +49,7 @@ function signalMatchMethod(signal: Signal): string {
  * Build the wizard's prefilled inputs for a template, tracking provenance per
  * field. Every account-scoped field comes from a real record (company, contact,
  * or validated signal); when no record exists the field is omitted or replaced
- * by a market-level value — never fabricated.
+ * by a market-level value - never fabricated.
  */
 export function buildWizardPrefill(agentId: AgentId, world: World, accountId?: string): WizardPrefill {
   const option = deliverableTemplateOption(agentId);
@@ -112,7 +112,7 @@ export function buildWizardPrefill(agentId: AgentId, world: World, accountId?: s
         fields.push({
           field: "evidence",
           label: "Strongest evidence",
-          value: `${signalHeadline(signal)} — ${signalSourceName(signal)}, ${signalSourceDate(signal)}`,
+          value: `${signalHeadline(signal)} - ${signalSourceName(signal)}, ${signalSourceDate(signal)}`,
           scope: "account",
           source: signalSourceName(signal),
           method: `signal:${signalMatchMethod(signal)}`,

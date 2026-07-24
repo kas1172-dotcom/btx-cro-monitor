@@ -7,6 +7,7 @@ import {
   recordToDeliverable,
 } from "../../app/deliverablesApi.ts";
 import type { Deliverable, DeliverableType } from "../../deliverables/types.ts";
+import type { ChartSpec } from "../../metrics/types.ts";
 import { useMemory } from "../../memory/localMemory.ts";
 import { openDeliverableWizard, setState } from "../../store/store.ts";
 import { EmptyState, ListRow, SurfaceHeader } from "../primitives.tsx";
@@ -28,6 +29,13 @@ const typeLabels: Record<DeliverableType, string> = {
   outreach: "Outreach",
   sales_pitch: "Sales pitch",
   capabilities_assessment: "Capabilities assessment",
+};
+
+const DEFAULT_FIGURE_SPEC: ChartSpec = {
+  metric: "revenue",
+  viz: "heatmap",
+  rows: "account",
+  cols: "quarter",
 };
 
 function labelType(type: DeliverableType): string {
@@ -143,6 +151,17 @@ export function DeliverableLibrary({ world }: { world: World }) {
           }}
         >
           New deliverable
+        </button>
+        <button
+          onClick={() => setState({
+            activeAnalysisSpec: DEFAULT_FIGURE_SPEC,
+            activeTab: "analysis",
+            activeDeliverable: null,
+            activeCompanyId: null,
+            brainResponse: null,
+          })}
+        >
+          Insert figure
         </button>
         <p>{visible.length} of {items.length} deliverables</p>
       </div>

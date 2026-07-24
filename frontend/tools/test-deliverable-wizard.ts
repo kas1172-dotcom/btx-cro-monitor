@@ -77,14 +77,14 @@ const evidenceField = richPrefill.fields.find((field) => field.field === "eviden
 assert(evidenceField && evidenceField.scope === "account", "Rich account must surface signal-backed evidence.");
 assert((evidenceField!.confidence ?? 0) > 0, "Signal-backed evidence must carry the signal confidence.");
 
-// 3. An account with no evidence gets market-level labels — never fabricated facts.
+// 3. An account with no evidence gets market-level labels - never fabricated facts.
 const bareAccount = world.companies.find((company) =>
   !world.contacts.some((contact) => contact.company_id === company.id) &&
   !world.analysis.valid.some((signal) => signal.subject_id === company.id),
 );
 if (bareAccount) {
   const barePrefill = buildWizardPrefill("capabilities_assessment", world, bareAccount.id);
-  assert(!barePrefill.fields.some((field) => field.field === "contact"), "No contact record means no contact field — never invented.");
+  assert(!barePrefill.fields.some((field) => field.field === "contact"), "No contact record means no contact field - never invented.");
   const bareEvidence = barePrefill.fields.find((field) => field.field === "evidence");
   assert(bareEvidence?.scope === "market", "Unsourced evidence must be labeled market-level.");
   assert(validatePrefillProvenance(barePrefill.fields).length === 0, "Market-labeled fields are conformant.");

@@ -76,7 +76,7 @@ EDITORIAL_MAX_TOKENS = 1024
 # out-tokens/item and truncated some batches at the old 700×2.0 sizing
 # ("Unterminated string" parse failures that wasted a full retry each). The
 # estimate now sits above observed output with generous headroom; max_tokens is
-# only a ceiling — you pay for tokens actually generated — so over-sizing is cheap.
+# only a ceiling - you pay for tokens actually generated - so over-sizing is cheap.
 DEEP_TOKENS_PER_ITEM_ESTIMATE = 1400  # expected deep output per item (obs. ~1135)
 DEEP_TOKENS_HEADROOM = 2.5            # multiple of expected output to allow
 DEEP_MAX_TOKENS_FLOOR = 2048          # never below this, even for a 1-item batch
@@ -277,7 +277,7 @@ class Scorer:
 
         Serial when max_concurrency == 1 (cap checked before every batch). When
         concurrent, batches run in waves of max_concurrency with the cap checked
-        between waves — so a run may overshoot by at most one wave, which is fine
+        between waves - so a run may overshoot by at most one wave, which is fine
         for a safety ceiling. Results are returned in submission order either way.
         """
         def _capped() -> bool:
@@ -327,7 +327,7 @@ class Scorer:
             system=system,
             messages=[{"role": "user", "content": user}],
             # Shape must match the SDK's OutputConfigParam / JSONOutputFormatParam
-            # TypedDicts (anthropic/types/) — the API rejects extra keys.
+            # TypedDicts (anthropic/types/) - the API rejects extra keys.
             output_config={
                 "format": {
                     "type": "json_schema",
@@ -403,7 +403,7 @@ class Scorer:
         for llm_item in parsed.results:
             raw = raw_by_id.get(llm_item.item_id)
             if raw is None:
-                logger.warning("LLM returned unknown item_id %r — skipping", llm_item.item_id)
+                logger.warning("LLM returned unknown item_id %r - skipping", llm_item.item_id)
                 continue
             assembled = self._assemble_item(llm_item, raw)
             if assembled is not None:
@@ -550,7 +550,7 @@ class Scorer:
             cost, parse, stream=True,
         )
         if result is None:
-            logger.error("Deep analysis failed for %d items — left without depth", len(batch))
+            logger.error("Deep analysis failed for %d items - left without depth", len(batch))
             return {}
         return result
 
@@ -666,7 +666,7 @@ class Scorer:
             deep_by_id.update(r)
         if len(batch_results) < len(batches):
             logger.warning(
-                "Output token cap reached — stopped after %d of %d deep-analysis batches",
+                "Output token cap reached - stopped after %d of %d deep-analysis batches",
                 len(batch_results), len(batches),
             )
 
@@ -713,7 +713,7 @@ class Scorer:
         analyzed: list[AnalyzedItem] = [item for br in batch_results for item in br]
         if len(batch_results) < len(batches):
             logger.warning(
-                "Output token cap reached — stopped after %d of %d classification batches",
+                "Output token cap reached - stopped after %d of %d classification batches",
                 len(batch_results), len(batches),
             )
 

@@ -51,7 +51,7 @@ for num,head,accent,tell,stat,statsub,sowhat in stories:
     # tell me
     txt(M+24,y+82,"TELL ME",9.5,TEAL,bold=True,spacing="1.5")
     txt(M+24,y+104,tell,11.5,INK)
-    # show me (stat callout) + so what — two columns
+    # show me (stat callout) + so what - two columns
     colw=(W-2*M-48)/2
     sx=M+24; syy=y+124
     rect(sx,syy,colw,96,TINT,rx=8)

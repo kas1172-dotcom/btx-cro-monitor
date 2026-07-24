@@ -42,9 +42,9 @@ export function ProgramContractTracker({ world }: { world: World }) {
   return (
     <section className="surface-page" data-surface-component="surface-program-contract-tracker">
       <SurfaceHeader
-        eyebrow="Program / contract tracker"
+        eyebrow="Signals"
         headline={`${programSignals.length} program, award, and recompete signals relevant to BTX capabilities.`}
-        subline="Program and award evidence stays market-level unless a relationship record links it to a canonical account."
+        subline="Contract and program news stays market-level until a verified account link is available."
       />
       <div className="program-signal-list">
         {programSignals.map((signal) => {

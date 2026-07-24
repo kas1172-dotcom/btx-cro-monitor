@@ -7,19 +7,20 @@ const SOURCE_LABELS: Record<string, string> = {
   "opportunities.json": "HubSpot CRM",
   "signals.json + news.json": "Monitor engine + public sources",
   "monitor-engine artifacts": "Monitor engine",
-  "erp_capacity.json": "ERP capacity baseline",
-  "account_monthly_revenue.json": "Revenue baseline",
-  "bookings_backlog.json": "Bookings and backlog baseline",
-  "pipeline_snapshots.json": "Pipeline baseline",
-  "win_loss_history.json": "Win/loss baseline",
-  "capacity_utilization.json": "Capacity baseline",
+  "Monitor engine evidence": "Monitor engine",
+  "erp_capacity.json": "ERP capacity sample data",
+  "account_monthly_revenue.json": "Revenue sample data",
+  "bookings_backlog.json": "Bookings and backlog sample data",
+  "pipeline_snapshots.json": "Pipeline sample data",
+  "win_loss_history.json": "Win/loss sample data",
+  "capacity_utilization.json": "Capacity sample data",
   "scoring trace": "Scoring trace",
   "user edits": "User edits",
 };
 
 const RECORD_LABELS: Record<string, string> = {
-  capacity: "Capacity baseline",
-  operating_baseline: "Operating baseline",
+  capacity: "Capacity sample data",
+  operating_baseline: "Production context",
 };
 
 export function humanSourceLabel(source: string): string {
@@ -28,12 +29,15 @@ export function humanSourceLabel(source: string): string {
 
 export function humanSourceReason(reason: string): string {
   return reason
-    .replace(/\bseeded\b/gi, "baseline")
+    .replace(/\bseeded baseline\b/gi, "sample data")
+    .replace(/\bseeded\b/gi, "sample")
     .replace(/\bmonitor-engine\b/g, "monitor engine")
+    .replace(/\bartifacts?\b/gi, "documents")
+    .replace(/\bprovenance\b/gi, "source record")
     .replace(/\bcompanies\.json\b/g, "HubSpot CRM")
     .replace(/\bcontacts\.json\b/g, "HubSpot CRM")
     .replace(/\bopportunities\.json\b/g, "HubSpot CRM")
-    .replace(/\berp_capacity\.json\b/g, "ERP capacity baseline")
+    .replace(/\berp_capacity\.json\b/g, "ERP capacity sample data")
     .replace(/\bsignals\.json \+ news\.json\b/g, "monitor engine and public sources");
 }
 

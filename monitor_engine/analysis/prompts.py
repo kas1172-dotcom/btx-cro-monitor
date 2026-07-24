@@ -32,7 +32,7 @@ def _format_profile_block(config: ClientConfig) -> str:
     if not lines:
         return ""
     return (
-        "CLIENT PROFILE — tie every assessment to this specific client. Connect items "
+        "CLIENT PROFILE - tie every assessment to this specific client. Connect items "
         "to these capabilities, goals, and named entities where relevant (e.g. what a "
         "development implies for the client's ability to win work or its exposure to "
         "risk). Do NOT invent facts about the client beyond what is stated here:\n"
@@ -75,10 +75,10 @@ EDITIONS TO ANALYZE:
 {chr(10).join(editions_block)}
 {profile_section}
 WRITING STYLE (applies to so_what and now_what):
-- BLUF — bottom line up front: lead with the consequence, not background.
+- BLUF - bottom line up front: lead with the consequence, not background.
 - Be specific, not generic. Name the agency, program, rule, company, or figure from the
   source. Avoid filler like "this could have significant implications" or "stakeholders
-  should monitor developments" — say what implication, for whom.
+  should monitor developments" - say what implication, for whom.
 - Calibrated uncertainty: state only what the source supports. If something is proposed vs.
   final, partial, or unclear, say so plainly. Never manufacture specifics or false precision.
 - Separate source facts from analyst inference. If now_what depends on an inference, make the
@@ -87,9 +87,9 @@ WRITING STYLE (applies to so_what and now_what):
   informs, and what evidence or deadline drives urgency when that evidence exists.
 
 SCORING RULES:
-- relevance_score: integer 0–100 measuring how relevant the item is to the edition's audience.
-  80–100: directly actionable; 50–79: useful context; 20–49: marginal; 0–19: not relevant.
-- so_what: 1–2 sentences, BLUF, on the concrete consequence for this edition's audience.
+- relevance_score: integer 0-100 measuring how relevant the item is to the edition's audience.
+  80-100: directly actionable; 50-79: useful context; 20-49: marginal; 0-19: not relevant.
+- so_what: 1-2 sentences, BLUF, on the concrete consequence for this edition's audience.
 - now_what: one concrete, specific action this audience should take or consider.
 - categories: only values from the edition's "Valid categories" list; empty list if none apply.
 {never_discard_note}
@@ -104,7 +104,7 @@ Null only when genuinely confident.
 - entities: the specific named things this item is about, for cross-referencing. Each entity has a \
 "name" (use the canonical/full form rather than an abbreviation or partial name) and a "type", one of: \
 organization, agency, program, person, place, product. Extract only entities actually named in the \
-item — up to 6, most central first. Empty list if none are named.
+item - up to 6, most central first. Empty list if none are named.
 
 Do NOT invent facts, figures, or deadlines not present in the source text; an absent detail is \
 "not stated", never a guess. Do not turn assumptions into facts. Analyze ALL items in the batch.
@@ -166,7 +166,7 @@ def build_deep_analysis_user_prompt(
     research_notes: dict[str, str] | None = None,
 ) -> str:
     """Render the deep-analysis user prompt. When *research_notes* (keyed by
-    item id) are supplied — produced by the agentic research pass — they are
+    item id) are supplied - produced by the agentic research pass - they are
     appended per item so the analyst can ground and cite live findings."""
     body = _format_items_block(items)
     notes = research_notes or {}
@@ -176,7 +176,7 @@ def build_deep_analysis_user_prompt(
             f"ITEM_ID: {iid}\n{text}" for iid, text in relevant.items()
         ]
         body += (
-            "\n\nRESEARCH NOTES (gathered by querying live sources during research — "
+            "\n\nRESEARCH NOTES (gathered by querying live sources during research - "
             "you may rely on and cite these; prefer them over assumptions):\n\n"
             + "\n\n".join(note_blocks)
         )
@@ -215,12 +215,12 @@ TOP ITEMS:
 Write exactly three fields:
 - theme_of_week: one sentence naming the dominant concrete theme across this run's most
   important items (name the specific thread, not "various developments").
-- editors_note: 2–3 sentences of editorial commentary on the specific pattern, risk, or
-  opportunity — BLUF, grounded in the items above, not platitudes.
-- whats_new_digest: 3–5 sentences on what is genuinely new or changed this run.
+- editors_note: 2-3 sentences of editorial commentary on the specific pattern, risk, or
+  opportunity - BLUF, grounded in the items above, not platitudes.
+- whats_new_digest: 3-5 sentences on what is genuinely new or changed this run.
 
 Be concise, authoritative, and specific; lead with the bottom line. Ground every claim in the
-items above — do not invent developments, numbers, timelines, or source coverage. Separate facts
+items above - do not invent developments, numbers, timelines, or source coverage. Separate facts
 from editorial judgment, and call out uncertainty or missing evidence when it matters. Do not repeat
 item titles verbatim.
 """.strip()

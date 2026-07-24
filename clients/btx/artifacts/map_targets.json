@@ -57,7 +57,7 @@
       ],
       "fit_score": 75,
       "fit_tier": "hot",
-      "fit_rationale": "Strong fit — a known customer/prime (Lockheed Martin); active on F-35; served by build-to-print manufacturing.",
+      "fit_rationale": "Strong fit - a known customer/prime (Lockheed Martin); active on F-35; served by build-to-print manufacturing.",
       "serve_with": [
         "build-to-print manufacturing"
       ],
@@ -97,7 +97,7 @@
       ],
       "fit_score": 68,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — a known customer/prime (Boeing Defense); served by build-to-print manufacturing.",
+      "fit_rationale": "Possible fit - a known customer/prime (Boeing Defense); served by build-to-print manufacturing.",
       "serve_with": [
         "build-to-print manufacturing"
       ],
@@ -137,7 +137,7 @@
       ],
       "fit_score": 64,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by precision machining, 5-axis CNC machining.",
+      "fit_rationale": "Possible fit - served by precision machining, 5-axis CNC machining.",
       "serve_with": [
         "precision machining",
         "5-axis CNC machining"
@@ -178,7 +178,7 @@
       ],
       "fit_score": 57,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — a known customer/prime (Northrop Grumman); active on B-21.",
+      "fit_rationale": "Possible fit - a known customer/prime (Northrop Grumman); active on B-21.",
       "serve_with": [],
       "source_id": "btx-targets",
       "url": "https://www.northropgrumman.com"
@@ -216,7 +216,7 @@
       ],
       "fit_score": 56,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by precision machining, 5-axis CNC machining.",
+      "fit_rationale": "Possible fit - served by precision machining, 5-axis CNC machining.",
       "serve_with": [
         "precision machining",
         "5-axis CNC machining"
@@ -257,7 +257,7 @@
       ],
       "fit_score": 56,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by precision machining, build-to-print manufacturing.",
+      "fit_rationale": "Possible fit - served by precision machining, build-to-print manufacturing.",
       "serve_with": [
         "precision machining",
         "build-to-print manufacturing"
@@ -298,7 +298,7 @@
       ],
       "fit_score": 56,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by precision machining, build-to-print manufacturing.",
+      "fit_rationale": "Possible fit - served by precision machining, build-to-print manufacturing.",
       "serve_with": [
         "precision machining",
         "build-to-print manufacturing"
@@ -339,7 +339,7 @@
       ],
       "fit_score": 56,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by 5-axis CNC machining, assembly of flight-critical components.",
+      "fit_rationale": "Possible fit - served by 5-axis CNC machining, assembly of flight-critical components.",
       "serve_with": [
         "5-axis CNC machining",
         "assembly of flight-critical components"
@@ -380,7 +380,7 @@
       ],
       "fit_score": 54,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by precision machining.",
+      "fit_rationale": "Possible fit - served by precision machining.",
       "serve_with": [
         "precision machining"
       ],
@@ -420,7 +420,7 @@
       ],
       "fit_score": 46,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — served by build-to-print manufacturing.",
+      "fit_rationale": "Possible fit - served by build-to-print manufacturing.",
       "serve_with": [
         "build-to-print manufacturing"
       ],
@@ -460,7 +460,7 @@
       ],
       "fit_score": 42,
       "fit_tier": "warm",
-      "fit_rationale": "Possible fit — a known customer/prime (RTX).",
+      "fit_rationale": "Possible fit - a known customer/prime (RTX).",
       "serve_with": [],
       "source_id": "btx-targets",
       "url": "https://www.rtx.com"
@@ -498,7 +498,7 @@
       ],
       "fit_score": 38,
       "fit_tier": "cool",
-      "fit_rationale": "Low signal — served by build-to-print manufacturing.",
+      "fit_rationale": "Low signal - served by build-to-print manufacturing.",
       "serve_with": [
         "build-to-print manufacturing"
       ],
@@ -538,7 +538,7 @@
       ],
       "fit_score": 35,
       "fit_tier": "cool",
-      "fit_rationale": "Low signal — active on F-35.",
+      "fit_rationale": "Low signal - active on F-35.",
       "serve_with": [],
       "source_id": "btx-targets",
       "url": null
@@ -576,7 +576,7 @@
       ],
       "fit_score": 20,
       "fit_tier": "cool",
-      "fit_rationale": "Low signal — no profile overlap detected.",
+      "fit_rationale": "Low signal - no profile overlap detected.",
       "serve_with": [],
       "source_id": "btx-targets",
       "url": null

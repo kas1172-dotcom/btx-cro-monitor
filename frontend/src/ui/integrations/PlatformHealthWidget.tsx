@@ -43,7 +43,7 @@ const STATUS_LABEL: Record<string, string> = {
 function dotClass(status: string): string {
   if (status === "ok") return "status-connected";
   if (status === "not_configured" || status === "missing") return "status-not_connected";
-  return "status-available"; // stale/invalid/degraded — attention, not failure
+  return "status-available"; // stale/invalid/degraded - attention, not failure
 }
 
 export function PlatformHealthWidget() {
@@ -71,7 +71,7 @@ export function PlatformHealthWidget() {
     return (
       <div className="platform-health-widget">
         <p className="eyebrow">Platform health</p>
-        <p className="muted">No backend configured (VITE_BACKEND_ENDPOINT unset) — running on local baseline data only.</p>
+        <p className="muted">No backend configured (VITE_BACKEND_ENDPOINT unset) - running on local baseline data only.</p>
       </div>
     );
   }

@@ -2,7 +2,7 @@
 
 Used as a geo fallback: an account that carries only a state (no lat/lon) is
 placed at the state's centroid so it still appears on the map. Centroids are
-approximate population/area centers — good enough for a regional overview, never
+approximate population/area centers - good enough for a regional overview, never
 presented as a precise location (the pin is flagged ``geo_approx``).
 """
 from __future__ import annotations

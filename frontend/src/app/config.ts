@@ -35,7 +35,7 @@ export interface ClientProfile {
 }
 export const PROFILE = profile as unknown as ClientProfile;
 
-/** Cities present in the demo world — drives the "where are you?" picker. */
+/** Cities present in the demo world - drives the "where are you?" picker. */
 export const CITIES: string[] = [
   ...new Set((companies as Array<{ location: { city: string } }>).map((c) => c.location.city)),
 ].sort();

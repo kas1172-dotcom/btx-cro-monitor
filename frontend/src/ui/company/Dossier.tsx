@@ -146,7 +146,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
 
       {openOpps.length > 0 && (
         <section id="dossier-pipeline">
-          <h4>Pipeline — {fmtM(pipelineValue)} open ({plural(openOpps.length, "deal")})</h4>
+          <h4>Pipeline - {fmtM(pipelineValue)} open ({plural(openOpps.length, "deal")})</h4>
           <ul className="opps">
             {openOpps.slice(0, 6).map((o) => (
               <li key={o.id}>
@@ -169,8 +169,8 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           <ul className="contacts">
             {facilities.map((f) => (
               <li key={f.id}>
-                <strong>{f.kind}</strong> — {formatAddress(f) ?? f.city}
-                <ProvenanceBadge label="Seeded baseline" />
+                <strong>{f.kind}</strong> - {formatAddress(f) ?? f.city}
+                <ProvenanceBadge label="Sample data" />
                 <div className="link-row"><ExternalLink href={f.source_url} label="ERP source" /></div>
               </li>
             ))}
@@ -183,7 +183,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         {fit.matched.length ? (
           <div className="tags">{fit.matched.map((m) => <span key={m} className="tag good">{m}</span>)}</div>
         ) : (
-          <p className="muted">No capability overlap — likely a teaming play, not a direct sale.</p>
+          <p className="muted">No capability overlap - likely a teaming play, not a direct sale.</p>
         )}
         {fit.missing.length > 0 && (
           <div className="tags">{fit.missing.map((m) => <span key={m} className="tag gap">{m}</span>)}</div>
@@ -218,7 +218,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         <ul className="contacts">
           {contacts.map((k) => (
             <li key={k.id}>
-              <strong>{k.name}</strong> — {k.title}
+              <strong>{k.name}</strong> - {k.title}
               <ProvenanceBadge label={provenanceForRecord(k)} />
             </li>
           ))}

@@ -95,7 +95,7 @@
         <select name="day"><option>monday</option><option>tuesday</option><option>wednesday</option><option>thursday</option><option>friday</option></select></div>
     </div>
     <div class="row">
-      <div><label>Hour (local, 0–23)</label><input type="number" name="hour_local" min="0" max="23" value="7"></div>
+      <div><label>Hour (local, 0-23)</label><input type="number" name="hour_local" min="0" max="23" value="7"></div>
       <div><label>Timezone</label><input type="text" name="timezone" value="UTC"></div>
     </div>
 
@@ -131,7 +131,7 @@
     SurveyIntake.SOURCE_LIBRARY.forEach((s) => {
       const lab = document.createElement('label');
       lab.innerHTML = '<input type="checkbox" value="' + s.name + '"> <span>' + s.name +
-        ' <span class="small">— ' + s.what + '</span></span>';
+        ' <span class="small">- ' + s.what + '</span></span>';
       sourcesEl.appendChild(lab);
     });
 

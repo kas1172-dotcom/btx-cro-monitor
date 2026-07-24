@@ -1,6 +1,6 @@
 // Single source of truth for the Signal contract and the score dimensions.
 // INDUSTRY-FREE: no client or sector names may appear in this file (or anywhere
-// under src/engine/). The engine knows about signals, dimensions and weights —
+// under src/engine/). The engine knows about signals, dimensions and weights -
 // never about a specific company or industry. Mock/demo data lives in data/.
 
 import type { AccountStatus, BusinessMotion } from "../brain/entities.ts";
@@ -9,7 +9,7 @@ export const PORTFOLIO_SIGNAL_SUBJECT_ID = "__portfolio__";
 
 /**
  * The dimensions the decision engine scores. To introduce a new score, add it
- * here and add a weight row in the weights config — no engine code changes.
+ * here and add a weight row in the weights config - no engine code changes.
  */
 export const SCORE_DIMENSIONS = [
   "risk",
@@ -71,7 +71,7 @@ export interface Signal {
   value?: number;
   /** Extraction confidence, 0..1. The validation layer gates on this. */
   confidence: number;
-  /** Verbatim supporting text — the audit trail back to the source. */
+  /** Verbatim supporting text - the audit trail back to the source. */
   source_quote: string;
   source_url?: string;
   document_url?: string;

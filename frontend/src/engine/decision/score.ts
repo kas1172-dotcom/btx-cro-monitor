@@ -2,7 +2,7 @@
 // Same signals + same weights config => byte-identical output, every time.
 //
 // Diminishing returns: repeated signals of the SAME event_type for a subject
-// decay — the 1st (most recent) is worth full weight, the 2nd weight×decay, the
+// decay - the 1st (most recent) is worth full weight, the 2nd weight×decay, the
 // 3rd weight×decay², ... This keeps the trace additive (every contribution is
 // still an explicit number that sums to the score) while stopping a single
 // repeated headline from saturating a dimension. The decay factor is config.
@@ -27,7 +27,7 @@ export interface DimensionScore {
   dimension: ScoreDimension;
   /** Final value after clamping to [0, dimension_cap]. */
   score: number;
-  /** Pre-clamp sum — distinguishes "barely 100" from "pinned far past the cap". */
+  /** Pre-clamp sum - distinguishes "barely 100" from "pinned far past the cap". */
   raw: number;
   /** Every signal that moved this dimension, and by how much. */
   contributions: Contribution[];
@@ -122,5 +122,5 @@ export function explainDimension(d: DimensionScore): string {
   if (d.contributions.length === 0) return `${d.dimension}: 0 (no contributing signals)`;
   const parts = d.contributions.map((c) => `${c.event_type} (+${c.delta})`).join(", ");
   const note = d.raw > d.score ? ` [capped from ${d.raw}]` : "";
-  return `${d.dimension}: ${d.score}${note} — ${parts}`;
+  return `${d.dimension}: ${d.score}${note} - ${parts}`;
 }

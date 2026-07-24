@@ -15,10 +15,10 @@ export function CapacityAssessment({ world }: { world: World }) {
       <SurfaceHeader
         eyebrow="Capacity assessment"
         headline="Machining capacity compared with committed backlog and visible demand."
-        subline="A compact operating snapshot for utilization, delivery risk, backlog, and open demand."
+        subline="A compact production view for work-center load, delivery risk, backlog, and open demand."
       />
       <div className="account360-kpis">
-        <div><span>Utilization</span><strong>{formatMetricValue(utilization.value, utilization.unit)}</strong></div>
+        <div><span>Work-center load</span><strong>{formatMetricValue(utilization.value, utilization.unit)}</strong></div>
         <div><span>Modeled OTD</span><strong>{formatMetricValue(delivery.value, delivery.unit)}</strong></div>
         <div><span>Backlog</span><strong>{formatMetricValue(backlog.value, backlog.unit)}</strong></div>
         <div><span>Open demand</span><strong>{formatMetricValue(openDemand, "$")}</strong></div>

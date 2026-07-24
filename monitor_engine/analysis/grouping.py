@@ -3,11 +3,11 @@ Conservative topic grouping.
 
 Collapses analyzed items that cover the *same underlying event* into one primary
 card, citing the rest as "also covered by" (AnalyzedItem.also_covered_by). This
-is distinct from archive.dedup_items, which removes exact item_id duplicates —
+is distinct from archive.dedup_items, which removes exact item_id duplicates -
 here the items are different (different sources/URLs) but report the same story.
 
 The heuristic is deliberately conservative (a false merge hides a distinct item):
-two items group only when BOTH gates hold —
+two items group only when BOTH gates hold -
   1. date proximity: published within DATE_PROXIMITY_DAYS, or both undated;
   2. strong title similarity: normalized-token Jaccard ≥ JACCARD_MIN, or a
      difflib ratio ≥ RATIO_MIN.
@@ -58,7 +58,7 @@ def _dates_close(a: AnalyzedItem, b: AnalyzedItem) -> bool:
 
 
 def _same_event(a: AnalyzedItem, b: AnalyzedItem) -> bool:
-    """Both gates must hold — conservative by construction."""
+    """Both gates must hold - conservative by construction."""
     return _dates_close(a, b) and _titles_similar(a, b)
 
 

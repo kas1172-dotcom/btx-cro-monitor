@@ -6,8 +6,8 @@ import { TAB_IDS, type TabId } from "../app/surfaces.ts";
 import type { QuestionIntent } from "./types.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { backendHeaders } from "../app/backendApi.ts";
+import { COPILOT_ENDPOINT, checkAiStatus, markAiLive, markAiOffline } from "../app/aiStatus.ts";
 
-const ENDPOINT = (import.meta as ImportMeta & { env?: { VITE_COPILOT_ENDPOINT?: string } }).env?.VITE_COPILOT_ENDPOINT;
 const INTENTS: QuestionIntent[] = [
   "market_signals",
   "geographic_prospecting",
@@ -63,10 +63,11 @@ async function withTimeout(url: string, body: unknown): Promise<unknown> {
 
 export async function routeBrainQuestion(question: string, world: World): Promise<RoutedClassification> {
   const fallback = classifyQuestion(question);
-  if (!ENDPOINT) return { ...fallback, routedBy: "offline_fallback", entities: [], params: {} };
+  const status = await checkAiStatus();
+  if (status.state !== "live" || !COPILOT_ENDPOINT) return { ...fallback, routedBy: "offline_fallback", entities: [], params: {} };
 
   try {
-    const raw = await withTimeout(ENDPOINT, {
+    const raw = await withTimeout(COPILOT_ENDPOINT, {
       model: LLM_MODELS.routing,
       system: routerSystem(world),
       messages: [{ role: "user", content: question }],
@@ -75,6 +76,7 @@ export async function routeBrainQuestion(question: string, world: World): Promis
     if (typeof text !== "string") throw new Error("router returned no text");
     const parsed = RouterResult.safeParse(JSON.parse(text));
     if (!parsed.success) throw new Error(parsed.error.message);
+    markAiLive(LLM_MODELS.routing);
     return {
       intent: parsed.data.intent,
       activatedTabs: parsed.data.activatedTabs,
@@ -83,7 +85,8 @@ export async function routeBrainQuestion(question: string, world: World): Promis
       deliverableType: parsed.data.deliverableType,
       params: parsed.data.params,
     };
-  } catch {
+  } catch (error) {
+    markAiOffline(error instanceof Error ? error.message : "router failed");
     return { ...fallback, routedBy: "offline_fallback", entities: [], params: {} };
   }
 }

@@ -168,7 +168,7 @@ export const itineraryAgent: DeliverableAgent<Inputs> = {
       stops: itineraryStops,
       sources: [
         { source: "companies.json", records: clusteredStops.map((p) => p.prospect.company.id), reason: "Addresses, coordinates, relationship status, and market clustering." },
-        { source: clusteredStops.some((p) => p.prospect.topSignal?.artifact) ? "monitor-engine artifacts" : "signals.json + news.json", records: clusteredStops.flatMap((p) => p.prospect.topSignal ? [p.prospect.topSignal.id] : []), reason: clusteredStops.some((p) => p.prospect.topSignal?.artifact) ? "Real monitor-engine trigger evidence with source names, dates, and artifact provenance." : "Trigger signals and why-now evidence for each stop." },
+        { source: clusteredStops.some((p) => p.prospect.topSignal?.artifact) ? "Monitor engine evidence" : "signals.json + news.json", records: clusteredStops.flatMap((p) => p.prospect.topSignal ? [p.prospect.topSignal.id] : []), reason: clusteredStops.some((p) => p.prospect.topSignal?.artifact) ? "Monitor engine trigger evidence with source names and dates." : "Trigger signals and why-now evidence for each stop." },
         { source: "contacts.json", records: clusteredStops.flatMap((p) => p.prospect.contact ? [p.prospect.contact.id] : []), reason: "Recommended contacts for meeting prep." },
       ],
     } as ItineraryContext;

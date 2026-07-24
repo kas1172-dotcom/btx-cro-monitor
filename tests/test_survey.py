@@ -3,7 +3,7 @@ Survey → intake → config round-trip.
 
 Drives the survey's pure core (docs/intake/survey.js) via Node with BTX
 defense-manufacturer answers, then feeds the generated intake through the real
-tooling/scaffold.py and asserts a valid ClientConfig with the profile intact —
+tooling/scaffold.py and asserts a valid ClientConfig with the profile intact -
 i.e. the survey actually generates a usable config, not just JSON.
 """
 from __future__ import annotations

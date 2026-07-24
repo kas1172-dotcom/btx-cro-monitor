@@ -1,5 +1,5 @@
 """Database engine/session setup. SQLite-friendly for local/test, Postgres in
-prod — the model layer is dialect-neutral (JSON columns, string PKs)."""
+prod - the model layer is dialect-neutral (JSON columns, string PKs)."""
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -18,7 +18,7 @@ class Base(DeclarativeBase):
 
 class SchemaNotMigrated(RuntimeError):
     """Raised when a prod-env engine's schema doesn't match the latest Alembic
-    revision — the deploy forgot to run `alembic upgrade head` first."""
+    revision - the deploy forgot to run `alembic upgrade head` first."""
 
 
 def make_engine(url: str) -> Engine:
@@ -128,7 +128,7 @@ def assert_schema_current(engine: Engine) -> None:
 
     Called only when settings.env == "prod" (see api.create_app). Dev/test
     keep using init_db()'s create_all() for zero-friction local SQLite; a
-    real deploy must not silently create tables from model metadata — that
+    real deploy must not silently create tables from model metadata - that
     would drift from what's tracked in alembic/versions/.
     """
     from alembic.config import Config

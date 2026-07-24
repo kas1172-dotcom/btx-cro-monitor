@@ -355,11 +355,11 @@ export async function downloadXlsx(deliverable: Deliverable): Promise<void> {
       }
     }
   }
-  const provenanceSheet: XlsxSheetData = [[xlsxColumn("Source"), xlsxColumn("Reason"), xlsxColumn("Records")]];
-  visibleSources(deliverable.sources).forEach((source) => provenanceSheet.push([source.label, source.reason, source.records]));
+  const sourceSheet: XlsxSheetData = [[xlsxColumn("Source"), xlsxColumn("Reason"), xlsxColumn("Records")]];
+  visibleSources(deliverable.sources).forEach((source) => sourceSheet.push([source.label, source.reason, source.records]));
   const blob = await writeXlsxFile([
     { sheet: "Deliverable", data: deliverableSheet, columns: [{ width: 36 }, { width: 28 }, { width: 28 }, { width: 28 }] },
-    { sheet: "Provenance", data: provenanceSheet, columns: [{ width: 28 }, { width: 44 }, { width: 44 }] },
+    { sheet: "Sources", data: sourceSheet, columns: [{ width: 28 }, { width: 44 }, { width: 44 }] },
   ]).toBlob();
   downloadFile(`${slugTitle(deliverable)}.xlsx`, blob, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 }

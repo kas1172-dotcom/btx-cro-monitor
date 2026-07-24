@@ -3,7 +3,7 @@
 For every configured enricher, the distinct matching entities across the run are
 looked up once each (parallel, fail-soft, capped), and the resulting facts are
 attached to every item that named that entity. This is the "integrate other APIs
-and let them talk to each other" core — entities discovered in one source are
+and let them talk to each other" core - entities discovered in one source are
 resolved against a second, third, … API and folded back onto the item.
 """
 from __future__ import annotations

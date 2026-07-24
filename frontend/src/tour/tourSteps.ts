@@ -18,20 +18,20 @@ export interface TourStep {
 
 export const TOUR_STEPS: TourStep[] = [
   {
-    title: "Monday, 7am — the brain already did the reading.",
+    title: "Monday, 7am - the brain already did the reading.",
     prompt: "What should I care about this week?",
     actionLabel: "Ask: What should I care about this week?",
     completion: "deliverable",
     execution: "ask",
   },
   {
-    title: "One opportunity stands out — and the brain says why.",
+    title: "One opportunity stands out - and the brain says why.",
     actionLabel: "Open the top opportunity dossier",
     completion: "dossier",
     execution: "dossier",
   },
   {
-    title: "Everything known about them, in one place — scores, signals, pipeline, provenance.",
+    title: "Everything known about them, in one place: scores, signals, pipeline, and sources.",
     actionLabel: "Hold on the dossier",
     completion: "hold",
     execution: "hold",
@@ -56,7 +56,7 @@ export const TOUR_STEPS: TourStep[] = [
     agentId: "capabilities_assessment",
   },
   {
-    title: "The brain drafts the outreach — grounded in their world, not boilerplate.",
+    title: "The brain drafts the outreach - grounded in their world, not boilerplate.",
     actionLabel: "Draft outreach under 100 words",
     completion: "deliverable",
     execution: "agent",
@@ -70,14 +70,14 @@ export const TOUR_STEPS: TourStep[] = [
     agentId: "sales_pitch",
   },
   {
-    title: "And the full deck — figures computed, sources attached, PowerPoint ready.",
+    title: "And the full deck - figures computed, sources attached, PowerPoint ready.",
     actionLabel: "Generate board deck",
     completion: "deliverable",
     execution: "agent",
     agentId: "board_deck",
   },
   {
-    title: "A morning's work in four minutes — and the brain remembered all of it.",
+    title: "A morning's work in four minutes - and the brain remembered all of it.",
     actionLabel: "Return Home and show the Library",
     completion: "home",
     execution: "home",

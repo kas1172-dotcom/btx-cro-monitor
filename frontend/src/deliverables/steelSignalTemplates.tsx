@@ -25,7 +25,7 @@ export interface SteelSignalValidationResult {
 export function validateSteelSignalDeliverable(deliverable: Deliverable, world: World): SteelSignalValidationResult {
   const text = deliverableText(deliverable);
   const errors: string[] = [];
-  if (/[—–]/.test(text)) errors.push("Generated deliverable text contains an em or en dash.");
+  if (/[\u2013\u2014]/.test(text)) errors.push("Generated deliverable text contains an em or en dash.");
   if (deliverable.type === "capabilities_assessment" && /\b(retention|earnings|churned|book-to-bill)\b/i.test(text)) {
     errors.push("Client-facing capabilities assessment cannot include other-client earnings or retention data.");
   }
@@ -128,7 +128,7 @@ export function MonthlyNewsletterTemplate({ deliverable, world }: { deliverable:
     <main className="ss-page ss-newsletter">
       <header className="ss-doc-header compact"><div><BrandMark /><div><p>BTX Defense Signal</p><span>Monthly market brief for the revenue team</span></div></div><aside><strong>{new Date(deliverable.createdAt).toLocaleString("en-US", { month: "long", year: "numeric" })}</strong><span>Internal</span></aside><h1>Three moves in the defense-machining market, and what each means for BTX pipeline.</h1></header>
       {stories.map((story) => <TellShowSoWhatBlock key={story.number} {...story} />)}
-      <aside className="ss-sources"><p className="ss-eyebrow">Sources</p><span>Monitor-engine market artifacts · HubSpot CRM · SAM.gov · DoD budget documents. Account links via canonical relationship records.</span></aside>
+      <aside className="ss-sources"><p className="ss-eyebrow">Sources</p><span>Monitor engine market evidence · HubSpot CRM · SAM.gov · DoD budget documents. Account links use reviewed relationship records.</span></aside>
       <footer>BTX Defense Signal · Internal monthly brief · Illustrative sample data</footer>
     </main>
   );
@@ -143,8 +143,8 @@ export function RetentionEarningsHeatmap({ world }: { world: World }) {
         number: 1,
         title: "Account earnings and retention, Q4 FY25 to Q1 FY27 forecast",
         xAxis: "Fiscal quarter ($K)",
-        yAxis: "Account (canonical)",
-        caption: "Each cell is one account's revenue in one fiscal quarter; darker cells indicate higher revenue. Source: CRM deals rolled up to canonical accounts. Internal use only.",
+        yAxis: "Account",
+        caption: "Each cell is one account's revenue in one fiscal quarter; darker cells indicate higher revenue. Source: CRM deals rolled up to accounts. Internal use only.",
         summary: "Revenue concentration and retention status identify accounts needing save or expansion work.",
       }}
     >
@@ -252,7 +252,7 @@ function marketSoWhat(index: number): string {
     "Treat as portfolio context; use it to shape target-list messaging, not account evidence.",
     "Ask BD to watch for named program owners before creating account-specific actions.",
     "Use this as a planning tailwind for capacity and content, while keeping scoring market scoped.",
-  ][index] ?? "Keep this market scoped until a relationship record links it to a canonical account.";
+  ][index] ?? "Keep this market scoped until a relationship record links it to an account.";
 }
 
 export function signalScopeForEvidence(signal: Signal): SignalScope {
@@ -265,13 +265,13 @@ function capacityRows(world: World): CapacityRow[] {
     facility: item.facility_name ?? item.city,
     fiveAxisCenters: String(Math.max(3, Math.round(item.available_5_axis_hours_next_30d / 20))),
     shifts: index === 2 ? "1" : "2",
-    utilization: `${Math.min(97, Math.max(60, 100 - Math.round(item.available_5_axis_hours_next_30d / 8)))}%`,
+    workCenterLoad: `${Math.min(97, Math.max(60, 100 - Math.round(item.available_5_axis_hours_next_30d / 8)))}%`,
     available: item.capacity_status.toLowerCase().includes("available") ? "Now" : item.capacity_status,
   }));
   return rows.length ? rows : [
-    { facility: "Fort Worth, TX", fiveAxisCenters: "8", shifts: "2", utilization: "93%", available: "Q1 FY27" },
-    { facility: "Wichita, KS", fiveAxisCenters: "5", shifts: "2", utilization: "88%", available: "Limited" },
-    { facility: "Tulsa, OK", fiveAxisCenters: "6", shifts: "1", utilization: "71%", available: "Now" },
+    { facility: "Fort Worth, TX", fiveAxisCenters: "8", shifts: "2", workCenterLoad: "93%", available: "Q1 FY27" },
+    { facility: "Wichita, KS", fiveAxisCenters: "5", shifts: "2", workCenterLoad: "88%", available: "Limited" },
+    { facility: "Tulsa, OK", fiveAxisCenters: "6", shifts: "1", workCenterLoad: "71%", available: "Now" },
   ];
 }
 

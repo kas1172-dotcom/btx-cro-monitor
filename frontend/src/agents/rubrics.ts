@@ -12,7 +12,7 @@ export const AGENT_RUBRICS = {
   outreach:
     "Draft outreach in 120 words or fewer. Include one specific hook from provided evidence, no flattery filler, no invented claims.",
   analysis_annotation:
-    "Explain what changed, why it matters, and what decision it supports. Use only provided metric facts and provenance.",
+    "Explain what changed, why it matters, and what decision it supports. Use only provided metric facts and sources.",
   sales_pitch:
     "Create a prospect-facing one-pager under 250 words. Plain language, specific proof, clear ask. Do not expose internal scores, records, or workflow terms.",
   capabilities_assessment:

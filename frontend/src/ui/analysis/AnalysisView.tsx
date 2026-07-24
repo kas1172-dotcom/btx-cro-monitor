@@ -10,6 +10,7 @@ import { saveDeliverable } from "../../memory/localMemory.ts";
 import { openDemoAction, setState } from "../../store/store.ts";
 import { AnalysisFigure } from "./ChartFigure.tsx";
 import { FigureTypePicker } from "./FigureTypePicker.tsx";
+import { humanSourceLabel, humanSourceReason } from "../../app/sourceLabels.ts";
 
 const METRIC_IDS = Object.keys(METRICS) as MetricId[];
 
@@ -175,7 +176,7 @@ export function AnalysisView({ world, initialSpec }: { world: World; initialSpec
           <AnalysisFigure spec={spec} world={world} />
           <div className="analysis-annotation">{annotation}</div>
           <div className="analysis-provenance">
-            {result.provenance.map((provenance) => <span key={provenance.source}>{provenance.source}: {provenance.reason}</span>)}
+            {result.provenance.map((provenance) => <span key={provenance.source}>{humanSourceLabel(provenance.source)}: {humanSourceReason(provenance.reason)}</span>)}
           </div>
         </div>
       </div>

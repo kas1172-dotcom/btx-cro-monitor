@@ -22,8 +22,8 @@
       "ticker": "public stock ticker or null",
       "parent": "parent entity name or null",
       "subsidiaries": "notable subsidiaries/divisions",
-      "cage_codes": "[{code, facility, verified, source}] — code is 5-char DLA CAGE",
-      "uei": "[{value, entity, verified, source}] — 12-char SAM.gov UEI",
+      "cage_codes": "[{code, facility, verified, source}] - code is 5-char DLA CAGE",
+      "uei": "[{value, entity, verified, source}] - 12-char SAM.gov UEI",
       "known_programs": "public defense programs for program matching + Program/Contract tracker"
     }
   },

@@ -1,4 +1,4 @@
-// One-off capture for the design-system-restyle pass — not a permanent test.
+// One-off capture for the design-system-restyle pass - not a permanent test.
 // Boots the built cockpit and screenshots 5 surfaces at desktop + one mobile
 // width into design/samples/ui/, matching the existing reference set's naming.
 import { spawn } from "node:child_process";

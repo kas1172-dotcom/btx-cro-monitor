@@ -1,10 +1,10 @@
-// Signal Extraction layer — the front of the pipeline. Reads unstructured news
+// Signal Extraction layer - the front of the pipeline. Reads unstructured news
 // (data/demo/btx/news.json), and for each article asks Claude to extract ONE strict
 // JSON signal (event_type from a fixed taxonomy, entities, optional value ONLY
 // if explicitly stated, confidence, verbatim source_quote). Then the VALIDATION
 // gate runs: a signal counts only if event_type != "none" and confidence >= 0.7.
 // Output committed to data/demo/btx/extracted-signals.json (frozen; the Feed view
-// renders it). Runs OFFLINE/CI with ANTHROPIC_API_KEY — never in the browser.
+// renders it). Runs OFFLINE/CI with ANTHROPIC_API_KEY - never in the browser.
 // Raw fetch, no SDK, so the project stays dependency-free.
 //
 //   ANTHROPIC_API_KEY=... node frontend/tools/extract-signals.ts
@@ -15,7 +15,7 @@ import { dirname, join } from "node:path";
 
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!API_KEY) {
-  console.error("ANTHROPIC_API_KEY is not set — this runs in CI with the repo secret.");
+  console.error("ANTHROPIC_API_KEY is not set - this runs in CI with the repo secret.");
   process.exit(1);
 }
 
@@ -38,13 +38,13 @@ const SYSTEM = `You extract exactly ONE structured business signal from a news a
 - entities: the canonical/full company or organization name(s) the event is about (not abbreviations or partials).
 - value: include ONLY if a specific dollar amount is explicitly stated in the text; otherwise omit it. Never guess or estimate a number.
 - confidence: 0..1, how clearly the text supports the event. Firm, stated fact -> high (>=0.85). Hedged/rumored/unconfirmed ("may", "could", "reportedly", "sources say") -> low (<0.5).
-- source_quote: a VERBATIM span copied from the body that directly supports the signal — do not paraphrase.
+- source_quote: a VERBATIM span copied from the body that directly supports the signal - do not paraphrase.
 Extraction discipline:
 - The source_quote must prove both the event_type and at least one extracted entity.
 - If the article only gives background, marketing language, analyst opinion, or unsupported implications, return event_type "none" with low confidence.
 - Do not infer customers, competitors, revenue impact, urgency, dates, or dollar values unless explicitly stated.
 - If multiple events are present, choose the most concrete and commercially actionable event with the strongest evidence.
-Extract only what the text states. No free-text reasoning, no interpretation, no invented detail — just the structured extraction.`;
+Extract only what the text states. No free-text reasoning, no interpretation, no invented detail - just the structured extraction.`;
 
 const SCHEMA = {
   type: "object",
@@ -91,7 +91,7 @@ async function extract(headline: string, body: string): Promise<Extracted | null
 const out: unknown[] = [];
 for (const article of news) {
   const extracted = await extract(article.headline, article.body);
-  // VALIDATION gate — only confident, real signals pass.
+  // VALIDATION gate - only confident, real signals pass.
   const valid = Boolean(extracted && extracted.event_type !== "none" && extracted.confidence >= MIN_CONFIDENCE);
   const reason = !extracted
     ? "extraction failed"

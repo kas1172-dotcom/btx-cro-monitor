@@ -102,21 +102,21 @@ export interface CapacityRow {
   facility: string;
   fiveAxisCenters: string;
   shifts: string;
-  utilization: string;
+  workCenterLoad: string;
   available: string;
 }
 
 export function CapacityTable({ rows }: { rows: CapacityRow[] }) {
   return (
     <table className="ss-capacity-table">
-      <thead><tr><th>Facility</th><th>5-axis centers</th><th>Shifts</th><th>Utilization</th><th>Available</th></tr></thead>
+      <thead><tr><th>Facility</th><th>5-axis centers</th><th>Shifts</th><th>Work-center load</th><th>Available</th></tr></thead>
       <tbody>
         {rows.map((row) => (
           <tr key={row.facility}>
             <td>{stripEmDashes(row.facility)}</td>
             <td>{row.fiveAxisCenters}</td>
             <td>{row.shifts}</td>
-            <td>{row.utilization}</td>
+            <td>{row.workCenterLoad}</td>
             <td><StatusPill status={capacityStatus(row.available)}>{stripEmDashes(row.available)}</StatusPill></td>
           </tr>
         ))}
@@ -180,7 +180,7 @@ export function assertRelationship(relationship: SignalRelationship): void {
 export function assertFigureMeta(meta: FigureMeta): void {
   const missing = [meta.number, meta.title, meta.xAxis, meta.yAxis, meta.caption, meta.summary].some((value) => value === "" || value === null || value === undefined);
   if (missing) throw new Error("Figures require number, title, axis labels with units, caption, and summary.");
-  if (!/\(.+\)|%|\$|quarter|date|year|account|facility/i.test(meta.xAxis) || !/\(.+\)|%|\$|revenue|utilization|count|value/i.test(meta.yAxis)) {
+  if (!/\(.+\)|%|\$|quarter|date|year|account|facility/i.test(meta.xAxis) || !/\(.+\)|%|\$|revenue|work-center load|count|value/i.test(meta.yAxis)) {
     throw new Error("Figure axes must include labels with units.");
   }
 }

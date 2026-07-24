@@ -4,7 +4,7 @@ import type { Deliverable, DeliverableSection } from "./types.ts";
 
 export interface RevisionRequest {
   endpoint: string;
-  deliverable: Pick<Deliverable, "title" | "audience" | "form">;
+  deliverable: Pick<Deliverable, "title" | "audience" | "form" | "sources">;
   section: DeliverableSection;
   instruction: string;
   bannedVocabulary?: string[];
@@ -22,13 +22,29 @@ export async function requestSectionRevision({
   const bannedLine = bannedVocabulary.length
     ? `Avoid these banned terms exactly: ${bannedVocabulary.join(", ")}.`
     : "No banned vocabulary list was provided.";
+  const sourceContext = deliverable.sources.map((source) => ({
+    source: source.source,
+    reason: source.reason,
+    records: source.records,
+  }));
   const res = await fetchImpl(endpoint, {
     method: "POST",
     headers: await backendHeaders({ "content-type": "application/json" }),
     body: JSON.stringify({
       model: LLM_MODELS.composition,
-      system: `Revise one deliverable section. Preserve facts and numbers. Respect audience/form rules and banned vocabulary. ${bannedLine} Return only revised prose.`,
-      messages: [{ role: "user", content: JSON.stringify({ title: deliverable.title, audience: deliverable.audience, form: deliverable.form, section, instruction, bannedVocabulary }) }],
+      system: `Revise one deliverable section. Use only the provided source context. Preserve names, dates, quantities, and units exactly unless the instruction asks to remove them. Do not introduce facts, numbers, dates, or names that are absent from source context. Respect audience/form rules and banned vocabulary. ${bannedLine} Return only revised prose.`,
+      messages: [{
+        role: "user",
+        content: JSON.stringify({
+          title: deliverable.title,
+          audience: deliverable.audience,
+          form: deliverable.form,
+          section,
+          instruction,
+          bannedVocabulary,
+          sourceContext,
+        }),
+      }],
     }),
   });
   if (!res.ok) {

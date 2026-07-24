@@ -165,16 +165,16 @@ function dollars(item: ArtifactItem): number[] {
 function sourceQuote(item: ArtifactItem): string {
   const soWhat = text(item.per_edition?.bd?.so_what) || text(item.per_edition?.exec?.so_what);
   const nowWhat = text(item.per_edition?.bd?.now_what);
-  const base = soWhat || text(item.title, "Monitor-engine artifact item");
+  const base = soWhat || text(item.title, "Monitor engine source item");
   return `${base}${nowWhat ? ` Action: ${nowWhat}` : ""}`;
 }
 
 export function assertArtifactRunOutput(value: unknown): asserts value is ArtifactRunOutput {
   const payload = value as ArtifactRunOutput;
-  if (!payload || typeof payload !== "object") throw new Error("artifact run_output is not an object");
-  if (!payload.meta || typeof payload.meta !== "object") throw new Error("artifact run_output missing meta");
-  if (!Array.isArray(payload.items)) throw new Error("artifact run_output missing items");
-  if (!text(payload.meta.run_at)) throw new Error("artifact run_output missing meta.run_at");
+  if (!payload || typeof payload !== "object") throw new Error("monitor output is not an object");
+  if (!payload.meta || typeof payload.meta !== "object") throw new Error("monitor output missing meta");
+  if (!Array.isArray(payload.items)) throw new Error("monitor output missing items");
+  if (!text(payload.meta.run_at)) throw new Error("monitor output missing meta.run_at");
 }
 
 export function buildArtifactSignals(runOutput: unknown, companies: Company[], options: ArtifactBuildOptions = {}): ArtifactMappingResult {
@@ -194,7 +194,7 @@ export function buildArtifactSignals(runOutput: unknown, companies: Company[], o
   for (const item of mergedItems) {
     const itemId = text(item.item_id);
     const headline = text(item.raw_title) || text(item.title);
-    const sourceName = text(item.source_id, "Monitor engine artifact");
+    const sourceName = text(item.source_id, "Monitor engine source");
     const publishedAt = text(item.published_at) || text(item.collected_at) || runAt;
     if (!itemId || !headline || !publishedAt) continue;
 

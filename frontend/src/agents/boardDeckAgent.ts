@@ -117,7 +117,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           id: "quarter-verdict",
           heading: "Quarter in One Slide",
           blocks: [
-            { kind: "text", text: `Demand is steady but capacity discipline matters: ${Number(f.bookToBill).toFixed(2)} book-to-bill on ${money(Number(f.revenue))} ${f.quarter} revenue.` },
+            { kind: "text", text: `Demand is steady but capacity discipline matters: bookings were ${Number(f.bookToBill).toFixed(2)}x shipped revenue on ${money(Number(f.revenue))} ${f.quarter} revenue.` },
             { kind: "text", text: `Backlog ended at ${money(Number(f.backlog))}, ${Number(f.backlog) >= Number(f.priorBacklog) ? "up" : "down"} from the prior quarter, while win rate was ${pct(Number(f.winRate))}.` },
             { kind: "text", text: `Priority: protect the riskiest accounts while using capacity selectively on high-fit growth.` },
           ],
@@ -127,7 +127,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           heading: "Executive Summary",
           blocks: [
             { kind: "text", text: `Verdict: ${f.quarter} is a healthy but capacity-sensitive quarter, with demand slightly ahead of shipments and account risk requiring follow-up.` },
-            { kind: "text", text: `Evidence: revenue was ${money(Number(f.revenue))}, bookings were ${money(Number(f.bookings))}, book-to-bill was ${Number(f.bookToBill).toFixed(2)}, and backlog ended at ${money(Number(f.backlog))}.` },
+            { kind: "text", text: `Evidence: revenue was ${money(Number(f.revenue))}, bookings were ${money(Number(f.bookings))}, bookings were ${Number(f.bookToBill).toFixed(2)}x shipped revenue, and backlog ended at ${money(Number(f.backlog))}.` },
             { kind: "text", text: `Implication: leadership should protect ${f.topRiskName}, prioritize high-fit work, and avoid filling constrained capacity with low-fit demand.` },
           ],
         },
@@ -141,18 +141,18 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
               ["Revenue", money(Number(f.revenue)), "Recognized current-business revenue"],
               ["Bookings", money(Number(f.bookings)), "New order intake"],
               ["Backlog", money(Number(f.backlog)), "End-of-quarter backlog"],
-              ["Book-to-bill", Number(f.bookToBill).toFixed(2), "Demand vs shipments"],
+              ["Bookings vs shipped revenue", Number(f.bookToBill).toFixed(2), "Demand vs shipments"],
               ["Win rate", pct(Number(f.winRate)), "Commercial conversion"],
             ],
           }],
         },
         {
           id: "growth",
-          heading: `Growth: demand ${Number(f.bookToBill) >= 1 ? "outruns" : "trails"} shipments at ${Number(f.bookToBill).toFixed(2)} book-to-bill`,
+          heading: `Growth: demand ${Number(f.bookToBill) >= 1 ? "outruns" : "trails"} shipments at ${Number(f.bookToBill).toFixed(2)}x`,
           blocks: [
             { kind: "chart-spec", title: "Bookings trend", spec: { viz: "trend", metric: "bookings", timeRange: trendRange } },
             { kind: "chart-spec", title: "Backlog trend", spec: { viz: "trend", metric: "backlog", timeRange: trendRange } },
-            { kind: "chart-spec", title: "Book-to-bill trend", spec: { viz: "trend", metric: "book_to_bill", timeRange: trendRange } },
+            { kind: "chart-spec", title: "Bookings versus shipped revenue trend", spec: { viz: "trend", metric: "book_to_bill", timeRange: trendRange } },
           ],
         },
         {
@@ -165,9 +165,9 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
         },
         {
           id: "efficiency",
-          heading: `Efficiency: capacity averages ${pct(Number(f.capacity))}, margin ${pct(Number(f.margin))}`,
+          heading: `Efficiency: work-center load averages ${pct(Number(f.capacity))}, margin ${pct(Number(f.margin))}`,
           blocks: [
-            { kind: "chart-spec", title: "Capacity utilization trend", spec: { viz: "trend", metric: "capacity_utilization", timeRange: trendRange } },
+            { kind: "chart-spec", title: "Work-center load trend", spec: { viz: "trend", metric: "capacity_utilization", timeRange: trendRange } },
             { kind: "chart-spec", title: "Average order value trend", spec: { viz: "trend", metric: "avg_order_value", timeRange: trendRange } },
           ],
         },
@@ -192,7 +192,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           heading: "Priorities and Asks",
           blocks: [
             { kind: "text", text: `Protect accounts with elevated risk before they become delivery or revenue slippage.` },
-            { kind: "text", text: `Use ${pct(Number(f.capacity))} average capacity utilization to keep sales focus aligned with production reality.` },
+            { kind: "text", text: `Use ${pct(Number(f.capacity))} average work-center load to keep sales focus aligned with production reality.` },
             { kind: "text", text: `Watch customer concentration at ${pct(Number(f.concentration))} and keep prospecting active in priority markets.` },
           ],
         },

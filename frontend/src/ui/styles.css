@@ -149,7 +149,7 @@ button, input, select, textarea { font: inherit; }
 }
 .brain-rail-btn:hover, .brain-rail-btn.active { color: var(--accent-text); background: var(--accent-tint); border-color: rgba(var(--accent-rgb), .35); }
 .brain-rail-btn span { color: inherit; font-size: 16px; text-align: center; flex-shrink: 0; }
-/* Never mid-word ellipsis in nav — word must fit whole (B2) */
+/* Never mid-word ellipsis in nav - word must fit whole (B2) */
 .brain-rail-btn strong { min-width: 0; color: inherit; font-size: 12px; font-weight: var(--font-semibold); overflow: hidden; text-overflow: clip; white-space: nowrap; }
 .brain-rail-btn em {
   min-width: 20px; height: 18px;
@@ -628,6 +628,36 @@ button, input, select, textarea { font: inherit; }
 .program-signal-list {
   display: grid;
   gap: 10px;
+}
+.surface-view-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.surface-view-toggle button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+}
+.surface-view-toggle button.active {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent-text);
+}
+.prospects-map-panel {
+  position: relative;
+  min-height: 620px;
+  overflow: hidden;
+  padding: 0;
+}
+.prospects-map-panel .map-shell {
+  position: relative;
+  min-height: 620px;
 }
 .program-signal-card {
   border: 1px solid var(--line);
@@ -2312,7 +2342,7 @@ button, input, select, textarea { font: inherit; }
 .rec-row:hover { background: var(--panel-2); }
 .rec-tag { flex: 0 0 auto; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; padding: 2px 7px; border-radius: 4px; font-weight: var(--font-semibold); }
 .rec-name { font-weight: var(--font-semibold); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* Description must wrap, not crush — A3 + B6 */
+/* Description must wrap, not crush - A3 + B6 */
 .rec-row .muted { white-space: normal; word-break: normal; overflow-wrap: break-word; min-width: 0; }
 /* action colors, shared by banner (.rec-*) and dashboard rows (.rec-tag) */
 .rec-pursue, .rec-tag.rec-pursue { color: var(--good); border-color: var(--good); }
@@ -2527,6 +2557,21 @@ button, input, select, textarea { font: inherit; }
   display: block;
   margin-top: 6px;
 }
+.composition-status {
+  display: block;
+  width: fit-content;
+  margin-top: 6px;
+  border: 1px solid rgba(var(--warning-rgb), .52);
+  border-radius: 999px;
+  padding: 4px 9px;
+  color: var(--warning);
+  background: rgba(var(--warning-rgb), .08);
+}
+.composition-status.live {
+  border-color: rgba(var(--accent-rgb), .52);
+  color: var(--accent-text);
+  background: rgba(var(--accent-rgb), .08);
+}
 .editor-assistant {
   align-self: start; position: sticky; top: 18px; display: grid; gap: 10px;
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px;
@@ -2540,8 +2585,55 @@ button, input, select, textarea { font: inherit; }
 .editor-assistant button, .suggestion-card button {
   background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; cursor: pointer;
 }
+.editor-assistant button:disabled,
+.document-actions button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.editor-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.editor-quick-actions button {
+  font-size: 12px;
+  padding: 6px 8px;
+}
+.quality-checklist,
+.version-history {
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.quality-checklist strong,
+.version-history strong {
+  color: var(--text);
+  font-size: 12px;
+}
+.quality-checklist span,
+.quality-checklist em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+.quality-checklist .ok { color: var(--good); }
+.quality-checklist .blocked { color: var(--warn); }
+.version-history {
+  max-height: 180px;
+  overflow-y: auto;
+}
+.version-history button {
+  text-align: left;
+}
 .suggestion-list { display: grid; gap: 8px; }
 .suggestion-card { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+.suggestion-card > span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
 .document-head {
   grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
   border-bottom: 1px solid var(--line); padding-bottom: 14px;
@@ -2610,7 +2702,7 @@ button, input, select, textarea { font: inherit; }
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px;
 }
 .document-section h2, .document-provenance h2 { margin: 0 0 10px; font-size: 17px; }
-/* Read-mode text — no resize grip, no fixed height, no clipping */
+/* Read-mode text - no resize grip, no fixed height, no clipping */
 .document-text-block {
   margin: 0; color: var(--text); font-size: 14px; line-height: 1.6;
   white-space: pre-wrap; overflow-wrap: break-word;
@@ -2630,7 +2722,7 @@ button, input, select, textarea { font: inherit; }
   background: var(--panel-2);
   outline: none;
 }
-/* Shared table rules — A3 */
+/* Shared table rules - A3 */
 .document-section table {
   width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto;
   overflow-x: auto; display: block;
@@ -2644,9 +2736,9 @@ button, input, select, textarea { font: inherit; }
   color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
   white-space: nowrap; /* headers never wrap mid-word */
 }
-/* First column (account name / need name) — priority 1: always visible */
+/* First column (account name / need name) - priority 1: always visible */
 .document-section td:first-child, .document-section th:first-child { min-width: 120px; }
-/* Last columns — lowest priority: drop gracefully below 800px */
+/* Last columns - lowest priority: drop gracefully below 800px */
 @media (max-width: 800px) {
   .document-section td:nth-child(n+4), .document-section th:nth-child(n+4) { display: none; }
 }
@@ -3434,10 +3526,10 @@ button, input, select, textarea { font: inherit; }
   }
 }
 /* ============================================================================
- * STEEL & SIGNAL DOCUMENT THEME — deliberate exception, see design.md.
+ * STEEL & SIGNAL DOCUMENT THEME - deliberate exception, see design.md.
  * This block (and every .ss-* rule below it) styles EXPORTED DELIVERABLE
  * DOCUMENTS ONLY (decks, PDFs, PPTX, the retention/earnings heat map render
- * in frontend/src/deliverables/steelSignalTemplates.tsx) — a separate,
+ * in frontend/src/deliverables/steelSignalTemplates.tsx) - a separate,
  * intentionally light-mode print theme for a different artifact class than
  * the cockpit app. It is excluded from the raw-hex guard
  * (frontend/tools/check-design-tokens.ts) and from the cockpit retrofit.

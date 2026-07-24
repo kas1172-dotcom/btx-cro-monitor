@@ -20,7 +20,7 @@ class EncryptionNotConfigured(RuntimeError):
 
 def _fernet_key(secret: str) -> bytes:
     # BTX_ENCRYPTION_KEY is an operator-chosen passphrase, not necessarily a
-    # valid Fernet key already — derive a stable 32-byte key from it so any
+    # valid Fernet key already - derive a stable 32-byte key from it so any
     # non-empty string works (mirrors how e.g. Django's SECRET_KEY is used).
     digest = hashlib.sha256(secret.encode("utf-8")).digest()
     return base64.urlsafe_b64encode(digest)
@@ -29,7 +29,7 @@ def _fernet_key(secret: str) -> bytes:
 def encrypt_value(plaintext: str, *, encryption_key: str | None) -> str:
     """Encrypt *plaintext*, returning a value safe to store in a text column.
 
-    Raises EncryptionNotConfigured if no key is set — callers must not fall
+    Raises EncryptionNotConfigured if no key is set - callers must not fall
     back to storing plaintext.
     """
     if not encryption_key:
@@ -51,7 +51,7 @@ def decrypt_value(stored: str, *, encryption_key: str | None) -> str:
     try:
         return fernet.decrypt(token.encode("ascii")).decode("utf-8")
     except InvalidToken as exc:
-        raise ValueError("credential could not be decrypted — wrong key or corrupted value") from exc
+        raise ValueError("credential could not be decrypted - wrong key or corrupted value") from exc
 
 
 def is_encrypted(value: str | None) -> bool:

@@ -5,17 +5,17 @@ Turns a client's plain-language source *briefs* (produced by tooling.scaffold)
 into validated ``sources[]`` by running an Anthropic tool-use loop over the two
 deterministic discovery tools:
 
-    fetch_sample  — let the model inspect a candidate URL's body.
-    probe_source  — THE ORACLE: validate a proposed config against the real
+    fetch_sample  - let the model inspect a candidate URL's body.
+    probe_source  - THE ORACLE: validate a proposed config against the real
                     Source schema and run it through the actual collector.
 
 The loop is self-grading: a proposed source is *accepted only when probe_source
-returns ok=True*. We capture the source at that moment — the exact config that
-passed the oracle — so the returned sources[] are correct by construction rather
+returns ok=True*. We capture the source at that moment - the exact config that
+passed the oracle - so the returned sources[] are correct by construction rather
 than re-serialized from model free-text. This is the same hand-run loop used to
 build sources by hand, now automated.
 
-Build-time client onboarding only — this never runs in the pipeline and lives in
+Build-time client onboarding only - this never runs in the pipeline and lives in
 tooling/, not the engine package.
 
 Usage (library):
@@ -244,7 +244,7 @@ class DiscoveryAgent:
             for tool in self._tool_uses(response.content):
                 result = self._dispatch(tool)
                 # Capture at the oracle: a source the oracle blessed is kept exactly
-                # as the model submitted it — no re-serialization, no drift.
+                # as the model submitted it - no re-serialization, no drift.
                 if tool.name == "probe_source" and result.get("ok"):
                     src = tool.input["source"]
                     accepted[src.get("id", f"_anon_{len(accepted)}")] = src

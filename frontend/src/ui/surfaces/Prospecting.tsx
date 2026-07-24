@@ -14,6 +14,7 @@ import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 import { EmptyState } from "../primitives.tsx";
 import { ImportListModal } from "../prospecting/ImportListModal.tsx";
+import { ProspectMap } from "../map/ProspectMap.tsx";
 
 const PROSPECT_STATUSES = new Set<AccountStatus>(["target_prospect", "new_logo"]);
 const PROSPECT_MOTIONS = new Set<BusinessMotion>(["prospect_new_business"]);
@@ -84,6 +85,7 @@ export function Prospecting({ world }: { world: World }) {
   const { city } = useStore();
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [expandedProspectId, setExpandedProspectId] = useState<string | null>(null);
+  const [prospectView, setProspectView] = useState<"list" | "map">("list");
   const prospectSignals = world.analysis.valid.filter(isProspectingSignal);
   const idsFromSignals = new Set(prospectSignals.map((s) => s.subject_id));
   const prospectCompanies = world.companies.filter(
@@ -145,6 +147,17 @@ export function Prospecting({ world }: { world: World }) {
         <button className="import-list-trigger" type="button" onClick={() => setIsImportOpen(true)}>Import list</button>
       </section>
 
+      <div className="surface-view-toggle" role="group" aria-label="Prospects view">
+        <button type="button" className={prospectView === "list" ? "active" : ""} onClick={() => setProspectView("list")}>List</button>
+        <button type="button" className={prospectView === "map" ? "active" : ""} onClick={() => setProspectView("map")}>Map</button>
+      </div>
+
+      {prospectView === "map" && (
+        <section className="surface-panel prospects-map-panel" aria-label="Prospect map">
+          <ProspectMap world={world} />
+        </section>
+      )}
+
       <section className="current-summary">
         <div>
           <span>Target accounts</span>
@@ -179,7 +192,7 @@ export function Prospecting({ world }: { world: World }) {
                 : "Select a city for an in-market visit plan. For now, these are the strongest national targets in the current data."}
             </p>
           </div>
-          <button onClick={() => setState({ activeTab: "map" })}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
+          <button onClick={() => setProspectView("map")}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
         </div>
         <div className="visit-plan-list">
           {visitPlanRows.map((row, index) => {
@@ -241,7 +254,7 @@ export function Prospecting({ world }: { world: World }) {
         <div className="current-panel current-panel-wide">
           <div className="panel-head">
             <h2>Top New Prospects</h2>
-            <button onClick={() => setState({ activeTab: "map" })}>Open Map</button>
+            <button onClick={() => setProspectView("map")}>Open Map</button>
           </div>
           {topProspects.map((row, index) => {
             const expanded = expandedProspectId === row.company.id;

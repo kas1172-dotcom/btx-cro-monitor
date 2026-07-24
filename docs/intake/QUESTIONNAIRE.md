@@ -1,13 +1,13 @@
 # Intake Questionnaire
 
 Fill this out and we build you a weekly intelligence monitor tuned to exactly
-what you need to track — no software to learn, just a briefing you open and read.
+what you need to track - no software to learn, just a briefing you open and read.
 
 Your answers become a structured `intake.json`, which the scaffolder turns into
 the deterministic parts of your config; the source-discovery agent then finds
 and verifies the live feeds for everything you list under **Coverage**.
 
-> Each section notes the config field it feeds (in *italics*) — for the operator,
+> Each section notes the config field it feeds (in *italics*) - for the operator,
 > not the client.
 
 ---
@@ -17,18 +17,18 @@ and verifies the live feeds for everything you list under **Coverage**.
 - **Brand color?** A hex code, or we'll pick a sensible default. *(→ `branding.accent_color`)*
 - **Who should be able to see it?** Just you / your team / public link. *(→ deployment: repo visibility)*
 
-## 2. Your audiences (1–4)
+## 2. Your audiences (1-4)
 For each distinct kind of reader, answer the three questions below. Each audience
 becomes a switchable "edition" with its own relevance lens. *(→ `editions[]`)*
-- **Label** — e.g. "Policy", "Sales", "Compliance". *(→ `editions[].label` / `id`)*
-- **Their role** — what do they do, what decisions do they make? *(→ `audience_description`)*
+- **Label** - e.g. "Policy", "Sales", "Compliance". *(→ `editions[].label` / `id`)*
+- **Their role** - what do they do, what decisions do they make? *(→ `audience_description`)*
 - **What makes something matter to them?** What would they act on; what would they
   ignore? Be specific. *(→ `analysis_instructions`)*
-- **Topic buckets** — how do they mentally sort this news? 3–6 short labels.
+- **Topic buckets** - how do they mentally sort this news? 3-6 short labels.
   *(→ `editions[].categories`)*
 
 ## 3. Never-miss triggers
-Words or events that are **always** critical — surface them even if nothing else
+Words or events that are **always** critical - surface them even if nothing else
 qualifies (e.g. "warning letter", a recall class, your company name, a key program).
 *(→ `scoring_rubric.never_discard`)*
 
@@ -41,22 +41,22 @@ The specific organizations, agencies, programs, competitors, or people you care
 about. These sharpen relevance and help the agent find the right sources.
 *(→ `keyword_prefilter.include` + source discovery)*
 
-## 6. Your profile — who are you?
+## 6. Your profile - who are you?
 So the analysis speaks to *your* goals, not generic takes, tell us about your
 organization. All optional, but the more you give, the sharper the "why it matters
 / what to do" gets. *(→ `profile`)*
-- **Capabilities** — what you do, make, or offer. *(→ `profile.capabilities`)*
-- **Certifications / qualifications** — e.g. AS9100, ITAR, ISO 13485. *(→ `profile.certifications`)*
-- **Industries & customer types you serve** — e.g. "defense primes", "health systems". *(→ `profile.industries_served`, `profile.customer_types`)*
-- **Geographic focus** — where you operate or sell. *(→ `profile.geographic_focus`)*
-- **Strategic goals** — what you're trying to achieve. *(→ `profile.strategic_goals`)*
-- **Risks / exposure** — what you're worried about. *(→ `profile.risks`)*
-- **Named entities** — your customers, competitors, agencies/regulators, and
+- **Capabilities** - what you do, make, or offer. *(→ `profile.capabilities`)*
+- **Certifications / qualifications** - e.g. AS9100, ITAR, ISO 13485. *(→ `profile.certifications`)*
+- **Industries & customer types you serve** - e.g. "defense primes", "health systems". *(→ `profile.industries_served`, `profile.customer_types`)*
+- **Geographic focus** - where you operate or sell. *(→ `profile.geographic_focus`)*
+- **Strategic goals** - what you're trying to achieve. *(→ `profile.strategic_goals`)*
+- **Risks / exposure** - what you're worried about. *(→ `profile.risks`)*
+- **Named entities** - your customers, competitors, agencies/regulators, and
   programs that matter, grouped. *(→ `profile.named_entities`)*
 
-## 7. Coverage — what should it watch?
+## 7. Coverage - what should it watch?
 List what you read today or wish you could keep up with: agencies, regulators,
-publications, databases, competitor newsrooms. **You don't need URLs** — names and
+publications, databases, competitor newsrooms. **You don't need URLs** - names and
 a one-line "what" are enough; the agent finds and verifies the live feeds.
 *(→ `source_briefs` → agent → `sources[]`)*
 For each: **name**, **what it covers**, **kind** (official / news / database /
@@ -73,7 +73,7 @@ background · key stakeholders · scenarios to watch · recommended actions.
 
 ## 10. Access & security
 - **Any paid or login-only sources** you want included? Name them; we'll request
-  the API key separately and store it as a secret — **never paste keys here.**
+  the API key separately and store it as a secret - **never paste keys here.**
   *(→ `sources[].auth_env_var` + repo secret)*
 
 ---

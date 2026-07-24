@@ -1,4 +1,4 @@
-// Deterministic Copilot. It NARRATES/ROUTES the engine's output — it never
+// Deterministic Copilot. It NARRATES/ROUTES the engine's output - it never
 // computes a score. Every answer is assembled from validated signals, scores,
 // the trace, and the prospect list. (The LLM free-form upgrade later swaps this
 // resolver for a proxy call, keeping the same "explain, don't decide" contract.)
@@ -16,7 +16,7 @@ const DIMENSION_WORDS: Array<[RegExp, ScoreDimension]> = [
   [/(opportunit|prospect|target|sell|win|pursue)/, "opportunity"],
 ];
 
-// Static fallback suggestions — overridden at render time by world-derived ones.
+// Static fallback suggestions - overridden at render time by world-derived ones.
 export const STATIC_SUGGESTIONS = [
   "What needs my attention today?",
   "What's the top opportunity?",
@@ -24,7 +24,7 @@ export const STATIC_SUGGESTIONS = [
   "Who should I call next?",
 ];
 
-/** Suggestions built from current world entities — never hardcoded account names. */
+/** Suggestions built from current world entities - never hardcoded account names. */
 export function worldSuggestions(world: World): string[] {
   const topRisk = [...world.analysis.scores].sort((a, b) => b.dimensions.risk.score - a.dimensions.risk.score)[0];
   const topProspect = world.prospects[0];
@@ -82,8 +82,8 @@ export function answer(question: string, world: World): string {
     if (rows.length === 0) return `No BTX prospects on file in ${city} yet.`;
     const lines = rows.map(
       (p) =>
-        `• ${p.company.name} — opportunity ${p.opportunity}, fit ${p.fit.score}%` +
-        (p.contact ? ` — call ${p.contact.name} (${p.contact.title})` : "") +
+        `• ${p.company.name} - opportunity ${p.opportunity}, fit ${p.fit.score}%` +
+        (p.contact ? ` - call ${p.contact.name} (${p.contact.title})` : "") +
         (p.fit.matched.length ? `\n   serve with: ${p.fit.matched.join(", ")}` : ""),
     );
     return `Prospects in ${city}, ranked:\n${lines.join("\n")}`;
@@ -108,19 +108,19 @@ export function answer(question: string, world: World): string {
     if (dim && dim !== "opportunity" && score) {
       const d = score.dimensions[dim];
       if (d.score === 0) return `${company.name} has no ${dim} signals right now.`;
-      return `${company.name} — ${dim} ${d.score}. Driven by ${summarizeGroups(groupTrace(d, CONFIG))}.`;
+      return `${company.name} - ${dim} ${d.score}. Driven by ${summarizeGroups(groupTrace(d, CONFIG))}.`;
     }
     const prospect = world.prospects.find((p) => p.company.id === company.id);
     if (prospect) {
       return (
-        `${company.name} — opportunity ${prospect.opportunity}, fit ${prospect.fit.score}%` +
+        `${company.name} - opportunity ${prospect.opportunity}, fit ${prospect.fit.score}%` +
         (prospect.fit.matched.length ? ` (serve with ${prospect.fit.matched.join(", ")})` : "") +
         (prospect.contact ? `. Call ${prospect.contact.name}, ${prospect.contact.title}.` : ".")
       );
     }
     if (score) {
       const d = score.dimensions;
-      return `${company.name} — risk ${d.risk.score}, opportunity ${d.opportunity.score}, capacityRisk ${d.capacityRisk.score}, competitivePressure ${d.competitivePressure.score}.`;
+      return `${company.name} - risk ${d.risk.score}, opportunity ${d.opportunity.score}, capacityRisk ${d.capacityRisk.score}, competitivePressure ${d.competitivePressure.score}.`;
     }
     return `I don't have data on ${company.name}.`;
   }
@@ -128,7 +128,7 @@ export function answer(question: string, world: World): string {
   // 3) portfolio-level
   if (/(what should i do|priorit|\baction|focus|today|attention)/.test(q)) {
     const top = world.analysis.recommendations.filter((r) => r.priority !== "low").slice(0, 5);
-    if (top.length) return "Top actions:\n" + top.map((r) => `• ${actionLabel(r.action)}: ${nameOf(r.subject_id)} — ${r.reason}`).join("\n");
+    if (top.length) return "Top actions:\n" + top.map((r) => `• ${actionLabel(r.action)}: ${nameOf(r.subject_id)} - ${r.reason}`).join("\n");
   }
   if (wantsRank) {
     const top = world.prospects[0];
@@ -148,12 +148,12 @@ export function answer(question: string, world: World): string {
   if (dim === "opportunity" || /\bbest\b/.test(q)) {
     const top = world.prospects[0];
     return top
-      ? `Top opportunity: ${top.company.name} — opportunity ${top.opportunity}, fit ${top.fit.score}%${top.contact ? `, call ${top.contact.name}` : ""}.`
+      ? `Top opportunity: ${top.company.name} - opportunity ${top.opportunity}, fit ${top.fit.score}%${top.contact ? `, call ${top.contact.name}` : ""}.`
       : help();
   }
   return help();
 }
 
 function help(): string {
-  return `Ask about the engine's output — e.g. "who should I call in Austin?", "why is Cobalt Alloys high risk?", "what's the top opportunity?". I only report what the deterministic engine computed.`;
+  return `Ask about the engine's output - e.g. "who should I call in Austin?", "why is Cobalt Alloys high risk?", "what's the top opportunity?". I only report what the scoring engine computed.`;
 }

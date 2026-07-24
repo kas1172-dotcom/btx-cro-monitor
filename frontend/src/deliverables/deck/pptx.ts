@@ -23,7 +23,7 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
   assertSteelSignalExportable(deliverable, world);
   const pptx = createSteelDeck("BTX Revenue Brain");
   const focus = focusCompany(deliverable, world);
-  const relationship = relationshipForCompany(world, focus) ?? sampleRelationship(focus?.name ?? "HubSpot CRM + monitor artifact");
+  const relationship = relationshipForCompany(world, focus) ?? sampleRelationship(focus?.name ?? "HubSpot CRM + monitor evidence");
 
   let slide = pptx.addSlide();
   slide.background = { color: C.navyHex };
@@ -38,14 +38,14 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
   bg(slide);
   head(slide, pptx, "Executive summary", "The quarter in four numbers");
   stat(slide, pptx, M, 1.7, 2.75, "$18.4M", "Bookings", "+12% vs prior quarter", C.tealHex);
-  stat(slide, pptx, M + 2.95, 1.7, 2.75, "1.18", "Book-to-bill", "Above 1.0 target", C.greenHex);
+  stat(slide, pptx, M + 2.95, 1.7, 2.75, "1.18", "Bookings/shipped revenue", "Above 1.0 target", C.greenHex);
   stat(slide, pptx, M + 5.9, 1.7, 2.75, "87%", "Capacity used", "Approaching ceiling", C.amberHex);
   stat(slide, pptx, M + 8.85, 1.7, 2.75, "$42.1M", "Qualified pipeline", "3.1x coverage", C.steelHex);
   text(slide, "What changed this quarter", M, 3.75, 8, 0.35, 16, C.inkHex, true);
   [
     ["F-35 sustainment demand is accelerating", "Lockheed lot-19 spares create a build-to-print opening matched to BTX 5-axis capacity.", C.greenHex],
     ["A tier-1 supplier delay opens a re-shore lane", "Spirit AeroSystems structures slip; two programs need a domestic AS9100 machining partner.", C.tealHex],
-    ["Capacity is the binding constraint, not demand", "Two facilities cross 90% utilization; winning more requires a capacity decision.", C.amberHex],
+    ["Capacity is the binding constraint, not demand", "Two facilities cross 90% work-center load; winning more requires a capacity decision.", C.amberHex],
   ].forEach(([title, detail, color], index) => {
     const y = 4.2 + index * 0.72;
     slide.addShape(pptx.ShapeType.ellipse, { x: M, y: y + 0.05, w: 0.18, h: 0.18, fill: { color: String(color) }, line: { color: String(color) } });
@@ -106,17 +106,17 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
 
   chartSlide(pptx.addSlide(), pptx, 2, "Capacity assessment", "The binding constraint on growth", {
     labels: ["Fort Worth", "Wichita", "Tulsa"],
-    series: [{ name: "Utilization %", values: [93, 88, 71] }],
+    series: [{ name: "Work-center load %", values: [93, 88, 71] }],
     meta: {
       number: 2,
-      title: "Facility capacity utilization, current quarter",
+      title: "Facility work-center load, current quarter",
       xAxis: "Facility",
-      yAxis: "Capacity utilization (%)",
-      caption: "Facility utilization shows whether demand can be absorbed without schedule risk.",
+      yAxis: "Work-center load (%)",
+      caption: "Work-center load shows whether demand can be absorbed without schedule risk.",
       summary: "Fort Worth at 93% is the binding constraint; Tulsa has headroom but lacks the required line.",
     },
     read: "Fort Worth is effectively full",
-    soWhat: "At 93% utilization, the F-35 opportunity cannot be absorbed without a second shift or capital add.",
+    soWhat: "At 93% work-center load, the F-35 opportunity cannot be absorbed without a second shift or capital add.",
     relationship,
   });
 
@@ -151,7 +151,7 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
   addPptxBrandMark(slide, pptx, M, 2.3);
   text(slide, "The decision this quarter", M, 3.05, 11, 0.9, 34, C.whiteHex, true);
   text(slide, "Approve a Fort Worth second shift to convert the F-35 sustainment opening. The demand is evidenced, the fit is 91%, and capacity is the only thing standing between backlog and bookings.", M, 4.05, 11.2, 1.3, 16, C.iceHex);
-  text(slide, "Sources: HubSpot CRM · monitor-engine market artifacts · ERP capacity · SAM.gov entity registry. Account links resolved via canonical relationship records. Figures illustrative.", M, 6.35, 11.2, 0.6, 10, C.iceHex);
+  text(slide, "Sources: HubSpot CRM · monitor engine market evidence · ERP capacity · SAM.gov entity registry. Account links use reviewed relationship records. Figures illustrative.", M, 6.35, 11.2, 0.6, 10, C.iceHex);
 
   validateDeckText([
     "Quarterly Revenue & Account Board Review",

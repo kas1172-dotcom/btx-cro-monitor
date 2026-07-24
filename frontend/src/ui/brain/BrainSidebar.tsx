@@ -2,15 +2,15 @@ import { setState } from "../../store/store.ts";
 import {
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
+  PRIMARY_TAB_IDS,
   UTILITY_SURFACES,
   type SurfaceSpec,
   type TabId,
 } from "../../app/surfaces.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
 
-const TODAY_IDS: TabId[] = ["brief", "work_queue", "prospecting", "deliverables"];
-const PIPELINE_IDS: TabId[] = ["accounts", "programs", "capacity", "hubspot"];
-const WORKBENCH_IDS: TabId[] = ["ask", "map", "analysis", "settings"];
+const PIPELINE_IDS: TabId[] = ["accounts", "prospecting", "programs"];
+const TOOLS_IDS: TabId[] = ["deliverables", "settings"];
 
 const surfaceById = new Map(
   [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES].map((surface) => [surface.id, surface]),
@@ -32,6 +32,14 @@ function openSurface(surface: TabId): void {
   });
 }
 
+function primaryTabFor(surface: TabId): TabId {
+  if (surface === "hubspot" || surface === "capacity") return "accounts";
+  if (surface === "map" || surface === "trip_planner") return "prospecting";
+  if (surface === "analysis") return "deliverables";
+  if (surface === "ask") return "brief";
+  return surface;
+}
+
 export function BrainSidebar({
   activeTab,
   counts,
@@ -40,10 +48,11 @@ export function BrainSidebar({
   counts: Partial<Record<TabId, number>>;
 }) {
   const groups = [
-    { label: "Today", items: surfacesFor(TODAY_IDS) },
+    { label: "Today", items: surfacesFor(PRIMARY_TAB_IDS.slice(0, 2)) },
     { label: "Pipeline", items: surfacesFor(PIPELINE_IDS) },
-    { label: "Tools", items: surfacesFor(WORKBENCH_IDS) },
+    { label: "Tools", items: surfacesFor(TOOLS_IDS) },
   ];
+  const primaryActiveTab = primaryTabFor(activeTab);
   return (
     <aside className="brain-rail">
       <div className="rail-brand" aria-label="BTX">
@@ -56,7 +65,7 @@ export function BrainSidebar({
           {group.items.map((surface) => (
             <button
               key={surface.id}
-              className={activeTab === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
+              className={primaryActiveTab === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
               onClick={() => openSurface(surface.id)}
               title={surface.title}
             >

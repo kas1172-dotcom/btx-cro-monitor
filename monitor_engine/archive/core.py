@@ -21,7 +21,7 @@ DEFAULT_MAX_RUNS: int = 52   # ~12 months at a weekly cadence
 DEFAULT_PERSIST_TIER: int = 1
 DEFAULT_DEADLINE_WINDOW_DAYS: int = 7
 
-# Query parameters that carry zero content identity — stripped when normalizing URLs
+# Query parameters that carry zero content identity - stripped when normalizing URLs
 _TRACKING_PARAMS = frozenset({
     "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
     "utm_id", "utm_reader", "utm_name",

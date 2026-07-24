@@ -498,7 +498,7 @@
           "title": "Airworthiness Directives; The Boeing Company Airplanes",
           "raw_title": null,
           "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13207/airworthiness-directives-the-boeing-company-airplanes",
-          "source_id": "Federal Register – Dept. of the Air Force",
+          "source_id": "Federal Register - Dept. of the Air Force",
           "published_at": "2026-06-30T00:00:00Z",
           "collected_at": "2026-06-30T15:19:16.854160Z",
           "tier": 3,
@@ -556,13 +556,13 @@
           "also_covered_by": [
             {
               "item_id": "1e426ac1189cbcb0",
-              "source_id": "Federal Register – Dept. of the Air Force",
+              "source_id": "Federal Register - Dept. of the Air Force",
               "title": "Airworthiness Directives; The Boeing Company Airplanes",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13216/airworthiness-directives-the-boeing-company-airplanes"
             },
             {
               "item_id": "16b87bd3518da0c1",
-              "source_id": "Federal Register – Dept. of Defense",
+              "source_id": "Federal Register - Dept. of Defense",
               "title": "Airworthiness Directives; The Boeing Company Airplanes",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13217/airworthiness-directives-the-boeing-company-airplanes"
             }
@@ -632,7 +632,7 @@
           "title": "Radar Data Pilot Program",
           "raw_title": null,
           "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program",
-          "source_id": "Federal Register – Dept. of the Air Force",
+          "source_id": "Federal Register - Dept. of the Air Force",
           "published_at": "2026-06-30T00:00:00Z",
           "collected_at": "2026-06-30T15:19:16.854160Z",
           "tier": 3,
@@ -685,7 +685,7 @@
           "also_covered_by": [
             {
               "item_id": "4045fe63802d95a6",
-              "source_id": "Federal Register – Dept. of Defense",
+              "source_id": "Federal Register - Dept. of Defense",
               "title": "Radar Data Pilot Program",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program"
             }
@@ -864,7 +864,7 @@
                 "Allied governments (NATO, Five Eyes)"
               ],
               "scenarios": [
-                "Chinese VLEO constellation reaches operational scale (1,000+ satellites) within 18–24 months, triggering U.S. military counter-surveillance and electronic-warfare response programs, which cascade requirements to Boeing, Lockheed, RTX, and their subcontractors.",
+                "Chinese VLEO constellation reaches operational scale (1,000+ satellites) within 18-24 months, triggering U.S. military counter-surveillance and electronic-warfare response programs, which cascade requirements to Boeing, Lockheed, RTX, and their subcontractors.",
                 "U.S. Space Force accelerates its own VLEO or responsive-space programs to maintain overhead intelligence and communications dominance, increasing build-to-print machining demand for rapid-turnaround satellite bus components, reaction control system parts, and thermal-management hardware.",
                 "Allied nations (UK, Australia, Canada, Japan) initiate sovereign VLEO initiatives with U.S. technology transfer, creating new export-licensed subcontract opportunities requiring ITAR compliance and DDTC approval for component designs and manufacturing data."
               ],
@@ -946,14 +946,14 @@
                 "Northrop Grumman (potential subsystem supplier)"
               ],
               "scenarios": [
-                "Boeing initiates full development and production of MUOS payload integration, driving Tier 2 subcontract RFQs for precision-machined structural, thermal, and RF-interface components; BTX and peers compete for build-to-print awards in 2026–2027.",
+                "Boeing initiates full development and production of MUOS payload integration, driving Tier 2 subcontract RFQs for precision-machined structural, thermal, and RF-interface components; BTX and peers compete for build-to-print awards in 2026-2027.",
                 "MUOS program encounters schedule pressure or technical challenges, accelerating demand for rapid-turnaround machining of prototype and qualification test articles, favoring suppliers (like BTX) with AS9100 and NADCAP certifications and proven responsiveness.",
                 "Boeing consolidates spacecraft bus production at fewer locations, requiring subcontractors to relocate production, qualify at new manufacturing sites, or accept longer lead times; BTX's ability to win first-article and follow-on production work depends on early engagement and qualified-supplier status."
               ],
               "recommended_actions": [
                 "Initiate direct outreach to Boeing Defense, Space & Security supply-chain (Seattle, Mesa, Huntington Beach) within this week to understand MUOS subsystem opportunities and RFQ timelines; position BTX's 5-axis CNC and assembly capabilities for structural/RF-interface components.",
                 "Monitor Space & Missile Systems Center (SMC) contract awards and engineering-change-order (ECO) traffic related to MUOS; flag any supplier-qualification or foreign-source-content (ITAR) issues that may create bottlenecks and subcontract openings.",
-                "Confirm BTX's qualification status with Boeing's supplier portal (if not already compliant); ensure NADCAP and AS9100 registrations are current and visible; prepare cost/schedule/quality submissions for competitive RFQs expected in Q3–Q4 2026."
+                "Confirm BTX's qualification status with Boeing's supplier portal (if not already compliant); ensure NADCAP and AS9100 registrations are current and visible; prepare cost/schedule/quality submissions for competitive RFQs expected in Q3-Q4 2026."
               ]
             }
           },
@@ -1033,7 +1033,7 @@
           "title": "Radar Data Pilot Program",
           "raw_title": null,
           "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13211/radar-data-pilot-program",
-          "source_id": "Federal Register – Dept. of the Air Force",
+          "source_id": "Federal Register - Dept. of the Air Force",
           "published_at": "2026-06-30T00:00:00Z",
           "collected_at": "2026-07-01T01:26:38.583681Z",
           "tier": 3,
@@ -1124,7 +1124,7 @@
           "title": "Airworthiness Directives; The Boeing Company Airplanes",
           "raw_title": null,
           "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13216/airworthiness-directives-the-boeing-company-airplanes",
-          "source_id": "Federal Register – Dept. of Defense",
+          "source_id": "Federal Register - Dept. of Defense",
           "published_at": "2026-06-30T00:00:00Z",
           "collected_at": "2026-07-01T01:26:38.802532Z",
           "tier": 3,
@@ -1154,7 +1154,7 @@
           "unverified_claims": [],
           "deep_analysis": {
             "sections": {
-              "background": "The FAA has issued a new Airworthiness Directive (AD) for Boeing 747-8 and 777 series aircraft, addressing failures in radio altimeter function caused by interference from 5G Lower C-Band (3.7–3.98 GHz) wireless broadband operations in Canadian airspace. The interference affects multiple aircraft systems reliant on radio altimeter data. This directive mandates technical or operational corrections to ensure continued safe flight.",
+              "background": "The FAA has issued a new Airworthiness Directive (AD) for Boeing 747-8 and 777 series aircraft, addressing failures in radio altimeter function caused by interference from 5G Lower C-Band (3.7-3.98 GHz) wireless broadband operations in Canadian airspace. The interference affects multiple aircraft systems reliant on radio altimeter data. This directive mandates technical or operational corrections to ensure continued safe flight.",
               "key_stakeholders": [
                 "Federal Aviation Administration (FAA)",
                 "Transport Canada",
@@ -1179,25 +1179,25 @@
           "also_covered_by": [
             {
               "item_id": "e21a74f77cb20b00",
-              "source_id": "Federal Register – Dept. of Defense",
+              "source_id": "Federal Register - Dept. of Defense",
               "title": "Airworthiness Directives; The Boeing Company Airplanes",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13208/airworthiness-directives-the-boeing-company-airplanes"
             },
             {
               "item_id": "dbf840a20775d2d5",
-              "source_id": "Federal Register – Dept. of Defense",
+              "source_id": "Federal Register - Dept. of Defense",
               "title": "Airworthiness Directives; The Boeing Company Airplanes",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13207/airworthiness-directives-the-boeing-company-airplanes"
             },
             {
               "item_id": "d6741c0bb28eaa73",
-              "source_id": "Federal Register – Dept. of Defense",
+              "source_id": "Federal Register - Dept. of Defense",
               "title": "Airworthiness Directives; The Boeing Company Airplanes",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13206/airworthiness-directives-the-boeing-company-airplanes"
             },
             {
               "item_id": "48b4037614258792",
-              "source_id": "Federal Register – Dept. of Defense",
+              "source_id": "Federal Register - Dept. of Defense",
               "title": "Airworthiness Directives; The Boeing Company Airplanes",
               "url": "https://www.federalregister.gov/documents/2026/06/30/2026-13205/airworthiness-directives-the-boeing-company-airplanes"
             }
@@ -1273,7 +1273,7 @@
           "title": "30-Day Notice of Proposed Information Collection: Brokering Approval (License)",
           "raw_title": null,
           "url": "https://www.federalregister.gov/documents/2026/07/07/2026-13664/30-day-notice-of-proposed-information-collection-brokering-approval-license",
-          "source_id": "Federal Register – State DDTC / ITAR",
+          "source_id": "Federal Register - State DDTC / ITAR",
           "published_at": "2026-07-07T00:00:00Z",
           "collected_at": "2026-07-10T21:24:44.245957Z",
           "tier": 3,
@@ -1380,12 +1380,12 @@
                 "Small innovative defense suppliers and systems integrators"
               ],
               "scenarios": [
-                "If the Navy prioritizes containerized payload modularity, primes may seek new precision-machined hardware interfaces, adapters, and mounting systems—creating build-to-print subcontract opportunities for BTX if those components are fastener-critical or require tight tolerances and AS9100 compliance.",
+                "If the Navy prioritizes containerized payload modularity, primes may seek new precision-machined hardware interfaces, adapters, and mounting systems-creating build-to-print subcontract opportunities for BTX if those components are fastener-critical or require tight tolerances and AS9100 compliance.",
                 "If DIU partners with non-traditional defense suppliers to prototype containerized systems, traditional Tier 1 primes may be sidelined on early-phase development, reducing near-term build-to-print subcontracting demand for established suppliers like BTX.",
                 "If containerized payloads are designed for rapid hot-swap at forward bases, the Navy may favor pre-integrated, sealed modules over custom machined hardware, potentially reducing BTX's addressable subcontract work in this domain."
               ],
               "recommended_actions": [
-                "Engage RTX and Lockheed Martin business-development teams to identify where containerized payload architectures require precision-machined brackets, interface blocks, or mounting hardware—areas where BTX's 5-axis CNC and AS9100 capability is defensible.",
+                "Engage RTX and Lockheed Martin business-development teams to identify where containerized payload architectures require precision-machined brackets, interface blocks, or mounting hardware-areas where BTX's 5-axis CNC and AS9100 capability is defensible.",
                 "Monitor DIU competitions and small-business initiatives (SBIR, etc.) to identify opportunities for BTX to partner with prime contractors or systems integrators on containerized payload prototypes.",
                 "Assess whether any of BTX's current F-35 or B-21 machined hardware could be adapted or repurposed for naval containerized systems; brief primes on modularity/interface opportunities."
               ]
@@ -1465,7 +1465,7 @@
                 "DoD/DCMA oversight"
               ],
               "scenarios": [
-                "If Lockheed's laser system progresses to production, BTX may be requested to machine precision optics mounts, thermal management housings, or pointing-mechanism components that require tight tolerances, material compatibility (e.g., aerospace-grade aluminum or titanium), and rigorous traceability—leveraging BTX's build-to-print and ITAR expertise.",
+                "If Lockheed's laser system progresses to production, BTX may be requested to machine precision optics mounts, thermal management housings, or pointing-mechanism components that require tight tolerances, material compatibility (e.g., aerospace-grade aluminum or titanium), and rigorous traceability-leveraging BTX's build-to-print and ITAR expertise.",
                 "If nLIGHT's optics supplier role expands, Lockheed may seek precision-machined subassemblies from build-to-print suppliers like BTX for integration into laser-weapon packages, creating new revenue if BTX can win the subcontract.",
                 "If the program matures and foreign military sales (FMS) are approved for NATO allies (e.g., Germany), BTX may face ITAR approval requirements for any exported machined components, requiring pre-negotiated export authorizations with DDTC and primes.",
                 " If the laser program competes with legacy air-defense budgets (Patriot, THAAD modernization), BTX's current kinetic-defense work may see funding pressure, offsetting new laser-related wins."
@@ -1731,7 +1731,7 @@
               ],
               "scenarios": [
                 "If the Air Force pursues modular, containerized refueling pods that can be rapidly reconfigured and deployed, primes may engage suppliers like BTX to machine specialized fuel-system manifolds, valve bodies, quick-disconnect interfaces, and structural supports that can withstand high-pressure fuel handling and harsh shipboard or austere-field environments.",
-                "If the solution involves distributed small-scale tankers or autonomous aerial-refueling drones, BTX may compete for precision-machined fuel-cell frames, boom-attachment hardware, or control-surface actuator mounts—areas aligned with BTX's 5-axis CNC and aerospace-grade assembly experience.",
+                "If the solution involves distributed small-scale tankers or autonomous aerial-refueling drones, BTX may compete for precision-machined fuel-cell frames, boom-attachment hardware, or control-surface actuator mounts-areas aligned with BTX's 5-axis CNC and aerospace-grade assembly experience.",
                 "If the Air Force opts for geographically dispersed tanker bases (CONUS or Guam-based rotational deployments) rather than engineering solutions, demand for new tanker hardware may remain modest, and BTX's refueling-related opportunities could be limited to maintenance and modification work on existing platforms.",
                 " If the solution includes naval refueling variants or air-to-surface refueling systems, the Navy and Army could become new customer segments, expanding BTX's prime-contractor relationships beyond current air-domain focus."
               ],
@@ -1782,7 +1782,7 @@
           "per_edition": {
             "bd": {
               "relevance_score": 45,
-              "so_what": "Pentagon is reprogramming $4.3B across weapon and tech programs to cover operational and personnel costs, likely reducing program funding available for new contract awards or sustainment—a potential headwind for BTX primes' near-term spending plans.",
+              "so_what": "Pentagon is reprogramming $4.3B across weapon and tech programs to cover operational and personnel costs, likely reducing program funding available for new contract awards or sustainment-a potential headwind for BTX primes' near-term spending plans.",
               "now_what": "Capture team should identify which of BTX's prime customers (Lockheed Martin, RTX, Northrop Grumman) are materially affected by the reprogramming and track the 47-page notification for specific program cuts that might free up or constrain subcontracting demand.",
               "categories": [
                 "Budget & Appropriations"
@@ -1818,14 +1818,14 @@
                 "Congressional delegations from states with affected programs"
               ],
               "scenarios": [
-                "If the $4.3B reprogramming strips dollars from weapons-development or procurement programs that are key to BTX's customers (e.g., F-35 sustainment, B-21 production tooling, or hypersonic component development), BTX's build-to-print subcontract volume could decline in 2026–2027, forcing BTX to pivot to non-defense or pursue new program wedges.",
+                "If the $4.3B reprogramming strips dollars from weapons-development or procurement programs that are key to BTX's customers (e.g., F-35 sustainment, B-21 production tooling, or hypersonic component development), BTX's build-to-print subcontract volume could decline in 2026-2027, forcing BTX to pivot to non-defense or pursue new program wedges.",
                 "If reprogramming favors high-priority, near-term operations (e.g., Ukraine support, Pacific deterrence) over long-cycle production, BTX may see a temporary reduction in stable, predictable build-to-print volumes but increased demand for urgent, low-volume machining of fielded-system modifications or sustainment components.",
                 "If reprogramming results in delays or schedule compression on major programs (e.g., F-35 Block 4, B-21 low-rate production), primes may accelerate subcontract orders to meet compressed timelines, creating near-term revenue spikes for BTX but raising quality and labor-availability risks.",
                 "If reprogramming prioritizes emerging capability areas (e.g., hypersonics, directed energy, autonomous systems) over legacy platforms, BTX should expect shifts in customer demand and may need to invest in new technical capabilities or customer development."
               ],
               "recommended_actions": [
                 "Immediately request detailed briefings from Lockheed Martin, RTX, Northrop Grumman, and Boeing Defense on which programs are affected by the $4.3B reprogramming; prioritize understanding impacts to F-35, B-21, and hypersonic programs (BTX's known focus areas).",
-                "Conduct a financial scenario-modeling exercise with BTX leadership: model revenue impact if top 3 customer programs lose 10–20% of planned procurement; identify which programs are most at-risk and which non-defense or adjacent-market opportunities could offset declines.",
+                "Conduct a financial scenario-modeling exercise with BTX leadership: model revenue impact if top 3 customer programs lose 10-20% of planned procurement; identify which programs are most at-risk and which non-defense or adjacent-market opportunities could offset declines.",
                 "If reprogramming favors operations/sustainment, engage primes on modification-kit and depot-maintenance build-to-print work; this often commands premium pricing and can provide stable, shorter-cycle revenue to offset production-program delays.",
                 "Monitor Congressional responses and Federal Register notifications for the final reprogramming approval; flag any programs directly affecting BTX's customer portfolio and adjust 2026 revenue guidance accordingly."
               ]
@@ -1976,7 +1976,7 @@
                 "Defense primes potentially serving as integrators (Lockheed Martin, RTX, Northrop Grumman, General Dynamics)"
               ],
               "scenarios": [
-                "Selected companies develop prototype autonomous breaching systems and seek Tier 1/Tier 2 suppliers for precision-machined structural components, power transmission systems, or sensor mounts—creating potential build-to-print subcontract opportunities for shops with robotics/automation experience.",
+                "Selected companies develop prototype autonomous breaching systems and seek Tier 1/Tier 2 suppliers for precision-machined structural components, power transmission systems, or sensor mounts-creating potential build-to-print subcontract opportunities for shops with robotics/automation experience.",
                 "The program advances to production phase, establishing steady-state demand for precision CNC-machined parts in quantities and tolerances that favor dedicated subcontractors with AS9100 certification and rapid-turnaround capability.",
                 "Program encounters technical or budget delays, reducing near-term component demand but potentially extending the timeline for BTX to position itself as a preferred subcontractor once prototype validation is complete."
               ],
@@ -1998,7 +1998,7 @@
           "related": [
             {
               "item_id": "e9b8b4b2b1d3f94f",
-              "title": "There’s promise — and peril — in the Army’s low-cost interceptor plan, experts…",
+              "title": "There’s promise - and peril - in the Army’s low-cost interceptor plan, experts…",
               "url": "https://breakingdefense.com/2026/07/theres-promise-and-pitfalls-in-the-armys-low-cost-interceptor-plan-experts-say/",
               "via": [
                 "U.S. Army"
@@ -2009,8 +2009,8 @@
         },
         {
           "item_id": "e9b8b4b2b1d3f94f",
-          "title": "There’s promise — and peril — in the Army’s low-cost interceptor plan, experts…",
-          "raw_title": "There’s promise — and peril — in the Army’s low-cost interceptor plan, experts say",
+          "title": "There’s promise - and peril - in the Army’s low-cost interceptor plan, experts…",
+          "raw_title": "There’s promise - and peril - in the Army’s low-cost interceptor plan, experts say",
           "url": "https://breakingdefense.com/2026/07/theres-promise-and-pitfalls-in-the-armys-low-cost-interceptor-plan-experts-say/",
           "source_id": "Breaking Defense",
           "published_at": "2026-07-09T12:30:00Z",
@@ -2195,7 +2195,7 @@
           "dollar_amount": null,
           "affected_population": null,
           "action_deadline": null,
-          "confidence_note": "Summary provides no detail on portfolio scope, leadership, or timeline; significance for BTX depends on which programs fall into which portfolio—information not provided.",
+          "confidence_note": "Summary provides no detail on portfolio scope, leadership, or timeline; significance for BTX depends on which programs fall into which portfolio-information not provided.",
           "unverified_claims": [],
           "deep_analysis": {
             "sections": {
@@ -2485,7 +2485,7 @@
                 "Cybersecurity Maturity Model Certification Program stakeholders"
               ],
               "scenarios": [
-                "If DoD enforces PQC CMMC requirements on aggressive timelines (12–24 months), supply-chain disruption could occur as many contractors lack PQC-capable infrastructure; BTX's ITAR-registered systems and classified-data handling practices may face unplanned re-certification costs and delays.",
+                "If DoD enforces PQC CMMC requirements on aggressive timelines (12-24 months), supply-chain disruption could occur as many contractors lack PQC-capable infrastructure; BTX's ITAR-registered systems and classified-data handling practices may face unplanned re-certification costs and delays.",
                 "If PQC implementations are delayed or phased (CMMC Level 3 first, then lower tiers), BTX can sequence its own cryptographic upgrades and budget for compliance without crisis-mode disruption to production or prime relationships.",
                 "If NIST standards for PQC remain unstable or multiple cryptographic algorithms compete, DoD may issue interim waivers or exceptions for small suppliers, potentially exempting BTX if it demonstrates a credible compliance roadmap.",
                 " If PQC is tightly integrated into CMMC audit protocols, BTX's ITAR and AS9100 compliance team will need to coordinate closely with its IT/cybersecurity function to ensure seamless certification renewal and avoid losing prime-customer accreditation."
@@ -2494,7 +2494,7 @@
                 "Engage BTX's CMMC Accreditation Body and DoD Security Cooperation Agreements team to obtain a clear timeline and technical specification for PQC requirements applicable to build-to-print/precision-machining suppliers; clarify whether BTX's current CMMC Level 2/3 status triggers immediate or phased obligations.",
                 "Commission a gap assessment of BTX's current cryptographic infrastructure (systems, key management, supply-chain IT) against emerging PQC standards; identify which systems store or transmit ITAR-controlled technical data and prioritize those for upgrade.",
                 "Budget for hybrid cryptography (post-quantum + classical) transition costs; engage Lockheed Martin, RTX, and Northrop Grumman ITAR/security teams to understand their PQC roadmaps and timelines, ensuring BTX's compliance path aligns with prime expectations.",
-                "Monitor NIST and DoD announcements on PQC algorithm standardization and CMMC implementation schedules; delay major IT infrastructure decisions until standards stabilize (2H 2026–1H 2027 likely)."
+                "Monitor NIST and DoD announcements on PQC algorithm standardization and CMMC implementation schedules; delay major IT infrastructure decisions until standards stabilize (2H 2026-1H 2027 likely)."
               ]
             }
           },
@@ -2555,7 +2555,7 @@
           "per_edition": {
             "bd": {
               "relevance_score": 25,
-              "so_what": "Pentagon is awarding contracts for directed-energy laser weapons systems. The summary does not identify the primes, programs, dollar values, or performance periods—insufficient detail to assess subcontracting opportunities for BTX's precision-machining capability.",
+              "so_what": "Pentagon is awarding contracts for directed-energy laser weapons systems. The summary does not identify the primes, programs, dollar values, or performance periods-insufficient detail to assess subcontracting opportunities for BTX's precision-machining capability.",
               "now_what": "Obtain the full contract award notice from SAM.gov or DoD press releases to identify the prime contractors, contract values, and technical scope. If a BTX prime (Lockheed Martin, RTX, Northrop Grumman) is named, evaluate whether laser-weapon assembly or critical optical-component machining aligns with BTX's 5-axis CNC and flight-critical assembly capabilities.",
               "categories": [
                 "Contract Award",
@@ -2638,10 +2638,10 @@
                 "If enforcement is selective or delayed, defense contractors may face uneven compliance pressure; BTX could gain competitive advantage by completing purge early, or suffer if late-movers avoid costs that BTX absorbs."
               ],
               "recommended_actions": [
-                "Immediately audit BTX's software stack—including CAM systems, ERP platforms, design tools, and any cloud-based collaboration platforms—for Anthropic integration or data linkages; flag any systems that rely on Anthropic APIs or Claude models.",
+                "Immediately audit BTX's software stack-including CAM systems, ERP platforms, design tools, and any cloud-based collaboration platforms-for Anthropic integration or data linkages; flag any systems that rely on Anthropic APIs or Claude models.",
                 "Brief BTX leadership and Lockheed Martin / RTX / Northrop Grumman contacts on BTX's compliance posture and timeline; use early transparency to differentiate BTX as a trustworthy, compliant partner and to understand which primes face the greatest Anthropic exposure.",
                 "Establish a contingency plan for replacing any Anthropic-dependent workflows with alternative (DoD-approved) vendors or in-house tools before September 1; cost and schedule this replacement now so that BTX can commit to primes with confidence.",
-                "Monitor Anthropic's litigation closely and track any Pentagon guidance on what counts as 'removal'—e.g., whether isolated, air-gapped systems are acceptable—to avoid over-compliance and unnecessary cost."
+                "Monitor Anthropic's litigation closely and track any Pentagon guidance on what counts as 'removal'-e.g., whether isolated, air-gapped systems are acceptable-to avoid over-compliance and unnecessary cost."
               ]
             }
           },
@@ -2952,7 +2952,7 @@
             "exec": {
               "relevance_score": 18,
               "so_what": "Wargame findings on tanker vulnerability may inform future defense spending priorities, but no program decision, funding shift, or supply-chain action is announced.",
-              "now_what": "Monitor for fiscal year 2027–2028 budget justifications or Congressional testimony on Pacific refueling; no immediate decision driver for BTX leadership.",
+              "now_what": "Monitor for fiscal year 2027-2028 budget justifications or Congressional testimony on Pacific refueling; no immediate decision driver for BTX leadership.",
               "categories": []
             }
           },
@@ -3075,7 +3075,7 @@
           "related": [
             {
               "item_id": "e9b8b4b2b1d3f94f",
-              "title": "There’s promise — and peril — in the Army’s low-cost interceptor plan, experts…",
+              "title": "There’s promise - and peril - in the Army’s low-cost interceptor plan, experts…",
               "url": "https://breakingdefense.com/2026/07/theres-promise-and-pitfalls-in-the-armys-low-cost-interceptor-plan-experts-say/",
               "via": [
                 "Army"
@@ -3086,8 +3086,8 @@
         },
         {
           "item_id": "e9b8b4b2b1d3f94f",
-          "title": "There’s promise — and peril — in the Army’s low-cost interceptor plan, experts…",
-          "raw_title": "There’s promise — and peril — in the Army’s low-cost interceptor plan, experts say",
+          "title": "There’s promise - and peril - in the Army’s low-cost interceptor plan, experts…",
+          "raw_title": "There’s promise - and peril - in the Army’s low-cost interceptor plan, experts say",
           "url": "https://breakingdefense.com/2026/07/theres-promise-and-pitfalls-in-the-armys-low-cost-interceptor-plan-experts-say/",
           "source_id": "Breaking Defense",
           "published_at": "2026-07-09T12:30:00Z",
@@ -3185,7 +3185,7 @@
               ],
               "recommended_actions": [
                 "Conduct an internal audit of BTX's technical bench depth: identify which 5-axis CNC and build-to-print processes rely most heavily on individual expert knowledge, and document critical procedures to reduce single-point-of-failure risk.",
-                "If BTX is in growth mode, design a structured mentorship and procedure-documentation program to onboard new machinists and inspectors without diluting quality or AS9100 compliance rigor—this becomes a competitive advantage in pitch to Lockheed Martin, RTX, and Northrop Grumman.",
+                "If BTX is in growth mode, design a structured mentorship and procedure-documentation program to onboard new machinists and inspectors without diluting quality or AS9100 compliance rigor-this becomes a competitive advantage in pitch to Lockheed Martin, RTX, and Northrop Grumman.",
                 "Engage with prime-contractor supply-chain partners to understand their own hiring plans and skill-gap concerns; position BTX as a reliable subcontractor with documented process controls that can absorb volume growth without quality degradation."
               ]
             }
@@ -3381,7 +3381,7 @@
             },
             "exec": {
               "relevance_score": 45,
-              "so_what": "Space Force's acquisition reorganization creates nine new portfolio-level decision-makers across major mission areas. This is a structural shift in how Space Force awards contracts and manages requirements—potentially affecting how BTX's primes win and subcontract space-related work, though impact is not yet clear.",
+              "so_what": "Space Force's acquisition reorganization creates nine new portfolio-level decision-makers across major mission areas. This is a structural shift in how Space Force awards contracts and manages requirements-potentially affecting how BTX's primes win and subcontract space-related work, though impact is not yet clear.",
               "now_what": "BTX leadership should request the full Space Force announcement, identify which portfolios span missile defense, hypersonics, or other areas BTX's primes compete for, and assess whether the new structure creates faster or slower sourcing cycles for BTX subcontracting opportunities. Consider outreach to BTX's prime-account teams to understand how they will navigate the new portfolio structure.",
               "categories": [
                 "Program Decision",
@@ -3404,7 +3404,7 @@
                 "DCMA"
               ],
               "scenarios": [
-                "If the nine portfolios align with specific mission areas (e.g., launch, C2, sensing, communications), and PAEs consolidate subcontractor management, it could streamline BTX's engagement with the Space Force—but only if BTX is already qualified for space-rated machining; if not, the new structure may create barriers to entry through formalized, portfolio-specific vendor lists.",
+                "If the nine portfolios align with specific mission areas (e.g., launch, C2, sensing, communications), and PAEs consolidate subcontractor management, it could streamline BTX's engagement with the Space Force-but only if BTX is already qualified for space-rated machining; if not, the new structure may create barriers to entry through formalized, portfolio-specific vendor lists.",
                 "If PAEs gain authority over modernization requirements and can rapidly pivot supplier strategies, they may accelerate qualification of new subcontractors to reduce supply-chain risk; this could open door for BTX if it proactively engages the right PAE and demonstrates space-capable manufacturing.",
                 "If the reorganization introduces new compliance, reporting, or data requirements (e.g., supply-chain risk assessments, cybersecurity certifications beyond CMMC), BTX will need to adapt its quality and compliance infrastructure to align with Space Force standards, increasing upfront investment before any award.",
                 "If PAEs are tasked with cutting costs or increasing industrial-base resilience, they may push primes to diversify supply and onboard new subcontractors; BTX should position its build-to-print precision capability as a lower-risk, faster-to-qualify alternative to building entirely new suppliers."
@@ -3413,7 +3413,7 @@
                 "Obtain the Space Force's official description of the nine portfolios and PAE organizational structure; identify which portfolio owns requirements for machined hardware, fasteners, structural components, or other precision-machining work.",
                 "Map BTX's current customer relationships (Lockheed Martin, RTX, Northrop Grumman, Boeing Defense) to their respective space-division programs and determine whether any of these primes serve a specific PAE portfolio; use this to draft a targeted engagement strategy.",
                 "Prepare a concise capability brief for Space Force PAEs or their integrated program teams: lead with AS9100/ITAR/NADCAP certifications, 5-axis CNC precision, and proven delivery on defense programs; offer to participate in industrial-base surveys or supply-chain resilience initiatives.",
-                "If BTX is not yet qualified for space-rated hardware, investigate the technical and compliance gaps (e.g., thermal cycling test data, outgassing certs, specific material traceability) and scope a path to qualification over 12–24 months."
+                "If BTX is not yet qualified for space-rated hardware, investigate the technical and compliance gaps (e.g., thermal cycling test data, outgassing certs, specific material traceability) and scope a path to qualification over 12-24 months."
               ]
             }
           },
@@ -3483,13 +3483,13 @@
                 "Small business community"
               ],
               "scenarios": [
-                "If Pulse Space Technologies successfully develops laser-power transmission systems and the Space Force validates the technology, it could transition to production contracts; primes may then need to establish supply chains for precision-machined optical-bench frames, heat sinks, laser-aperture housings, or other precision components—all candidates for BTX's 5-axis CNC capability.",
+                "If Pulse Space Technologies successfully develops laser-power transmission systems and the Space Force validates the technology, it could transition to production contracts; primes may then need to establish supply chains for precision-machined optical-bench frames, heat sinks, laser-aperture housings, or other precision components-all candidates for BTX's 5-axis CNC capability.",
                 "If the technology remains in development phase or faces technical setbacks, no near-term subcontract opportunity will materialize; BTX should monitor the program's progress but should not prioritize it over more mature acquisition pipelines.",
-                "If laser power-transmission becomes a mandated technology for future space platforms (e.g., F-35-equivalent space systems, B-21-equivalent orbital nodes), it could eventually generate recurring machining work, but this is 3–5+ years downstream and subject to significant technical and budget risk.",
+                "If laser power-transmission becomes a mandated technology for future space platforms (e.g., F-35-equivalent space systems, B-21-equivalent orbital nodes), it could eventually generate recurring machining work, but this is 3-5+ years downstream and subject to significant technical and budget risk.",
                 " If the award triggers competitive awards to other small businesses or established primes, Pulse Space may license or sublicense its technology, widening the potential supplier base and creating uncertainty about which integrator will own manufacturing."
               ],
               "recommended_actions": [
-                "Track Pulse Space Technologies' contract progress (quarterly reports, award announcements on sam.gov) over the next 12–18 months; do not invest engineering resources until the technology is validated and a prime-contractor integrator is identified.",
+                "Track Pulse Space Technologies' contract progress (quarterly reports, award announcements on sam.gov) over the next 12-18 months; do not invest engineering resources until the technology is validated and a prime-contractor integrator is identified.",
                 "If BTX has relationships with Lockheed Martin, RTX, or Northrop Grumman space divisions, informally ask whether they are aware of Pulse Space work or are likely to be the prime integrator; this will help prioritize attention.",
                 "Do not pursue direct subcontract work with Pulse Space unless BTX is actively seeking small-business prime partnerships; instead, position for eventual manufacturing of production hardware once integration path is clear and demand is visible.",
                 "Flag this as a 'watch item' in BTX's strategic-planning process, not a near-term pipeline opportunity."
@@ -3564,16 +3564,16 @@
                 "NIST"
               ],
               "scenarios": [
-                "If PQC requirements are mandated into CMMC L3–L5 assessments in 2027–2028 without technology standardization or vendor maturity, BTX and other contractors may face costly delayed certifications, failed assessments, or compliance violations; primes may require subcontractors to upgrade cybersecurity infrastructure ahead of schedule, increasing costs.",
+                "If PQC requirements are mandated into CMMC L3-L5 assessments in 2027-2028 without technology standardization or vendor maturity, BTX and other contractors may face costly delayed certifications, failed assessments, or compliance violations; primes may require subcontractors to upgrade cybersecurity infrastructure ahead of schedule, increasing costs.",
                 "If NIST finalizes PQC standards and major vendors release approved implementations by mid-2027, BTX could hire a cybersecurity consultant to assess current systems against PQC benchmarks and plan an upgrade roadmap; this would position BTX as ahead of the market and aligned with prime requirements.",
                 "If the DoD phases PQC requirements gradually (e.g., L5-only initially, then L3 by 2029), BTX may have more time to plan and implement changes without disrupting operations; the key risk is uncertainty about the timeline, which could leave BTX unprepared if phased-in deadlines slip.",
                 " If small businesses or contractors without deep cybersecurity expertise struggle to implement PQC-compliant systems, they may lose CMMC certification or face exclusion from new awards; BTX's AS9100/ITAR compliance posture could be an asset if paired with modern cybersecurity, but gaps in PQC readiness could undermine those certifications."
               ],
               "recommended_actions": [
                 "Schedule an immediate cybersecurity assessment with BTX's IT/security team and external counsel: inventory all systems that use cryptographic algorithms (data-at-rest, data-in-transit, authentication), document which are potentially vulnerable to quantum threats, and map vendor roadmaps for PQC upgrades.",
-                "Contact BTX's current CMMC Accreditation Body (C3PAO) or a trusted consultant to obtain a written summary of PQC timelines, likely CMMC update schedules, and estimated cost/effort for BTX's specific infrastructure; use this to build a 12–24 month upgrade plan.",
+                "Contact BTX's current CMMC Accreditation Body (C3PAO) or a trusted consultant to obtain a written summary of PQC timelines, likely CMMC update schedules, and estimated cost/effort for BTX's specific infrastructure; use this to build a 12-24 month upgrade plan.",
                 "Engage with prime-customer procurement or supply-chain teams (Lockheed Martin, RTX, Northrop Grumman, Boeing Defense) to ask whether they are issuing PQC guidance to subcontractors and what timelines they expect; align BTX's upgrades to prime requirements, not just DoD directives.",
-                "Allocate budget for cybersecurity infrastructure upgrades in FY2027–FY2028; prioritize systems handling ITAR or classified data first, then expand to general IT.",
+                "Allocate budget for cybersecurity infrastructure upgrades in FY2027-FY2028; prioritize systems handling ITAR or classified data first, then expand to general IT.",
                 "Do not wait for final NIST PQC standards; begin strategic planning now to avoid surprise non-compliance and ensure BTX remains CMMC-certified and eligible for defense work."
               ]
             }
@@ -3697,7 +3697,7 @@
           "unverified_claims": [],
           "deep_analysis": {
             "sections": {
-              "background": "The Pentagon has awarded contracts for directed-energy laser weapon systems designed to counter unmanned aerial vehicle swarms, a threat domain that has become a priority for air-defense modernization. Directed-energy weapons (DEW) have been under development and testing for several years, with the Defense Department consistently emphasizing their operational advantages—chiefly speed of engagement, cost-per-shot economics, and magazine depth (theoretically unlimited rate of fire)—over traditional kinetic air-defense systems.",
+              "background": "The Pentagon has awarded contracts for directed-energy laser weapon systems designed to counter unmanned aerial vehicle swarms, a threat domain that has become a priority for air-defense modernization. Directed-energy weapons (DEW) have been under development and testing for several years, with the Defense Department consistently emphasizing their operational advantages-chiefly speed of engagement, cost-per-shot economics, and magazine depth (theoretically unlimited rate of fire)-over traditional kinetic air-defense systems.",
               "key_stakeholders": [
                 "Department of Defense",
                 "Air Force",
@@ -3714,7 +3714,7 @@
               "recommended_actions": [
                 "Contact Lockheed Martin, RTX (Collins Aerospace and Raytheon divisions), and Northrop Grumman business-development contacts within air-defense / directed-energy portfolios to understand laser weapon platform architecture and identify subcontracting build-to-print opportunities (e.g., thermal mounts, optical benches, structural fastening).",
                 "Assess internal 5-axis CNC capabilities for precision-machined components used in thermal-management and optical-stability assemblies; flag any ITAR compliance or raw-material lead-time gaps that could constrain responsiveness if contracts are awarded on short notice.",
-                "Monitor DefenseNews and prime earnings calls (Q2–Q3 2026) for explicit mentions of laser weapon production contracts, timelines, and Tier 2 supplier requirements; establish quarterly checks with capture leads."
+                "Monitor DefenseNews and prime earnings calls (Q2-Q3 2026) for explicit mentions of laser weapon production contracts, timelines, and Tier 2 supplier requirements; establish quarterly checks with capture leads."
               ]
             }
           },
@@ -3782,7 +3782,7 @@
           "per_edition": {
             "bd": {
               "relevance_score": 68,
-              "so_what": "GAO flagged schedule constraints and production challenges in Pentagon hypersonic programs—a named BTX target market—signaling potential urgency for manufacturing capacity and possibly revised procurement timelines that could affect subcontracting openings.",
+              "so_what": "GAO flagged schedule constraints and production challenges in Pentagon hypersonic programs-a named BTX target market-signaling potential urgency for manufacturing capacity and possibly revised procurement timelines that could affect subcontracting openings.",
               "now_what": "BD and capture team should request the full GAO report to identify which primes (RTX, Lockheed Martin, Northrop Grumman) are assigned to hypersonic efforts and whether production bottlenecks create near-term build-to-print machining opportunities for flight-critical components.",
               "categories": [
                 "Industry News",
@@ -3791,7 +3791,7 @@
             },
             "exec": {
               "relevance_score": 71,
-              "so_what": "DOD hypersonic programs are facing production and schedule risks per GAO assessment, creating potential demand for precision-manufacturing capacity—a core BTX strength—to de-risk timelines and boost throughput.",
+              "so_what": "DOD hypersonic programs are facing production and schedule risks per GAO assessment, creating potential demand for precision-manufacturing capacity-a core BTX strength-to de-risk timelines and boost throughput.",
               "now_what": "Executive leadership should direct business development to engage prime contractors on hypersonic programs to understand production constraints and position BTX's 5-axis CNC and AS9100 capability as a risk mitigation partner; request the GAO report details on which primes and programs are affected.",
               "categories": [
                 "Program Decision",

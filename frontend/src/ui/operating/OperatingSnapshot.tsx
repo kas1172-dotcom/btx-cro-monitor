@@ -22,10 +22,20 @@ function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function plainSourceText(value: string): string {
+  return value
+    .replace(/\bseeded baseline\b/gi, "sample data")
+    .replace(/\bseeded\b/gi, "sample")
+    .replace(/\bmonitor-engine\b/gi, "monitor engine")
+    .replace(/\bartifacts?\b/gi, "documents")
+    .replace(/\boperating snapshot\b/gi, "production view")
+    .replace(/\boperating baseline\b/gi, "production context");
+}
+
 export function OperatingSnapshot() {
   const snapshot = useOperatingSnapshot();
 
-  if (!snapshot) return <div className="loading">loading operating snapshot…</div>;
+  if (!snapshot) return <div className="loading">loading production view...</div>;
 
   const connected = snapshot.integrations.filter((i) => i.status === "connected");
   const available = snapshot.integrations.filter((i) => i.status === "available");
@@ -33,10 +43,10 @@ export function OperatingSnapshot() {
   return (
     <div className="operating">
       <section className="operating-head">
-        <p className="eyebrow">Operating snapshot</p>
+        <p className="eyebrow">Production view</p>
         <h1>What data is the brain using right now?</h1>
         <p>
-          Backend CRM records, monitor-engine market output, and the seeded operating baseline feed one runtime adapter. Capacity remains labeled as ERP pending until a live ERP source is connected.
+          Backend CRM records, monitor engine market output, and sample production context feed one runtime adapter. Capacity remains labeled as sample data until a live ERP source is connected.
         </p>
       </section>
 
@@ -50,8 +60,8 @@ export function OperatingSnapshot() {
         <div>
           <span>Capacity sources</span>
           <strong>{snapshot.capacity.length}</strong>
-          <em>{snapshot.capacity[0]?.source_name ?? "ERP snapshot"}</em>
-          <ProvenanceBadge label="Seeded baseline" />
+          <em>{plainSourceText(snapshot.capacity[0]?.source_name ?? "ERP sample data")}</em>
+          <ProvenanceBadge label="Sample data" />
         </div>
         <div>
           <span>Public signals</span>
@@ -83,7 +93,7 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Capacity / ERP Baseline</h2>
+            <h2>Capacity / ERP sample data</h2>
           </div>
           {snapshot.capacity.map((row) => (
             <div key={row.facility_id} className="operating-row">
@@ -97,7 +107,7 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Pipeline / Contracts Baseline</h2>
+            <h2>Pipeline / contracts sample data</h2>
           </div>
           <div className="operating-callout">
             <strong>{money(snapshot.pipeline.summary.open_pipeline_value)} open pipeline</strong>
@@ -123,7 +133,7 @@ export function OperatingSnapshot() {
             <em>Latest signal {dateLabel(snapshot.publicSignals.latest_signal_at)} · latest news {dateLabel(snapshot.publicSignals.latest_news_date)}</em>
           </div>
           <p className="operating-copy">
-            Monitor signals are validated as market context. Weak account matches stay portfolio-level and do not affect account scores. Source: {snapshot.publicSignals.artifact_path ?? snapshot.publicSignals.source_name}.
+            Monitor signals are validated as market context. Weak account matches stay market-level and do not affect account scores. Source: {plainSourceText(snapshot.publicSignals.artifact_path ?? snapshot.publicSignals.source_name)}.
           </p>
         </div>
 
@@ -142,7 +152,7 @@ export function OperatingSnapshot() {
             ))}
           </div>
           <p className="operating-copy">
-            {connected.length} connected source{connected.length === 1 ? "" : "s"} and {available.length} seeded source{available.length === 1 ? "" : "s"} are active.
+            {connected.length} connected source{connected.length === 1 ? "" : "s"} and {available.length} sample source{available.length === 1 ? "" : "s"} are active.
           </p>
         </div>
 
@@ -152,7 +162,7 @@ export function OperatingSnapshot() {
           </div>
           {snapshot.publicSignals.run_at && (
             <div className={snapshot.publicSignals.stale ? "operating-callout warn" : "operating-callout"}>
-              <strong>Monitor-engine run: {dateLabel(snapshot.publicSignals.run_at ?? null)}</strong>
+              <strong>Monitor engine run: {dateLabel(snapshot.publicSignals.run_at ?? null)}</strong>
               <span>{snapshot.publicSignals.stale ? "Monitor output is older than 7 days." : "Monitor signal data is fresh."}</span>
             </div>
           )}
@@ -163,8 +173,8 @@ export function OperatingSnapshot() {
             </div>
           )}
           <div className="operating-callout warn">
-            <strong>{snapshot.assumptions.summary}</strong>
-            <span>Source mode: {titleCase(snapshot.assumptions.source_mode)}</span>
+            <strong>{plainSourceText(snapshot.assumptions.summary)}</strong>
+            <span>Source mode: {plainSourceText(titleCase(snapshot.assumptions.source_mode))}</span>
           </div>
           <ul className="operating-list">
             {snapshot.assumptions.assumptions.map((item) => (

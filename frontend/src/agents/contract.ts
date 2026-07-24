@@ -80,8 +80,9 @@ export function validateAudienceAndForm(
     "HubSpot CRM",
     "monitor-engine artifacts",
     "Monitor engine",
-    "Seeded baseline",
+    "Sample data",
     "Operating baseline",
+    "Monitor engine evidence",
   ].includes(source.source));
   const internalBanned = backendGrounding ? HYBRID_INTERNAL_BANNED : INTERNAL_BANNED;
   const banned = audience === "prospect" ? includesBanned(visibleText, PROSPECT_BANNED) : includesBanned(allText, internalBanned);
@@ -132,7 +133,7 @@ export function validateRequiredSections(
     }
     if (section.blocks.length === 0) errors.push(`Section ${required.heading} has no blocks`);
   }
-  if (deliverable.sources.length === 0) errors.push("Deliverable has no provenance");
-  if (ctx.sources.length > 0 && deliverable.sources.length < ctx.sources.length) errors.push("Deliverable omitted context provenance");
+  if (deliverable.sources.length === 0) errors.push("Deliverable has no sources");
+  if (ctx.sources.length > 0 && deliverable.sources.length < ctx.sources.length) errors.push("Deliverable omitted context sources");
   return { valid: errors.length === 0, errors };
 }

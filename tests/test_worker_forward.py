@@ -1,6 +1,6 @@
 """WP10-B forwarder coverage: a job runs and delivers, retries on failure,
 then dead-letters after max_attempts. Exercises forward_event_sync directly
-(no broker needed) — the Celery task registered in workers/forward.py is a
+(no broker needed) - the Celery task registered in workers/forward.py is a
 thin wrapper that calls the same function, proven by test_celery_task_wiring.
 """
 from __future__ import annotations
@@ -127,7 +127,7 @@ def test_forward_missing_event_is_a_no_op():
 
 def test_celery_task_wiring_dispatches_by_name():
     """CeleryQueue.enqueue_forward must call the exact task name
-    workers/forward.py registers — this is the wiring seam ingest.py depends
+    workers/forward.py registers - this is the wiring seam ingest.py depends
     on; a typo here would silently drop every forwarded event in prod."""
     calls = []
 

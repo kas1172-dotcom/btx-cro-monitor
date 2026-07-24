@@ -5,6 +5,7 @@ import {
   ALL_SURFACES,
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
+  PRIMARY_TAB_IDS,
   TAB_IDS,
   UTILITY_SURFACES,
   countForSurface,
@@ -62,6 +63,7 @@ assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queu
 assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "prospecting,trip_planner,map,analysis,capacity,programs", "Secondary nav must contain the analytical surfaces.");
 assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "deliverables,hubspot,settings", "Utility nav must expose Deliverable Editor, HubSpot, and Settings.");
 assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,prospecting,trip_planner,map,analysis,capacity,programs,deliverables,hubspot,settings", "TabId order must stay canonical.");
+assert(PRIMARY_TAB_IDS.join(",") === "brief,work_queue,accounts,prospecting,programs,deliverables,settings", "Primary rail must contain the simplified seven-tab IA.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
 assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
 

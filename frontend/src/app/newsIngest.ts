@@ -1,12 +1,12 @@
 // The join that closes the loop: News -> Signal -> (Validation) -> Engine.
 // Turns each market event into an engine Signal.
 //   - If the LLM extracted this article (extracted-signals.json populated): honor
-//     that result — valid+resolvable => a signal; rejected/unresolvable => nothing
+//     that result - valid+resolvable => a signal; rejected/unresolvable => nothing
 //     (the validation gate is real).
 //   - Otherwise (no LLM run): fall back to the embedded ground truth so the loop
 //     still works offline.
 // Only signals whose subject is in `companies` are returned (handles city scoping).
-// The result is merged into the stream validation + scoring run on — so a news
+// The result is merged into the stream validation + scoring run on - so a news
 // article genuinely moves a score.
 
 import type { Company, MarketEvent } from "../engine/brain/entities.ts";
@@ -38,7 +38,7 @@ export function deriveNewsSignals(companies: Company[], news: MarketEvent[], ext
     let business_motion = n.business_motion;
 
     if (ex) {
-      // LLM ran for this article — honor its validation result.
+      // LLM ran for this article - honor its validation result.
       if (!ex.valid || !ex.extracted) continue; // rejected by the gate
       const resolved = ex.extracted.entities.map((e) => byName.get(e.toLowerCase())).find(Boolean);
       if (!resolved) continue; // couldn't resolve the entity to a company
@@ -52,7 +52,7 @@ export function deriveNewsSignals(companies: Company[], news: MarketEvent[], ext
       account_status = undefined;
       business_motion = undefined;
     } else {
-      // No LLM extraction — offline fallback to the embedded ground truth.
+      // No LLM extraction - offline fallback to the embedded ground truth.
       subject_id = n.subject_id;
       event_type = n.event_type;
       value = n.value;

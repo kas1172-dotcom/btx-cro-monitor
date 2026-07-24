@@ -1,4 +1,4 @@
-# BTX CRO Product — Claude Instructions
+# BTX CRO Product - Claude Instructions
 
 ## Role
 
@@ -165,7 +165,7 @@ The map should not exist only as a visual element.
 
 It should help the CRO answer practical questions such as:
 
-* I’m in Austin — who nearby should BTX talk to?
+* I’m in Austin - who nearby should BTX talk to?
 * Which companies in this region are relevant to aerospace, defense, or advanced manufacturing?
 * Which prospects are close to current customers, suppliers, or production capacity?
 * Where are there clusters of opportunity?
@@ -401,7 +401,7 @@ Default assumptions:
 * Optimize for BTX and Jamie first.
 * Prioritize CRO usefulness over generic abstraction.
 * Keep current business and prospecting conceptually separate.
-* Make rankings and signals explainable, but only on demand — keep default/scanning views compact and let the user drill down for the full reasoning.
+* Make rankings and signals explainable, but only on demand - keep default/scanning views compact and let the user drill down for the full reasoning.
 * Make ChatPill context-aware.
 * Keep the UI clean, readable, and demo-ready.
 * Preserve a path toward future API-driven behavior.

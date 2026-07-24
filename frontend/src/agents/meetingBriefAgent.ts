@@ -37,6 +37,18 @@ function riskPhrase(value: unknown): string {
   return score > 0 ? `risk score is ${score}` : "there are no active risk signals";
 }
 
+function evidenceConfidence(input: { hasVerifiedLink: boolean; hasContact: boolean; hasPipeline: boolean; hasDatedSignal: boolean }): { confidence: Deliverable["confidence"]; reason: string } {
+  const missing = [
+    input.hasVerifiedLink ? "" : "verified account link",
+    input.hasContact ? "" : "named contact",
+    input.hasPipeline ? "" : "open pipeline",
+    input.hasDatedSignal ? "" : "dated signal",
+  ].filter(Boolean);
+  if (missing.length === 0) return { confidence: "high", reason: "High: verified account link, contact, open pipeline, and dated signal are available." };
+  if (missing.length <= 2) return { confidence: "medium", reason: `Medium: missing ${missing.join(", ")}.` };
+  return { confidence: "low", reason: `Low, needs qualification: missing ${missing.join(", ")}.` };
+}
+
 export function buildMeetingBriefContext(accountId: string, world: World): AgentContext {
   const company = world.companies.find((c) => c.id === accountId);
   if (!company) throw new Error(`Unknown account ${accountId}`);
@@ -49,6 +61,12 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const score = world.analysis.byId.get(accountId);
   const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + o.value, 0);
   const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
+  const confidence = evidenceConfidence({
+    hasVerifiedLink: company.relationship === "customer" || Boolean(topSignal?.relationships?.some((relationship) => relationship.canonical_account_id === accountId && relationship.review_status === "accepted")),
+    hasContact: contacts.length > 0,
+    hasPipeline: openPipelineValue > 0,
+    hasDatedSignal: Boolean(topSignal?.detected_at || topSignal?.artifact?.source_date),
+  });
   const topSignalAccount = world.companies.find((c) => c.id === topSignal?.subject_id)?.name ?? "Portfolio monitor";
   const accountSource = provenanceForRecord(company) === "CRM" ? "HubSpot CRM" : "Account baseline";
   const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "CRM") ? "HubSpot CRM" : "Contact baseline";
@@ -77,13 +95,15 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       topSignal: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal) : "No monitor signal available.",
       artifactSignalFigures: signalFigureContext(topSignal ? [topSignal, ...signals] : signals),
       recommendedAction: rec ? `${actionLabel(rec.action)}: ${rec.reason}` : "Monitor until a stronger signal appears.",
+      deliverableConfidence: confidence.confidence,
+      deliverableConfidenceReason: confidence.reason,
     },
     entityIds: [accountId],
     sources: [
       { source: accountSource, records: [accountId], reason: "Account profile, market, relationship, and capability needs." },
       { source: contactSource, records: contacts.map((c) => c.id), reason: "Recommended stakeholder coverage." },
       { source: opportunitySource, records: opportunities.map((o) => o.id), reason: "Open pipeline, stages, close dates, and values." },
-      { source: signalSource, records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? "Real monitor-engine evidence with source names, dates, and artifact provenance." : "Validated evidence and timing." },
+      { source: signalSource, records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? "Monitor engine evidence with source names and dates." : "Validated evidence and timing." },
       { source: "Operating baseline", records: ["capacity", "operating_baseline"], reason: "Capacity and operating context come from the approved baseline until ERP integration is connected." },
     ],
   };
@@ -98,7 +118,8 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
     createdAt: new Date().toISOString(),
     brainArea: "accounts",
     entityIds: ctx.entityIds,
-    confidence: "high",
+    confidence: String(f.deliverableConfidence) as Deliverable["confidence"],
+    confidenceReason: String(f.deliverableConfidenceReason),
     sections: [
       {
         id: "overview",

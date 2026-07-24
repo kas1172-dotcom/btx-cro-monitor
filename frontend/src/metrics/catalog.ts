@@ -36,7 +36,7 @@ function result(value: number, label: string, unit: MetricResult["unit"], source
     value: Math.round(value * 100) / 100,
     label,
     unit,
-    provenance: [{ source, records, reason: `Computed ${label} from approved baseline records.` }],
+    provenance: [{ source, records, reason: `Computed ${label} from approved source records.` }],
   };
 }
 
@@ -137,10 +137,10 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
   },
   capacity_utilization: {
     id: "capacity_utilization",
-    label: "Capacity utilization",
-    definition: "Average work-center utilization percentage.",
+    label: "Work-center load",
+    definition: "Average work-center load percentage.",
     unit: "%",
-    compute: (_world, _filters, range) => result(avg(capacityRows.filter((r) => inRange(r.month, range)).map((r) => r.utilization_pct)), "Capacity utilization", "%", "capacity_utilization.json", capacityRows.map((r) => `${r.facility_id}:${r.month}`)),
+    compute: (_world, _filters, range) => result(avg(capacityRows.filter((r) => inRange(r.month, range)).map((r) => r.utilization_pct)), "Work-center load", "%", "capacity_utilization.json", capacityRows.map((r) => `${r.facility_id}:${r.month}`)),
   },
   on_time_delivery: {
     id: "on_time_delivery",

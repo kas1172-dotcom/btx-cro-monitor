@@ -1,5 +1,5 @@
 """Runtime configuration. All values come from the environment (prefix BTX_) or
-an optional .env file — never hardcoded. See .env.example for the full list."""
+an optional .env file - never hardcoded. See .env.example for the full list."""
 from __future__ import annotations
 
 from functools import lru_cache

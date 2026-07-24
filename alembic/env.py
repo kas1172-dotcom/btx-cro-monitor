@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-# Import models so they register on Base.metadata before we reference it —
+# Import models so they register on Base.metadata before we reference it -
 # mirrors btx_platform.db.init_db's own import-then-create_all pattern.
 from btx_platform import models  # noqa: F401
 from btx_platform.config import get_settings
@@ -34,7 +34,7 @@ def _sqlalchemy_url(url: str) -> str:
 
 # The app and migrations must never point at different databases by default,
 # so fall back to the same Settings the app uses rather than alembic.ini's
-# placeholder — but only when the caller (CLI or a test's Config object)
+# placeholder - but only when the caller (CLI or a test's Config object)
 # hasn't already set an explicit URL, so tests can point at a throwaway file.
 if not config.get_main_option("sqlalchemy.url"):
     config.set_main_option("sqlalchemy.url", _sqlalchemy_url(get_settings().database_url))

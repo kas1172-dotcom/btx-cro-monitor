@@ -33,16 +33,16 @@ export function retrieveContext(question: string, intent: QuestionIntent, activa
     .slice(0, 8);
   const openDeals = world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost");
   const contextUsed: ContextSource[] = [];
-  const signalSource = world.snapshot?.publicSignals.run_at ? "monitor-engine artifacts" : "signals.json + news.json";
+  const signalSource = world.snapshot?.publicSignals.run_at ? "Monitor engine evidence" : "signals.json + news.json";
   const signalReason = world.snapshot?.publicSignals.run_at
-    ? `Monitor-engine signals from ${world.snapshot.publicSignals.artifact_path}, run ${world.snapshot.publicSignals.run_at}.`
+    ? `Monitor engine signals from latest source run ${world.snapshot.publicSignals.run_at}.`
     : "Validated market signals and source quotes.";
   if (activatedTabs.includes("programs") || activatedTabs.includes("brief")) contextUsed.push({ source: signalSource, reason: signalReason });
   if (activatedTabs.includes("accounts")) contextUsed.push({ source: "companies.json + contacts.json", reason: "Account roster, relationships, and contacts." });
   if (activatedTabs.includes("analysis")) contextUsed.push({ source: "opportunities.json + scoring trace", reason: "Pipeline, opportunity scores, risk scores, and recommendations." });
-  if (activatedTabs.includes("capacity")) contextUsed.push({ source: "client-profile.json + erp_capacity.json", reason: "BTX capabilities and seeded capacity baseline." });
+  if (activatedTabs.includes("capacity")) contextUsed.push({ source: "client-profile.json + erp_capacity.json", reason: "BTX capabilities and sample capacity data." });
   if (activatedTabs.includes("map")) contextUsed.push({ source: "companies.json + facilities.json", reason: "Addresses and map coordinates." });
-  if (activatedTabs.includes("settings")) contextUsed.push({ source: "recommendation engine", reason: "Prioritized deterministic actions." });
+  if (activatedTabs.includes("settings")) contextUsed.push({ source: "recommendation engine", reason: "Prioritized actions." });
   if (activatedTabs.includes("work_queue")) contextUsed.push({ source: "workflow actions", reason: "Work item, task, and outreach actions." });
 
   return {

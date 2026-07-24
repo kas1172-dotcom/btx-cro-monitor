@@ -43,6 +43,20 @@ type TaskDialog =
   | { status: "created"; subject: string; body: string; target: TaskTarget; id: string; recordUrl: string }
   | { status: "error"; subject: string; body: string; target: TaskTarget; error: string };
 
+interface Suggestion {
+  id: string;
+  sectionId: string;
+  originalText: string;
+  text: string;
+  warning?: string;
+}
+
+interface VersionEntry {
+  id: string;
+  label: string;
+  sections: DeliverableSection[];
+}
+
 function isChartSpec(value: unknown): value is ChartSpec {
   return Boolean(value) && typeof value === "object" && typeof (value as { metric?: unknown }).metric === "string" && typeof (value as { viz?: unknown }).viz === "string";
 }
@@ -54,6 +68,21 @@ function editableSections(sections: DeliverableSection[]): DeliverableSection[] 
   }));
 }
 
+function textFromSections(sections: DeliverableSection[]): string {
+  return sections.flatMap((section) => section.blocks).filter((block) => block.kind === "text").map((block) => block.text).join(" ");
+}
+
+function factTokens(text: string): string[] {
+  const numbers = [...text.matchAll(/\$?\b\d+(?:[.,]\d+)*(?:%|\s?(?:days?|weeks?|months?|years?|hours?|hrs?|units?|parts?|quotes?|opportunities?|deals?))?\b/gi)]
+    .map((match) => match[0].replace(/[,$%]/g, "").replace(/\s+/g, " ").trim().toLowerCase());
+  const dates = [...text.matchAll(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:,\s+\d{4})?|\b\d{4}-\d{2}-\d{2}\b/gi)].map((match) => match[0]);
+  return [...new Set([...numbers, ...dates])];
+}
+
+function bannedHits(text: string): string[] {
+  return EDITOR_BANNED_VOCABULARY.filter((term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(text));
+}
+
 export function DocumentViewer({ deliverable, world, openedFrom = "generation" }: { deliverable: Deliverable; world?: World; openedFrom?: "generation" | "library" }) {
   const [sections, setSections] = useState(() => editableSections(deliverable.sections));
   const [title, setTitle] = useState(deliverable.title);
@@ -61,7 +90,8 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   const [saveStatus, setSaveStatus] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [assistantInput, setAssistantInput] = useState("");
-  const [suggestions, setSuggestions] = useState<Array<{ id: string; sectionId: string; text: string; warning?: string }>>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [versions, setVersions] = useState<VersionEntry[]>(() => [{ id: `${Date.now()}`, label: "v1 original", sections: editableSections(deliverable.sections) }]);
   const [taskDialog, setTaskDialog] = useState<TaskDialog | null>(null);
   const current = useMemo(() => ({ ...deliverable, title, sections }), [deliverable, sections, title]);
   const markdown = useMemo(() => deliverableToMarkdown(current), [current]);
@@ -72,16 +102,25 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
     setDirty(false);
     setSaveStatus("");
     setSuggestions([]);
+    setVersions([{ id: `${Date.now()}`, label: "v1 original", sections: editableSections(deliverable.sections) }]);
     setMenuOpen(false);
   }, [deliverable.id, deliverable.sections]);
 
+  function rememberVersion(label: string, nextSections: DeliverableSection[]) {
+    setVersions((items) => [...items, { id: `${Date.now()}-${items.length + 1}`, label: `v${items.length + 1} ${label}`, sections: editableSections(nextSections) }].slice(-20));
+  }
+
   function updateText(sectionId: string, blockIndex: number, text: string) {
-    setSections((items) => items.map((section) => section.id === sectionId
-      ? {
-          ...section,
-          blocks: section.blocks.map((block, index) => index === blockIndex && block.kind === "text" ? { ...block, text } : block),
-        }
-      : section));
+    setSections((items) => {
+      const next = items.map((section) => section.id === sectionId
+        ? {
+            ...section,
+            blocks: section.blocks.map((block, index) => index === blockIndex && block.kind === "text" ? { ...block, text } : block),
+          }
+        : section);
+      rememberVersion("manual edit", next);
+      return next;
+    });
     setDirty(true);
   }
 
@@ -137,8 +176,19 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
     if (format === "ics") downloadIcs(current);
   }
 
-  async function requestSuggestion() {
-    const instruction = assistantInput.trim();
+  function revisionWarning(text: string): string | undefined {
+    const currentSourceText = [deliverable.title, textFromSections(deliverable.sections), deliverable.sources.map((source) => `${source.source} ${source.reason} ${source.records.join(" ")}`).join(" ")].join(" ");
+    const allowed = new Set(factTokens(currentSourceText).map((token) => token.toLowerCase()));
+    const unsupported = factTokens(text).filter((token) => !allowed.has(token.toLowerCase()));
+    if (unsupported.length > 0) return `Unsupported claim: ${unsupported.slice(0, 4).join(", ")}`;
+    const banned = bannedHits(text);
+    if (banned.length > 0) return `Banned terms: ${banned.join(", ")}`;
+    if (text.includes("\u2014")) return "No em dashes are allowed.";
+    return undefined;
+  }
+
+  async function requestSuggestion(instructionOverride?: string) {
+    const instruction = (instructionOverride ?? assistantInput).trim();
     if (!instruction) return;
     const target = sections.find((section) => instruction.toLowerCase().includes(section.heading.toLowerCase())) ?? sections.find((section) => section.blocks.some((block) => block.kind === "text"));
     if (!target) return;
@@ -146,7 +196,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
     if (!firstText || firstText.kind !== "text") return;
     const endpoint = copilotEndpoint;
     if (!endpoint) {
-      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text: firstText.text, warning: "Assistant needs the connection — manual editing still works." }]);
+      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, originalText: firstText.text, text: firstText.text, warning: "Assistant needs the connection, manual editing still works." }]);
       setAssistantInput("");
       return;
     }
@@ -158,11 +208,12 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         instruction,
         bannedVocabulary: EDITOR_BANNED_VOCABULARY,
       });
-      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, text }]);
+      setSuggestions((items) => [...items, { id: `${Date.now()}`, sectionId: target.id, originalText: firstText.text, text, warning: revisionWarning(text) }]);
     } catch (error) {
       setSuggestions((items) => [...items, {
         id: `${Date.now()}`,
         sectionId: target.id,
+        originalText: firstText.text,
         text: "No suggestion generated.",
         warning: error instanceof Error ? error.message : "Assistant revision failed.",
       }]);
@@ -224,15 +275,30 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   function applySuggestion(id: string) {
     const suggestion = suggestions.find((item) => item.id === id);
     if (!suggestion || suggestion.warning) return;
-    setSections((items) => items.map((section) => section.id === suggestion.sectionId
-      ? { ...section, blocks: section.blocks.map((block, index) => index === 0 && block.kind === "text" ? { ...block, text: suggestion.text } : block) }
-      : section));
+    setSections((items) => {
+      const next = items.map((section) => section.id === suggestion.sectionId
+        ? { ...section, blocks: section.blocks.map((block, index) => index === 0 && block.kind === "text" ? { ...block, text: suggestion.text } : block) }
+        : section);
+      rememberVersion("AI edit accepted", next);
+      return next;
+    });
     setSuggestions((items) => items.filter((item) => item.id !== id));
     setDirty(true);
   }
 
   const formats = DELIVERABLE_DOWNLOAD_FORMATS[deliverable.type];
   const visibleBuiltFrom = visibleSources(deliverable.sources);
+  const lockedTokens = factTokens([deliverable.title, textFromSections(deliverable.sections)].join(" "));
+  const currentText = textFromSections(sections);
+  const missingLockedTokens = lockedTokens.filter((token) => !currentText.includes(token));
+  const checklist = [
+    { label: "Sources attached", ok: deliverable.sources.length > 0 },
+    { label: "No banned terms", ok: bannedHits(currentText).length === 0 },
+    { label: "No em dashes", ok: !currentText.includes("\u2014") },
+    { label: "Locked facts unchanged", ok: missingLockedTokens.length === 0 },
+    { label: "Confidence matches evidence", ok: !(deliverable.confidence === "high" && /needs qualification|missing/i.test(deliverable.confidenceReason ?? "")) },
+  ];
+  const sendBlocked = checklist.some((item) => !item.ok) || suggestions.some((item) => Boolean(item.warning));
 
   return (
     <div className="editor-overlay" role="dialog" aria-modal="true">
@@ -242,6 +308,9 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
           <p className="eyebrow">Deliverable</p>
           <input className="document-title-input" value={title} onChange={(event) => { setTitle(event.target.value); setDirty(true); }} />
           <span title={deliverable.confidenceReason}>{deliverableMetaLabel(deliverable)}{dirty ? " - edited" : ""}</span>
+          <span className={deliverable.compositionPath?.startsWith("Composed: LLM") ? "composition-status live" : "composition-status"}>
+            {deliverable.compositionPath ?? "Template fallback (LLM unavailable: composition status unavailable)"}
+          </span>
           {saveStatus && <span className="document-save-status">{saveStatus}</span>}
         </div>
         <div className="document-actions">
@@ -260,7 +329,13 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
               </div>
             )}
           </div>
-          <button onClick={() => openDemoAction({ title: "Send via Outlook", action: "follow_up", evidence: "External writes require operator confirmation." })}>Send</button>
+          <button
+            onClick={() => openDemoAction({ title: "Send via Outlook", action: "follow_up", evidence: "External writes require operator confirmation." })}
+            disabled={sendBlocked}
+            title={sendBlocked ? "Resolve the quality checklist before sending." : "Send requires confirmation."}
+          >
+            Send
+          </button>
           <button onClick={openTaskFlow}>Create task</button>
         </div>
       </header>
@@ -393,15 +468,45 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       </aside>
       <aside className="editor-assistant">
         <h2>ChatPill Editor</h2>
-        <p>{copilotEndpoint ? "Ask for a focused rewrite of a section." : "Assistant needs the connection — manual editing still works."}</p>
+        <p>{copilotEndpoint ? "Ask for a focused rewrite of a section." : "Assistant needs the connection, manual editing still works."}</p>
+        <div className="editor-quick-actions">
+          {["Tighten", "More formal", "Shorten to 80 words", "Add evidence", "Soften claims", "Fix to sources"].map((action) => (
+            <button key={action} type="button" onClick={() => void requestSuggestion(action)}>{action}</button>
+          ))}
+        </div>
         <textarea value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Tighten the subject line, make it more formal, cut it to 80 words..." />
         <button onClick={() => void requestSuggestion()}>Suggest Revision</button>
+        <div className="quality-checklist">
+          <strong>Quality checklist</strong>
+          {checklist.map((item) => (
+            <span key={item.label} className={item.ok ? "ok" : "blocked"}>{item.ok ? "Pass" : "Fix"}: {item.label}</span>
+          ))}
+          {missingLockedTokens.length > 0 && <em>Changed locked facts: {missingLockedTokens.slice(0, 5).join(", ")}</em>}
+        </div>
+        <div className="version-history">
+          <strong>Version history</strong>
+          {versions.map((version) => (
+            <button
+              key={version.id}
+              type="button"
+              onClick={() => {
+                setSections(editableSections(version.sections));
+                setDirty(true);
+              }}
+            >
+              {version.label}
+            </button>
+          ))}
+        </div>
         <div className="suggestion-list">
           {suggestions.map((suggestion) => (
             <div key={suggestion.id} className="suggestion-card">
               <strong>{sections.find((section) => section.id === suggestion.sectionId)?.heading}</strong>
+              <span>Current</span>
+              <p>{suggestion.originalText}</p>
+              <span>Proposed</span>
               <p>{suggestion.text}</p>
-              {suggestion.warning ? <em>{suggestion.warning}</em> : <button onClick={() => applySuggestion(suggestion.id)}>Apply</button>}
+              {suggestion.warning ? <em>{suggestion.warning}</em> : <button onClick={() => applySuggestion(suggestion.id)}>Accept</button>}
               <button onClick={() => setSuggestions((items) => items.filter((item) => item.id !== suggestion.id))}>Discard</button>
             </div>
           ))}

@@ -22,10 +22,10 @@ _BOILERPLATE_TAIL_RE = re.compile(
 )
 # Trailing source attribution like " | FDA" or " - Federal Register". Requires
 # whitespace around the separator so hyphenated words ("Build-to-Print") are safe.
-_SOURCE_SUFFIX_RE = re.compile(r"\s+[|–—]\s+[^|–—]{1,40}$|\s+-\s+[^|–—\-]{1,40}$")
+_SOURCE_SUFFIX_RE = re.compile(r"\s+(?:\||-)\s+[^|-]{1,40}$")
 _WS_RE = re.compile(r"\s+")
 # A word is "screaming" if its letters are all uppercase and longer than a
-# typical acronym — so FDA/CMS/USP/HCl survive but CARBONATE/TABLETS get fixed.
+# typical acronym - so FDA/CMS/USP/HCl survive but CARBONATE/TABLETS get fixed.
 _ACRONYM_MAX_LEN = 4
 
 
@@ -41,7 +41,7 @@ def normalize_title(raw_title: str) -> str:
 
     Deterministic and conservative: decodes entities, collapses whitespace, cuts
     distributor/packaging boilerplate tails, de-SCREAMs long all-caps words (short
-    acronyms preserved), and caps length at a word boundary. Never returns empty —
+    acronyms preserved), and caps length at a word boundary. Never returns empty -
     falls back to the trimmed original if normalization would erase everything.
     """
     if not raw_title:

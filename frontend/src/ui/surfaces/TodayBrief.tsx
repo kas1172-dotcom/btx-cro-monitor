@@ -47,8 +47,12 @@ function weekdayBriefingLabel(world: World): string {
   return `${weekday} briefing`;
 }
 
-function signalLink(signal: Signal): BriefLink {
+function signalLink(world: World, signal: Signal): BriefLink {
   if (signal.scope === "specific_account" && signal.subject_id) {
+    const company = world.companies.find((item) => item.id === signal.subject_id || item.canonical_account_id === signal.subject_id);
+    if (company?.business_motion === "prospect_new_business" || company?.account_status === "new_logo" || company?.account_status === "target_prospect") {
+      return { label: "Open prospect", surface: "prospecting", accountId: signal.subject_id };
+    }
     return { label: "Open account", surface: "accounts", accountId: signal.subject_id };
   }
   if (signal.scope === "program" || signal.event_type.includes("contract") || signal.event_type.includes("award")) {
@@ -98,7 +102,7 @@ function signalToBriefItem(world: World, signal: Signal): BriefItem {
     title,
     reason,
     meta: `${accountName} - ${sourceDate}`,
-    link: signalLink(signal),
+    link: signalLink(world, signal),
     seed: `Explain today's top signal for a CRO: ${String(title)}. Evidence: ${signal.source_quote}`,
   };
 }

@@ -46,6 +46,18 @@ function firstAccount(world: World, accountId?: string): World["prospects"][numb
   return prospect;
 }
 
+function evidenceConfidence(input: { hasContact: boolean; hasPipeline: boolean; hasSignal: boolean; fitScore: number }): { confidence: Deliverable["confidence"]; reason: string } {
+  const missing = [
+    input.hasContact ? "" : "named contact",
+    input.hasPipeline ? "" : "open pipeline",
+    input.hasSignal ? "" : "dated public signal",
+    input.fitScore < 100 ? "" : "qualified fit check",
+  ].filter(Boolean);
+  if (missing.length === 0) return { confidence: "high", reason: "High: contact, pipeline, public signal, and qualified fit context are available." };
+  if (missing.length <= 2) return { confidence: "medium", reason: `Medium: missing ${missing.join(", ")}.` };
+  return { confidence: "low", reason: `Low, needs qualification: missing ${missing.join(", ")}.` };
+}
+
 export const salesPitchAgent: DeliverableAgent<Inputs> = {
   id: "sales_pitch",
   audience: "prospect",
@@ -59,6 +71,8 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
     const contact = world.contacts.find((item) => item.company_id === prospect.company.id);
     const topSignal = prospect.topSignal;
     const capacity = world.snapshot?.capacity.find((item) => item.city === prospect.company.location.city) ?? world.snapshot?.capacity[0];
+    const openPipeline = world.opportunities.some((item) => item.company_id === prospect.company.id && item.stage !== "won" && item.stage !== "lost" && item.value > 0);
+    const confidence = evidenceConfidence({ hasContact: Boolean(contact), hasPipeline: openPipeline, hasSignal: Boolean(topSignal), fitScore: fit.score });
     return {
       facts: {
         accountName: prospect.company.name,
@@ -72,11 +86,13 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
         contactName: contact?.name ?? "their operations leader",
         senderName: PROFILE.sender_name,
         senderTitle: PROFILE.sender_title,
+        deliverableConfidence: confidence.confidence,
+        deliverableConfidenceReason: confidence.reason,
       },
       entityIds: [prospect.company.id],
       sources: [
         { source: "companies.json", records: [prospect.company.id], reason: "Account profile, market, and stated needs." },
-        { source: topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json", records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? `Account-specific public trigger from ${topSignal.artifact.source_name} on ${topSignal.artifact.source_date.slice(0, 10)}.` : "Account-specific public trigger." },
+        { source: topSignal?.artifact ? "Monitor engine evidence" : "signals.json + news.json", records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? `Account-specific public trigger from ${topSignal.artifact.source_name} on ${topSignal.artifact.source_date.slice(0, 10)}.` : "Account-specific public trigger." },
         { source: "erp_capacity.json", records: capacity ? [capacity.facility_id] : [], reason: "Capacity context used for the pitch." },
       ],
     };
@@ -91,8 +107,8 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
       createdAt: new Date().toISOString(),
       brainArea: "work_queue",
       entityIds: ctx.entityIds,
-      confidence: "high",
-      confidenceReason: "High: account need, public trigger, fit, and capacity context are available.",
+      confidence: String(f.deliverableConfidence) as Deliverable["confidence"],
+      confidenceReason: String(f.deliverableConfidenceReason),
       sections: [
         {
           id: "opening-hook",

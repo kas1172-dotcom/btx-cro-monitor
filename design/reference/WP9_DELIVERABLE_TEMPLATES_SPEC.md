@@ -1,4 +1,4 @@
-# WP9 — Deliverable Templates: Design Spec & Codex Build Prompt
+# WP9 - Deliverable Templates: Design Spec & Codex Build Prompt
 
 This is the spec that turns the six locked reference designs into the app's live
 deliverable pipeline. It defines the shared visual system ("Steel & Signal"), the
@@ -15,7 +15,7 @@ blocks cite real relationship records). Do WP9 after those land.
 
 Six approved reference artifacts and their generators are the visual source of
 truth. Their generator code specifies exact colors, coordinates, type sizes, and
-spacing — port that, don't reinvent it. Put them in the repo at `design/reference/`:
+spacing - port that, don't reinvent it. Put them in the repo at `design/reference/`:
 
 | Deliverable | Reference render | Generator (exact spec) |
 |---|---|---|
@@ -32,7 +32,7 @@ The visual output must match these references.
 
 ---
 
-## 2. Shared visual system — "Steel & Signal" (single source of truth)
+## 2. Shared visual system - "Steel & Signal" (single source of truth)
 
 Create one design-tokens module in the frontend (e.g.
 `frontend/src/deliverables/designTokens.ts`) that every template imports. No
@@ -64,10 +64,10 @@ are reserved for status (retention, risk, scope tiers) and nothing decorative.
 - One family for headings and body, weights 400 and 700 only. (The committed reference
   renders used an Arial/Calibri-class fallback because Inter was not installed in the
   render environment; production output must ship Inter and match the reference layout.)
-- Scale (slides, pt): slide title 30 bold · section header 16–18 bold · body 12–13 ·
-  caption 9–10 · eyebrow 11 bold + letter-spacing · stat callout 40 bold.
+- Scale (slides, pt): slide title 30 bold · section header 16-18 bold · body 12-13 ·
+  caption 9-10 · eyebrow 11 bold + letter-spacing · stat callout 40 bold.
 - Scale (documents, px at 816-wide page): H1 34 · section 17 · body 12.5 · caption 10 ·
-  eyebrow 10–11 bold letter-spaced.
+  eyebrow 10-11 bold letter-spaced.
 
 ### Layout + motif
 - Motif = a filled **teal circle** for section markers and step/story numbers. Carry
@@ -88,16 +88,16 @@ are reserved for status (retention, risk, scope tiers) and nothing decorative.
 
 ## 3. Two global rules (enforced in code, tested)
 
-### Rule A — Provenance on every factual claim
+### Rule A - Provenance on every factual claim
 Every account-linked claim, figure, and recommended action renders a **provenance
 card**: `tint` fill, `BFE3DD` border, "SOURCE" eyebrow in `1E8C7E`, then the source
 entity (bold), the match method, and the confidence, pulled from the WP3 relationship
-record — not free text. Build one shared `<ProvenanceCard>` (and a pptx equivalent)
+record - not free text. Build one shared `<ProvenanceCard>` (and a pptx equivalent)
 and reuse it. A claim that resolves to an `unlinked`/low-confidence signal must render
 as market/portfolio scope, never as account-specific evidence. A deliverable that
 would cite an unsourced account figure fails validation and does not export.
 
-### Rule B — Figure convention (research-paper style)
+### Rule B - Figure convention (research-paper style)
 Every chart/figure carries, in this order:
 1. **Figure number + descriptive title** ("Figure 1.  Bookings and backlog by fiscal quarter").
 2. **Fully labeled axes with units** (and a labeled legend/colorbar where used).
@@ -133,7 +133,7 @@ grounding checks); LLM prose only for non-factual framing.
    cadence default (make cadence a config value).
 6. **Retention/earnings heat map** (chart component, not a document). Accounts × periods,
    color = revenue, status column = retention. Lives in the **Analysis dashboard** and is
-   embeddable in the board deck. **Internal only** — never in a client-facing deliverable.
+   embeddable in the board deck. **Internal only** - never in a client-facing deliverable.
    Follows Rule B.
 
 ---
@@ -158,11 +158,11 @@ The references were rendered with standalone tools; map each to the app's real s
 ## 6. Codex build prompt (paste after the House Rules)
 
 ```
-# Task: WP9 — implement the deliverable-template system (Steel & Signal)
+# Task: WP9 - implement the deliverable-template system (Steel & Signal)
 
 Reference designs are committed under design/reference/ (six renders + their
 generator scripts). They are the visual source of truth; match them. The generator
-code specifies exact colors, coordinates, and type sizes — port the design, do not
+code specifies exact colors, coordinates, and type sizes - port the design, do not
 invent new styling.
 
 1. Create frontend/src/deliverables/designTokens.ts as the SINGLE source of truth for
