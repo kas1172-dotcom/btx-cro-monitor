@@ -47,7 +47,7 @@ function wordPattern(word: string): RegExp {
  */
 export function findVoiceViolations(text: string): string[] {
   const found: string[] = [];
-  if (/[–—]/.test(text)) found.push("em or en dash");
+  if (/[\u2013\u2014]/.test(text)) found.push("em or en dash");
   for (const word of BANNED_WORDS) {
     if (wordPattern(word).test(text)) found.push(`banned word "${word}"`);
   }
