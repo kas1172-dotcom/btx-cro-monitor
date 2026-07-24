@@ -70,7 +70,7 @@ export const steelSignal = {
     confidential: "Confidential",
     illustrative: "Illustrative sample",
     document: "BTX Precision Machining  ·  Confidential  ·  Illustrative sample",
-    board: "BTX Revenue Brain   ·   Confidential · Illustrative sample data",
+    board: "BTX Revenue Brain   ·   Confidential · Illustrative planning context",
     pitch: "BTX Precision Machining   ·   Sales pitch · Illustrative sample",
   },
 } as const;

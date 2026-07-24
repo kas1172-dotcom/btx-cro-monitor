@@ -1,9 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import companies from "../data/demo/btx/companies.json";
-import contacts from "../data/demo/btx/contacts.json";
-import opportunities from "../data/demo/btx/opportunities.json";
 
 const FRONTEND_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const REPO_DIR = join(FRONTEND_DIR, "..");
@@ -116,6 +113,36 @@ function emailLocalPart(name: string): string {
 function deterministicEmail(contact: ContactRow): string {
   return contact.email ?? `${emailLocalPart(contact.name)}@${contact.company_id}.example.com`;
 }
+
+const OLD_FAKE_COMPANIES: CompanyRow[] = [
+  { id: "lonestar-aero-systems", name: "Lonestar Aero Systems", relationship: "customer", location: { city: "Austin" }, domain: "lonestar-aero-systems.example" },
+  { id: "trinity-defense-components", name: "Trinity Defense Components", relationship: "customer", location: { city: "Dallas" }, domain: "trinity-defense-components.example" },
+  { id: "pecan-valley-machining", name: "Pecan Valley Machining", relationship: "customer", location: { city: "San Antonio" }, domain: "pecan-valley-machining.example" },
+  { id: "clearfork-turbine-works", name: "Clearfork Turbine Works", relationship: "customer", location: { city: "Fort Worth" }, domain: "clearfork-turbine-works.example" },
+  { id: "bluebonnet-avionics", name: "Bluebonnet Avionics", relationship: "customer", location: { city: "Austin" }, domain: "bluebonnet-avionics.example" },
+  { id: "gulf-coast-propulsion", name: "Gulf Coast Propulsion", relationship: "customer", location: { city: "Houston" }, domain: "gulf-coast-propulsion.example" },
+  { id: "brazos-precision-castings", name: "Brazos Precision Castings", relationship: "customer", location: { city: "Dallas" }, domain: "brazos-precision-castings.example" },
+  { id: "red-river-assemblies", name: "Red River Assemblies", relationship: "customer", location: { city: "Oklahoma City" }, domain: "red-river-assemblies.example" },
+  { id: "high-plains-actuation", name: "High Plains Actuation", relationship: "target", location: { city: "Amarillo" }, domain: "high-plains-actuation.example" },
+  { id: "alamo-composite-tooling", name: "Alamo Composite Tooling", relationship: "target", location: { city: "San Antonio" }, domain: "alamo-composite-tooling.example" },
+  { id: "hill-country-aerostructures", name: "Hill Country Aerostructures", relationship: "target", location: { city: "Austin" }, domain: "hill-country-aerostructures.example" },
+  { id: "caprock-guidance-systems", name: "Caprock Guidance Systems", relationship: "target", location: { city: "Lubbock" }, domain: "caprock-guidance-systems.example" },
+  { id: "cypress-creek-fabrication", name: "Cypress Creek Fabrication", relationship: "target", location: { city: "Houston" }, domain: "cypress-creek-fabrication.example" },
+  { id: "mesquite-defense-manufacturing", name: "Mesquite Defense Manufacturing", relationship: "target", location: { city: "Dallas" }, domain: "mesquite-defense-manufacturing.example" },
+  { id: "violet-crown-micro-precision", name: "Violet Crown Micro Precision", relationship: "target", location: { city: "Austin" }, domain: "violet-crown-micro-precision.example" },
+  { id: "ranger-landing-gear", name: "Ranger Landing Gear", relationship: "target", location: { city: "Fort Worth" }, domain: "ranger-landing-gear.example" },
+  { id: "live-oak-sensor-housings", name: "Live Oak Sensor Housings", relationship: "target", location: { city: "Austin" }, domain: "live-oak-sensor-housings.example" },
+  { id: "blackland-hydraulics", name: "Blackland Hydraulics", relationship: "target", location: { city: "Waco" }, domain: "blackland-hydraulics.example" },
+  { id: "mesa-verde-aerosystems", name: "Mesa Verde Aerosystems", relationship: "target", location: { city: "Denver" }, domain: "mesa-verde-aerosystems.example" },
+  { id: "rocky-mountain-flight-controls", name: "Rocky Mountain Flight Controls", relationship: "target", location: { city: "Denver" }, domain: "rocky-mountain-flight-controls.example" },
+  { id: "carolina-nacelle-works", name: "Carolina Nacelle Works", relationship: "target", location: { city: "Charlotte" }, domain: "carolina-nacelle-works.example" },
+  { id: "chesapeake-rotor-systems", name: "Chesapeake Rotor Systems", relationship: "target", location: { city: "Baltimore" }, domain: "chesapeake-rotor-systems.example" },
+  { id: "great-lakes-engine-cases", name: "Great Lakes Engine Cases", relationship: "target", location: { city: "Cleveland" }, domain: "great-lakes-engine-cases.example" },
+  { id: "cascade-actuator-products", name: "Cascade Actuator Products", relationship: "target", location: { city: "Seattle" }, domain: "cascade-actuator-products.example" },
+  { id: "desert-sky-machining", name: "Desert Sky Machining", relationship: "target", location: { city: "Phoenix" }, domain: "desert-sky-machining.example" },
+];
+
+const OLD_FAKE_DEAL_EXTERNAL_IDS = Array.from({ length: 45 }, (_item, index) => `opp-${String(index + 1).padStart(4, "0")}`);
 
 async function hubspot<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T | undefined> {
   if (!token) return undefined;
@@ -251,12 +278,11 @@ function printCleanupDryRun(companyRows: CompanyRow[], contactRows: ContactRow[]
   console.log("Would leave all records outside the known old BTX seed identifiers untouched.");
 }
 
-const companyRows = companies as CompanyRow[];
-const contactRows = contacts as ContactRow[];
-const opportunityRows = opportunities as OpportunityRow[];
+const companyRows = OLD_FAKE_COMPANIES;
+const opportunityRows = OLD_FAKE_DEAL_EXTERNAL_IDS.map((id) => ({ id, company_id: "", name: id }));
 
 if (!confirmed) {
-  printCleanupDryRun(companyRows, contactRows, opportunityRows);
+  printCleanupDryRun(companyRows, [], opportunityRows);
 } else if (!token) {
   console.log("HubSpot cleanup skipped: set HUBSPOT_ACCESS_TOKEN or BTX_HUBSPOT_ACCESS_TOKEN.");
 } else {
@@ -266,17 +292,20 @@ if (!confirmed) {
     return [domain, `${domain}.com`];
   }));
   const fakeCompanyNames = new Set(companyRows.map((company) => company.name));
-  const fakeEmails = contactRows.map(deterministicEmail);
   const fakeDealExternalIds = opportunityRows.map((opportunity) => opportunity.id);
 
   const allCompanies = await searchAll("companies", ["name", "domain", "btx_company_domain", "createdate"]);
+  const allContacts = await searchAll("contacts", ["email", "firstname", "lastname"]);
   const companiesToArchive = allCompanies.filter((record) => {
     const domain = record.properties.domain ?? "";
     const btxDomain = record.properties.btx_company_domain ?? "";
     const name = record.properties.name ?? "";
     return fakeDomains.has(domain) || fakeDomains.has(btxDomain) || fakeCompanyNames.has(name);
   });
-  const contactsToArchive = [...(await batchReadByIdProperty("contacts", "email", fakeEmails, ["email", "firstname", "lastname"])).values()];
+  const contactsToArchive = allContacts.filter((record) => {
+    const email = record.properties.email ?? "";
+    return [...fakeDomains].some((domain) => email.endsWith(`@${domain}`) || email.endsWith(`@${domain}.com`));
+  });
   const dealsToArchive = [...(await batchReadByIdProperty("deals", "btx_external_id", fakeDealExternalIds, ["btx_external_id", "dealname"])).values()];
 
   await archiveObjects("deals", dealsToArchive.map((record) => record.id));

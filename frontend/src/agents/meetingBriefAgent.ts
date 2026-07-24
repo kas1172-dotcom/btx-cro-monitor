@@ -125,7 +125,7 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
         id: "overview",
         heading: "Overview",
         blocks: [
-          { kind: "text", text: `${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} fit is ${f.fitScore}%.` },
+          { kind: "text", text: `${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} capability fit is ${Number(f.fitScore) >= 70 ? "strong" : Number(f.fitScore) >= 45 ? "partial" : "limited"}.` },
         ],
       },
       {

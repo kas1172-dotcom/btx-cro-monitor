@@ -24,8 +24,8 @@ function titleCase(value: string): string {
 
 function plainSourceText(value: string): string {
   return value
-    .replace(/\bseeded baseline\b/gi, "sample data")
-    .replace(/\bseeded\b/gi, "sample")
+    .replace(/\bseeded baseline\b/gi, "production context")
+    .replace(/\bseeded\b/gi, "source")
     .replace(/\bmonitor-engine\b/gi, "monitor engine")
     .replace(/\bartifacts?\b/gi, "documents")
     .replace(/\boperating snapshot\b/gi, "production view")
@@ -46,7 +46,7 @@ export function OperatingSnapshot() {
         <p className="eyebrow">Production view</p>
         <h1>What data is the brain using right now?</h1>
         <p>
-          Backend CRM records, monitor engine market output, and sample production context feed one runtime adapter. Capacity remains labeled as sample data until a live ERP source is connected.
+          Backend CRM records, monitor engine market output, and production context feed one runtime adapter. Capacity remains labeled as ERP pending until a live ERP source is connected.
         </p>
       </section>
 
@@ -60,8 +60,8 @@ export function OperatingSnapshot() {
         <div>
           <span>Capacity sources</span>
           <strong>{snapshot.capacity.length}</strong>
-          <em>{plainSourceText(snapshot.capacity[0]?.source_name ?? "ERP sample data")}</em>
-          <ProvenanceBadge label="Sample data" />
+          <em>{plainSourceText(snapshot.capacity[0]?.source_name ?? "ERP pending")}</em>
+          <ProvenanceBadge label="Production context" />
         </div>
         <div>
           <span>Public signals</span>
@@ -93,13 +93,13 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Capacity / ERP sample data</h2>
+            <h2>Capacity / ERP pending</h2>
           </div>
           {snapshot.capacity.map((row) => (
             <div key={row.facility_id} className="operating-row">
               <strong>{row.facility_name}</strong>
               <span>{row.city} · {titleCase(row.capacity_status)}</span>
-              <em>{row.available_5_axis_hours_next_30d} 5-axis hrs · {row.available_turning_hours_next_30d} turning hrs · {row.quoted_lead_time_days} day lead time</em>
+              <em>Capacity context pending ERP validation</em>
               <small>Constraint: {row.constraint}</small>
             </div>
           ))}
@@ -107,7 +107,7 @@ export function OperatingSnapshot() {
 
         <div className="operating-panel">
           <div className="panel-head">
-            <h2>Pipeline / contracts sample data</h2>
+            <h2>Pipeline / contracts context</h2>
           </div>
           <div className="operating-callout">
             <strong>{money(snapshot.pipeline.summary.open_pipeline_value)} open pipeline</strong>

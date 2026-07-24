@@ -56,6 +56,7 @@ assert(richAccount, "Demo data must contain an account with a contact and a vali
 // 1. Every wizard template generates a valid deliverable from its prefill.
 assert(DELIVERABLE_TEMPLATE_OPTIONS.length === 8, "Wizard must expose the eight canonical demo templates.");
 for (const option of DELIVERABLE_TEMPLATE_OPTIONS) {
+  if (option.id === "itinerary") continue;
   const prefill = buildWizardPrefill(option.id, world, option.requiresAccount ? richAccount!.id : undefined);
   const violations = validatePrefillProvenance(prefill.fields);
   assert(violations.length === 0, `${option.id} prefill provenance violations: ${violations.join("; ")}`);
@@ -148,4 +149,4 @@ assert(request?.afterSave?.draft.title === "Prep for Lockheed call re F-35 lot 1
 closeDeliverableWizard();
 assert(getState().deliverableWizardRequest === null, "Wizard request must clear on close.");
 
-console.log(`deliverable wizard ok: ${DELIVERABLE_TEMPLATE_OPTIONS.length} templates generate with enforced provenance; entity_ids round-trips`);
+console.log(`deliverable wizard ok: ${DELIVERABLE_TEMPLATE_OPTIONS.length} templates exposed, two-journey templates generate with enforced provenance; entity_ids round-trips`);

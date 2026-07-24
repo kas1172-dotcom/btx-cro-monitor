@@ -2,6 +2,7 @@ import type { World } from "./useWorld.ts";
 import { processBrainQuestionAsync } from "../brain/brainEngine.ts";
 import type { TabId } from "./surfaces.ts";
 import type { BrainResponse } from "../brain/types.ts";
+import type { BrainChatMessage } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
 import { runAgent } from "../agents/runAgent.ts";
 import { saveBrainMemoryNote, saveDeliverable } from "../memory/localMemory.ts";
@@ -17,6 +18,7 @@ export interface BrainActionOptions {
   quarter?: string;
   metric?: MetricId;
   instructions?: string;
+  history?: BrainChatMessage[];
 }
 
 export interface BrainActionEvents {
@@ -62,7 +64,7 @@ export async function dispatchBrainQuestion(
   const q = question.trim();
   if (!q) throw new Error("Cannot dispatch an empty brain question");
 
-  const response = await processBrainQuestionAsync(q, world);
+  const response = await processBrainQuestionAsync(q, world, options.history ?? []);
   const usedFallback = response.contextUsed.some((source) => source.source === "offline routing fallback");
   events.routed?.(response, usedFallback);
   events.retrieved?.(response);

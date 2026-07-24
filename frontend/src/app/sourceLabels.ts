@@ -8,18 +8,18 @@ const SOURCE_LABELS: Record<string, string> = {
   "signals.json + news.json": "Monitor engine + public sources",
   "monitor-engine artifacts": "Monitor engine",
   "Monitor engine evidence": "Monitor engine",
-  "erp_capacity.json": "ERP capacity sample data",
-  "account_monthly_revenue.json": "Revenue sample data",
-  "bookings_backlog.json": "Bookings and backlog sample data",
-  "pipeline_snapshots.json": "Pipeline sample data",
-  "win_loss_history.json": "Win/loss sample data",
-  "capacity_utilization.json": "Capacity sample data",
+  "erp_capacity.json": "ERP capacity context",
+  "account_monthly_revenue.json": "Revenue context",
+  "bookings_backlog.json": "Bookings and backlog context",
+  "pipeline_snapshots.json": "Pipeline context",
+  "win_loss_history.json": "Win/loss context",
+  "capacity_utilization.json": "Capacity context",
   "scoring trace": "Scoring trace",
   "user edits": "User edits",
 };
 
 const RECORD_LABELS: Record<string, string> = {
-  capacity: "Capacity sample data",
+  capacity: "Capacity context",
   operating_baseline: "Production context",
 };
 
@@ -29,15 +29,15 @@ export function humanSourceLabel(source: string): string {
 
 export function humanSourceReason(reason: string): string {
   return reason
-    .replace(/\bseeded baseline\b/gi, "sample data")
-    .replace(/\bseeded\b/gi, "sample")
+    .replace(/\bseeded baseline\b/gi, "production context")
+    .replace(/\bseeded\b/gi, "source")
     .replace(/\bmonitor-engine\b/g, "monitor engine")
     .replace(/\bartifacts?\b/gi, "documents")
     .replace(/\bprovenance\b/gi, "source record")
     .replace(/\bcompanies\.json\b/g, "HubSpot CRM")
     .replace(/\bcontacts\.json\b/g, "HubSpot CRM")
     .replace(/\bopportunities\.json\b/g, "HubSpot CRM")
-    .replace(/\berp_capacity\.json\b/g, "ERP capacity sample data")
+    .replace(/\berp_capacity\.json\b/g, "ERP capacity context")
     .replace(/\bsignals\.json \+ news\.json\b/g, "monitor engine and public sources");
 }
 

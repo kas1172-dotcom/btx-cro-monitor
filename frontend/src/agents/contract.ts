@@ -33,7 +33,7 @@ const PROSPECT_BANNED = [
   "signal",
   "validated",
   "opportunity score",
-  "fit %",
+  "fit percentage",
   "risk score",
   "pipeline",
   "demo",
@@ -80,7 +80,7 @@ export function validateAudienceAndForm(
     "HubSpot CRM",
     "monitor-engine artifacts",
     "Monitor engine",
-    "Sample data",
+    "Production context",
     "Operating baseline",
     "Monitor engine evidence",
   ].includes(source.source));

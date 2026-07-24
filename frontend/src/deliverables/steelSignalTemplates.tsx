@@ -129,7 +129,7 @@ export function MonthlyNewsletterTemplate({ deliverable, world }: { deliverable:
       <header className="ss-doc-header compact"><div><BrandMark /><div><p>BTX Defense Signal</p><span>Monthly market brief for the revenue team</span></div></div><aside><strong>{new Date(deliverable.createdAt).toLocaleString("en-US", { month: "long", year: "numeric" })}</strong><span>Internal</span></aside><h1>Three moves in the defense-machining market, and what each means for BTX pipeline.</h1></header>
       {stories.map((story) => <TellShowSoWhatBlock key={story.number} {...story} />)}
       <aside className="ss-sources"><p className="ss-eyebrow">Sources</p><span>Monitor engine market evidence · HubSpot CRM · SAM.gov · DoD budget documents. Account links use reviewed relationship records.</span></aside>
-      <footer>BTX Defense Signal · Internal monthly brief · Illustrative sample data</footer>
+      <footer>BTX Defense Signal · Internal monthly brief · Illustrative planning context</footer>
     </main>
   );
 }

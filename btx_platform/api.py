@@ -216,6 +216,14 @@ def _hubspot_list_record_url(list_id: str) -> str:
     return f"https://app.hubspot.com/lists/{list_id}"
 
 
+def _hubspot_company_record_url(company_id: str) -> str:
+    return f"https://app.hubspot.com/contacts/company/{company_id}"
+
+
+def _hubspot_contact_record_url(contact_id: str) -> str:
+    return f"https://app.hubspot.com/contacts/contact/{contact_id}"
+
+
 def _hubspot_record_id(value: str, list_type: str) -> str:
     prefix = "hubspot-company-" if list_type == "company" else "hubspot-contact-"
     return value.removeprefix(prefix)
@@ -532,7 +540,7 @@ def create_app(
     @app.get("/operating-baseline")
     def operating_baseline() -> Response:
         return JSONResponse({
-            "data_provenance": "Seeded baseline - ERP integration pending",
+            "data_provenance": "Operating baseline - ERP integration pending",
             "crm": _baseline_json("crm.json"),
             "capacity": _baseline_json("erp_capacity.json"),
             "pipeline": _baseline_json("pipeline.json"),
@@ -680,12 +688,17 @@ def create_app(
         })
 
     @app.post("/crm/import/prospects")
-    def import_prospects_to_hubspot(payload: HubSpotImportRequest) -> Response:
+    def import_prospects_to_hubspot(payload: HubSpotImportRequest, request: Request) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot prospect import")
+        idempotency_key = request.headers.get(settings.idempotency_header)
+        if idempotency_key:
+            cached = app.state.crm_list_idempotency.get(("import_prospects", idempotency_key))
+            if cached:
+                return JSONResponse(cached)
 
         row_results: dict[str, dict] = {
-            row.row_id: {"row_id": row.row_id, "status": "pending", "company_id": None, "contact_id": None, "reason": None}
+            row.row_id: {"row_id": row.row_id, "status": "pending", "company_id": None, "contact_id": None, "company_record_url": None, "contact_record_url": None, "reason": None}
             for row in payload.rows
         }
         company_inputs: list[dict] = []
@@ -698,6 +711,8 @@ def create_app(
                     "status": "failed",
                     "company_id": None,
                     "contact_id": None,
+                    "company_record_url": None,
+                    "contact_record_url": None,
                     "reason": "Missing required company name or domain.",
                 }
                 continue
@@ -724,6 +739,7 @@ def create_app(
 
         for row_id, company_id in company_successes.items():
             row_results[row_id]["company_id"] = company_id
+            row_results[row_id]["company_record_url"] = _hubspot_company_record_url(company_id)
             row_results[row_id]["status"] = "succeeded"
         for row_id, reason in company_failures.items():
             row_results[row_id]["status"] = "failed"
@@ -746,13 +762,14 @@ def create_app(
 
         for row_id, contact_id in contact_successes.items():
             row_results[row_id]["contact_id"] = contact_id
+            row_results[row_id]["contact_record_url"] = _hubspot_contact_record_url(contact_id)
         for row_id, reason in contact_failures.items():
             if row_results[row_id]["status"] == "succeeded":
                 row_results[row_id]["status"] = "partial"
                 row_results[row_id]["reason"] = f"Company created; contact failed: {reason}"
 
         rows = list(row_results.values())
-        return JSONResponse({
+        body = {
             "status": "completed",
             "summary": {
                 "succeeded": sum(1 for row in rows if row["status"] == "succeeded"),
@@ -760,7 +777,11 @@ def create_app(
                 "failed": sum(1 for row in rows if row["status"] == "failed"),
             },
             "rows": rows,
-        })
+            "idempotency_key": idempotency_key,
+        }
+        if idempotency_key:
+            app.state.crm_list_idempotency[("import_prospects", idempotency_key)] = body
+        return JSONResponse(body)
 
     @app.post("/crm/task")
     def create_crm_task(payload: CrmTaskRequest, request: Request) -> Response:
@@ -769,6 +790,10 @@ def create_app(
         body = payload.body or payload.evidence or ""
         associations = _task_associations(payload)
         idempotency_key = request.headers.get(settings.idempotency_header)
+        if idempotency_key:
+            cached = app.state.crm_list_idempotency.get(("crm_task", idempotency_key))
+            if cached:
+                return JSONResponse({**cached, "duplicate": True})
         try:
             result = HubSpotClient(settings.hubspot_access_token).create_task(
                 subject=payload.title,
@@ -807,12 +832,17 @@ def create_app(
                 "associations": audit_associations,
             },
         )
-        return JSONResponse({
+        response_body = {
             "status": "created",
+            "duplicate": False,
+            "idempotency_key": idempotency_key,
             "id": task_id,
             "record_url": record_url,
             "title": payload.title,
-        })
+        }
+        if idempotency_key:
+            app.state.crm_list_idempotency[("crm_task", idempotency_key)] = response_body
+        return JSONResponse(response_body)
 
     @app.post("/work-items/{item_id}/execute/hubspot-task")
     def execute_work_item_hubspot_task(item_id: str, payload: HubSpotTaskExecuteRequest, request: Request) -> Response:

@@ -35,7 +35,7 @@ function publicHook(accountName: string, hook: string): string {
     .replace(/\bvalidated\b/gi, "public")
     .replace(/\bsignals?\b/gi, "shows")
     .replace(/\bopportunity score\b/gi, "timing")
-    .replace(/\bfit %\b/gi, "fit")
+    .replace(/\bfit percentage\b/gi, "fit")
     .replace(/\brisk score\b/gi, "risk");
 }
 
@@ -112,7 +112,7 @@ export const outreachAgent: DeliverableAgent<Inputs> = {
       entityIds: [prospect.company.id],
       sources: [
         { source: "companies.json", records: [prospect.company.id], reason: "Account and location context." },
-        { source: prospect.topSignal?.artifact ? "Monitor engine evidence" : "signals.json + news.json", records: prospect.topSignal ? [prospect.topSignal.id] : [], reason: prospect.topSignal?.artifact ? `Specific outreach hook from ${prospect.topSignal.artifact.source_name} on ${prospect.topSignal.artifact.source_date.slice(0, 10)}.` : "Specific outreach hook." },
+        { source: prospect.topSignal?.artifact ? "Monitor engine evidence" : "Monitor engine + public sources", records: prospect.topSignal ? [prospect.topSignal.id] : [], reason: prospect.topSignal?.artifact ? `Specific outreach hook from ${prospect.topSignal.artifact.source_name} on ${prospect.topSignal.artifact.source_date.slice(0, 10)}.` : "Specific outreach hook." },
         { source: "contacts.json", records: contact ? [contact.id] : [], reason: "Recipient context." },
       ],
     };
@@ -166,7 +166,7 @@ export const outreachAgent: DeliverableAgent<Inputs> = {
           heading: "Why This Works",
           audience: "internal",
           blocks: [
-            { kind: "text", text: `Internal rationale: outreach uses opportunity score ${f.opportunityScore}, fit ${f.fitScore}%, contact selection note "${f.contactNote}", and the top public hook "${f.hook}".` },
+            { kind: "text", text: `Internal rationale: outreach uses opportunity score ${f.opportunityScore}, capability fit context, contact selection note "${f.contactNote}", and the top public hook "${f.hook}".` },
           ],
         },
         {

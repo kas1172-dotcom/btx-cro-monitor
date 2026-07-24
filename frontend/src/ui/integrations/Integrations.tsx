@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<IntegrationRecord["status"], string> = {
 
 function plainSourceText(value: string): string {
   return value
-    .replace(/\bseeded baseline\b/gi, "sample data")
+    .replace(/\bseeded baseline\b/gi, "production context")
     .replace(/\bbackend-served\b/gi, "backend loaded")
     .replace(/\bmonitor-engine\b/gi, "monitor engine")
     .replace(/\bartifacts?\b/gi, "documents")
@@ -32,7 +32,7 @@ export function Integrations() {
         <p className="eyebrow">Connections</p>
         <h1>Data Sources</h1>
         <p>
-          The cockpit reads CRM data, market signals, and production context through the backend. Sample data is clearly labeled until each live source is connected.
+          The cockpit reads CRM data, market signals, and production context through the backend. ERP-dependent context is clearly labeled until each live source is connected.
         </p>
       </div>
 
@@ -109,7 +109,7 @@ export function Integrations() {
 
             <div className="assumption-box">
               <strong>{snapshot.assumptions.summary}</strong>
-              <p>Capacity and ERP context is labeled as sample data until the ERP connection is live.</p>
+              <p>Capacity and ERP context is labeled as pending until the ERP connection is live.</p>
             </div>
           </section>
         </div>

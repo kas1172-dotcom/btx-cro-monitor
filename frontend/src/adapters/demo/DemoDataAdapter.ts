@@ -78,31 +78,31 @@ export class DemoDataAdapter implements DataAdapter {
       .at(-1) ?? null;
 
     return {
-      crm: CRM.map((row) => ({ ...row, source_type: "sample_data", source_name: "Sample data - ERP integration pending", source_mode: "sample_data" })),
-      capacity: CAPACITY.map((row) => ({ ...row, source_type: "sample_data", source_name: "Sample data - ERP integration pending", source_mode: "sample_data" })),
+      crm: CRM.map((row) => ({ ...row, source_type: "sample_data", source_name: "Production context - ERP integration pending", source_mode: "sample_data" })),
+      capacity: CAPACITY.map((row) => ({ ...row, source_type: "sample_data", source_name: "Production context - ERP integration pending", source_mode: "sample_data" })),
       pipeline: {
         ...PIPELINE,
         source_type: "seeded_baseline",
-        source_name: "Sample data - ERP integration pending",
+        source_name: "Production context - ERP integration pending",
         source_mode: "sample_data",
-        records: PIPELINE.records.map((row) => ({ ...row, source_type: "sample_data", source_name: "Sample data - ERP integration pending", source_mode: "sample_data" })),
+        records: PIPELINE.records.map((row) => ({ ...row, source_type: "sample_data", source_name: "Production context - ERP integration pending", source_mode: "sample_data" })),
       },
       integrations: INTEGRATIONS,
       assumptions: {
         ...ASSUMPTIONS,
         source_type: "seeded_baseline",
-        source_name: "Sample data - ERP integration pending",
+        source_name: "Production context - ERP integration pending",
         source_mode: "sample_data",
         is_seeded_baseline: true,
-        summary: "Sample data - ERP integration pending",
+        summary: "Production context - ERP integration pending",
       },
       publicSignals: {
         signal_count: ALL_SIGNALS.length,
         news_count: NEWS.length,
         latest_signal_at: latestSignal,
         latest_news_date: latestNews,
-        source_name: "Seeded signals + public news",
-        source_mode: "seeded_signals",
+        source_name: "Pinned public signals + news",
+        source_mode: "pinned_public_signals",
       },
     };
   }

@@ -32,7 +32,7 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
     ? `${topSignalCompany} ${topSignal.event_type === "contract_win" ? "books" : topSignal.event_type === "government_contract_award" ? "wins" : "signals"} ${topSignalValue ?? conciseQuote(topSignal.source_quote)} · ${signalSourceName(topSignal)} ${signalSourceDate(topSignal)}`
     : "No validated signal";
   const topOpportunityLabel = topOpportunity
-    ? `${topOpportunity.company.name}: opp ${topOpportunity.opportunity}, fit ${topOpportunity.fit.score}%`
+    ? `${topOpportunity.company.name}: opportunity ${topOpportunity.opportunity}, ${topOpportunity.fit.matched.length ? "capability overlap found" : "needs qualification"}`
     : "No ranked opportunity";
   const topRiskDriver = topRisk?.dimensions.risk.contributions[0]?.event_type?.replace(/_/g, " ") ?? "validated risk signal";
   const topRiskLabel = topRisk ? `${nameOf(topRisk.subject_id)}: risk ${topRisk.dimensions.risk.score}, ${topRiskDriver}` : "No elevated risk";

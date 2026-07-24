@@ -2,7 +2,8 @@ import type { World } from "../app/useWorld.ts";
 import { classifyQuestion } from "./classifyQuestion.ts";
 import { retrieveContext } from "./retrieveContext.ts";
 import { generateBrainResponse } from "./generateBrainResponse.ts";
-import type { BrainResponse } from "./types.ts";
+import { composeGroundedBrainResponse } from "./groundedAssistant.ts";
+import type { BrainChatMessage, BrainResponse } from "./types.ts";
 import { routeBrainQuestion } from "./llmRouter.ts";
 
 export function processBrainQuestion(question: string, world?: World): BrainResponse {
@@ -25,13 +26,13 @@ export function processBrainQuestion(question: string, world?: World): BrainResp
   return generateBrainResponse(context, world);
 }
 
-export async function processBrainQuestionAsync(question: string, world?: World): Promise<BrainResponse> {
+export async function processBrainQuestionAsync(question: string, world?: World, history: BrainChatMessage[] = []): Promise<BrainResponse> {
   if (!world) return processBrainQuestion(question, world);
   const classification = await routeBrainQuestion(question, world);
   const context = retrieveContext(question, classification.intent, classification.activatedTabs, world);
-  const response = generateBrainResponse(context, world);
-  return {
-    ...response,
+  const fallback = generateBrainResponse(context, world);
+  const response = {
+    ...fallback,
     contextUsed: [
       {
         source: classification.routedBy === "llm" ? "LLM router" : "offline routing fallback",
@@ -39,9 +40,10 @@ export async function processBrainQuestionAsync(question: string, world?: World)
           ? "Validated strict JSON routing metadata from the configured proxy."
           : "Keyword classifier used because no valid router response was available.",
       },
-      ...response.contextUsed,
+      ...fallback.contextUsed,
     ],
   };
+  return (await composeGroundedBrainResponse(question, world, response, history)).response;
 }
 
 export type { BrainResponse };

@@ -186,7 +186,7 @@ export const itineraryAgent: DeliverableAgent<Inputs> = {
     });
     const briefBlocks = stops.map((stop, index) => ({
       kind: "text" as const,
-      text: `Stop ${index + 1}: ${stop.name}. Opportunity ${stop.opportunity}, fit ${stop.fit}%. Contact: ${stop.contact}. Why visit: ${stripTerminalPunctuation(stop.trigger)}. Talking point: ${stripTerminalPunctuation(stop.talkingPoint)}.`,
+      text: `Stop ${index + 1}: ${stop.name}. Opportunity ${stop.opportunity}. Contact: ${stop.contact}. Why visit: ${stripTerminalPunctuation(stop.trigger)}. Talking point: ${stripTerminalPunctuation(stop.talkingPoint)}.`,
     }));
     return {
       id: `deliv-${Date.now()}-itinerary`,

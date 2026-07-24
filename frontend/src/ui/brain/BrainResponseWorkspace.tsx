@@ -4,16 +4,48 @@ import { TAB_LABELS } from "../../app/surfaces.ts";
 import type { World } from "../../app/useWorld.ts";
 import { OpportunityCards } from "./OpportunityCards.tsx";
 import { SignalFeed } from "../feed/SignalFeed.tsx";
+import { AskBrainBar } from "./AskBrainBar.tsx";
+import { openDeliverableWizard, openDemoAction, setState } from "../../store/store.ts";
 
 const ProspectMap = lazy(() => import("../map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
 
 export function BrainResponseWorkspace({ response, world }: { response: BrainResponse; world: World }) {
+  const primaryCompanyId = response.relatedOpportunities[0]?.companyId ?? world.prospects[0]?.company.id ?? world.companies[0]?.id;
+  function confirmAction(action: string): void {
+    const lower = action.toLowerCase();
+    const namedCompany = world.companies.find((company) => lower.includes(company.name.toLowerCase()));
+    const accountId = namedCompany?.id ?? primaryCompanyId;
+    if (lower.includes("open prospect")) {
+      setState({ activeTab: "prospecting", brainResponse: null, activeCompanyId: accountId });
+      return;
+    }
+    if (lower.includes("open") && accountId) {
+      setState({ activeTab: "accounts", brainResponse: null, activeCompanyId: accountId });
+      return;
+    }
+    if (lower.includes("deliverable") || lower.includes("brief") || lower.includes("pitch")) {
+      openDeliverableWizard({ accountId, startStep: "pick" });
+      return;
+    }
+    openDemoAction({ title: action, action: "crm_task", accountId, accountName: world.companies.find((company) => company.id === accountId)?.name });
+  }
+
   return (
     <div className="brain-response">
       <div className="brain-response-head">
         <span>{response.activatedTabs.map((area) => TAB_LABELS[area]).join(" + ")}</span>
         <h1>{response.directAnswer}</h1>
       </div>
+      {response.recommendedActions.length > 0 && (
+        <section className="brain-chat-actions">
+          <h2>Suggested next steps</h2>
+          <div>
+            {response.recommendedActions.map((action) => (
+              <button key={action} type="button" onClick={() => confirmAction(action)}>{action}</button>
+            ))}
+          </div>
+        </section>
+      )}
       <section>
         <h2>Why This Matters</h2>
         <p>{response.whyThisMatters}</p>
@@ -34,6 +66,10 @@ export function BrainResponseWorkspace({ response, world }: { response: BrainRes
         </div>
       )}
       <OpportunityCards cards={response.relatedOpportunities} />
+      <section className="brain-follow-up">
+        <h2>Continue the conversation</h2>
+        <AskBrainBar key={response.conversation?.map((message) => message.content).join("|") ?? response.question} world={world} large initialMessages={response.conversation ?? []} />
+      </section>
     </div>
   );
 }

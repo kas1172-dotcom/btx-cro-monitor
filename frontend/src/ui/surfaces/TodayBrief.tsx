@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { setState } from "../../store/store.ts";
 import type { World } from "../../app/useWorld.ts";
 import { useWorkItems, type WorkItem } from "../../app/workItems.ts";
+import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import type { TabId } from "../../app/surfaces.ts";
@@ -30,6 +31,8 @@ type AttentionCard = {
   link: BriefLink;
 };
 
+const DEMO_MINI_BRIEF_LIMIT = 2;
+
 function nameOf(world: World, id: string | null | undefined): string {
   if (!id) return "Portfolio";
   return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
@@ -55,10 +58,13 @@ function signalLink(world: World, signal: Signal): BriefLink {
     }
     return { label: "Open account", surface: "accounts", accountId: signal.subject_id };
   }
-  if (signal.scope === "program" || signal.event_type.includes("contract") || signal.event_type.includes("award")) {
+  if (signal.scope === "program") {
     return { label: "Open programs", surface: "programs" };
   }
-  return { label: "Open analysis", surface: "analysis" };
+  if (signal.account_status === "new_logo" || signal.business_motion === "prospect_new_business" || signal.scope === "unlinked") {
+    return { label: "Open prospect", surface: "prospecting", accountId: signal.subject_id };
+  }
+  return { label: "Open signals", surface: "programs" };
 }
 
 function navigate(link: BriefLink): void {
@@ -88,15 +94,15 @@ function workItemToBriefItem(world: World, item: WorkItem): BriefItem {
 }
 
 function signalToBriefItem(world: World, signal: Signal): BriefItem {
-  const accountName = signal.scope === "specific_account" ? nameOf(world, signal.subject_id) : "Portfolio";
+  const accountName = signal.scope === "specific_account" || signal.scope === "unlinked" ? nameOf(world, signal.subject_id) : "Portfolio";
   const source = signalSourceName(signal);
   const sourceDate = signalSourceDate(signal);
   const title = signalHeadline(signal);
   const event = eventLabel(signal.event_type);
-  const confidence = Math.round(signal.confidence * 100);
+  const confidence = qualitativeSignalConfidence(signal);
   const reason = signal.scope === "specific_account"
-    ? `${accountName} has a ${event} trigger from ${source}; confidence ${confidence}%.`
-    : `${source} surfaced a portfolio ${event} trigger with ${confidence}% confidence.`;
+    ? `${accountName} has a ${event} trigger from ${source}; ${confidence.label}.`
+    : `${accountName}: ${source} surfaced a ${event} prospect signal; ${confidence.label}: ${confidence.reason}.`;
   return {
     id: `signal-${signal.id}`,
     title,
@@ -178,20 +184,20 @@ export function TodayBrief({ world }: { world: World }) {
   const saronicProspect = saronicProspectBriefItem(world);
   const reservedBriefs = [lockheedSignal, saronicSignal ?? saronicWork ?? saronicProspect].filter((item): item is BriefItem => Boolean(item));
   const seenBriefIds = new Set<string>();
-  const miniBrief = [...reservedBriefs, ...signalBriefs, ...attentionBriefs]
+  const miniBrief = reservedBriefs
     .filter((item) => {
       if (seenBriefIds.has(item.id)) return false;
       seenBriefIds.add(item.id);
       return true;
     })
-    .slice(0, 5);
+    .slice(0, DEMO_MINI_BRIEF_LIMIT);
   const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
   const deadlineCount = [
     ...attention.items.map((item) => item.due_date),
     ...world.opportunities.filter((opp) => opp.stage !== "won" && opp.stage !== "lost").map((opp) => opp.close_date),
   ].filter((date) => isThisWeek(date)).length;
-  const activeAccountCount = world.companies.filter((company) => company.relationship === "customer" || company.relationship === "target").length;
-  const summaryLine = `${activeAccountCount} active accounts, ${topSignals.length} validated signals, and ${attention.items.length} open work items are ready for review.`;
+  const activeAccountCount = world.companies.filter((company) => company.relationship === "customer").length;
+  const summaryLine = `${activeAccountCount} customer account, ${miniBrief.length} signals shown, and ${attention.items.length} open work items are ready for review.`;
   const topSeed = miniBrief[0]?.seed;
   const attentionCards: AttentionCard[] = [
     {

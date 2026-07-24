@@ -22,7 +22,7 @@ const MONITOR_BASE_URL = (env?.VITE_ARTIFACT_BASE_URL ?? "../btx").replace(/\/$/
 const PUBLISHED_RUN_OUTPUT_PATH = `${MONITOR_BASE_URL}/run_output.json`;
 const PUBLISHED_ARCHIVE_PATH = `${MONITOR_BASE_URL}/archive.json`;
 const BUNDLED_RUN_OUTPUT_PATH = "clients/btx/artifacts/run_output.json";
-const BASELINE_SOURCE = "Sample data - ERP integration pending";
+const BASELINE_SOURCE = "Production context - ERP integration pending";
 const STALE_DAYS = 7;
 
 const SEEDED_COMPANIES = companiesData as unknown as Company[];
@@ -36,10 +36,11 @@ const SEEDED_PIPELINE = pipelineData as PipelineSnapshot;
 const SEEDED_INTEGRATIONS = integrationsData as Array<Partial<IntegrationRecord> & { demo_file?: string }>;
 const SEEDED_ASSUMPTIONS = assumptionsData as unknown as AssumptionsSnapshot;
 const NEWS = newsData as Array<{ published_date?: string }>;
+const DEMO_SIGNAL_IDS = new Set(["pinned-lockheed-f35-lot-18-19", "pinned-saronic-corsair-series-d"]);
 
 const state = {
   errors: [] as string[],
-  provenance: "HubSpot + Monitor evidence + Sample data",
+  provenance: "HubSpot + Monitor evidence + Production context",
 };
 
 interface RuntimeResponse<T> {
@@ -77,6 +78,10 @@ export function cockpitAdapterStatus(): { errors: string[]; provenance: string }
 
 function rememberError(message: string): void {
   if (!state.errors.includes(message)) state.errors.push(message);
+}
+
+function demoSignalId(id: string): string {
+  return id.replace(/^artifact-sig-/, "");
 }
 
 function applyFilter<T extends { company_id?: string; location?: { city?: string }; city?: string }>(
@@ -149,12 +154,12 @@ function seededIntegrations(): IntegrationRecord[] {
       source_kind: "monitor",
     },
     ...SEEDED_INTEGRATIONS.map((item) => ({
-      id: item.id ?? "sample-data",
-      name: item.name ?? "Sample data",
+      id: item.id ?? "production-context",
+      name: item.name ?? "Production context",
       category: item.category ?? "Operating baseline",
       status: (item.status === "future" ? "future" : "available") as IntegrationRecord["status"],
       source_ref: item.demo_file ?? "frontend/data/demo/btx/",
-      production_method: item.production_method ?? "Backend served sample data",
+      production_method: item.production_method ?? "Backend served production context",
       description: item.description ?? BASELINE_SOURCE,
       source_kind: "seeded" as const,
     })),
@@ -326,14 +331,38 @@ export class CockpitDataAdapter implements DataAdapter {
     for (const candidate of await this.monitorCandidates()) {
       try {
         const mapped = buildArtifactSignals(candidate.runOutput, companies, { includePinnedSignals: true });
-        if (!mapped.signals.length) {
+        const demoSignals = mapped.signals
+          .filter((signal) => DEMO_SIGNAL_IDS.has(demoSignalId(signal.id)))
+          .map((signal) => {
+            const id = demoSignalId(signal.id);
+            const normalized = { ...signal, id };
+            if (id !== "pinned-saronic-corsair-series-d") return normalized;
+            const { relationships: _relationships, ...rest } = normalized;
+            return {
+              ...rest,
+              subject_id: "saronic-technologies",
+              scope: "unlinked" as const,
+              account_status: "new_logo" as const,
+              business_motion: "prospect_new_business" as const,
+            };
+          });
+        if (!demoSignals.length) {
           errors.push(`${candidate.source} monitor output parsed, but no valid signal rows mapped.`);
           continue;
         }
         this.activeMonitor = candidate;
-        this.monitorState = mapped;
+        const result: ArtifactMappingResult = {
+          ...mapped,
+          signals: demoSignals,
+          latestPublishedAt: demoSignals
+            .map((signal) => signal.detected_at)
+            .sort()
+            .at(-1) ?? mapped.latestPublishedAt,
+          sourceCount: new Set(demoSignals.map((signal) => signal.artifact?.source_name).filter(Boolean)).size,
+        };
+        this.monitorState = result;
         this.monitorError = null;
-        return mapped;
+        return result;
       } catch (error) {
         errors.push(error instanceof Error ? error.message : `${candidate.source} monitor output could not be parsed.`);
       }
@@ -379,7 +408,7 @@ export class CockpitDataAdapter implements DataAdapter {
           ...snapshot.publicSignals,
           source_mode: "monitor_unavailable",
           artifact_path: path,
-          notice: this.monitorError ?? "Monitor output unavailable; seeded signals are being used.",
+          notice: this.monitorError ?? "Monitor output unavailable; pinned public signals are being used.",
         },
       };
     }

@@ -88,11 +88,13 @@ export function ScopePill({ scope }: { scope?: string }) {
 }
 
 export function ProvenanceStrip({ entity, method, confidence }: { entity?: string; method?: string; confidence?: number }) {
-  const percent = typeof confidence === "number" ? `${Math.round(confidence * 100)}%` : "review";
+  const band = typeof confidence === "number"
+    ? confidence >= 0.9 ? "high confidence" : confidence >= 0.7 ? "medium confidence" : "needs qualification"
+    : "review";
   return (
     <div className="provenance-strip">
       <i />
-      <span>{entity || "Portfolio"} · {method || "market evidence"} · {percent}</span>
+      <span>{entity || "Portfolio"} · {method || "market evidence"} · {band}</span>
     </div>
   );
 }

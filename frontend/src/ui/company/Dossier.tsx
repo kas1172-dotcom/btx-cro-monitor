@@ -23,6 +23,12 @@ import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
 
+function fitLabel(score: number): string {
+  if (score >= 70) return "strong";
+  if (score >= 45) return "partial";
+  return "needs qualification";
+}
+
 export function Dossier({ world, companyId }: { world: World; companyId: string }) {
   const [busyDeliverable, setBusyDeliverable] = useState<AgentId | null>(null);
   const company = world.companies.find((c) => c.id === companyId);
@@ -125,8 +131,8 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           <div className="metric-lbl">opportunity</div>
         </div>
         <div className="metric">
-          <div className="metric-val">{fit.score}%</div>
-          <div className="metric-lbl">fit to {PROFILE.name}</div>
+          <div className="metric-val">{fitLabel(fit.score)}</div>
+          <div className="metric-lbl">capability fit</div>
         </div>
         <div className="metric">
           <div className="metric-val">{healthValue}</div>
@@ -140,7 +146,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         {oppGroups.length > 0 && <p className="audit">scoring: {summarizeGroups(oppGroups)}</p>}
         <AskChatpilButton
           label="Why this account?"
-          prompt={explainAccountPrompt(company, `Dossier narrative: ${narrative}. Opportunity ${opp?.score ?? 0}, fit ${fit.score}%, pipeline health ${healthValue}.`)}
+          prompt={explainAccountPrompt(company, `Dossier narrative: ${narrative}. Opportunity ${opp?.score ?? 0}, ${fitLabel(fit.score)} capability fit, pipeline health ${healthValue}.`)}
         />
       </section>
 
@@ -170,7 +176,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
             {facilities.map((f) => (
               <li key={f.id}>
                 <strong>{f.kind}</strong> - {formatAddress(f) ?? f.city}
-                <ProvenanceBadge label="Sample data" />
+                <ProvenanceBadge label="Production context" />
                 <div className="link-row"><ExternalLink href={f.source_url} label="ERP source" /></div>
               </li>
             ))}

@@ -1,58 +1,30 @@
 {
-  "as_of": "2026-07-03",
+  "as_of": "2026-07-24",
   "summary": {
-    "open_pipeline_value": 44810000,
-    "weighted_pipeline_value": 14359500,
-    "priority_accounts": [
-      "lonestar-aero-systems",
-      "hill-country-aerostructures",
-      "mesquite-defense-manufacturing"
-    ],
-    "top_action": "Prioritize accounts with validated demand signals and available BTX capacity."
+    "open_pipeline_value": 2450000,
+    "weighted_pipeline_value": 1225000,
+    "priority_accounts": ["lockheed-martin-aeronautics"],
+    "top_action": "Prepare the Lockheed F-35 capacity review and qualify Saronic before outreach."
   },
   "records": [
     {
-      "company_id": "lonestar-aero-systems",
-      "recommended_action": "Expand Relationship",
-      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
-      "source_type": "demo",
-      "source_name": "Simulated Pipeline Snapshot",
-      "source_mode": "static_snapshot"
+      "company_id": "lockheed-martin-aeronautics",
+      "recommended_action": "Prepare customer meeting",
+      "reason": "F-35 sustainment evidence is linked to the Lockheed account and supports a call-prep brief.",
+      "source_type": "live_ready",
+      "source_name": "CRM fallback record",
+      "source_mode": "sample_data"
     },
     {
-      "company_id": "clearfork-turbine-works",
-      "recommended_action": "Expand Relationship",
-      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
-      "source_type": "demo",
-      "source_name": "Simulated Pipeline Snapshot",
-      "source_mode": "static_snapshot"
-    },
-    {
-      "company_id": "hill-country-aerostructures",
-      "recommended_action": "Pursue Revenue",
-      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
-      "source_type": "demo",
-      "source_name": "Simulated Pipeline Snapshot",
-      "source_mode": "static_snapshot"
-    },
-    {
-      "company_id": "mesquite-defense-manufacturing",
-      "recommended_action": "Pursue Revenue",
-      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
-      "source_type": "demo",
-      "source_name": "Simulated Pipeline Snapshot",
-      "source_mode": "static_snapshot"
-    },
-    {
-      "company_id": "ranger-landing-gear",
-      "recommended_action": "Pursue Revenue",
-      "reason": "Static demo context combines CRM status, public signals, fit, and capacity availability.",
-      "source_type": "demo",
-      "source_name": "Simulated Pipeline Snapshot",
-      "source_mode": "static_snapshot"
+      "company_id": "saronic-technologies",
+      "recommended_action": "Qualify prospect",
+      "reason": "Funding evidence supports a prospecting hypothesis, but the account has no CAGE match, no contact, and no pipeline.",
+      "source_type": "prospect_research",
+      "source_name": "Public company research",
+      "source_mode": "sample_data"
     }
   ],
-  "source_type": "demo",
-  "source_name": "Simulated Pipeline Snapshot",
-  "source_mode": "static_snapshot"
+  "source_type": "live_ready",
+  "source_name": "Pipeline fallback record",
+  "source_mode": "sample_data"
 }

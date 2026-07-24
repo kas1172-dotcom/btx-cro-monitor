@@ -121,6 +121,8 @@ export interface HubSpotImportRowResult {
   status: "succeeded" | "partial" | "failed";
   company_id: string | null;
   contact_id: string | null;
+  company_record_url?: string | null;
+  contact_record_url?: string | null;
   reason: string | null;
 }
 
@@ -128,11 +130,49 @@ export interface HubSpotImportResponse {
   status: "completed";
   summary: { succeeded: number; partial: number; failed: number };
   rows: HubSpotImportRowResult[];
+  idempotency_key?: string | null;
 }
 
-export async function importProspectsToHubSpot(rows: HubSpotImportRowInput[]): Promise<HubSpotImportResponse> {
+export async function importProspectsToHubSpot(rows: HubSpotImportRowInput[], idempotencyKey?: string): Promise<HubSpotImportResponse> {
   return backendJson<HubSpotImportResponse>("/crm/import/prospects", {
     method: "POST",
+    headers: idempotencyKey ? { "X-Idempotency-Key": idempotencyKey } : undefined,
     body: JSON.stringify({ rows }),
+  });
+}
+
+export interface HubSpotTaskResponse {
+  status: "created";
+  id: string;
+  record_url: string;
+  title: string;
+  duplicate?: boolean;
+  idempotency_key?: string | null;
+}
+
+export async function createHubSpotTask(input: {
+  title: string;
+  body?: string;
+  evidence?: string;
+  dueAt?: string;
+  priority?: string;
+  companyId?: string | null;
+  contactId?: string | null;
+  dealId?: string | null;
+  idempotencyKey?: string;
+}): Promise<HubSpotTaskResponse> {
+  return backendJson<HubSpotTaskResponse>("/crm/task", {
+    method: "POST",
+    headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
+    body: JSON.stringify({
+      title: input.title,
+      body: input.body,
+      evidence: input.evidence,
+      due_at: input.dueAt,
+      priority: input.priority,
+      company_id: input.companyId,
+      contact_id: input.contactId,
+      deal_id: input.dealId,
+    }),
   });
 }

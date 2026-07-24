@@ -216,7 +216,7 @@ function resultRows(
         rowId: row.rowId,
         label: row.likelyDuplicate ? "skipped-as-duplicate" : "skipped",
         detail: row.likelyDuplicate
-          ? `Matched ${row.matchedAccountName} at ${Math.round((row.confidence ?? 0) * 100)}% confidence.`
+          ? `Matched ${row.matchedAccountName}, ${matchBand(row.confidence)}.`
           : "Excluded before confirm.",
       };
     }
@@ -228,6 +228,12 @@ function resultRows(
       detail: backend.reason ?? ([backend.company_id, backend.contact_id].filter(Boolean).join(" / ") || "Created in HubSpot."),
     };
   });
+}
+
+function matchBand(confidence: number | undefined): string {
+  if ((confidence ?? 0) >= 0.9) return "high confidence match";
+  if ((confidence ?? 0) >= 0.7) return "medium confidence match";
+  return "needs review";
 }
 
 export function ImportListModal({ world, onClose }: { world: World; onClose: () => void }) {
@@ -465,7 +471,7 @@ function ImportDedupeTable({
               <td>
                 {row.missingRequired && "Missing company name or domain"}
                 {row.likelyDuplicate && !row.missingRequired &&
-                  `Likely duplicate: ${row.matchedAccountName} (${Math.round((row.confidence ?? 0) * 100)}%, ${row.matchMethod})`}
+                  `Likely duplicate: ${row.matchedAccountName} (${matchBand(row.confidence)}, ${row.matchMethod})`}
                 {!row.likelyDuplicate && !row.missingRequired && "New company candidate"}
               </td>
             </tr>

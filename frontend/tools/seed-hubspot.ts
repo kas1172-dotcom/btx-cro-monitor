@@ -255,11 +255,11 @@ function verifiedIdentifier<T extends { verified?: boolean }>(items: T[] | undef
 const lockheed = lockheedReference();
 
 const companyRows: CompanyRow[] = [{
-  id: "lockheed-martin-corporation",
-  name: "Lockheed Martin Corporation",
-  relationship: "existing customer",
-  account_status: "active_pipeline",
-  location: { city: "Bethesda", state: "MD", address: "6801 Rockledge Dr", postal_code: "20817" },
+  id: "lockheed-martin-aeronautics",
+  name: "Lockheed Martin Aeronautics",
+  relationship: "customer",
+  account_status: "current_customer",
+  location: { city: "Fort Worth", state: "TX", address: "1 Lockheed Blvd", postal_code: "76108" },
   domain: "lockheedmartin.com",
   website_url: "https://www.lockheedmartin.com",
   aliases: lockheed.aliases ?? ["Lockheed Martin", "Lockheed"],
@@ -269,44 +269,29 @@ const companyRows: CompanyRow[] = [{
   known_programs: ["F-35 Lightning II", "F-22 Raptor", "C-130J Super Hercules"],
   known_customers: ["US Department of Defense", "US Air Force", "US Navy"],
   notes: [
-    "BTX relationship centers on build-to-print precision components for aircraft production and sustainment programs.",
-    "Account owner should lead with F-35 timing, inspection capacity, and AS9100 controlled process fit.",
+    "BTX relationship centers on build-to-print precision components for aircraft production and sustainment programs at the Fort Worth aeronautics facility.",
+    "Account owner should lead with F-35 timing, inspection capacity, AS9100 controlled process fit, and clear qualification evidence.",
   ],
 }];
 
 const contactRows: ContactRow[] = [
   {
-    id: "lockheed-supply-chain-lead",
-    company_id: "lockheed-martin-corporation",
-    name: "Jamie Carter",
-    title: "Supply Chain Lead, Aeronautics",
-    email: "jamie.carter.lockheed-demo@example.com",
-  },
-  {
-    id: "lockheed-procurement-manager",
-    company_id: "lockheed-martin-corporation",
-    name: "Morgan Ellis",
+    id: "lockheed-procurement-lead",
+    company_id: "lockheed-martin-aeronautics",
+    name: "Dana Whitaker",
     title: "Procurement Manager, F-35 Sustainment",
-    email: "morgan.ellis.lockheed-demo@example.com",
+    email: "dana.whitaker@lockheedmartin.example.com",
   },
 ];
 
 const opportunityRows: OpportunityRow[] = [
   {
     id: "lockheed-f35-build-to-print",
-    company_id: "lockheed-martin-corporation",
-    name: "F-35 sustainment build-to-print components",
-    value: 1850000,
-    stage: "proposal",
-    close_date: "2026-09-30",
-  },
-  {
-    id: "lockheed-aero-fixture-assemblies",
-    company_id: "lockheed-martin-corporation",
-    name: "Aeronautics fixture and small assembly package",
-    value: 640000,
+    company_id: "lockheed-martin-aeronautics",
+    name: "F-35 lot 19 precision bracket capacity review",
+    value: 2450000,
     stage: "qualified",
-    close_date: "2026-08-15",
+    close_date: "2026-09-30",
   },
 ];
 
@@ -598,7 +583,7 @@ if (!confirmed) {
   } catch (error) {
     if (!isNonUniqueIdPropertyError(error, "domain")) throw error;
     console.log("HubSpot portal does not allow company upsert by built-in domain; using unique btx_company_domain fallback.");
-    await ensureUniqueStringProperty("companies", "companyinformation", "btx_company_domain", "BTX Company Domain", "Stable fictional company domain used by the BTX demo HubSpot seed script.");
+    await ensureUniqueStringProperty("companies", "companyinformation", "btx_company_domain", "BTX Company Domain", "Stable company domain used by the BTX demo HubSpot seed script.");
     companySummary = await batchUpsert("companies", "btx_company_domain", companyUpsertInputs(companyRows, "btx_company_domain"));
   }
 

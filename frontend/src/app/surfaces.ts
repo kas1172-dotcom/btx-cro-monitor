@@ -65,7 +65,7 @@ export function countForSurface(surface: TabId, world: World | null, memory: Mem
     case "work_queue":
       return world.analysis.recommendations.length;
     case "accounts":
-      return world.companies.filter((company) => company.relationship === "customer" || company.relationship === "target").length;
+      return world.companies.filter((company) => company.relationship === "customer").length;
     case "ask":
       return undefined;
     case "prospecting":
@@ -79,9 +79,7 @@ export function countForSurface(surface: TabId, world: World | null, memory: Mem
     case "capacity":
       return world.facilities.length || world.snapshot?.capacity.length;
     case "programs":
-      return world.analysis.valid.filter((signal) =>
-        signal.event_type.includes("contract") || signal.event_type.includes("award") || signal.scope === "program"
-      ).length;
+      return world.analysis.valid.length;
     case "deliverables":
       return memory?.deliverables.length;
     case "hubspot":

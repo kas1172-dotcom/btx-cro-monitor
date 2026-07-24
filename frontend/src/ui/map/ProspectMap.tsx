@@ -4,6 +4,7 @@
 // output; it computes nothing.
 
 import { useEffect } from "react";
+import L from "leaflet";
 import { MapContainer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet";
 import { useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -16,6 +17,7 @@ import { buildMapMarkers, mapCenter, mappableCompanies } from "./mapModel.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
 import { AccountToken } from "../common/AccountToken.tsx";
 import { DarkMapTiles } from "./DarkMapTiles.tsx";
+import { prospectQualificationLabel } from "../../app/confidence.ts";
 
 function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   const map = useMap();
@@ -37,6 +39,19 @@ function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   return null;
 }
 
+function FitMapBounds({ points, watchKey }: { points: Array<[number, number]>; watchKey: string }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!points.length) {
+      map.setView([31.5, -97], 5);
+      return;
+    }
+    const bounds = L.latLngBounds(points);
+    map.fitBounds(bounds, { padding: [56, 56], maxZoom: 11 });
+  }, [map, points, watchKey]);
+  return null;
+}
+
 export function ProspectMap({ world }: { world: World }) {
   const { activeCompanyId } = useStore();
   const markers = buildMapMarkers(world.companies, world.analysis.byId);
@@ -50,6 +65,7 @@ export function ProspectMap({ world }: { world: World }) {
     <div className="map-shell" data-surface-component="surface-map">
       <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
         <MapSizeInvalidator watchKey={watchKey} />
+        <FitMapBounds points={markers.map((marker) => marker.center)} watchKey={watchKey} />
         <ZoomControl position="bottomright" />
         <DarkMapTiles />
         {markers.map(({ company: c, center: markerCenter, opportunity: opp, prospect, radius }) => {
@@ -84,7 +100,14 @@ export function ProspectMap({ world }: { world: World }) {
         </div>
         {omittedCount > 0 && <p className="map-rail-note">{omittedCount} account{omittedCount === 1 ? "" : "s"} omitted: missing coordinates</p>}
         <div className="map-prospect-list">
-          {world.prospects.slice(0, 12).map((p, i) => (
+          {world.prospects.slice(0, 12).map((p, i) => {
+            const qualification = prospectQualificationLabel({
+              company: p.company,
+              contact: p.contact,
+              opportunities: world.opportunities.filter((opportunity) => opportunity.company_id === p.company.id),
+              fitMatched: p.fit.matched,
+            });
+            return (
             <button
               key={p.company.id}
               className={p.company.id === activeCompanyId ? "map-prospect active" : "map-prospect"}
@@ -96,21 +119,24 @@ export function ProspectMap({ world }: { world: World }) {
               </span>
               <span className="map-prospect-main">
                 <strong>{p.company.name}</strong>
-                <em>Opp {p.opportunity} · fit {p.fit.score}% · {p.company.location.city}</em>
+                <em>
+                  Opp {p.opportunity} · {qualification.label} · {p.company.location.city}
+                </em>
                 {p.topSignal && <small>{p.topSignal.event_type}: {p.topSignal.source_quote}</small>}
                 <span className="map-prospect-actions">
                   <AskChatpilButton
                     label="Explain"
-                    prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Opportunity ${p.opportunity}, fit ${p.fit.score}%, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
+                    prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Opportunity ${p.opportunity}, ${qualification.label}, missing ${qualification.gaps.join(", ") || "none"}, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
                   />
                   <AskChatpilButton
                     label="Draft outreach"
-                    prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Opportunity ${p.opportunity}, fit ${p.fit.score}%, contact ${p.contact?.name ?? "not available"}.`)}
+                    prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Opportunity ${p.opportunity}, ${qualification.label}, contact ${p.contact?.name ?? "not available"}.`)}
                   />
                 </span>
               </span>
             </button>
-          ))}
+            );
+          })}
         </div>
         <div className="map-legend">
           <span><i className="legend-prospect" /> prospect/customer</span>

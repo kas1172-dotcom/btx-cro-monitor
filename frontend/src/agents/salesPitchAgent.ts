@@ -33,7 +33,7 @@ function publicHook(text: string): string {
     .replace(/\bvalidated\b/gi, "public")
     .replace(/\bsignals?\b/gi, "shows")
     .replace(/\bopportunity score\b/gi, "timing")
-    .replace(/\bfit %\b/gi, "fit")
+    .replace(/\bfit percentage\b/gi, "fit")
     .replace(/\brisk score\b/gi, "risk")
     .replace(/\bpipeline\b/gi, "program");
 }
@@ -46,12 +46,13 @@ function firstAccount(world: World, accountId?: string): World["prospects"][numb
   return prospect;
 }
 
-function evidenceConfidence(input: { hasContact: boolean; hasPipeline: boolean; hasSignal: boolean; fitScore: number }): { confidence: Deliverable["confidence"]; reason: string } {
+function evidenceConfidence(input: { hasCage: boolean; hasContact: boolean; hasPipeline: boolean; hasSignal: boolean; fitMatched: string[] }): { confidence: Deliverable["confidence"]; reason: string } {
   const missing = [
+    input.hasCage ? "" : "CAGE match",
     input.hasContact ? "" : "named contact",
     input.hasPipeline ? "" : "open pipeline",
     input.hasSignal ? "" : "dated public signal",
-    input.fitScore < 100 ? "" : "qualified fit check",
+    input.fitMatched.length ? "" : "confirmed fit",
   ].filter(Boolean);
   if (missing.length === 0) return { confidence: "high", reason: "High: contact, pipeline, public signal, and qualified fit context are available." };
   if (missing.length <= 2) return { confidence: "medium", reason: `Medium: missing ${missing.join(", ")}.` };
@@ -72,7 +73,7 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
     const topSignal = prospect.topSignal;
     const capacity = world.snapshot?.capacity.find((item) => item.city === prospect.company.location.city) ?? world.snapshot?.capacity[0];
     const openPipeline = world.opportunities.some((item) => item.company_id === prospect.company.id && item.stage !== "won" && item.stage !== "lost" && item.value > 0);
-    const confidence = evidenceConfidence({ hasContact: Boolean(contact), hasPipeline: openPipeline, hasSignal: Boolean(topSignal), fitScore: fit.score });
+    const confidence = evidenceConfidence({ hasCage: Boolean(prospect.company.cage_code), hasContact: Boolean(contact), hasPipeline: openPipeline, hasSignal: Boolean(topSignal), fitMatched: fit.matched });
     return {
       facts: {
         accountName: prospect.company.name,
@@ -82,7 +83,11 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
         publicTrigger: topSignal ? clean(signalEvidence(topSignal)) : "a visible production need",
         artifactSignalFigures: signalFigureContext(topSignal ? [topSignal] : []),
         matchedCapabilities: fit.matched.slice(0, 3).join(", ") || "certified precision machining",
-        capacityLine: capacity ? `${capacity.facility_name} has available 5-axis capacity with quoted lead time of ${capacity.quoted_lead_time_days} days` : "BTX can qualify capacity after the first conversation",
+        capacityLine: confidence.confidence === "low" || !openPipeline
+          ? "BTX should confirm scope and capacity only after qualification"
+          : capacity
+            ? `${capacity.facility_name} has current 5-axis capacity context available for review`
+            : "BTX can qualify capacity after the first conversation",
         contactName: contact?.name ?? "their operations leader",
         senderName: PROFILE.sender_name,
         senderTitle: PROFILE.sender_title,
@@ -92,7 +97,7 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
       entityIds: [prospect.company.id],
       sources: [
         { source: "companies.json", records: [prospect.company.id], reason: "Account profile, market, and stated needs." },
-        { source: topSignal?.artifact ? "Monitor engine evidence" : "signals.json + news.json", records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? `Account-specific public trigger from ${topSignal.artifact.source_name} on ${topSignal.artifact.source_date.slice(0, 10)}.` : "Account-specific public trigger." },
+        { source: topSignal?.artifact ? "Monitor engine evidence" : "Monitor engine + public sources", records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? `Account-specific public trigger from ${topSignal.artifact.source_name} on ${topSignal.artifact.source_date.slice(0, 10)}.` : "Account-specific public trigger." },
         { source: "erp_capacity.json", records: capacity ? [capacity.facility_id] : [], reason: "Capacity context used for the pitch." },
       ],
     };
@@ -138,7 +143,7 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
           id: "the-ask",
           heading: "The Ask",
           audience: "prospect",
-          blocks: [{ kind: "text", text: `Ask ${f.contactName} for a 20-minute fit call with one current print package or work statement, then confirm materials, certifications, delivery window, and whether ${f.capacityLine}.` }],
+          blocks: [{ kind: "text", text: `Ask ${f.contactName} for a 20-minute fit call with one current print package or work statement, then confirm materials, certifications, delivery window, and qualification evidence. ${f.capacityLine}.` }],
         },
       ],
       sources: ctx.sources,

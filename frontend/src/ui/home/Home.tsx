@@ -133,7 +133,7 @@ export function Home({ world, cityWorld }: { world: World; cityWorld: World | nu
               <span className="rank-badge">#{i + 1}</span>
               <strong>{p.company.name}</strong>
               <span>
-                Opportunity {p.opportunity}, fit {p.fit.score}%{p.contact ? `, call ${p.contact.name}` : ""}
+                Opportunity {p.opportunity}, {p.fit.matched.length ? "qualified capability overlap" : "needs qualification"}{p.contact ? `, call ${p.contact.name}` : ""}
                 <RankingWhy explanation={rankingExplanation(cityWorld ?? world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score })} />
               </span>
             </button>

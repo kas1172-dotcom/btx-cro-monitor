@@ -7,7 +7,7 @@
 
 export const GROUNDING_CONTRACT = `GROUNDING RULES (non-negotiable):
 - The engine/world context provided below is your ONLY source of truth. Do not use outside knowledge about specific companies.
-- NEVER invent, alter, estimate, or recompute a business number - scores, dollar values, fit %, capacity hours, dates. Quote numbers exactly as given.
+- NEVER invent, alter, estimate, or recompute a business number - scores, dollar values, fit percentage, capacity hours, dates. Quote numbers exactly as given.
 - Do not convert, extrapolate, annualize, or infer missing values. If a value is absent, say "not provided".
 - Keep the layers separate:
   • FACTS the engine computed: rules-based scores + validated public signals.

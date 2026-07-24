@@ -9,9 +9,17 @@ import { WorkItemList } from "./WorkItemList.tsx";
 import { deriveWorkItems } from "../../app/workItems.ts";
 import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 import { AccountToken } from "../common/AccountToken.tsx";
+import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
+import { openDeliverableWizard } from "../../store/store.ts";
 
 function money(value: number): string {
   return value >= 1_000_000 ? `$${(value / 1_000_000).toFixed(1)}M` : `$${Math.round(value / 1000)}k`;
+}
+
+function fitLabel(score: number): string {
+  if (score >= 70) return "strong";
+  if (score >= 45) return "partial";
+  return "needs qualification";
 }
 
 function relationshipBackedSignals(world: World, accountId: string) {
@@ -27,7 +35,7 @@ function relationshipBackedSignals(world: World, accountId: string) {
 export function Account360({ world }: { world: World }) {
   const accountRows = useMemo(() => {
     return world.companies
-      .filter((company) => company.relationship === "customer" || company.relationship === "target")
+      .filter((company) => company.relationship === "customer")
       .map((company) => ({
         company,
         score: world.analysis.byId.get(company.id),
@@ -88,9 +96,26 @@ export function Account360({ world }: { world: World }) {
           <div className="account360-kpis">
             <div><span>Health</span><strong>{score?.dimensions.risk.score ?? 0} risk</strong></div>
             <div><span>Opportunity</span><strong>{score?.dimensions.opportunity.score ?? 0}</strong></div>
-            <div><span>Capacity fit</span><strong>{fit.score}%</strong></div>
+            <div><span>Capacity fit</span><strong>{fitLabel(fit.score)}</strong></div>
             <div><span>Pipeline</span><strong>{money(selected.openPipeline)}</strong></div>
           </div>
+
+          <section className="surface-panel primary-action-panel">
+            <div>
+              <h2>Next actions</h2>
+              <p>Create a deliverable or confirm a HubSpot task from this account context.</p>
+            </div>
+            <div className="primary-action-row">
+              <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create deliverable</button>
+            </div>
+            <CrmWriteActions
+              company={company}
+              contact={contacts[0]}
+              variant="account"
+              defaultTaskSubject={`Follow up with ${company.name}`}
+              defaultTaskBody={rec?.reason ?? `Review next step for ${company.name}.`}
+            />
+          </section>
 
           {rec && (
             <section className="surface-panel">

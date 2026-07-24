@@ -5,7 +5,7 @@ export function signalAccountLabel(companyName: string, signal: Signal): string 
 }
 
 export function signalSourceName(signal: Signal): string {
-  return signal.artifact?.source_name ?? "Sample signal feed";
+  return signal.artifact?.source_name ?? (signal as Signal & { source_name?: string }).source_name ?? "Public source";
 }
 
 export function signalSourceDate(signal: Signal): string {

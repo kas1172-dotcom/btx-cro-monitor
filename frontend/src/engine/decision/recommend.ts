@@ -28,10 +28,10 @@ export function recommend(company: Company, score: CompanyScore, fit: FitResult)
     case "target":
     case "customer": {
       if (opp >= 60 && fit.score >= 60)
-        return { subject_id: id, action: "pursue", priority: "high", reason: `Opportunity ${opp} with ${fit.score}% fit - lead with ${fit.matched[0] ?? "your core capability"}.` };
+        return { subject_id: id, action: "pursue", priority: "high", reason: `Opportunity ${opp} with strong capability fit. Lead with ${fit.matched[0] ?? "your core capability"}.` };
       if (opp >= 40)
-        return { subject_id: id, action: fit.score >= 50 ? "pursue" : "watch", priority: "medium", reason: fit.matched.length ? `Opportunity ${opp}, ${fit.score}% fit - serve ${fit.matched.slice(0, 2).join(", ")}.` : `Opportunity ${opp} but ${fit.score}% fit - likely a teaming play.` };
-      return { subject_id: id, action: "watch", priority: "low", reason: `Low opportunity (${opp}) for now - keep warm.` };
+        return { subject_id: id, action: fit.score >= 50 ? "pursue" : "watch", priority: "medium", reason: fit.matched.length ? `Opportunity ${opp} with partial capability fit. Serve ${fit.matched.slice(0, 2).join(", ")}.` : `Opportunity ${opp} with limited capability fit. Likely a teaming play.` };
+      return { subject_id: id, action: "watch", priority: "low", reason: `Low opportunity (${opp}) for now. Keep warm.` };
     }
     case "competitor":
       if (opp >= 60)

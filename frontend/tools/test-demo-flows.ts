@@ -218,32 +218,7 @@ const cockpitCompanies = cockpitCompaniesRaw.some((company) => company.name.toLo
         needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "marine autonomy integration"],
       },
     ];
-const cockpitSignalsWithRelationships = (cockpitSignals as Parameters<typeof analyze>[1]).map((signal) => {
-  const row = signal as { id?: string; subject_id?: string; scope?: string; entities?: string[]; source_quote?: string; artifact?: { headline?: string }; confidence?: number; detected_at?: string; relationships?: unknown[]; account_status?: string; business_motion?: string };
-  const text = [row.id, row.subject_id, row.artifact?.headline, row.source_quote, ...(row.entities ?? [])].filter(Boolean).join(" ").toLowerCase();
-  if (!text.includes("saronic") && !text.includes("corsair")) return signal;
-  return {
-    ...row,
-    subject_id: "signal-prospect-saronic",
-    scope: "specific_account",
-    account_status: "new_logo",
-    business_motion: "prospect_new_business",
-    relationships: [
-      ...(row.relationships ?? []),
-      {
-        canonical_account_id: "signal-prospect-saronic",
-        source_entity_name: "Saronic Technologies",
-        match_method: "manual",
-        evidence: "Pinned market signal names Saronic Technologies and Corsair.",
-        confidence: 0.86,
-        review_status: "accepted",
-        creation_source: "manual",
-        last_validated_at: row.detected_at ?? null,
-      },
-    ],
-  };
-});
-const cockpitAnalysis = analyze(cockpitCompanies, [...cockpitSignalsWithRelationships, ...deriveNewsSignals(cockpitCompanies, newsData as MarketEvent[], extractedData as ExtractedRow[])]);
+const cockpitAnalysis = analyze(cockpitCompanies, [...cockpitSignals, ...deriveNewsSignals(cockpitCompanies, newsData as MarketEvent[], extractedData as ExtractedRow[])]);
 const journeyPriority = (signal: { id: string; artifact?: { headline?: string }; source_quote?: string; subject_id?: string; entities?: string[] }) => {
   const text = [signal.id, signal.artifact?.headline, signal.source_quote, signal.subject_id, ...(signal.entities ?? [])].filter(Boolean).join(" ").toLowerCase();
   if (text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s")) return 0;
@@ -253,11 +228,15 @@ const journeyPriority = (signal: { id: string; artifact?: { headline?: string };
 const cockpitTopSignals = [...cockpitAnalysis.valid].sort((a, b) => journeyPriority(a) - journeyPriority(b) || b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at));
 
 assert(!world.companies.some((company) => company.name === PROFILE.name), "Client company must not appear as a scored account");
+assert(cockpitCompanies.length === 2, "Demo cockpit must contain exactly two companies.");
 assert(cockpitCompanies.some((company) => company.name === "Lockheed Martin Aeronautics"), "Lockheed must be seeded as a resolvable account.");
 assert(cockpitCompanies.some((company) => company.name === "Saronic Technologies"), "Saronic prospect injection must be available.");
-assert(cockpitTopSignals[0]?.id === "artifact-sig-pinned-lockheed-f35-lot-18-19", "Pinned Lockheed F-35 signal must sort first.");
+assert(cockpitTopSignals.length === 2, "Demo cockpit must contain exactly two signals.");
+assert(cockpitTopSignals[0]?.id === "pinned-lockheed-f35-lot-18-19", "Pinned Lockheed F-35 signal must sort first.");
 assert(cockpitTopSignals[0]?.subject_id === "lockheed-martin-aeronautics", "Pinned Lockheed signal must resolve to the Lockheed account.");
-assert(cockpitTopSignals[1]?.id === "artifact-sig-pinned-saronic-corsair-series-d", "Pinned Saronic signal must sort second.");
+assert(cockpitTopSignals[1]?.id === "pinned-saronic-corsair-series-d", "Pinned Saronic signal must sort second.");
+assert(cockpitTopSignals[1]?.event_type === "funding_round", "Pinned Saronic signal must be classified as a funding round.");
+assert(cockpitTopSignals[1]?.scope === "unlinked", "Pinned Saronic signal must stay unlinked.");
 assert(AREA_MARKET_SCOPING.map && AREA_MARKET_SCOPING.trip_planner && AREA_MARKET_SCOPING.programs, "Map, Trip Planner, and program views must be market-scoped");
 assert(!AREA_MARKET_SCOPING.analysis && !AREA_MARKET_SCOPING.settings && !AREA_MARKET_SCOPING.accounts, "Analysis, settings, and accounts must not be market-scoped");
 assert(!isMarketScopedView({ activeTab: "map", brainResponse: null, activeDeliverable: { id: "doc" }, activeAnalysisSpec: null }), "Deliverables must hide market dropdown and use all-markets scope");
@@ -298,15 +277,14 @@ for (const [question, expectedArea] of questions) {
 const maxScore = Math.max(...world.analysis.scores.flatMap((score) => Object.values(score.dimensions).map((dimension) => dimension.score)));
 assert(maxScore <= 97, `score cap exceeded: ${maxScore}`);
 
-const itinerary = await runAgent("itinerary", { city: "Austin", startDate: "2026-07-07", endDate: "2026-07-09", focus: "mixed" }, world);
-assert(itinerary.entityIds.length >= 6, "Austin itinerary has fewer than 6 stops");
-assert(itinerary.sources.length > 0, "Austin itinerary missing provenance");
-assert(itinerary.brainArea === "trip_planner", "Itinerary must belong to the Trip Planner tab.");
-const mapStops = itinerary.sections.flatMap((section) => section.blocks).filter((block) => block.kind === "map-ref").flatMap((block) => block.stops ?? []);
-assert(mapStops.every((stop) => !/^\d+\.\s/.test(stop.label)), "Itinerary map labels must not duplicate pin numbers");
-const firstStopBrief = await runAgent("meeting_brief", { accountId: itinerary.entityIds[0] }, world);
-const tripBrief = await runAgent("trip_brief", { itinerary, meetingBriefs: [firstStopBrief], logistics: "Confirm meeting owners before departure." }, world);
-assert(tripBrief.brainArea === "trip_planner" && tripBrief.sections.some((section) => section.id === "itinerary-logistics"), "Trip brief must compile itinerary logistics.");
+const lockheedBrief = await runAgent("meeting_brief", { accountId: "lockheed-martin-aeronautics" }, world);
+const lockheedBriefText = lockheedBrief.sections.flatMap((section) => section.blocks).map((block) => block.kind === "text" ? block.text : block.kind === "table" ? block.rows.flat().join(" ") : block.title).join(" ");
+assert(lockheedBriefText.includes("Lockheed Martin Aeronautics") && lockheedBrief.sources.some((source) => source.records.includes("pinned-lockheed-f35-lot-18-19")), "Lockheed meeting brief must be built from the pinned F-35 signal.");
+
+const saronicPitch = await runAgent("sales_pitch", { accountId: "saronic-technologies" }, world);
+const saronicPitchText = saronicPitch.sections.flatMap((section) => section.blocks).map((block) => block.kind === "text" ? block.text : block.kind === "table" ? block.rows.flat().join(" ") : block.title).join(" ");
+assert(saronicPitch.confidence === "low" && /needs qualification/i.test(saronicPitch.confidenceReason ?? ""), "Saronic pitch must remain low confidence and needs qualification.");
+assert(saronicPitch.sources.every((source) => !source.records.includes("pinned-lockheed-f35-lot-18-19")) && !saronicPitchText.includes("F-35"), "Saronic pitch must not use Lockheed F-35 evidence.");
 
 const analysisAnnotation = await runAgent("analysis_annotation", { metric: "revenue", quarter: "Q2 2026", instructions: "Annotate the saved heatmap figure." }, world);
 assert(analysisAnnotation.type === "analysis_view" && analysisAnnotation.brainArea === "analysis", "Analysis annotation must save as an analysis deliverable.");
@@ -349,7 +327,7 @@ assert(DELIVERABLE_DOWNLOAD_FORMATS.itinerary.includes("ics"), "Itinerary missin
 assert(DELIVERABLE_DOWNLOAD_FORMATS.analysis_view.includes("xlsx") && DELIVERABLE_DOWNLOAD_FORMATS.analysis_view.includes("csv"), "Analysis view missing spreadsheet downloads");
 assert(DELIVERABLE_DOWNLOAD_FORMATS.board_deck.includes("pptx"), "Board deck missing PPTX download");
 assert(instructedOutreach.sources.some((source) => source.source === "user instructions" && source.reason.includes("ITAR")), "Deliverable instructions were not recorded in sources");
-const deliverableText = [itinerary, tripBrief, analysisAnnotation, memo, outreach]
+const deliverableText = [lockheedBrief, saronicPitch, analysisAnnotation, memo, outreach]
   .flatMap((deliverable) => deliverable.sections)
   .flatMap((section) => section.blocks)
   .map((block) => {
@@ -361,4 +339,4 @@ const deliverableText = [itinerary, tripBrief, analysisAnnotation, memo, outreac
   .join(" ");
 assert(!/\b[a-z]+_[a-z_]+\b/.test(deliverableText), `Rendered deliverables leaked snake_case: ${deliverableText.match(/\b[a-z]+_[a-z_]+\b/)?.[0]}`);
 
-console.log(`demo flows ok: ${questions.length} questions, itinerary ${itinerary.entityIds.length} stops, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, CRM brief cited CRM + monitor, outreach ${outreach.sections.length} sections`);
+console.log(`demo flows ok: ${questions.length} questions, Lockheed brief ${lockheedBrief.sections.length} sections, Saronic pitch ${saronicPitch.sections.length} sections, weekly memo ${memo.sections.length} sections, artifact brief cited real signal, CRM brief cited CRM + monitor, outreach ${outreach.sections.length} sections`);

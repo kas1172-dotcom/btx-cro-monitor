@@ -41,7 +41,7 @@ function formatRunDate(value: string | null | undefined): string {
 
 function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" | "warning"; label: string; value: string } | null {
   if (!world) return null;
-  if (world.loadErrors.length) return { tone: "warning", label: "Data", value: "Sample data" };
+  if (world.loadErrors.length) return { tone: "warning", label: "Data", value: "Bundled data" };
   return { tone: "success", label: "Data", value: "Live data" };
 }
 

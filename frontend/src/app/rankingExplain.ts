@@ -75,7 +75,7 @@ export function rankingExplanation(
 
   const factors: string[] = [];
   if (signals[0]) factors.push(`the public ${signals[0].event_type.replace(/_/g, " ")} signal is live`);
-  if (fit) factors.push(`${PROFILE.name} fit is ${fitStrength(fit)} (${fit}%)`);
+  if (fit) factors.push(`${PROFILE.name} fit is ${fitStrength(fit)}`);
   factors.push(businessContext.crmClause);
   factors.push(businessContext.capacityClause);
   factors.push(businessContext.pipelineClause);
@@ -84,9 +84,9 @@ export function rankingExplanation(
     : `Ranked here because ${joinList(factors)}.`;
 
   return {
-    summary: `${rankText}: ${labelDimension(dimension)} ${scoreValue}${fit ? `, fit ${fit}%` : ""}.`,
+    summary: `${rankText}: ${labelDimension(dimension)} ${scoreValue}${fit ? `, ${fitStrength(fit)} capability fit` : ""}.`,
     scoreLine: `${labelDimension(dimension)} score ${scoreValue}${primary && primary.raw > primary.score ? `, capped from ${primary.raw}` : ""}.`,
-    fitLine: fit ? `Fit score ${fit}% against ${PROFILE.name} capabilities.` : "Fit score is not available for this account.",
+    fitLine: fit ? `Capability fit is ${fitStrength(fit)} against ${PROFILE.name} capabilities.` : "Capability fit is not available for this account.",
     driverLine: drivers.length ? `Top drivers: ${drivers.join("; ")}.` : "No score-driver trace moved this ranking dimension.",
     signalLine: signals[0] ? `Top signal: ${signals[0].event_type} - ${signals[0].source_quote}` : "No validated signal is attached to this account.",
     actionLine: rec ? `Recommended action: ${actionLabel(rec.action)} - ${rec.reason}` : "No recommended action is available.",

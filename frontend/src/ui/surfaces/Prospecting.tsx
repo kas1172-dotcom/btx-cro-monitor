@@ -4,7 +4,7 @@ import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { accountStatus, isProspectingAccount } from "../../brain/classification.ts";
 import type { AccountStatus, BusinessMotion, Company } from "../../engine/brain/entities.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
-import { setState, useStore } from "../../store/store.ts";
+import { openDeliverableWizard, setState, useStore } from "../../store/store.ts";
 import { explainRankingPrompt, expandSignalPrompt, nextActionPrompt, outreachPrompt } from "../../app/copilotPrompts.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { companyLinks, formatAddress } from "../../app/format.ts";
@@ -15,6 +15,8 @@ import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 import { EmptyState } from "../primitives.tsx";
 import { ImportListModal } from "../prospecting/ImportListModal.tsx";
 import { ProspectMap } from "../map/ProspectMap.tsx";
+import { prospectQualificationLabel, qualitativeSignalConfidence } from "../../app/confidence.ts";
+import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
 
 const PROSPECT_STATUSES = new Set<AccountStatus>(["target_prospect", "new_logo"]);
 const PROSPECT_MOTIONS = new Set<BusinessMotion>(["prospect_new_business"]);
@@ -35,7 +37,7 @@ function titleCase(value: string): string {
 }
 
 function signalStrength(signals: Signal[]): number {
-  return Math.round(signals.reduce((sum, s) => sum + s.confidence * 100, 0) / Math.max(signals.length, 1));
+  return signals.reduce((sum, s) => sum + (qualitativeSignalConfidence(s).band === "high" ? 3 : qualitativeSignalConfidence(s).band === "medium" ? 2 : 1), 0);
 }
 
 function isProspectingSignal(signal: Signal): boolean {
@@ -74,11 +76,12 @@ function recommendedOutreach(company: Company, contactName: string | undefined):
   return `${lead} about ${company.needs.slice(0, 2).join(" and ")} needs, then offer a capacity-fit conversation.`;
 }
 
-function visitReason(row: { opportunity: number; fit: number; signals: Signal[]; contact?: { name: string } }): string {
+function visitReason(row: { opportunity: number; qualification: { label: string; gaps: string[] }; signals: Signal[]; contact?: { name: string } }): string {
   const signal = row.signals[0];
   const contact = row.contact ? ` and ${row.contact.name} is available` : "";
-  if (signal) return `Opportunity ${row.opportunity}, fit ${row.fit}%, and a ${titleCase(signal.event_type)} signal${contact}.`;
-  return `Opportunity ${row.opportunity} and fit ${row.fit}% make this a practical market stop${contact}.`;
+  const gaps = row.qualification.gaps.length ? ` Missing evidence: ${row.qualification.gaps.join(", ")}.` : "";
+  if (signal) return `Opportunity ${row.opportunity}, ${row.qualification.label}, and a ${titleCase(signal.event_type)} signal${contact}.${gaps}`;
+  return `Opportunity ${row.opportunity} and ${row.qualification.label} make this a practical market stop${contact}.${gaps}`;
 }
 
 export function Prospecting({ world }: { world: World }) {
@@ -108,8 +111,14 @@ export function Prospecting({ world }: { world: World }) {
         .reduce((sum, o) => sum + o.value, 0);
       const opportunity = score?.dimensions.opportunity.score ?? rankedProspect?.opportunity ?? 0;
       const fit = rankedProspect?.fit.score ?? 0;
+      const qualification = prospectQualificationLabel({
+        company,
+        contact,
+        opportunities: world.opportunities.filter((opportunity) => opportunity.company_id === company.id),
+        fitMatched: rankedProspect?.fit.matched ?? [],
+      });
       const urgency = opportunity + fit + signalStrength(signals) + (contact ? 10 : 0) + (revenue > 0 ? 12 : 0);
-      return { company, score, rankedProspect, signals, contact, revenue, opportunity, fit, urgency };
+      return { company, score, rankedProspect, signals, contact, revenue, opportunity, fit, qualification, urgency };
     })
     .filter((row) => PROSPECT_STATUSES.has(accountStatus(row.company)) || row.company.business_motion === "prospect_new_business")
     .sort((a, b) => b.urgency - a.urgency || a.company.name.localeCompare(b.company.name));
@@ -234,11 +243,18 @@ export function Prospecting({ world }: { world: World }) {
                           }}
                         />
                       </div>
+                      <CrmWriteActions
+                        company={row.company}
+                        contact={row.contact}
+                        variant="prospect"
+                        defaultTaskSubject={`Qualify ${row.company.name}`}
+                        defaultTaskBody={`${whyNow(row.signals)} Missing evidence: ${row.qualification.gaps.join(", ") || "none"}.`}
+                      />
                     </div>
                   )}
                 </div>
                 <div className="visit-plan-meta">
-                  <span>Fit {row.fit}%</span>
+                  <span>{row.qualification.label}</span>
                   <span>Opportunity {row.opportunity}</span>
                   <button type="button" onClick={() => setExpandedProspectId(expanded ? null : `visit-${row.company.id}`)}>
                     {expanded ? "Hide" : "Details"}
@@ -263,12 +279,12 @@ export function Prospecting({ world }: { world: World }) {
               <span className="rank-badge">#{index + 1}</span>
               <span className="prospect-card-main">
                 <strong>{row.company.name}</strong>
-                <em>{row.company.location.city} · fit {row.fit}% · signal {signalStrength(row.signals)} · {row.contact ? "contact ready" : "find contact"}</em>
+                <em>{row.company.location.city} · {row.qualification.label} · {row.contact ? "contact ready" : "find contact"}</em>
                 {expanded && (
                   <div className="scan-detail-panel">
                     {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
                     <RankingWhy explanation={rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit })} />
-                    <span><b>Why this company?</b> Fit {row.fit}% with opportunity {row.opportunity}; estimated revenue {money(row.revenue)}.</span>
+                    <span><b>Why this company?</b> {row.qualification.label} with opportunity {row.opportunity}; {row.qualification.gaps.length ? `missing ${row.qualification.gaps.join(", ")}` : `estimated revenue ${money(row.revenue)}`}.</span>
                     <span><b>Why now?</b> {whyNow(row.signals)}</span>
                     <span><b>Next:</b> {recommendedOutreach(row.company, row.contact?.name)}</span>
                     <span className="link-row">
@@ -277,12 +293,13 @@ export function Prospecting({ world }: { world: World }) {
                     </span>
                     <AskChatpilButton
                       label="Explain ranking"
-                      prompt={explainRankingPrompt(row.company.name, `Prospecting rank #${index + 1}. ${rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit }).summary} Estimated revenue ${money(row.revenue)}, signal strength ${signalStrength(row.signals)}, contact ${row.contact?.name ?? "not available"}.`)}
+                      prompt={explainRankingPrompt(row.company.name, `Prospecting rank #${index + 1}. ${rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit }).summary} ${row.qualification.label}, missing ${row.qualification.gaps.join(", ") || "none"}, contact ${row.contact?.name ?? "not available"}.`)}
                     />
                     <AskChatpilButton
                       label="Draft outreach"
-                      prompt={outreachPrompt(row.company, `Prospecting card. Why now: ${whyNow(row.signals)} Contact: ${row.contact?.name ?? "not available"}. Fit ${row.fit}%, opportunity ${row.opportunity}.`)}
+                      prompt={outreachPrompt(row.company, `Prospecting card. Why now: ${whyNow(row.signals)} Contact: ${row.contact?.name ?? "not available"}. ${row.qualification.label}, opportunity ${row.opportunity}, missing ${row.qualification.gaps.join(", ") || "none"}.`)}
                     />
+                    <button type="button" onClick={() => openDeliverableWizard({ accountId: row.company.id, startStep: "pick" })}>Create deliverable</button>
                     <DemoActionButton
                       label="Create CRM Task"
                       action={{
@@ -316,13 +333,13 @@ export function Prospecting({ world }: { world: World }) {
           {marketProspects.map((row) => (
             <button key={row.company.id} className="current-mini-row" onClick={() => setState({ activeCompanyId: row.company.id })}>
               <strong>{row.company.name}</strong>
-              <span>{row.company.location.city} · fit {row.fit}% · opportunity {row.opportunity}</span>
+              <span>{row.company.location.city} · {row.qualification.label} · opportunity {row.opportunity}</span>
               {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
               <em>{row.contact ? `Call ${row.contact.name}` : "Contact discovery needed"}</em>
               <span className="link-row">{companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}</span>
               <AskChatpilButton
                 label="Why this account?"
-                prompt={explainRankingPrompt(row.company.name, `Market-based prospect. City ${row.company.location.city}, fit ${row.fit}%, opportunity ${row.opportunity}, contact ${row.contact?.name ?? "not available"}.`)}
+                prompt={explainRankingPrompt(row.company.name, `Market-based prospect. City ${row.company.location.city}, ${row.qualification.label}, opportunity ${row.opportunity}, contact ${row.contact?.name ?? "not available"}, missing ${row.qualification.gaps.join(", ") || "none"}.`)}
               />
             </button>
           ))}

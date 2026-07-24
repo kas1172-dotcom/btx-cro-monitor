@@ -32,7 +32,7 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
   text(slide, "Quarterly Revenue & Account Board Review", M, 2.95, 11.5, 1.5, 40, C.whiteHex, true);
   text(slide, "Signal-to-action intelligence for precision machining & defense supply", M, 4.35, 11, 0.5, 16, C.iceHex);
   rich(slide, [{ text: "FY26 · Q3 Board Packet", options: { bold: true, color: C.whiteHex } }, { text: "        Confidential", options: { color: C.iceHex } }], M, 6.4, 11, 0.35, 12);
-  slide.addNotes("Cover. BTX Revenue Brain quarterly board review. All figures illustrative sample data.");
+  slide.addNotes("Cover. BTX Revenue Brain quarterly board review. All figures use illustrative planning context.");
 
   slide = pptx.addSlide();
   bg(slide);
@@ -150,7 +150,7 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
   slide.background = { color: C.navyHex };
   addPptxBrandMark(slide, pptx, M, 2.3);
   text(slide, "The decision this quarter", M, 3.05, 11, 0.9, 34, C.whiteHex, true);
-  text(slide, "Approve a Fort Worth second shift to convert the F-35 sustainment opening. The demand is evidenced, the fit is 91%, and capacity is the only thing standing between backlog and bookings.", M, 4.05, 11.2, 1.3, 16, C.iceHex);
+  text(slide, "Approve a Fort Worth second shift to convert the F-35 sustainment opening. The demand is evidenced, the capability fit is strong, and capacity is the main constraint between backlog and bookings.", M, 4.05, 11.2, 1.3, 16, C.iceHex);
   text(slide, "Sources: HubSpot CRM · monitor engine market evidence · ERP capacity · SAM.gov entity registry. Account links use reviewed relationship records. Figures illustrative.", M, 6.35, 11.2, 0.6, 10, C.iceHex);
 
   validateDeckText([

@@ -326,7 +326,7 @@ const crm = ACCOUNT_ROWS.slice(0, 14).map((a, index) => {
   return {
     account_id: a.id,
     crm_account_name: a.name,
-    owner: a.relationship === "target" ? "BTX Growth Team" : pick(["Alyssa Hart", "Marcus Lee", "Priya Raman"]),
+    owner: a.relationship === "target" ? "BTX Growth Team" : pick(["BTX Revenue Team", "Marcus Lee", "Priya Raman"]),
     account_tier: a.tier,
     last_activity_at: isoDaysAgo(1 + (index % 18)),
     next_step: a.relationship === "target" ? "Validate decision-maker and capacity need" : "Review account plan and confirm next production window",

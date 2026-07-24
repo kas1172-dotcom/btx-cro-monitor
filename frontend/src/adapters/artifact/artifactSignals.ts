@@ -139,6 +139,7 @@ function artifactText(item: ArtifactItem): string {
 function eventType(item: ArtifactItem): string {
   const cats = categories(item).join(" ").toLowerCase();
   const body = artifactText(item).toLowerCase();
+  if (cats.includes("funding") || cats.includes("capital raise") || body.includes("raises $") || body.includes("valuation")) return "funding_round";
   if (cats.includes("contract award") || cats.includes("subcontracting")) return "government_contract_award";
   if (cats.includes("supply chain") || body.includes("supply-chain") || body.includes("supply chain")) return "supplier_delay";
   if (body.includes("airworthiness") || body.includes("regulatory") || body.includes("compliance") || body.includes("itar") || body.includes("cui")) return "regulatory_change";

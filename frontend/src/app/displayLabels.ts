@@ -6,6 +6,7 @@ const LABELS: Record<string, string> = {
   regulatory_change: "Regulatory change",
   contract_loss: "Contract loss",
   government_contract_award: "Government contract award",
+  funding_round: "Funding round",
   contract_win: "Contract win",
   demand_spike: "Demand spike",
   hiring_surge: "Hiring surge",

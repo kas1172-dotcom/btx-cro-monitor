@@ -82,7 +82,7 @@ export function answer(question: string, world: World): string {
     if (rows.length === 0) return `No BTX prospects on file in ${city} yet.`;
     const lines = rows.map(
       (p) =>
-        `• ${p.company.name} - opportunity ${p.opportunity}, fit ${p.fit.score}%` +
+        `• ${p.company.name} - opportunity ${p.opportunity}, ${p.fit.matched.length ? "capability overlap found" : "needs qualification"}` +
         (p.contact ? ` - call ${p.contact.name} (${p.contact.title})` : "") +
         (p.fit.matched.length ? `\n   serve with: ${p.fit.matched.join(", ")}` : ""),
     );
@@ -98,7 +98,7 @@ export function answer(question: string, world: World): string {
       if (rank && prospect) {
         return (
           `${company.name} is ranked #${rank} in the prospect list because the presentation rank blends opportunity and fit. ` +
-          `It has opportunity ${prospect.opportunity} and ${prospect.fit.score}% fit` +
+          `It has opportunity ${prospect.opportunity} and ${prospect.fit.matched.length ? "capability overlap" : "needs qualification"}` +
           (prospect.fit.matched.length ? `, with BTX able to serve ${prospect.fit.matched.join(", ")}` : "") +
           `. ${rankDriver(world, company.id)}`
         );
@@ -113,7 +113,7 @@ export function answer(question: string, world: World): string {
     const prospect = world.prospects.find((p) => p.company.id === company.id);
     if (prospect) {
       return (
-        `${company.name} - opportunity ${prospect.opportunity}, fit ${prospect.fit.score}%` +
+        `${company.name} - opportunity ${prospect.opportunity}, ${prospect.fit.matched.length ? "capability overlap found" : "needs qualification"}` +
         (prospect.fit.matched.length ? ` (serve with ${prospect.fit.matched.join(", ")})` : "") +
         (prospect.contact ? `. Call ${prospect.contact.name}, ${prospect.contact.title}.` : ".")
       );
@@ -135,7 +135,7 @@ export function answer(question: string, world: World): string {
     if (!top) return "No ranked prospects are available right now.";
     return (
       `${top.company.name} is ranked #1 because it has the strongest prospect blend in the current engine output: ` +
-      `opportunity ${top.opportunity} plus ${top.fit.score}% fit` +
+      `opportunity ${top.opportunity} plus ${top.fit.matched.length ? "capability overlap" : "qualification gaps"}` +
       (top.fit.matched.length ? `, with BTX able to serve ${top.fit.matched.join(", ")}` : "") +
       `. ${rankDriver(world, top.company.id)}` +
       (top.contact ? ` Call ${top.contact.name}, ${top.contact.title}.` : "")
@@ -148,7 +148,7 @@ export function answer(question: string, world: World): string {
   if (dim === "opportunity" || /\bbest\b/.test(q)) {
     const top = world.prospects[0];
     return top
-      ? `Top opportunity: ${top.company.name} - opportunity ${top.opportunity}, fit ${top.fit.score}%${top.contact ? `, call ${top.contact.name}` : ""}.`
+      ? `Top opportunity: ${top.company.name} - opportunity ${top.opportunity}, ${top.fit.matched.length ? "capability overlap found" : "needs qualification"}${top.contact ? `, call ${top.contact.name}` : ""}.`
       : help();
   }
   return help();

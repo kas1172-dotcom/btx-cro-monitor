@@ -36,7 +36,8 @@ function verdictFor(input: { fitScore: number; missingCount: number; total5Axis:
   return "pursue";
 }
 
-function confidence(value: string): Deliverable["confidence"] {
+function confidence(value: string, missingEvidence: number): Deliverable["confidence"] {
+  if (missingEvidence >= 3) return "low";
   if (value === "pursue") return "high";
   if (value === "pursue-with-caution") return "medium";
   return "medium";
@@ -56,6 +57,14 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
     const signals = world.analysis.valid.filter((item) => item.subject_id === company.id);
     const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
     const opportunities = world.opportunities.filter((item) => item.company_id === company.id);
+    const contact = world.contacts.find((item) => item.company_id === company.id);
+    const openPipeline = opportunities.some((item) => item.stage !== "won" && item.stage !== "lost" && item.value > 0);
+    const missingEvidence = [
+      company.cage_code ? "" : "CAGE match",
+      contact ? "" : "contact",
+      openPipeline ? "" : "open pipeline",
+      fit.matched.length ? "" : "confirmed fit",
+    ].filter(Boolean);
     const capacity = world.snapshot?.capacity ?? [];
     const localCapacity = capacity.find((item) => item.city === company.location.city);
     const relevantCapacity = localCapacity ? [localCapacity, ...capacity.filter((item) => item.facility_id !== localCapacity.facility_id)] : capacity;
@@ -83,6 +92,8 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
         quotedLeadTimeDays: relevantCapacity[0]?.quoted_lead_time_days ?? 0,
         constraints: constraints.join(", ") || "No major constraints recorded",
         verdict,
+        missingEvidence: missingEvidence.join(", ") || "No major evidence gaps recorded",
+        missingEvidenceCount: missingEvidence.length,
         decidingFactor: verdict === "pursue"
           ? "fit is high and capacity appears available enough for qualification"
           : verdict === "pursue-with-caution"
@@ -112,8 +123,8 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
       createdAt: new Date().toISOString(),
       brainArea: "capacity",
       entityIds: ctx.entityIds,
-      confidence: confidence(verdict),
-      confidenceReason: `Verdict ${verdict}: based on fit ${f.fitScore}%, capacity hours, constraints, and known needs.`,
+      confidence: confidence(verdict, Number(f.missingEvidenceCount)),
+      confidenceReason: Number(f.missingEvidenceCount) >= 3 ? `Low, needs qualification: missing ${f.missingEvidence}.` : `Verdict ${verdict}: based on capability fit, capacity hours, constraints, and known needs.`,
       sections: [
         {
           id: "likely-need",

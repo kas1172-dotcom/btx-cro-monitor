@@ -7,20 +7,11 @@ import { cockpitAdapterStatus } from "../adapters/CockpitDataAdapter.ts";
 import { getScoringConfigVersion, subscribeScoringConfig } from "./config.ts";
 import { provenanceCounts, provenanceSummary, type ProvenanceLabel } from "./provenance.ts";
 import { analyze, buildProspects } from "./intelligence.ts";
-import { deriveNewsSignals } from "./newsIngest.ts";
-import newsData from "../../data/demo/btx/news.json";
-import extractedData from "../../data/demo/btx/extracted-signals.json";
 import type { Analysis, Prospect } from "./intelligence.ts";
-import type { ExtractedRow } from "./newsIngest.ts";
-import type { Company, Contact, Facility, Opportunity, MarketEvent } from "../engine/brain/entities.ts";
+import type { Company, Contact, Facility, Opportunity } from "../engine/brain/entities.ts";
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
-import type { Signal } from "../engine/signals/contract.ts";
 
 const adapter = createDataAdapter();
-const NEWS = newsData as unknown as MarketEvent[];
-const EXTRACTED = extractedData as unknown as ExtractedRow[];
-const SARONIC_PROSPECT_ID = "signal-prospect-saronic";
-
 export interface World {
   city: string | null;
   companies: Company[];
@@ -35,94 +26,6 @@ export interface World {
   loadErrors: string[];
   provenanceSources: Array<{ label: ProvenanceLabel; count: number; detail: string }>;
   provenanceSummary: string | null;
-}
-
-function hasSaronicSignal(signals: unknown[]): boolean {
-  return signals.some((signal) => {
-    const row = signal as { id?: unknown; entities?: unknown; artifact?: { headline?: unknown } };
-    const text = [
-      typeof row.id === "string" ? row.id : "",
-      Array.isArray(row.entities) ? row.entities.join(" ") : "",
-      typeof row.artifact?.headline === "string" ? row.artifact.headline : "",
-    ].join(" ").toLowerCase();
-    return text.includes("saronic");
-  });
-}
-
-function withSignalProspects(companies: Company[], signals: unknown[], city: string | null): Company[] {
-  const hasRealSaronic = companies.some((company) =>
-    company.name.toLowerCase().includes("saronic") ||
-    company.domains?.some((domain) => domain.toLowerCase() === "saronic.com"),
-  );
-  if (hasRealSaronic || !hasSaronicSignal(signals)) return companies;
-  if (city && city !== "Austin") return companies;
-  return [
-    ...companies,
-    {
-      id: SARONIC_PROSPECT_ID,
-      name: "Saronic Technologies",
-      relationship: "target",
-      account_status: "new_logo",
-      business_motion: "prospect_new_business",
-      location: {
-        city: "Austin",
-        state: "TX",
-        country: "USA",
-        lat: 30.2672,
-        lon: -97.7431,
-      },
-      website_url: "https://www.saronic.com",
-      source_url: "https://app.dealroom.co/news/note/saronic-raises-1-75b-at-9-25b-valuation-to-scale-autonomous-warships-for-us-navy",
-      needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "marine autonomy integration"],
-      domains: ["saronic.com"],
-      aliases: ["Saronic"],
-      known_programs: ["Corsair autonomous surface vessel"],
-    },
-  ];
-}
-
-function isSaronicSignal(signal: Signal): boolean {
-  const text = [
-    signal.id,
-    signal.subject_id,
-    signal.artifact?.headline,
-    signal.source_quote,
-    signal.entities.join(" "),
-  ].filter(Boolean).join(" ").toLowerCase();
-  return text.includes("saronic") || text.includes("corsair");
-}
-
-function withSignalProspectRelationships(companies: Company[], signals: unknown[]): unknown[] {
-  const saronic = companies.find((company) => company.id === SARONIC_PROSPECT_ID);
-  if (!saronic) return signals;
-
-  return signals.map((signal) => {
-    const row = signal as Signal;
-    if (!row?.id || !isSaronicSignal(row)) return signal;
-    const existingRelationship = row.relationships?.some((relationship) => relationship.canonical_account_id === saronic.id);
-    return {
-      ...row,
-      subject_id: saronic.id,
-      scope: "specific_account",
-      account_status: saronic.account_status,
-      business_motion: saronic.business_motion,
-      relationships: existingRelationship
-        ? row.relationships
-        : [
-            ...(row.relationships ?? []),
-            {
-              canonical_account_id: saronic.id,
-              source_entity_name: "Saronic Technologies",
-              match_method: "manual",
-              evidence: "Pinned market signal names Saronic Technologies and Corsair.",
-              confidence: 0.86,
-              review_status: "accepted",
-              creation_source: "manual",
-              last_validated_at: row.detected_at ?? null,
-            },
-          ],
-    } satisfies Signal;
-  });
 }
 
 export function useWorld(city: string | null): World | null {
@@ -141,10 +44,9 @@ export function useWorld(city: string | null): World | null {
       adapter.getOperatingSnapshot().catch(() => null),
     ]).then(([rawCompanies, signals, contacts, facilities, opportunities, snapshot]) => {
       if (!alive) return;
-      const companies = withSignalProspects(rawCompanies, signals, city);
-      const resolvedSignals = withSignalProspectRelationships(companies, signals);
-      const newsSignals = deriveNewsSignals(companies, NEWS, EXTRACTED);
-      const analysis = analyze(companies, [...resolvedSignals, ...newsSignals]);
+      const companies = rawCompanies;
+      const resolvedSignals = signals;
+      const analysis = analyze(companies, resolvedSignals);
       const prospects = buildProspects(companies, contacts, analysis.valid, analysis.byId);
       const adapterStatus = cockpitAdapterStatus();
       const draft = {

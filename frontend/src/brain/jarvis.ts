@@ -128,7 +128,7 @@ export function engineContext(world: World): string {
   lines.push("TOP PROSPECTS:");
   for (const p of world.prospects.slice(0, 8))
     lines.push(
-      `- ${p.company.name} [${p.company.location.city}]${p.company.account_status ? ` account_status ${p.company.account_status}` : ""}${p.company.business_motion ? ` business_motion ${p.company.business_motion}` : ""}, opportunity ${p.opportunity}, fit ${p.fit.score}%` +
+      `- ${p.company.name} [${p.company.location.city}]${p.company.account_status ? ` account_status ${p.company.account_status}` : ""}${p.company.business_motion ? ` business_motion ${p.company.business_motion}` : ""}, opportunity ${p.opportunity}, ${p.fit.matched.length ? "capability overlap found" : "needs qualification"}` +
         (p.contact ? `, contact ${p.contact.name} (${p.contact.title})` : "") +
         (p.fit.matched.length ? `, serve ${p.fit.matched.join("/")}` : ""),
     );

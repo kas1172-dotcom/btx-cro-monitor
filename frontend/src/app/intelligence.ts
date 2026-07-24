@@ -50,7 +50,7 @@ export interface Prospect {
 }
 
 /** Build sellable-prospect dossiers (targets + existing customers), ranked by a
- *  presentation blend of opportunity + fit so a 0%-fit account can't top the list. */
+ *  presentation blend of opportunity + fit so a no-fit account cannot top the list. */
 export function buildProspects(
   companies: Company[],
   contacts: Contact[],

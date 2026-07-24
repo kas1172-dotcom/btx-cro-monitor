@@ -145,7 +145,7 @@ def test_operating_baseline_public_and_labeled_seeded(tmp_path: Path):
 
     assert response.status_code == 200
     body = response.json()
-    assert body["data_provenance"] == "Seeded baseline - ERP integration pending"
+    assert body["data_provenance"] == "Operating baseline - ERP integration pending"
     assert body["capacity"]
     assert body["pipeline"]["records"]
 

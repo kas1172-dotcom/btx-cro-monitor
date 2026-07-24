@@ -12,6 +12,12 @@ export interface SavedBrainNote {
   entities: string[];
 }
 
+export interface BrainChatMessage {
+  role: "user" | "assistant";
+  content: string;
+  source?: "llm" | "offline";
+}
+
 export interface ScoreBreakdownItem {
   label: string;
   value: number;
@@ -30,6 +36,8 @@ export interface OpportunityCard {
   whySurfaced: string;
   matchedCapabilities: string[];
   capabilityGaps: string[];
+  qualificationLabel?: string;
+  qualificationGaps?: string[];
   topSignal?: string;
   confidence: "low" | "medium" | "high";
   recommendedAction: string;
@@ -50,6 +58,7 @@ export interface BrainResponse {
   relatedOpportunities: OpportunityCard[];
   confidence: "low" | "medium" | "high";
   focusView?: "map" | "signals" | "accounts" | "capabilities" | "brief";
+  conversation?: BrainChatMessage[];
 }
 
 export type QuestionIntent =

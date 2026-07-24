@@ -8,7 +8,8 @@ export function OpportunityCards({ cards }: { cards: OpportunityCard[] }) {
       {cards.map((card) => (
         <button key={card.companyId} className="brain-opportunity-row" onClick={() => setState({ activeCompanyId: card.companyId })}>
           <strong>{card.companyName}</strong>
-          <span>Opportunity {card.opportunityScore} · fit {card.fitScore}% · {card.city}</span>
+          <span>Opportunity {card.opportunityScore} · {card.qualificationLabel ?? card.confidence} · {card.city}</span>
+          {card.qualificationGaps?.length ? <span>Missing: {card.qualificationGaps.join(", ")}</span> : null}
           <em>{card.whySurfaced}</em>
           <small>{card.recommendedAction}</small>
           <span

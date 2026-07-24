@@ -2,6 +2,7 @@ import type { World } from "../app/useWorld.ts";
 import { PROFILE } from "../app/config.ts";
 import { actionLabel } from "../app/actionLabels.ts";
 import { displayLabel } from "../app/displayLabels.ts";
+import { prospectQualificationLabel, qualitativeSignalConfidence } from "../app/confidence.ts";
 import type { Prospect } from "../app/intelligence.ts";
 import type { BrainResponse, OpportunityCard, SavedBrainNote, ScoreBreakdownItem } from "./types.ts";
 import type { RetrievedContext } from "./retrieveContext.ts";
@@ -17,9 +18,18 @@ function confidence(score: number): "low" | "medium" | "high" {
 function cardFor(prospect: Prospect, world: World): OpportunityCard {
   const rec = world.analysis.recById.get(prospect.company.id);
   const score = prospect.score;
+  const contact = world.contacts.find((row) => row.company_id === prospect.company.id);
+  const opportunities = world.opportunities.filter((row) => row.company_id === prospect.company.id);
+  const qualification = prospectQualificationLabel({
+    company: prospect.company,
+    contact,
+    opportunities,
+    fitMatched: prospect.fit.matched,
+  });
+  const signalConfidence = prospect.topSignal ? qualitativeSignalConfidence(prospect.topSignal) : null;
   const breakdown: ScoreBreakdownItem[] = [
-    { label: "Capability fit", value: prospect.fit.score, note: prospect.fit.matched.length ? prospect.fit.matched.slice(0, 3).join(", ") : "No matched capability", positive: prospect.fit.score >= 50 },
-    { label: "Market signal", value: Math.round((prospect.topSignal?.confidence ?? 0) * 100), note: prospect.topSignal ? displayLabel(prospect.topSignal.event_type) : "No top signal", positive: Boolean(prospect.topSignal) },
+    { label: "Capability fit", value: prospect.fit.score, note: qualification.label, positive: qualification.gaps.length === 0 },
+    { label: "Market signal", value: signalConfidence?.band === "high" ? 3 : signalConfidence?.band === "medium" ? 2 : 1, note: prospect.topSignal ? `${displayLabel(prospect.topSignal.event_type)}, ${signalConfidence?.label}` : "No top signal", positive: signalConfidence?.band === "high" },
     { label: "Revenue potential", value: score.dimensions.opportunity.score, note: "Opportunity score from the scoring engine", positive: score.dimensions.opportunity.score >= 40 },
     { label: "Production feasibility", value: Math.max(0, 100 - score.dimensions.capacityRisk.score), note: `Capacity risk ${score.dimensions.capacityRisk.score}`, positive: score.dimensions.capacityRisk.score < 50 },
   ];
@@ -34,8 +44,10 @@ function cardFor(prospect: Prospect, world: World): OpportunityCard {
     whySurfaced: rec?.reason ?? prospect.topSignal?.source_quote ?? "Ranked by opportunity and fit.",
     matchedCapabilities: prospect.fit.matched,
     capabilityGaps: prospect.fit.missing,
+    qualificationLabel: qualification.label,
+    qualificationGaps: qualification.gaps,
     topSignal: prospect.topSignal?.source_quote,
-    confidence: confidence(prospect.topSignal?.confidence ?? 0.55),
+    confidence: signalConfidence?.band ?? confidence(prospect.topSignal?.confidence ?? 0.55),
     recommendedAction: rec ? actionLabel(rec.action) : "Monitor",
     contactName: prospect.contact?.name,
     contactTitle: prospect.contact?.title,

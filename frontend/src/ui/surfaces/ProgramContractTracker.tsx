@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { displayLabel } from "../../app/displayLabels.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
+import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import { EmptyState, ProvenanceStrip, ScopePill, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
@@ -30,21 +31,14 @@ function soWhat(signal: Signal): string {
 
 export function ProgramContractTracker({ world }: { world: World }) {
   const [expandedSignalId, setExpandedSignalId] = useState<string | null>(null);
-  const programSignals = world.analysis.valid
-    .filter((signal) =>
-      signal.scope === "program" ||
-      signal.event_type.includes("contract") ||
-      signal.event_type.includes("award") ||
-      signal.entities.some((entity) => /\b(f-35|b-21|hypersonic|missile|space|program)\b/i.test(entity))
-    )
-    .sort((a, b) => b.detected_at.localeCompare(a.detected_at));
+  const programSignals = [...world.analysis.valid].sort((a, b) => b.detected_at.localeCompare(a.detected_at));
 
   return (
     <section className="surface-page" data-surface-component="surface-program-contract-tracker">
       <SurfaceHeader
         eyebrow="Signals"
-        headline={`${programSignals.length} program, award, and recompete signals relevant to BTX capabilities.`}
-        subline="Contract and program news stays market-level until a verified account link is available."
+        headline={`${programSignals.length} signals relevant to BTX capabilities.`}
+        subline="Funding, contract, and program news stays market-level until a verified account link is available."
       />
       <div className="program-signal-list">
         {programSignals.map((signal) => {
@@ -52,6 +46,7 @@ export function ProgramContractTracker({ world }: { world: World }) {
           const owner = signalOwner(world, signal);
           const sourceName = signalSourceName(signal);
           const sourceDate = signalSourceDate(signal);
+          const confidence = qualitativeSignalConfidence(signal);
           return (
             <article key={signal.id} className={expanded ? "program-signal-card expanded" : "program-signal-card"}>
               <div className="program-signal-summary">
@@ -61,7 +56,7 @@ export function ProgramContractTracker({ world }: { world: World }) {
                   <p>{soWhat(signal)}</p>
                   <div className="meta-row"><ScopePill scope={signal.scope} /><span>{owner}</span><span>{sourceName}</span><span>{sourceDate}</span></div>
                 </div>
-                <span className="confidence-chip">{Math.round(signal.confidence * 100)}%</span>
+                <span className="confidence-chip">{confidence.label}</span>
                 <button
                   type="button"
                   className="accent-action"

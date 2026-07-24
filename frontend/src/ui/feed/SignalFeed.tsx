@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
-import news from "../../../data/demo/btx/news.json";
 import { importProspectsToHubSpot } from "../../app/backendApi.ts";
 import { CONFIG } from "../../app/config.ts";
 import type { World } from "../../app/useWorld.ts";
 import { createWorkItem } from "../../app/workItems.ts";
-import type { MarketEvent } from "../../engine/brain/entities.ts";
 import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
 import { PORTFOLIO_SIGNAL_SUBJECT_ID, SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
 import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
@@ -12,14 +10,13 @@ import { actionLabel } from "../../app/actionLabels.ts";
 import { expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
+import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
-import { openDeliverableWizard } from "../../store/store.ts";
+import { setState } from "../../store/store.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState } from "../primitives.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
-
-const NEWS = news as unknown as MarketEvent[];
 
 type Filter = "all" | "current" | "prospecting" | "revenue" | "risk" | "competitor" | "contract" | "high_confidence";
 type Sort = "priority" | "newest" | "confidence" | "impact";
@@ -144,6 +141,7 @@ interface SignalRow {
   priority: "high" | "medium" | "low" | "none";
   actionText: string;
   why: string;
+  confidenceLabel: string;
 }
 
 export function SignalFeed({ world }: { world: World }) {
@@ -153,38 +151,10 @@ export function SignalFeed({ world }: { world: World }) {
   const [confirmingSaronicId, setConfirmingSaronicId] = useState<string | null>(null);
   const [expandedSignalId, setExpandedSignalId] = useState<string | null>(null);
   const [statusBySignalId, setStatusBySignalId] = useState<Record<string, string>>({});
-  const newsById = new Map(NEWS.map((item) => [`news-sig-${item.id}`, item]));
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
 
   function setSignalStatus(signalId: string, value: string): void {
     setStatusBySignalId((current) => ({ ...current, [signalId]: value }));
-  }
-
-  function createLockheedPrep(signal: Signal): void {
-    const company = world.companies.find((item) => item.id === signal.subject_id || item.canonical_account_id === signal.subject_id);
-    if (!company) {
-      setSignalStatus(signal.id, "Lockheed account is not available in live CRM yet.");
-      return;
-    }
-    setSignalStatus(signal.id, "Opening sourced meeting-brief wizard...");
-    openDeliverableWizard({
-      agentId: "meeting_brief",
-      accountId: company.id,
-      startStep: "confirm",
-      instructions: `Prepare for Lockheed call re F-35 lot 19. Use this source signal: ${signalHeadline(signal)}. Evidence: ${signal.source_quote}`,
-      afterSave: {
-        kind: "create_work_item",
-        openDeliverable: true,
-        draft: {
-          title: "Prep for Lockheed call re F-35 lot 19",
-          accountName: company.name,
-          accountId: company.id,
-          sourceSignalIds: [signal.id],
-          type: "meeting_brief",
-          priority: "high",
-        },
-      },
-    });
   }
 
   async function createSaronicProspect(signal: Signal): Promise<void> {
@@ -239,23 +209,23 @@ export function SignalFeed({ world }: { world: World }) {
       const portfolio = isPortfolioSignal(signal);
       const company = world.companies.find((c) => c.id === signal.subject_id);
       const rec = world.analysis.recById.get(signal.subject_id);
-      const article = newsById.get(signal.id);
       const impact = portfolio ? { text: "Market-level only; not account-scored", total: 0, dimensions: [] } : scoreImpact(signal.event_type);
       return {
         signal,
         companyName: portfolio ? "Market / portfolio" : nameOf(signal.subject_id),
         companyRelationship: portfolio ? "unlinked" : company?.relationship ?? "unknown",
         address: company ? formatAddress(company.location) : null,
-        headline: signal.artifact ? signalHeadline(signal) : article?.headline ?? titleCase(signal.event_type),
-        source: signal.artifact ? signalSourceName(signal) : article?.source ?? "Sample signal feed",
-        sourceDate: signal.artifact ? signalSourceDate(signal) : article?.published_date ?? signal.detected_at.slice(0, 10),
-        sourceUrl: signal.artifact?.source_url ?? article?.source_url ?? signal.source_url,
-        documentUrl: article?.document_url ?? signal.document_url,
+        headline: signalHeadline(signal),
+        source: signalSourceName(signal),
+        sourceDate: signalSourceDate(signal),
+        sourceUrl: signal.artifact?.source_url ?? signal.source_url,
+        documentUrl: signal.document_url,
         motion: motionForSignal(world, signal),
         impact,
         priority: portfolio ? "none" : rec?.priority ?? "none",
         actionText: portfolio ? "Review as market context; no account task is recommended." : rec ? `${actionLabel(rec.action)} - ${rec.reason}` : "Monitor this account; no immediate action is recommended.",
         why: whyItMatters(world, signal),
+        confidenceLabel: qualitativeSignalConfidence(signal).label,
       };
     });
   }, [world]);
@@ -301,14 +271,14 @@ export function SignalFeed({ world }: { world: World }) {
           const expanded = expandedSignalId === row.signal.id || confirmingSaronicId === row.signal.id;
           const primaryAction = isLockheedSignal(row.signal) && row.signal.scope === "specific_account"
             ? (
-                <button type="button" onClick={() => void createLockheedPrep(row.signal)} disabled={busySignalId === row.signal.id}>
-                  {busySignalId === row.signal.id ? "Creating..." : "Create call prep"}
+                <button type="button" onClick={() => setState({ activeTab: "accounts", activeCompanyId: row.signal.subject_id, brainResponse: null })} disabled={busySignalId === row.signal.id}>
+                  Open account
                 </button>
               )
             : isSaronicSignal(row.signal)
               ? (
-                  <button type="button" onClick={() => setConfirmingSaronicId(row.signal.id)} disabled={busySignalId === row.signal.id}>
-                    Create prospect
+                  <button type="button" onClick={() => setState({ activeTab: "prospecting", activeCompanyId: "saronic-technologies", brainResponse: null })} disabled={busySignalId === row.signal.id}>
+                    Open prospect
                   </button>
                 )
               : (
@@ -325,7 +295,7 @@ export function SignalFeed({ world }: { world: World }) {
                 <span>{row.headline}</span>
               </div>
               <span className="signal-summary-why">{row.why}</span>
-              <span className="confidence-chip">{(row.signal.confidence * 100).toFixed(0)}%</span>
+              <span className="confidence-chip">{row.confidenceLabel}</span>
               <div className="signal-primary-action">{primaryAction}</div>
             </div>
             <button
@@ -368,7 +338,7 @@ export function SignalFeed({ world }: { world: World }) {
               <div>
                 <span>Score impact</span>
                 <strong>{row.impact.text}</strong>
-                <em>Confidence {(row.signal.confidence * 100).toFixed(0)}%{row.signal.value ? ` · value ${money(row.signal.value)}` : ""}</em>
+                <em>{row.confidenceLabel}{row.signal.value ? ` · value ${money(row.signal.value)}` : ""}</em>
               </div>
             </div>
 
@@ -379,7 +349,7 @@ export function SignalFeed({ world }: { world: World }) {
                 <ExternalLink href={row.sourceUrl} label="Open source" />
                 <ExternalLink href={row.documentUrl} label="Document" />
               </div>
-              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor engine document" : "No source link in the current sample data"}</em>}
+              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor engine document" : "No source link in the current context"}</em>}
             </div>
             {isSaronicSignal(row.signal) && (
               <div className="qualification-gaps">

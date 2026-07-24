@@ -133,7 +133,7 @@ def test_hubspot_create_task_payload_includes_associations(monkeypatch):
 def test_hubspot_search_companies_uses_date_versioned_search(monkeypatch):
     FakeHttpxClient.calls = []
     FakeHttpxClient.responses = [
-        httpx.Response(200, json={"results": [{"id": "10", "properties": {"name": "Trinity Defense", "domain": "trinity.example"}}]}),
+        httpx.Response(200, json={"results": [{"id": "10", "properties": {"name": "Trinity Defense", "domain": "northstar.example"}}]}),
     ]
     monkeypatch.setattr("btx_platform.hubspot.httpx.Client", FakeHttpxClient)
 
@@ -189,10 +189,10 @@ def test_hubspot_batch_create_companies_and_contacts_payload(monkeypatch):
 
     client = HubSpotClient("token")
     company_result = client.create_companies_batch([
-        {"objectWriteTraceId": "row-1", "properties": {"name": "Trinity Defense Components", "domain": "trinity.example"}},
+        {"objectWriteTraceId": "row-1", "properties": {"name": "Northstar Precision Test", "domain": "northstar.example"}},
     ])
     contact_result = client.create_contacts_batch([
-        {"objectWriteTraceId": "row-1", "properties": {"email": "buyer@trinity.example", "firstname": "Riley"}},
+        {"objectWriteTraceId": "row-1", "properties": {"email": "buyer@northstar.example", "firstname": "Riley"}},
     ])
 
     assert company_result["results"][0]["id"] == "company-1"
@@ -204,7 +204,7 @@ def test_hubspot_batch_create_companies_and_contacts_payload(monkeypatch):
     assert contact_call[1].endswith("/crm/objects/2026-03/contacts/batch/create")
     assert company_call[2]["json"] == {
         "inputs": [{
-            "properties": {"name": "Trinity Defense Components", "domain": "trinity.example"},
+            "properties": {"name": "Northstar Precision Test", "domain": "northstar.example"},
             "objectWriteTraceId": "row-1",
         }],
     }
@@ -584,7 +584,7 @@ def test_crm_import_prospects_batches_rows_and_reports_partial_failures(monkeypa
             "rows": [
                 {
                     "row_id": "row-1",
-                    "company": {"companyName": "Trinity Defense Components", "domain": "trinity.example", "city": "Pittsburgh"},
+                    "company": {"companyName": "Northstar Precision Test", "domain": "northstar.example", "city": "Pittsburgh"},
                     "contact": {"contactName": "Ari Lee", "email": "bad-email", "title": "Buyer"},
                 },
                 {
@@ -612,7 +612,7 @@ def test_crm_import_prospects_batches_rows_and_reports_partial_failures(monkeypa
     assert rows["row-3"]["status"] == "failed"
     assert rows["row-3"]["reason"] == "Missing required company name or domain."
     assert captured["companies"] == [
-        {"objectWriteTraceId": "row-1", "properties": {"name": "Trinity Defense Components", "domain": "trinity.example", "city": "Pittsburgh"}},
+        {"objectWriteTraceId": "row-1", "properties": {"name": "Northstar Precision Test", "domain": "northstar.example", "city": "Pittsburgh"}},
         {"objectWriteTraceId": "row-2", "properties": {"name": "Duplicate Defense", "domain": "duplicate.example"}},
     ]
     assert captured["contacts"] == [

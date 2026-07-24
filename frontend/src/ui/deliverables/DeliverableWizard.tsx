@@ -18,6 +18,13 @@ const WIZARD_STEPS: Array<{ id: DeliverableWizardStep; label: string }> = [
   { id: "saved", label: "Save" },
 ];
 
+function evidenceBand(confidence: number | null): string {
+  if (confidence === null) return "";
+  if (confidence >= 0.9) return "high confidence";
+  if (confidence >= 0.7) return "medium confidence";
+  return "needs qualification";
+}
+
 interface DeliverableWizardProps {
   world: World;
   initialAgentId?: AgentId;
@@ -211,7 +218,7 @@ export function DeliverableWizard({
                   <span className="deliverable-wizard-provenance-meta">
                     <ScopePill scope={field.scope === "account" ? "specific_account" : "market"} />
                     {field.source} · {field.method.replace(/_/g, " ")}
-                    {field.confidence !== null ? ` · ${Math.round(field.confidence * 100)}%` : ""}
+                    {field.confidence !== null ? ` · ${evidenceBand(field.confidence)}` : ""}
                   </span>
                 </div>
               ))}

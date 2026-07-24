@@ -4,6 +4,7 @@ import { useStore } from "../../store/store.ts";
 import type { MetricId } from "../../metrics/types.ts";
 import { dispatchBrainQuestion } from "../../app/brainActions.ts";
 import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
+import type { BrainChatMessage } from "../../brain/types.ts";
 
 const ACTIONS = [
   "Plan a trip",
@@ -40,9 +41,10 @@ const INITIAL_STAGES: WorkStage[] = [
   { id: "composing", label: "Composing the answer", status: "pending" },
 ];
 
-export function AskBrainBar({ world, large = false, seedPrompt }: { world: World; large?: boolean; seedPrompt?: string }) {
+export function AskBrainBar({ world, large = false, seedPrompt, initialMessages = [] }: { world: World; large?: boolean; seedPrompt?: string; initialMessages?: BrainChatMessage[] }) {
   const { askDraftPrompt } = useStore();
   const [question, setQuestion] = useState(seedPrompt ?? "");
+  const [messages, setMessages] = useState<BrainChatMessage[]>(initialMessages);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [workingQuestion, setWorkingQuestion] = useState<string | null>(null);
@@ -77,6 +79,10 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
     if (!askDraftPrompt && !question && seedPrompt) setQuestion(seedPrompt);
   }, [askDraftPrompt, question, seedPrompt]);
 
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
+
   function updateStage(id: string, patch: Partial<WorkStage>) {
     setWorkingStages((stages) => stages.map((stage) => stage.id === id ? { ...stage, ...patch } : stage));
   }
@@ -86,11 +92,12 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
     if (!q) return;
     let showTimer: number | undefined;
     setWorkingQuestion(q);
+    setMessages((current) => [...current, { role: "user", content: q }]);
     setShowWorking(false);
     setWorkingStages(INITIAL_STAGES.map((stage, index) => ({ ...stage, status: index === 0 ? "active" : "pending" })));
     showTimer = window.setTimeout(() => setShowWorking(true), 300);
     try {
-      await dispatchBrainQuestion(q, world, {
+      const result = await dispatchBrainQuestion(q, world, {
         accountId,
         city: tripCity,
         startDate,
@@ -98,6 +105,7 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         quarter,
         metric,
         instructions,
+        history: messages,
       }, {
         routed: (response, usedFallback) => updateStage("routed", {
           status: usedFallback ? "fallback" : "done",
@@ -112,8 +120,14 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         scored: (_response, scoredCount) => updateStage("scored", { status: "done", label: `Scored ${scoredCount} opportunities` }),
         composing: (label) => updateStage("composing", { status: "active", label }),
       });
+      if (result.response?.conversation) setMessages(result.response.conversation);
       updateStage("composing", { status: "done" });
       setQuestion("");
+    } catch (error) {
+      setMessages((current) => [
+        ...current,
+        { role: "assistant", content: error instanceof Error ? `Could not answer: ${error.message}` : "Could not answer the question.", source: "offline" },
+      ]);
     } finally {
       if (showTimer) window.clearTimeout(showTimer);
       setShowWorking(false);
@@ -167,6 +181,16 @@ export function AskBrainBar({ world, large = false, seedPrompt }: { world: World
         />
         <button type="submit" disabled={workingQuestion !== null}>{workingQuestion ? "Working..." : "Ask"}</button>
       </form>
+      {messages.length > 0 && (
+        <div className="ask-chat-thread" aria-live="polite">
+          {messages.slice(-8).map((message, index) => (
+            <article key={`${message.role}-${index}-${message.content.slice(0, 20)}`} className={`ask-chat-message ask-chat-${message.role}`}>
+              <span>{message.role === "user" ? "You" : message.source === "offline" ? "Assistant, offline fallback" : "Assistant"}</span>
+              <p>{message.content}</p>
+            </article>
+          ))}
+        </div>
+      )}
       {workingQuestion && showWorking && !pendingAction && (
         <div className="ask-working" aria-live="polite">
           <strong>You asked: {workingQuestion}</strong>
