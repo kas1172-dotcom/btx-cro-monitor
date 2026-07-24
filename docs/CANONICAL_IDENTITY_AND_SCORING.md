@@ -59,4 +59,3 @@ Frontend surfaces should use backend-authoritative payloads:
 - Work Queue uses the lifecycle: detected, triaged, prepared, awaiting approval, approved, in progress, executed, verified, outcome recorded, closed, dismissed.
 
 Legacy browser-side scoring can still support tests and local empty-state tooling, but it must not override backend score snapshots in the live cockpit.
-
