@@ -86,7 +86,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     noteArea = "map";
     noteTitle = `${city} prospecting plan`;
   } else if (ctx.intent === "account_risk") {
-    directAnswer = `${ctx.atRiskAccounts.length} accounts show elevated risk. Priority: ${ctx.atRiskAccounts.slice(0, 3).map((c) => c.name).join(", ") || "none"}.`;
+    directAnswer = `${ctx.atRiskAccounts.length} accounts are at higher risk. Priority: ${ctx.atRiskAccounts.slice(0, 3).map((c) => c.name).join(", ") || "none"}.`;
     whyThisMatters = "Account risk can become delivery risk, revenue slippage, or competitive loss if the team waits too long.";
     recommendedActions = ["Review top at-risk account", "Create a CRM follow-up task", "Prepare a defensive account brief"];
     suggestedNextQuestions = ["What is driving the top risk?", "Draft a check-in for the top risk account.", "Which deals are exposed?"];

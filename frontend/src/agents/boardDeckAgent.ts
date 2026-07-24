@@ -191,7 +191,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           id: "priorities",
           heading: "Priorities and Asks",
           blocks: [
-            { kind: "text", text: `Protect accounts with elevated risk before they become delivery or revenue slippage.` },
+            { kind: "text", text: `Protect accounts at high risk before they become delivery or revenue slippage.` },
             { kind: "text", text: `Use ${pct(Number(f.capacity))} average work-center load to keep sales focus aligned with production reality.` },
             { kind: "text", text: `Watch customer concentration at ${pct(Number(f.concentration))} and keep prospecting active in priority markets.` },
           ],

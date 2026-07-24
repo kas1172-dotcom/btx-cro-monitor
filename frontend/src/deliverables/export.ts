@@ -316,6 +316,7 @@ export function printDeliverable(deliverable: Deliverable, world?: World): void 
   const html = [
     "<!doctype html><html><head><title>",
     deliverable.title,
+    // check:design-allow: neutral print greys for the exported HTML document, not cockpit tokens.
     "</title><style>body{font-family:Arial,sans-serif;color:#111;background:#fff;margin:36px;line-height:1.45}h1{font-size:26px}h2{font-size:16px;margin-top:24px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border-bottom:1px solid #ddd;text-align:left;padding:7px;vertical-align:top}pre{white-space:pre-wrap}.footer{margin-top:32px;color:#666;font-size:11px}</style></head><body>",
     `<h1>${deliverable.form === "email" ? emailSubject(deliverable) : deliverable.title}</h1>`,
     ...sections.map((section) => [

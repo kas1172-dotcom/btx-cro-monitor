@@ -1,0 +1,5 @@
+# check:voice allowlist. One exact phrase per line. A user-visible string or
+# prompt line that contains an allowlisted phrase is exempt from the voice
+# check. Use this only for legitimate exceptions, for example a real product or
+# company name that contains a banned substring. This is reviewed, not a dumping
+# ground. Lines starting with # are comments.

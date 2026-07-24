@@ -8,6 +8,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "check:design": "tsx tools/check-design-tokens.ts",
+    "check:voice": "tsx tools/check-voice.ts",
     "gen": "tsx tools/generate-demo.ts && tsx tools/generate-sample-library.ts",
     "engine": "tsx demo/run.ts",
     "demo:generate": "tsx tools/generate-demo.ts && tsx tools/generate-sample-library.ts",

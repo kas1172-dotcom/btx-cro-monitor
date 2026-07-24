@@ -35,7 +35,7 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
     ? `${topOpportunity.company.name}: opportunity ${topOpportunity.opportunity}, ${topOpportunity.fit.matched.length ? "capability overlap found" : "needs qualification"}`
     : "No ranked opportunity";
   const topRiskDriver = topRisk?.dimensions.risk.contributions[0]?.event_type?.replace(/_/g, " ") ?? "validated risk signal";
-  const topRiskLabel = topRisk ? `${nameOf(topRisk.subject_id)}: risk ${topRisk.dimensions.risk.score}, ${topRiskDriver}` : "No elevated risk";
+  const topRiskLabel = topRisk ? `${nameOf(topRisk.subject_id)}: risk ${topRisk.dimensions.risk.score}, ${topRiskDriver}` : "No high-risk accounts";
 
   function ask(question: string) {
     const response = processBrainQuestion(question, world);

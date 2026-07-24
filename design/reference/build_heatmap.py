@@ -28,7 +28,7 @@ rev = np.array([
 status = ["Growing","Stable","Stable","Growing","At risk","Stable","Soft","Churned"]
 scol = {"Growing":GREEN,"Stable":TEAL,"Soft":AMBER,"At risk":AMBER,"Churned":RED}
 
-cmap = LinearSegmentedColormap.from_list("btx", ["#F4F8FC","#BFE3DD","#2FB6A8","#12263A"])
+cmap = LinearSegmentedColormap.from_list("btx", ["#F6F8FB","#BFE3DD","#2FB6A8","#12263A"])
 
 fig, ax = plt.subplots(figsize=(11.5, 7.4), dpi=150)
 plt.subplots_adjust(bottom=0.20, top=0.90)
