@@ -625,6 +625,61 @@ button, input, select, textarea { font: inherit; }
   display: grid;
   gap: 8px;
 }
+.program-signal-list {
+  display: grid;
+  gap: 10px;
+}
+.program-signal-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(var(--card-rgb), .72);
+  box-shadow: 0 14px 34px rgba(var(--rail-rgb), .22);
+  padding: 12px;
+}
+.program-signal-card.expanded {
+  background: var(--card);
+}
+.program-signal-summary {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: start;
+}
+.program-event-tag {
+  border: 1px solid rgba(var(--accent-rgb), .42);
+  border-radius: 999px;
+  color: var(--accent-text);
+  background: rgba(var(--accent-rgb), .08);
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  line-height: 1.2;
+  width: fit-content;
+  max-width: 180px;
+}
+.program-signal-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.program-signal-main strong {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.25;
+}
+.program-signal-main p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.program-signal-detail {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
 .signal-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2074,6 +2129,8 @@ button, input, select, textarea { font: inherit; }
   .map-rail { left: 10px; right: 10px; top: auto; bottom: 10px; width: auto; max-height: 48%; overflow: hidden; }
   .map-prospect-list { max-height: min(34vh, 280px); }
   .map-prospect-main small { -webkit-line-clamp: 1; }
+  .program-signal-summary { grid-template-columns: 1fr; }
+  .program-event-tag { max-width: 100%; }
 
   /* Inspector becomes a full-screen slide-in, shown only when a company is picked. */
   .inspector {
