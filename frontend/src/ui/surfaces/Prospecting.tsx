@@ -159,7 +159,7 @@ export function Prospecting({ world }: { world: World }) {
         <div>
           <span>Revenue potential</span>
           <strong>{money(totalRevenue)}</strong>
-          <em>estimated from demo pipeline records</em>
+          <em>estimated from current pipeline records</em>
         </div>
         <div>
           <span>Outreach queue</span>
@@ -176,14 +176,14 @@ export function Prospecting({ world }: { world: World }) {
             <p>
               {selectedMarket
                 ? `A practical prospecting list for a ${selectedMarket} visit, ranked by opportunity, fit, signal strength, contact availability, and geography.`
-                : "Select a city for an in-market visit plan. For now, these are the strongest national targets from the demo data."}
+                : "Select a city for an in-market visit plan. For now, these are the strongest national targets in the current data."}
             </p>
           </div>
           <button onClick={() => setState({ activeTab: "map" })}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
         </div>
         <div className="visit-plan-list">
           {visitPlanRows.map((row, index) => {
-            const evidence = row.signals[0]?.source_quote ?? "No validated signal attached in demo data.";
+            const evidence = row.signals[0]?.source_quote ?? "No validated signal attached in current data.";
             const expanded = expandedProspectId === `visit-${row.company.id}`;
             return (
               <article key={row.company.id} className="visit-plan-card compact-scan-card">

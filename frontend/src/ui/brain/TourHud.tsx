@@ -15,7 +15,7 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
   const [paused, setPaused] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [typedPrompt, setTypedPrompt] = useState("");
-  const [narration, setNarration] = useState(autoStart ? "Starting the tour from a clean cockpit state." : "Press Play to run the demo tour.");
+  const [narration, setNarration] = useState(autoStart ? "Starting the tour from a clean cockpit state." : "Press Play to run the guided tour.");
   const [error, setError] = useState<string | null>(null);
   const [failures, setFailures] = useState(0);
 
@@ -131,7 +131,7 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
 
   if (minimized) {
     return (
-      <div className="tour-hud minimized" role="dialog" aria-label="Demo tour">
+      <div className="tour-hud minimized" role="dialog" aria-label="Guided tour">
         <div className="tour-actions">
           <button onClick={() => setMinimized(false)}>Tour {tourStep + 1}/{TOUR_STEPS.length}</button>
           <button onClick={() => { setPlaying(true); setPaused(false); }} disabled={playing && !paused}>Play</button>
@@ -143,8 +143,8 @@ export function TourHud({ world, autoStart = false, onDismiss }: TourHudProps) {
   }
 
   return (
-    <div className="tour-hud" role="dialog" aria-label="Demo tour">
-      <p className="eyebrow">Demo tour · {tourStep + 1} of {TOUR_STEPS.length}</p>
+    <div className="tour-hud" role="dialog" aria-label="Guided tour">
+      <p className="eyebrow">Guided tour · {tourStep + 1} of {TOUR_STEPS.length}</p>
       <h2>{TOUR_STEPS[tourStep].title}</h2>
       <p>{narration}</p>
       <div className="tour-typewriter">{typedPrompt || TOUR_STEPS[tourStep].prompt || TOUR_STEPS[tourStep].actionLabel}</div>

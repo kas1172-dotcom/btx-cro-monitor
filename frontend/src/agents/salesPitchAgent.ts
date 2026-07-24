@@ -19,7 +19,7 @@ type Inputs = z.infer<typeof Inputs>;
 const sectionSpec = [
   { id: "opening-hook", heading: "Opening Hook", required: true },
   { id: "what-btx-does", heading: "What BTX Does for Companies Like Them", required: true },
-  { id: "proof-points", heading: "Proof Points", required: true },
+  { id: "evidence", heading: "Evidence", required: true },
   { id: "why-now", heading: "Why Now", required: true },
   { id: "the-ask", heading: "The Ask", required: true },
 ];
@@ -107,8 +107,8 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
           blocks: [{ kind: "text", text: `${PROFILE.name} helps aerospace and defense manufacturers move qualified machined work through certified outside capacity. For ${f.accountName}, the most relevant fit is ${f.matchedCapabilities}. We keep the conversation practical: prints, materials, timing, and what can be supported without overpromising.` }],
         },
         {
-          id: "proof-points",
-          heading: "Proof Points",
+          id: "evidence",
+          heading: "Evidence",
           audience: "prospect",
           blocks: [{ kind: "text", text: `BTX brings AS9100 and ITAR discipline, 5-axis machining capacity, build-to-print execution, and delivery follow-through for production teams that need dependable support.` }],
         },

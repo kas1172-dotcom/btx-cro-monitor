@@ -42,7 +42,7 @@ export function businessContextForCompany(
 
   const crmLine = crm
     ? `CRM: ${crm.account_tier} account owned by ${crm.owner}; relationship ${crm.relationship_health}; last touch ${dateLabel(crm.last_activity_at)}; next step: ${crm.next_step}.`
-    : "CRM: no simulated owner or last-touch record is attached to this account.";
+    : "CRM: no owner or last-touch record is attached to this account.";
 
   const capacityLine = bestCapacity
     ? `ERP/capacity: ${bestCapacity.facility_name} has ${bestCapacity.available_5_axis_hours_next_30d} available 5-axis hours and ${bestCapacity.available_turning_hours_next_30d} turning hours over 30 days; constraint is ${bestCapacity.constraint}; lead time ${bestCapacity.quoted_lead_time_days} days.`
@@ -52,15 +52,15 @@ export function businessContextForCompany(
     ? `Pipeline: ${pipelineRecord.recommended_action}. ${pipelineRecord.reason}`
     : openOpps.length
       ? `Pipeline: ${openOpps.length} open item${openOpps.length === 1 ? "" : "s"} worth ${money(openValue)}; ${wonOpps.length} won contract${wonOpps.length === 1 ? "" : "s"}.`
-      : "Pipeline: no open simulated opportunity is attached to this account.";
+      : "Pipeline: no open opportunity is attached to this account.";
 
   const assumptionsLine = snapshot
-    ? `Demo disclosure: ${snapshot.assumptions.assumptions[0] ?? snapshot.assumptions.summary}`
-    : "Demo disclosure: CRM, ERP/capacity, opportunities, and pipeline context are static demo snapshots.";
+    ? `Baseline disclosure: ${snapshot.assumptions.assumptions[0] ?? snapshot.assumptions.summary}`
+    : "Baseline disclosure: CRM, ERP/capacity, opportunities, and pipeline context are local baseline records.";
 
   const crmClause = crm
-    ? `simulated CRM shows a ${crm.relationship_health} relationship owned by ${crm.owner}`
-    : "simulated CRM shows no active owner (whitespace account)";
+    ? `CRM shows a ${crm.relationship_health} relationship owned by ${crm.owner}`
+    : "CRM shows no active owner";
   const capacityClause = bestCapacity
     ? `ERP/capacity shows ${bestCapacity.available_5_axis_hours_next_30d} available 5-axis hours`
     : "ERP/capacity is not modeled for this account";

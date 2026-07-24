@@ -9,10 +9,10 @@ export function processBrainQuestion(question: string, world?: World): BrainResp
   if (!world) {
     return {
       question,
-      directAnswer: "The Revenue Brain is still loading its local demo context.",
-      whyThisMatters: "The brain only answers from deterministic engine data, so it waits for account, signal, opportunity, and capacity context before answering.",
+      directAnswer: "The Revenue Brain is still loading its local operating context.",
+      whyThisMatters: "The brain only answers from rules-based account, signal, opportunity, and capacity context, so it waits for those records before answering.",
       activatedTabs: ["analysis"],
-      contextUsed: [{ source: "local demo adapter", reason: "Required before deterministic scoring can run." }],
+      contextUsed: [{ source: "local operating context", reason: "Required before rules-based scoring can run." }],
       recommendedActions: ["Wait for data to load", "Ask again from the cockpit"],
       savedNote: { title: "Brain context unavailable", brainArea: "analysis", summary: "Question received before context loaded.", entities: [] },
       suggestedNextQuestions: ["What should I care about this week?", "Who should I target in Austin?"],

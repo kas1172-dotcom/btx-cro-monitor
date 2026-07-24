@@ -33,6 +33,14 @@ function eventLabel(value: string): string {
   return value.replace(/_/g, " ");
 }
 
+function weekdayBriefingLabel(world: World): string {
+  const anchor = world.snapshot?.publicSignals.run_at ? new Date(world.snapshot.publicSignals.run_at) : new Date();
+  const weekday = Number.isNaN(anchor.getTime())
+    ? "Daily"
+    : anchor.toLocaleDateString(undefined, { weekday: "long" });
+  return `${weekday} briefing`;
+}
+
 function signalLink(signal: Signal): BriefLink {
   if (signal.scope === "specific_account" && signal.subject_id) {
     return { label: "Open account", surface: "accounts", accountId: signal.subject_id };
@@ -74,10 +82,15 @@ function signalToBriefItem(world: World, signal: Signal): BriefItem {
   const source = signalSourceName(signal);
   const sourceDate = signalSourceDate(signal);
   const title = signalHeadline(signal);
+  const event = eventLabel(signal.event_type);
+  const confidence = Math.round(signal.confidence * 100);
+  const reason = signal.scope === "specific_account"
+    ? `${accountName} has a ${event} trigger from ${source}; confidence ${confidence}%.`
+    : `${source} surfaced a portfolio ${event} trigger with ${confidence}% confidence.`;
   return {
     id: `signal-${signal.id}`,
     title,
-    reason: `${Math.round(signal.confidence * 100)}% confidence ${eventLabel(signal.event_type)} signal from ${source}.`,
+    reason,
     meta: `${accountName} - ${sourceDate}`,
     link: signalLink(signal),
     seed: `Explain today's top signal for a CRO: ${String(title)}. Evidence: ${signal.source_quote}`,
@@ -167,14 +180,16 @@ export function TodayBrief({ world }: { world: World }) {
     ...attention.items.map((item) => item.due_date),
     ...world.opportunities.filter((opp) => opp.stage !== "won" && opp.stage !== "lost").map((opp) => opp.close_date),
   ].filter((date) => isThisWeek(date)).length;
+  const activeAccountCount = world.companies.filter((company) => company.relationship === "customer" || company.relationship === "target").length;
+  const summaryLine = `${activeAccountCount} active accounts, ${topSignals.length} validated signals, and ${attention.items.length} open work items are ready for review.`;
   const topSeed = miniBrief[0]?.seed;
 
   return (
     <section className="surface-page today-brief-page" data-surface-component="surface-todays-brief">
       <SurfaceHeader
         eyebrow="Daily briefing"
-        headline="Today's BTX demo path"
-        subline="Start with the Lockheed account action, then qualify Saronic as the net-new prospect."
+        headline={weekdayBriefingLabel(world)}
+        subline={summaryLine}
       />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
 
@@ -184,8 +199,8 @@ export function TodayBrief({ world }: { world: World }) {
           <span>{miniBrief.length} signals</span>
         </div>
         <div className="today-brief-list">
-          {miniBrief.map((item) => (
-            <article key={item.id} className="today-brief-item">
+          {miniBrief.map((item, index) => (
+            <article key={item.id} className={index < reservedBriefs.length ? "today-brief-item pinned" : "today-brief-item"}>
               <div>
                 <strong>{item.title}</strong>
                 <p>{item.reason}</p>

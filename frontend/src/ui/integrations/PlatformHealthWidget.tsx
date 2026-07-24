@@ -71,7 +71,7 @@ export function PlatformHealthWidget() {
     return (
       <div className="platform-health-widget">
         <p className="eyebrow">Platform health</p>
-        <p className="muted">No backend configured (VITE_BACKEND_ENDPOINT unset) — running on static demo data only.</p>
+        <p className="muted">No backend configured (VITE_BACKEND_ENDPOINT unset) — running on local baseline data only.</p>
       </div>
     );
   }

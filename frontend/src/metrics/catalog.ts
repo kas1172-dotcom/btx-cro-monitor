@@ -36,7 +36,7 @@ function result(value: number, label: string, unit: MetricResult["unit"], source
     value: Math.round(value * 100) / 100,
     label,
     unit,
-    provenance: [{ source, records, reason: `Computed ${label} from deterministic demo records.` }],
+    provenance: [{ source, records, reason: `Computed ${label} from approved baseline records.` }],
   };
 }
 

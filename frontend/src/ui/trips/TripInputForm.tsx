@@ -17,7 +17,7 @@ export function TripInputForm({ world, onSubmit, busy = false }: { world: World;
   const [startDate, setStartDate] = useState(tripDefaults.startDate);
   const [endDate, setEndDate] = useState(tripDefaults.endDate);
   const [focus, setFocus] = useState<TripFormValues["focus"]>("mixed");
-  const [instructions, setInstructions] = useState("Prioritize the two demo journeys when they fit the market, then keep the trip practical.");
+  const [instructions, setInstructions] = useState("Prioritize the two priority account journeys when they fit the market, then keep the trip practical.");
 
   return (
     <form

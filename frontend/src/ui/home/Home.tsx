@@ -66,7 +66,7 @@ export function Home({ world, cityWorld }: { world: World; cityWorld: World | nu
     <div className="home">
       <section className="home-hero">
         <div>
-          <p className="eyebrow">Static CRO demo · deterministic engine</p>
+          <p className="eyebrow">CRO operating cockpit</p>
           <h1>{PROFILE.name} Enterprise Brain</h1>
           <p className="home-copy">
             Split every CRO decision into two modes: protect and grow the business you already have, or find the next accounts to pursue.

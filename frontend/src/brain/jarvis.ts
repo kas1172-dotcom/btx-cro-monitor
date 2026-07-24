@@ -1,4 +1,4 @@
-// Chatpil brain — the CRO's chief-of-staff layer over the deterministic engine.
+// ChatPill brain — the CRO's chief-of-staff layer over the rules-based engine.
 // LLM path: proxy call with a grounded context snapshot, personal-assistant behavior,
 // action-dispatch offers, and full error isolation.
 // Offline path: rule-based resolver. No debug text ever renders in the thread.
@@ -191,7 +191,7 @@ export function engineContext(world: World): string {
 
   const snap = world.snapshot;
   if (snap) {
-    lines.push("BUSINESS CONTEXT (simulated CRM / ERP / pipeline — demo snapshot, not scored):");
+    lines.push("BUSINESS CONTEXT (CRM / ERP / pipeline baseline, not scored):");
     lines.push(`- Pipeline: ${snap.pipeline.summary.top_action} ($${(snap.pipeline.summary.open_pipeline_value / 1e6).toFixed(1)}M open, $${(snap.pipeline.summary.weighted_pipeline_value / 1e6).toFixed(1)}M weighted).`);
     for (const c of snap.crm.slice(0, 6))
       lines.push(`- CRM ${nameOf(c.account_id)}: ${c.account_tier}, ${c.relationship_health}, owner ${c.owner}, next step: ${c.next_step}.`);
@@ -203,7 +203,7 @@ export function engineContext(world: World): string {
 }
 
 function systemPrompt(world: World): string {
-  return `You are Chatpil, the revenue chief-of-staff for ${PROFILE.name} Precision's CRO. You are grounded exclusively in the ENGINE STATE context below.
+  return `You are ChatPill, the revenue chief-of-staff for ${PROFILE.name} Precision's CRO. You are grounded exclusively in the ENGINE STATE context below.
 
 ${GROUNDING_CONTRACT}
 

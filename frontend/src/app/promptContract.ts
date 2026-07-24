@@ -1,7 +1,7 @@
-// Centralized prompt guardrails for the browser-facing Chatpil surfaces (the
+// Centralized prompt guardrails for the browser-facing ChatPill surfaces (the
 // system prompt in jarvis.ts and the user-prompt builders in copilotPrompts.ts).
-// Keeping the "grounding contract" in one place means every Chatpil call enforces
-// the same rules. Chatpil is the CRO EXPLANATION layer over a deterministic
+// Keeping the "grounding contract" in one place means every ChatPill call enforces
+// the same rules. ChatPill is the CRO EXPLANATION layer over a rules-based
 // engine — it explains scores, rankings, signals, and recommendations; it never
 // computes, alters, or invents the numbers.
 
@@ -10,8 +10,8 @@ export const GROUNDING_CONTRACT = `GROUNDING RULES (non-negotiable):
 - NEVER invent, alter, estimate, or recompute a business number — scores, dollar values, fit %, capacity hours, dates. Quote numbers exactly as given.
 - Do not convert, extrapolate, annualize, or infer missing values. If a value is absent, say "not provided".
 - Keep the layers separate:
-  • FACTS the engine computed: deterministic scores + validated public signals.
-  • CONNECTED CONTEXT (simulated demo): CRM ownership/health, ERP/capacity, pipeline. This sharpens the "why" — it does NOT change the score.
+  • FACTS the engine computed: rules-based scores + validated public signals.
+  • CONNECTED CONTEXT: CRM ownership/health, ERP/capacity, pipeline. This sharpens the "why" — it does NOT change the score.
   • Your INFERENCE: anything you conclude beyond the above — label it as inference.
 - Cite the evidence behind each claim (the signal, quote, score, or CRM/capacity/pipeline record).
 - If the data needed to answer is not in the context, say plainly what is missing — do not guess.

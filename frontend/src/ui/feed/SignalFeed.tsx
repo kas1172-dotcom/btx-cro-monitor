@@ -379,7 +379,7 @@ export function SignalFeed({ world }: { world: World }) {
                 <ExternalLink href={row.sourceUrl} label="Open source" />
                 <ExternalLink href={row.documentUrl} label="Document" />
               </div>
-              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor-engine artifact" : "No source link in static demo snapshot"}</em>}
+              {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor-engine artifact" : "No source link in the current baseline"}</em>}
             </div>
             {isSaronicSignal(row.signal) && (
               <div className="qualification-gaps">

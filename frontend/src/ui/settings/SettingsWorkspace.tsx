@@ -50,6 +50,12 @@ const WEIGHTS_KEY = "btx.settings.scoring_weights";
 const SOURCES_KEY = "btx.settings.source_registry";
 const SOURCE_REQUESTS_KEY = "btx.settings.source_requests";
 const DIMENSIONS: Dimension[] = ["risk", "opportunity", "capacityRisk", "competitivePressure"];
+const DIMENSION_LABELS: Record<Dimension, string> = {
+  risk: "Risk",
+  opportunity: "Opportunity",
+  capacityRisk: "Capacity risk",
+  competitivePressure: "Competitive pressure",
+};
 const LIVE_MODE = Boolean(BACKEND_ENDPOINT);
 
 const DEFAULT_SOURCE_REGISTRY: SourceRegistryDocument = {
@@ -78,7 +84,7 @@ function clearAllThreads(): void {
 }
 
 function resetDemo(): void {
-  if (!window.confirm("Reset demo and clear all local state?")) return;
+  if (!window.confirm("Reset workspace and clear all local state?")) return;
   clearAllThreads();
   clearMemory();
   resetUiState();
@@ -99,7 +105,7 @@ function applyWeights(document: WeightsConfig): void {
 }
 
 function updatedLabel(response?: EngineConfigResponse<unknown> | null): string {
-  if (!response) return LIVE_MODE ? "Not loaded from backend yet" : "Local demo draft";
+  if (!response) return LIVE_MODE ? "Not loaded from backend yet" : "Local draft";
   return `v${response.version} saved ${new Date(response.updated_at).toLocaleString()}`;
 }
 
@@ -108,7 +114,7 @@ function sectionCopy(section: SettingsSection): { title: string; body: string } 
     case "engine":
       return {
         title: "Engine tuning",
-        body: "Tune deterministic scoring weights. Changes apply immediately in this browser; save to persist them.",
+        body: "Tune rules-based scoring weights. Changes apply immediately in this browser; save to persist them.",
       };
     case "memory":
       return {
@@ -133,7 +139,7 @@ function sectionCopy(section: SettingsSection): { title: string; body: string } 
     case "general":
       return {
         title: "General & history",
-        body: "Manage local demo history and reset controls.",
+        body: "Manage local history and reset controls.",
       };
   }
 }
@@ -141,7 +147,7 @@ function sectionCopy(section: SettingsSection): { title: string; body: string } 
 function EngineTuningPanel() {
   const [weights, setWeights] = useState<WeightsConfig>(() => readLocal(WEIGHTS_KEY, defaultWeights as WeightsConfig));
   const [saved, setSaved] = useState<EngineConfigResponse<WeightsConfig> | null>(null);
-  const [status, setStatus] = useState(LIVE_MODE ? "Loading backend scoring weights..." : "Demo mode: changes save to this browser.");
+  const [status, setStatus] = useState(LIVE_MODE ? "Loading backend scoring weights..." : "Local mode: changes save to this browser.");
 
   useEffect(() => {
     let alive = true;
@@ -184,7 +190,7 @@ function EngineTuningPanel() {
     setStatus("Saving...");
     if (!LIVE_MODE) {
       window.localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights));
-      setStatus("Saved to local demo settings.");
+      setStatus("Saved to local settings.");
       return;
     }
     try {
@@ -210,7 +216,7 @@ function EngineTuningPanel() {
       <div className="settings-weight-table">
         <div className="settings-weight-head">
           <span>Event type</span>
-          {DIMENSIONS.map((dimension) => <span key={dimension}>{dimension}</span>)}
+          {DIMENSIONS.map((dimension) => <span key={dimension}>{DIMENSION_LABELS[dimension]}</span>)}
         </div>
         {eventTypes.map((eventType) => (
           <div key={eventType} className="settings-weight-row">
@@ -234,7 +240,7 @@ function EngineTuningPanel() {
 function SourcesPanel() {
   const [registry, setRegistry] = useState<SourceRegistryDocument>(() => readLocal(SOURCES_KEY, DEFAULT_SOURCE_REGISTRY));
   const [saved, setSaved] = useState<EngineConfigResponse<SourceRegistryDocument> | null>(null);
-  const [status, setStatus] = useState(LIVE_MODE ? "Loading backend source registry..." : "Demo mode: changes save to this browser.");
+  const [status, setStatus] = useState(LIVE_MODE ? "Loading backend source registry..." : "Local mode: changes save to this browser.");
   const [requestText, setRequestText] = useState(() => readLocal(SOURCE_REQUESTS_KEY, ""));
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const enabledCount = useMemo(() => registry.sources.filter((source) => source.enabled).length, [registry]);
@@ -288,7 +294,7 @@ function SourcesPanel() {
     if (!LIVE_MODE) {
       window.localStorage.setItem(SOURCES_KEY, JSON.stringify(registry));
       window.localStorage.setItem(SOURCE_REQUESTS_KEY, JSON.stringify(requestText));
-      setStatus("Saved to local demo settings.");
+      setStatus("Saved to local settings.");
       return;
     }
     try {
@@ -399,19 +405,19 @@ export function SettingsWorkspace() {
             <div className="settings-actions">
               <button onClick={() => clearCurrentThread(activeTab)}>
                 <strong>Clear this chat</strong>
-                <span>Remove the Chatpil thread stored for the current tab.</span>
+                <span>Remove the ChatPill thread stored for the current tab.</span>
               </button>
               <button onClick={clearAllThreads}>
                 <strong>Clear all chats</strong>
-                <span>Remove every local Chatpil thread from this browser.</span>
+                <span>Remove every local ChatPill thread from this browser.</span>
               </button>
               <button onClick={clearMemory}>
                 <strong>Clear notes + activity</strong>
                 <span>Remove saved notes, generated deliverable records, and activity history.</span>
               </button>
               <button onClick={resetDemo}>
-                <strong>Reset demo</strong>
-                <span>Clear local demo state and reload from the seeded snapshot.</span>
+                <strong>Reset workspace</strong>
+                <span>Clear local state and reload from the approved baseline.</span>
               </button>
             </div>
           ) : active.id === "memory" ? (

@@ -24,10 +24,10 @@ export async function maybeComposeWithLlm(input: {
   rubric: string;
   validate: (deliverable: Deliverable, ctx: AgentContext) => ValidationResult;
 }): Promise<Deliverable> {
-  if (!ENDPOINT) return { ...input.template, compositionPath: "Composed: template" };
+  if (!ENDPOINT) return { ...input.template, compositionPath: "Template fallback" };
 
   const first = await composeOnce(input, false);
-  if (!first) return { ...input.template, compositionPath: "Composed: template" };
+  if (!first) return { ...input.template, compositionPath: "Template fallback" };
   const critiqued = await critiqueAndRevise(input, first);
   return { ...(critiqued ?? first), compositionPath: "Composed: LLM (claude-sonnet-4-5)" };
 }

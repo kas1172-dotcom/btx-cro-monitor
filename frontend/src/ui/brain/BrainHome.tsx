@@ -62,7 +62,7 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
 
   return (
     <div className="quiet-home">
-      <p className="home-welcome">Welcome to Chatpil, your personal assistant</p>
+      <p className="home-welcome">Welcome to ChatPill, your personal assistant</p>
       <div className="today-strip">
         <button title={topSignalLabel} onClick={() => ask("What market signals should BTX care about this week?")}>
           <span>Top signal</span>
@@ -84,7 +84,7 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
       <div className="sample-library">
         <div className="sample-library-head">
           <span>Library</span>
-          <button onClick={requestTour}>Demo tour</button>
+          <button onClick={requestTour}>Guided tour</button>
         </div>
         <div className="sample-library-list">
           {SAMPLE_LIBRARY.slice(0, 6).map((sample) => (

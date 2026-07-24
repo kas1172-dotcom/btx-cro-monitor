@@ -162,7 +162,7 @@ export function DeliverableWizard({
 
         {step === "pick" && (
           <>
-            <h2>Build a demo-ready deliverable</h2>
+            <h2>Build a client-ready deliverable</h2>
             <p className="deliverable-wizard-hint">
               Choose the artifact you want to show, then confirm the source-backed inputs before anything is generated.
             </p>

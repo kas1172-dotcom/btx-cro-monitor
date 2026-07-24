@@ -87,7 +87,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
     noteTitle = "Account risk review";
   } else if (ctx.intent === "capabilities") {
     const hours = world.snapshot?.capacity.reduce((sum, row) => sum + row.available_5_axis_hours_next_30d, 0) ?? 0;
-    directAnswer = `${PROFILE.name} should lead with ${PROFILE.capabilities.slice(0, 4).join(", ")}. Current demo capacity shows ${hours} available 5-axis hours next 30 days.`;
+    directAnswer = `${PROFILE.name} should lead with ${PROFILE.capabilities.slice(0, 4).join(", ")}. Current capacity context shows ${hours} available 5-axis hours next 30 days.`;
     whyThisMatters = "Sales focus should match what production can actually support, so BTX avoids overpromising while pursuing high-fit work.";
     recommendedActions = ["Lead with high-fit accounts", "Avoid capability-gap accounts unless teaming", "Use available 5-axis capacity in outreach"];
     suggestedNextQuestions = ["Which accounts best match BTX capabilities?", "What should BTX not sell right now?", "Draft capability-led outreach."];

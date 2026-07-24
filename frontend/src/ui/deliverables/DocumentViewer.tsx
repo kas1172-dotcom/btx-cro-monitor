@@ -276,7 +276,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
               </div>
             )}
           </div>
-          <button onClick={() => openDemoAction({ title: "Send via Outlook", action: "follow_up", evidence: "Demo mode - no external writes." })}>Send</button>
+          <button onClick={() => openDemoAction({ title: "Send via Outlook", action: "follow_up", evidence: "External writes require operator confirmation." })}>Send</button>
           <button onClick={openTaskFlow}>Create task</button>
         </div>
       </header>
@@ -411,7 +411,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         ))}
       </aside>
       <aside className="editor-assistant">
-        <h2>Chatpil Editor</h2>
+        <h2>ChatPill Editor</h2>
         <p>{copilotEndpoint ? "Ask for a focused rewrite of a section." : "Assistant needs the connection — manual editing still works."}</p>
         <textarea value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Tighten the subject line, make it more formal, cut it to 80 words..." />
         <button onClick={() => void requestSuggestion()}>Suggest Revision</button>

@@ -86,7 +86,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
       setBackendDeliverables(records.map(recordToDeliverable));
       setStatus("");
     } catch (error) {
-      setStatus(error ? "Program memory is using local drafts for this demo session." : "Could not load backend deliverables.");
+      setStatus(error ? "Program memory is using local drafts for this browser session." : "Could not load backend deliverables.");
     } finally {
       setLoading(false);
     }
