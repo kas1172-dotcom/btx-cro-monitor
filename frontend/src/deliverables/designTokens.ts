@@ -1,9 +1,11 @@
+import { brandCore, hex } from "../app/brandCore.ts";
+
 export const steelSignal = {
   colors: {
     navy: "#12263A",
     navyHex: "12263A",
-    teal: "#2FB6A8",
-    tealHex: "2FB6A8",
+    teal: brandCore.accent,
+    tealHex: hex(brandCore.accent),
     steel: "#3E7CB1",
     steelHex: "3E7CB1",
     ink: "#12263A",
@@ -28,15 +30,15 @@ export const steelSignal = {
     provenanceInkHex: "1E8C7E",
     green: "#3FA66A",
     greenHex: "3FA66A",
-    amber: "#E0A93B",
-    amberHex: "E0A93B",
+    amber: brandCore.amber,
+    amberHex: hex(brandCore.amber),
     red: "#D6533C",
     redHex: "D6533C",
   },
   font: {
-    family: "\"Inter\", \"Segoe UI\", Arial, sans-serif",
-    pptxFace: "Inter",
-    weights: { regular: 400, bold: 700 },
+    family: brandCore.font.family,
+    pptxFace: brandCore.font.face,
+    weights: { regular: brandCore.font.weightRegular, bold: 700 },
     slide: {
       title: 30,
       sectionHeader: 17,

@@ -1,3 +1,5 @@
+import { brandCore } from "./brandCore.ts";
+
 export const uiTokens = {
   color: {
     page: "#0C1621",
@@ -6,21 +8,21 @@ export const uiTokens = {
     card: "#13212F",
     cardBorder: "#22384B",
     hairline: "#1B2C3C",
-    accent: "#2FB6A8",
+    accent: brandCore.accent,
     accentText: "#7FE3D6",
     accentTint: "#123430",
     textPrimary: "#E9EFF4",
     textSecondary: "#8DA1B4",
     textMuted: "#5F7488",
     success: "#54B37E",
-    warning: "#E0A93B",
+    warning: brandCore.amber,
     danger: "#D96A57",
     info: "#4C86C4",
   },
   font: {
-    family: '"Inter", "Segoe UI", Arial, sans-serif',
-    weightRegular: 400,
-    weightSemibold: 600,
+    family: brandCore.font.family,
+    weightRegular: brandCore.font.weightRegular,
+    weightSemibold: brandCore.font.weightSemibold,
   },
   rgb: {
     page: "12, 22, 33",
