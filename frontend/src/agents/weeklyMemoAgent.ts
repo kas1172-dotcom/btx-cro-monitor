@@ -61,10 +61,9 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
     const topSignalAccount = nameOf(topSignal?.subject_id);
     const topRiskAccount = nameOf(topRisk?.subject_id);
     const evidenceSignals = [topSignal, topRiskSignal].filter((signal): signal is NonNullable<typeof topSignal> => Boolean(signal));
-    const accountSource = topOpportunity && provenanceForRecord(topOpportunity.company) === "CRM" ? "CRM" : "companies.json";
-    const opportunitySource = world.opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "CRM" : "opportunities.json";
-    const signalSource = topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json";
-    const signalDisplay = topSignal?.artifact ? "Monitor" : "Seeded signals";
+    const accountSource = topOpportunity && provenanceForRecord(topOpportunity.company) === "CRM" ? "HubSpot CRM" : "Account baseline";
+    const opportunitySource = world.opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "HubSpot CRM" : "Pipeline baseline";
+    const signalSource = topSignal?.artifact ? "Monitor engine" : "Monitor engine + public sources";
 
     return {
       facts: {
@@ -83,8 +82,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
         recommendedAction: topAction ? `${actionLabel(topAction.action)}: ${topAction.reason}` : "Monitor the portfolio for new evidence.",
         accountSource,
         opportunitySource,
-        signalSource: signalDisplay,
-        fallbackDisclosure: "Seeded baseline — ERP integration pending. CRM-backed facts are used when the backend is connected; capacity context remains seeded.",
+        signalSource,
         ...(topRisk?.subject_id ? { [`${topRisk.subject_id}:evidence`]: `${topRiskAccount}::${signalEvidenceForCompany(topRiskAccount, topRiskSignal, topRiskAccount)}` } : {}),
       },
       entityIds: [topOpportunity?.company.id, topRisk?.subject_id, topSignal?.subject_id].filter((id): id is string => Boolean(id)),
@@ -92,7 +90,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
         { source: accountSource, records: world.companies.map((c) => c.id), reason: "Account names, markets, and relationship status." },
         { source: signalSource, records: world.analysis.valid.map((s) => s.id).slice(0, 12), reason: topSignal?.artifact ? `Real monitor-engine signal evidence from ${topSignal.artifact.source_name}, run ${topSignal.artifact.run_at}.` : "Validated market and risk evidence used in scores." },
         { source: opportunitySource, records: world.opportunities.map((o) => o.id).slice(0, 12), reason: "Open pipeline value and opportunity context." },
-        { source: "Seeded baseline", records: ["capacity", "operating_baseline"], reason: "Capacity and operating context are seeded until ERP integration is connected." },
+        { source: "Operating baseline", records: ["capacity", "operating_baseline"], reason: "Capacity and operating context come from the approved baseline until ERP integration is connected." },
       ],
     };
   },
@@ -114,7 +112,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
           id: "answer",
           heading: "This Week's Answer",
           blocks: [
-            { kind: "text", text: `Verdict: ${PROFILE.name} should focus this week on ${f.topOpportunityName} while protecting ${f.topRiskName} from delivery or account risk. ${f.fallbackDisclosure ? `${f.fallbackDisclosure} ` : ""}${f.pipelineScope}: ${money(Number(f.openPipelineValue))} remains open, and the strongest current evidence is [${f.signalSource}] ${String(f.topSignalType).toLowerCase()} tied to ${f.topOpportunityName}.` },
+            { kind: "text", text: `Verdict: ${PROFILE.name} should focus this week on ${f.topOpportunityName} while protecting ${f.topRiskName} from delivery or account risk. ${f.pipelineScope}: ${money(Number(f.openPipelineValue))} remains open, and the strongest current evidence is ${String(f.topSignalType).toLowerCase()} tied to ${f.topOpportunityName}.` },
           ],
         },
         {

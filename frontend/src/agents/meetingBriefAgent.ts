@@ -41,7 +41,6 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const company = world.companies.find((c) => c.id === accountId);
   if (!company) throw new Error(`Unknown account ${accountId}`);
   const signals = world.analysis.valid.filter((s) => s.subject_id === accountId);
-  const fallbackSignal = [...world.analysis.valid].filter((signal) => signal.artifact).sort((a, b) => b.confidence - a.confidence)[0];
   const opportunities = world.opportunities.filter((o) => o.company_id === accountId);
   const contacts = world.contacts.filter((c) => c.company_id === accountId);
   const fit = scoreFit(company.needs, PROFILE.capabilities);
@@ -49,13 +48,12 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const rec = world.analysis.recById.get(accountId);
   const score = world.analysis.byId.get(accountId);
   const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + o.value, 0);
-  const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0] ?? fallbackSignal;
+  const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
   const topSignalAccount = world.companies.find((c) => c.id === topSignal?.subject_id)?.name ?? "Portfolio monitor";
-  const accountSource = provenanceForRecord(company) === "CRM" ? "CRM" : "companies.json";
-  const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "CRM") ? "CRM" : "contacts.json";
-  const opportunitySource = opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "CRM" : "opportunities.json";
-  const signalSource = topSignal?.artifact ? "monitor-engine artifacts" : "signals.json + news.json";
-  const signalDisplay = topSignal?.artifact ? "Monitor" : "Seeded signals";
+  const accountSource = provenanceForRecord(company) === "CRM" ? "HubSpot CRM" : "Account baseline";
+  const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "CRM") ? "HubSpot CRM" : "Contact baseline";
+  const opportunitySource = opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "HubSpot CRM" : "Pipeline baseline";
+  const signalSource = topSignal?.artifact ? "Monitor engine" : "Monitor engine + public sources";
 
   return {
     facts: {
@@ -75,8 +73,7 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       accountSource,
       contactSource,
       opportunitySource,
-      signalSource: signalDisplay,
-      fallbackDisclosure: "Seeded baseline — ERP integration pending. Account, contact, and deal facts use CRM when the backend is connected; capacity context remains seeded.",
+      signalSource,
       topSignal: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal) : "No monitor signal available.",
       artifactSignalFigures: signalFigureContext(topSignal ? [topSignal, ...signals] : signals),
       recommendedAction: rec ? `${actionLabel(rec.action)}: ${rec.reason}` : "Monitor until a stronger signal appears.",
@@ -87,7 +84,7 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       { source: contactSource, records: contacts.map((c) => c.id), reason: "Recommended stakeholder coverage." },
       { source: opportunitySource, records: opportunities.map((o) => o.id), reason: "Open pipeline, stages, close dates, and values." },
       { source: signalSource, records: topSignal ? [topSignal.id] : [], reason: topSignal?.artifact ? "Real monitor-engine evidence with source names, dates, and artifact provenance." : "Validated evidence and timing." },
-      { source: "Seeded baseline", records: ["capacity", "operating_baseline"], reason: "Capacity and operating context are seeded until ERP integration is connected." },
+      { source: "Operating baseline", records: ["capacity", "operating_baseline"], reason: "Capacity and operating context come from the approved baseline until ERP integration is connected." },
     ],
   };
 }
@@ -107,7 +104,7 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
         id: "overview",
         heading: "Overview",
         blocks: [
-          { kind: "text", text: `${f.fallbackDisclosure ? `${f.fallbackDisclosure} ` : ""}[${f.accountSource}] ${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} fit is ${f.fitScore}%.` },
+          { kind: "text", text: `${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} fit is ${f.fitScore}%.` },
         ],
       },
       {
@@ -121,7 +118,7 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
         id: "signals",
         heading: "Live Signals",
         blocks: [
-          { kind: "text", text: `[${f.signalSource}] ${String(f.topSignal)}` },
+          { kind: "text", text: `${String(f.topSignal)}` },
         ],
       },
       {

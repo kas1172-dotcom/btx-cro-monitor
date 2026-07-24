@@ -310,9 +310,9 @@ const hybridBriefText = hybridBrief.sections
     return block.title;
   })
   .join(" ");
-assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "CRM"), "Hybrid meeting brief missing real CRM account grounding");
-assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "monitor-engine artifacts"), "Hybrid meeting brief missing real monitor signal grounding");
-assert(hybridBriefText.includes("Seeded baseline") || hybridBrief.sources.some((source) => source.source === "Seeded baseline"), "CRM-grounded meeting brief missing seeded baseline disclosure");
+assert(hybridBriefText.includes("Boeing") && hybridBrief.sources.some((source) => source.source === "HubSpot CRM"), "Hybrid meeting brief missing real CRM account grounding");
+assert(hybridBriefText.includes("SpaceNews Mini") && hybridBrief.sources.some((source) => source.source === "Monitor engine"), "Hybrid meeting brief missing real monitor signal grounding");
+assert(!hybridBriefText.includes("Seeded baseline") && hybridBrief.sources.some((source) => source.source === "Operating baseline"), "CRM-grounded meeting brief should keep baseline disclosure in provenance only");
 
 const outreach = await runAgent("outreach", {}, world);
 const instructedOutreach = await runAgent("outreach", { instructions: "Lead with ITAR angle" }, world);

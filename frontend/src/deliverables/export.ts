@@ -4,6 +4,7 @@ import { calendarStartFromDeliverable } from "../app/dateDefaults.ts";
 import type { World } from "../app/useWorld.ts";
 import { renderSteelSignalDocument } from "./steelSignalTemplates.tsx";
 import { PROFILE } from "../app/config.ts";
+import { deliverableMetaLabel, visibleSources } from "../app/sourceLabels.ts";
 
 export type DownloadFormat = "markdown" | "docx" | "pdf" | "pptx" | "xlsx" | "csv" | "ics";
 
@@ -74,9 +75,7 @@ const DOCX_COLORS = {
 };
 
 function metaLabel(deliverable: Deliverable): string {
-  const form = deliverable.form ?? deliverable.type;
-  const audience = deliverable.audience ?? "internal";
-  return `${audience} ${form.replace(/_/g, " ")} · ${deliverable.confidence} confidence`;
+  return deliverableMetaLabel(deliverable);
 }
 
 function docxTextParagraph(docx: DocxModule, text: string) {
@@ -357,7 +356,7 @@ export async function downloadXlsx(deliverable: Deliverable): Promise<void> {
     }
   }
   const provenanceSheet: XlsxSheetData = [[xlsxColumn("Source"), xlsxColumn("Reason"), xlsxColumn("Records")]];
-  deliverable.sources.forEach((source) => provenanceSheet.push([source.source, source.reason, source.records.join(", ")]));
+  visibleSources(deliverable.sources).forEach((source) => provenanceSheet.push([source.label, source.reason, source.records]));
   const blob = await writeXlsxFile([
     { sheet: "Deliverable", data: deliverableSheet, columns: [{ width: 36 }, { width: 28 }, { width: 28 }, { width: 28 }] },
     { sheet: "Provenance", data: provenanceSheet, columns: [{ width: 28 }, { width: 44 }, { width: 44 }] },

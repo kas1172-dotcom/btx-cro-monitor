@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
+import { visibleSources } from "../../app/sourceLabels.ts";
 import { saveStoredDeliverable, hasDeliverablesBackend, recordToDeliverable } from "../../app/deliverablesApi.ts";
 import { DELIVERABLE_TEMPLATE_OPTIONS, deliverableTemplateOption } from "../../agents/deliverableRegistry.ts";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
@@ -250,8 +251,8 @@ export function DeliverableWizard({
             <div className="deliverable-wizard-sources">
               <span>Sources</span>
               <ul>
-                {preview.sources.map((source, index) => (
-                  <li key={`${source.source}-${index}`}>{source.source}: {source.reason}</li>
+                {visibleSources(preview.sources).map((source, index) => (
+                  <li key={`${source.label}-${index}`}>{source.label}: {source.reason}</li>
                 ))}
               </ul>
             </div>

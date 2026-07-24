@@ -75,7 +75,14 @@ export function validateAudienceAndForm(
   const errors: string[] = [];
   const visibleText = publicSections(deliverable).map(blockText).join(" ");
   const allText = deliverable.sections.map(blockText).join(" ");
-  const backendGrounding = ctx.sources.some((source) => ["CRM", "monitor-engine artifacts", "Seeded baseline"].includes(source.source));
+  const backendGrounding = ctx.sources.some((source) => [
+    "CRM",
+    "HubSpot CRM",
+    "monitor-engine artifacts",
+    "Monitor engine",
+    "Seeded baseline",
+    "Operating baseline",
+  ].includes(source.source));
   const internalBanned = backendGrounding ? HYBRID_INTERNAL_BANNED : INTERNAL_BANNED;
   const banned = audience === "prospect" ? includesBanned(visibleText, PROSPECT_BANNED) : includesBanned(allText, internalBanned);
   if (banned) errors.push(`${audience} ${form} includes banned term "${banned}"`);

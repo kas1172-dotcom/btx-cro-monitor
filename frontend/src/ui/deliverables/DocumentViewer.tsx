@@ -21,6 +21,7 @@ import {
   type DownloadFormat,
 } from "../../deliverables/export.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
+import { deliverableMetaLabel, visibleSources } from "../../app/sourceLabels.ts";
 import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
 import type { ChartSpec } from "../../metrics/types.ts";
 
@@ -230,13 +231,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   }
 
   const formats = DELIVERABLE_DOWNLOAD_FORMATS[deliverable.type];
-  const accountId = current.canonicalAccountId ?? current.entityIds[0] ?? null;
-  const sourceAccount = accountId ? world?.companies.find((company) => company.id === accountId) : undefined;
-  const sourceTrace = sourceAccount
-    ? { label: `Generated from: ${sourceAccount.name}`, surface: "accounts" as const, companyId: sourceAccount.id }
-    : current.tripId
-      ? { label: `Generated from: ${current.tripId}`, surface: "map" as const, companyId: null }
-      : null;
+  const visibleBuiltFrom = visibleSources(deliverable.sources);
 
   return (
     <div className="editor-overlay" role="dialog" aria-modal="true">
@@ -245,19 +240,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         <div>
           <p className="eyebrow">Deliverable</p>
           <input className="document-title-input" value={title} onChange={(event) => { setTitle(event.target.value); setDirty(true); }} />
-          <span title={deliverable.confidenceReason}>{deliverable.audience ?? "Internal"} · {(deliverable.form ?? deliverable.type).replace(/_/g, " ")} · {deliverable.confidence} confidence{dirty ? " · edited" : ""}</span>
-          {sourceTrace && (
-            <button
-              className="document-source-trace"
-              onClick={() => setState({
-                activeDeliverable: null,
-                activeTab: sourceTrace.surface,
-                activeCompanyId: sourceTrace.companyId,
-              })}
-            >
-              {sourceTrace.label}
-            </button>
-          )}
+          <span title={deliverable.confidenceReason}>{deliverableMetaLabel(deliverable)}{dirty ? " - edited" : ""}</span>
           {saveStatus && <span className="document-save-status">{saveStatus}</span>}
         </div>
         <div className="document-actions">
@@ -402,11 +385,11 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
 
       <aside className="document-provenance">
         <h2>Built From</h2>
-        {deliverable.sources.map((source) => (
-          <div key={source.source}>
-            <strong>{source.source}</strong>
+        {visibleBuiltFrom.map((source, index) => (
+          <div key={`${source.label}-${index}`}>
+            <strong>{source.label}</strong>
             <span>{source.reason}</span>
-            <em>{source.records.slice(0, 6).join(", ")}{source.records.length > 6 ? "..." : ""}</em>
+            <em>{source.records}</em>
           </div>
         ))}
       </aside>

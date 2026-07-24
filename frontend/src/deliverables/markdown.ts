@@ -1,4 +1,5 @@
 import type { Deliverable, DeliverableBlock } from "./types.ts";
+import { visibleSources } from "../app/sourceLabels.ts";
 
 function blockToMarkdown(block: DeliverableBlock): string {
   if (block.kind === "text") return block.text;
@@ -17,7 +18,7 @@ export function deliverableToMarkdown(deliverable: Deliverable): string {
     `## ${section.heading}`,
     ...section.blocks.map(blockToMarkdown),
   ].join("\n\n"));
-  const sources = deliverable.sources.map((source) => `- ${source.source}: ${source.reason} (${source.records.join(", ")})`);
+  const sources = visibleSources(deliverable.sources).map((source) => `- ${source.label}: ${source.reason} (${source.records})`);
   return [
     `# ${deliverable.title}`,
     `Created: ${deliverable.createdAt}`,
