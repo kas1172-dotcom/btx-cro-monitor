@@ -1,7 +1,7 @@
 name: 90 Discovery Validation
 
 # Live run of the source-discovery agent against real briefs. Makes real network
-# + Anthropic API calls (costs spend), so it is manual-only — never on push/PR.
+# + Anthropic API calls (costs spend), so it is manual-only - never on push/PR.
 # Trigger from the Actions tab; pick a client whose intake.json exists.
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
       # and compare the discovered sources against the hand-built config. The
       # coverage report is written to the run's Step Summary; the step fails only
       # if the agent produced zero usable sources (validate_discovery exits 1).
-      - name: Validate discovery – ${{ inputs.client }}
+      - name: Validate discovery - ${{ inputs.client }}
         run: python -m tooling.validate_discovery "clients/${{ inputs.client }}" > /dev/null
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

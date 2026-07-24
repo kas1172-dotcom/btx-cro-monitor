@@ -39,8 +39,8 @@ const opportunities = normalizeOpportunities({
 assert.equal(companies[0].location.city, "Pittsburgh");
 assert.deepEqual(companies[0].needs, ["ITAR"]);
 assert.equal(contacts[0].title, "Contact");
-assert.equal(opportunities[0].value, 0);
+assert.equal(opportunities[0].value, null);
 assert.equal(opportunities[0].stage, "proposal");
-assert.match(opportunities[0].close_date, /^\d{4}-\d{2}-\d{2}$/u);
+assert.equal(opportunities[0].close_date, null);
 
 console.log("live adapter mapping ok: HubSpot fixtures normalized");

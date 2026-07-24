@@ -1,8 +1,3 @@
-import revenueData from "../../data/demo/btx/account_monthly_revenue.json";
-import pipelineSnapshotsData from "../../data/demo/btx/pipeline_snapshots.json";
-import bookingsBacklogData from "../../data/demo/btx/bookings_backlog.json";
-import capacityUtilizationData from "../../data/demo/btx/capacity_utilization.json";
-import winLossData from "../../data/demo/btx/win_loss_history.json";
 import type { World } from "../app/useWorld.ts";
 import type { MetricDefinition, MetricFilters, MetricId, MetricResult, TimeRange } from "./types.ts";
 import { inMonthRange } from "./time.ts";
@@ -13,11 +8,11 @@ interface BookingsRow { month: string; bookings: number; backlog: number; shipme
 interface CapacityRow { month: string; facility_id: string; utilization_pct: number; available_5_axis_hours: number; quoted_lead_time_days: number }
 interface WinLossRow { month: string; wins: number; losses: number; win_value: number; loss_value: number }
 
-const revenueRows = revenueData as RevenueRow[];
-const pipelineRows = pipelineSnapshotsData as PipelineRow[];
-const bookingsRows = bookingsBacklogData as BookingsRow[];
-const capacityRows = capacityUtilizationData as CapacityRow[];
-const winLossRows = winLossData as WinLossRow[];
+const revenueRows: RevenueRow[] = [];
+const pipelineRows: PipelineRow[] = [];
+const bookingsRows: BookingsRow[] = [];
+const capacityRows: CapacityRow[] = [];
+const winLossRows: WinLossRow[] = [];
 
 function inRange(month: string, range?: TimeRange): boolean {
   return inMonthRange(month, range);
@@ -31,9 +26,9 @@ function avg(values: number[]): number {
   return values.length ? sum(values) / values.length : 0;
 }
 
-function result(value: number, label: string, unit: MetricResult["unit"], source: string, records: string[]): MetricResult {
+function result(value: number | null, label: string, unit: MetricResult["unit"], source: string, records: string[]): MetricResult {
   return {
-    value: Math.round(value * 100) / 100,
+    value: value === null ? null : Math.round(value * 100) / 100,
     label,
     unit,
     provenance: [{ source, records, reason: `Computed ${label} from approved source records.` }],
@@ -50,7 +45,10 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     label: "Revenue",
     definition: "Recognized monthly revenue from current customer accounts.",
     unit: "$",
-    compute: (_world, filters, range) => result(sum(revenueSlice(filters, range).map((r) => r.revenue)), "Revenue", "$", "account_monthly_revenue.json", revenueSlice(filters, range).map((r) => `${r.account_id}:${r.month}`)),
+    compute: (_world, filters, range) => {
+      const rows = revenueSlice(filters, range);
+      return result(rows.length ? sum(rows.map((r) => r.revenue)) : null, "Revenue", "$", "operating.revenue", rows.map((r) => `${r.account_id}:${r.month}`));
+    },
   },
   bookings: {
     id: "bookings",
@@ -59,7 +57,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     unit: "$",
     compute: (_world, _filters, range) => {
       const rows = bookingsRows.filter((r) => inRange(r.month, range));
-      return result(sum(rows.map((r) => r.bookings)), "Bookings", "$", "bookings_backlog.json", rows.map((r) => r.month));
+      return result(rows.length ? sum(rows.map((r) => r.bookings)) : null, "Bookings", "$", "operating.bookings", rows.map((r) => r.month));
     },
   },
   backlog: {
@@ -69,7 +67,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     unit: "$",
     compute: (_world, _filters, range) => {
       const rows = bookingsRows.filter((r) => inRange(r.month, range));
-      return result(rows.at(-1)?.backlog ?? avg(rows.map((r) => r.backlog)), "Backlog", "$", "bookings_backlog.json", rows.map((r) => r.month));
+      return result(rows.length ? rows.at(-1)?.backlog ?? avg(rows.map((r) => r.backlog)) : null, "Backlog", "$", "operating.backlog", rows.map((r) => r.month));
     },
   },
   book_to_bill: {
@@ -79,7 +77,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     unit: "ratio",
     compute: (_world, _filters, range) => {
       const rows = bookingsRows.filter((r) => inRange(r.month, range));
-      return result(sum(rows.map((r) => r.bookings)) / Math.max(1, sum(rows.map((r) => r.shipments))), "Book-to-bill", "ratio", "bookings_backlog.json", rows.map((r) => r.month));
+      return result(rows.length ? sum(rows.map((r) => r.bookings)) / Math.max(1, sum(rows.map((r) => r.shipments))) : null, "Book-to-bill", "ratio", "operating.bookings", rows.map((r) => r.month));
     },
   },
   pipeline_coverage: {
@@ -91,7 +89,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
       const rows = pipelineRows.filter((r) => inRange(r.month, range));
       const quarterlyRevenue = sum(revenueSlice(filters, range).map((r) => r.revenue));
       const weightedPipe = rows.at(-1)?.weighted_pipeline_value ?? avg(rows.map((r) => r.weighted_pipeline_value));
-      return result(weightedPipe / Math.max(1, quarterlyRevenue / 3), "Pipeline coverage", "ratio", "pipeline_snapshots.json", world.opportunities.map((o) => o.id));
+      return result(rows.length && quarterlyRevenue > 0 ? weightedPipe / Math.max(1, quarterlyRevenue / 3) : null, "Pipeline coverage", "ratio", "operating.pipeline", world.opportunities.map((o) => o.id));
     },
   },
   win_rate: {
@@ -103,7 +101,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
       const rows = winLossRows.filter((r) => inRange(r.month, range));
       const wins = sum(rows.map((r) => r.wins));
       const losses = sum(rows.map((r) => r.losses));
-      return result((wins / Math.max(1, wins + losses)) * 100, "Win rate", "%", "win_loss_history.json", rows.map((r) => r.month));
+      return result(rows.length && wins + losses > 0 ? (wins / (wins + losses)) * 100 : null, "Win rate", "%", "operating.win_loss", rows.map((r) => r.month));
     },
   },
   avg_order_value: {
@@ -113,7 +111,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     unit: "$",
     compute: (_world, _filters, range) => {
       const rows = winLossRows.filter((r) => inRange(r.month, range));
-      return result(sum(rows.map((r) => r.win_value)) / Math.max(1, sum(rows.map((r) => r.wins))), "Average order value", "$", "win_loss_history.json", rows.map((r) => r.month));
+      const wins = sum(rows.map((r) => r.wins));
+      return result(rows.length && wins > 0 ? sum(rows.map((r) => r.win_value)) / wins : null, "Average order value", "$", "operating.win_loss", rows.map((r) => r.month));
     },
   },
   margin_trend: {
@@ -121,7 +120,10 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     label: "Margin trend",
     definition: "Average gross margin percentage across monthly revenue records.",
     unit: "%",
-    compute: (_world, filters, range) => result(avg(revenueSlice(filters, range).map((r) => r.gross_margin_pct)) * 100, "Margin trend", "%", "account_monthly_revenue.json", revenueSlice(filters, range).map((r) => `${r.account_id}:${r.month}`)),
+    compute: (_world, filters, range) => {
+      const rows = revenueSlice(filters, range);
+      return result(rows.length ? avg(rows.map((r) => r.gross_margin_pct)) * 100 : null, "Margin trend", "%", "operating.revenue", rows.map((r) => `${r.account_id}:${r.month}`));
+    },
   },
   customer_concentration: {
     id: "customer_concentration",
@@ -132,7 +134,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
       const byAccount = new Map<string, number>();
       for (const row of revenueSlice(undefined, range)) byAccount.set(row.account_id, (byAccount.get(row.account_id) ?? 0) + row.revenue);
       const total = sum([...byAccount.values()]);
-      return result((Math.max(0, ...byAccount.values()) / Math.max(1, total)) * 100, "Customer concentration", "%", "account_monthly_revenue.json", [...byAccount.keys()]);
+      return result(total > 0 ? (Math.max(0, ...byAccount.values()) / total) * 100 : null, "Customer concentration", "%", "operating.revenue", [...byAccount.keys()]);
     },
   },
   capacity_utilization: {
@@ -140,7 +142,10 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     label: "Work-center load",
     definition: "Average work-center load percentage.",
     unit: "%",
-    compute: (_world, _filters, range) => result(avg(capacityRows.filter((r) => inRange(r.month, range)).map((r) => r.utilization_pct)), "Work-center load", "%", "capacity_utilization.json", capacityRows.map((r) => `${r.facility_id}:${r.month}`)),
+    compute: (_world, _filters, range) => {
+      const rows = capacityRows.filter((r) => inRange(r.month, range));
+      return result(rows.length ? avg(rows.map((r) => r.utilization_pct)) : null, "Work-center load", "%", "operating.capacity", rows.map((r) => `${r.facility_id}:${r.month}`));
+    },
   },
   on_time_delivery: {
     id: "on_time_delivery",
@@ -148,8 +153,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     definition: "Modeled delivery performance from lead-time pressure.",
     unit: "%",
     compute: (_world, _filters, range) => {
-      const lead = avg(capacityRows.filter((r) => inRange(r.month, range)).map((r) => r.quoted_lead_time_days));
-      return result(Math.max(70, 98 - lead * 0.8), "On-time delivery", "%", "capacity_utilization.json", capacityRows.map((r) => `${r.facility_id}:${r.month}`));
+      const rows = capacityRows.filter((r) => inRange(r.month, range));
+      return result(rows.length ? null : null, "On-time delivery", "%", "operating.delivery", rows.map((r) => `${r.facility_id}:${r.month}`));
     },
   },
   repeat_revenue_rate: {
@@ -163,7 +168,7 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
         if (row.revenue > 0) byAccount.set(row.account_id, (byAccount.get(row.account_id) ?? new Set()).add(row.month));
       }
       const repeat = [...byAccount.values()].filter((months) => months.size >= 18).length;
-      return result((repeat / Math.max(1, byAccount.size)) * 100, "Repeat-revenue rate", "%", "account_monthly_revenue.json", [...byAccount.keys()]);
+      return result(byAccount.size ? (repeat / byAccount.size) * 100 : null, "Repeat-revenue rate", "%", "operating.revenue", [...byAccount.keys()]);
     },
   },
   pipeline_by_stage: {
@@ -171,7 +176,10 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     label: "Pipeline by stage",
     definition: "Open pipeline value across prospecting, qualified, and proposal stages.",
     unit: "$",
-    compute: (world) => result(sum(world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").map((o) => o.value)), "Pipeline by stage", "$", "opportunities.json", world.opportunities.map((o) => o.id)),
+    compute: (world) => {
+      const open = world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost" && o.value !== null);
+      return result(open.length ? sum(open.map((o) => o.value ?? 0)) : null, "Pipeline by stage", "$", "backend.opportunities", open.map((o) => o.id));
+    },
   },
   revenue_yoy_change: {
     id: "revenue_yoy_change",
@@ -182,7 +190,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
       const rows = revenueSlice(filters).sort((a, b) => a.month.localeCompare(b.month));
       const current = rows.slice(-12);
       const prior = rows.slice(-24, -12);
-      return result(((sum(current.map((r) => r.revenue)) - sum(prior.map((r) => r.revenue))) / Math.max(1, sum(prior.map((r) => r.revenue)))) * 100, "Revenue YoY change", "%", "account_monthly_revenue.json", rows.map((r) => `${r.account_id}:${r.month}`));
+      const priorRevenue = sum(prior.map((r) => r.revenue));
+      return result(current.length && priorRevenue > 0 ? ((sum(current.map((r) => r.revenue)) - priorRevenue) / priorRevenue) * 100 : null, "Revenue YoY change", "%", "operating.revenue", rows.map((r) => `${r.account_id}:${r.month}`));
     },
   },
 };

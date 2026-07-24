@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
-import { importProspectsToHubSpot } from "../../app/backendApi.ts";
 import { CONFIG } from "../../app/config.ts";
 import type { World } from "../../app/useWorld.ts";
-import { createWorkItem } from "../../app/workItems.ts";
 import { businessMotionForAccount, isCurrentBusinessAccount, isProspectingAccount } from "../../brain/classification.ts";
 import { PORTFOLIO_SIGNAL_SUBJECT_ID, SCORE_DIMENSIONS } from "../../engine/signals/contract.ts";
 import type { ScoreDimension, Signal } from "../../engine/signals/contract.ts";
@@ -72,37 +70,18 @@ function motionForSignal(world: World, signal: Signal): MotionLabel {
 }
 
 function whyItMatters(world: World, signal: Signal): string {
-  if (isSaronicSignal(signal)) {
-    return "Funded Navy supplier with Austin manufacturing context, but no BTX account, CAGE, or contact evidence yet.";
-  }
   if (isPortfolioSignal(signal)) return "Market-level monitor signal; not linked to a CRM account without verified account evidence.";
   const company = world.companies.find((c) => c.id === signal.subject_id);
   const rec = world.analysis.recById.get(signal.subject_id);
   const impact = scoreImpact(signal.event_type);
   const openPipeline = world.opportunities
     .filter((o) => o.company_id === signal.subject_id && o.stage !== "won" && o.stage !== "lost")
-    .reduce((sum, o) => sum + o.value, 0);
+    .reduce((sum, o) => sum + (o.value ?? 0), 0);
   if (rec) return `${actionLabel(rec.action)} is recommended because this signal contributes to the account's current score context.`;
   if (impact.dimensions.includes("opportunity")) return `${company?.name ?? "This account"} has a revenue-related signal that can raise pursuit priority.`;
   if (impact.dimensions.includes("risk") || impact.dimensions.includes("capacityRisk")) return `This signal can affect delivery, capacity, supplier, or account risk.`;
   if (openPipeline > 0) return `${money(openPipeline)} in open pipeline is attached to this account.`;
   return `This signal is validated evidence for monitoring ${company?.name ?? "the account"}.`;
-}
-
-function isLockheedSignal(signal: Signal): boolean {
-  const text = `${signal.id} ${signal.entities.join(" ")} ${signal.artifact?.headline ?? ""}`.toLowerCase();
-  return text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s");
-}
-
-function isSaronicSignal(signal: Signal): boolean {
-  const text = `${signal.id} ${signal.entities.join(" ")} ${signal.artifact?.headline ?? ""}`.toLowerCase();
-  return text.includes("saronic");
-}
-
-function journeyPriority(signal: Signal): number {
-  if (isLockheedSignal(signal)) return 0;
-  if (isSaronicSignal(signal)) return 1;
-  return 2;
 }
 
 function filterRow(filter: Filter, row: SignalRow): boolean {
@@ -147,62 +126,8 @@ interface SignalRow {
 export function SignalFeed({ world }: { world: World }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("priority");
-  const [busySignalId, setBusySignalId] = useState<string | null>(null);
-  const [confirmingSaronicId, setConfirmingSaronicId] = useState<string | null>(null);
   const [expandedSignalId, setExpandedSignalId] = useState<string | null>(null);
-  const [statusBySignalId, setStatusBySignalId] = useState<Record<string, string>>({});
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
-
-  function setSignalStatus(signalId: string, value: string): void {
-    setStatusBySignalId((current) => ({ ...current, [signalId]: value }));
-  }
-
-  async function createSaronicProspect(signal: Signal): Promise<void> {
-    setBusySignalId(signal.id);
-    setSignalStatus(signal.id, "Creating Saronic account and work items...");
-    try {
-      const response = await importProspectsToHubSpot([{
-        row_id: "saronic-technologies",
-        company: {
-          companyName: "Saronic Technologies",
-          domain: "saronic.com",
-          website: "https://www.saronic.com",
-          city: "Austin",
-          state: "TX",
-          country: "USA",
-        },
-      }]);
-      const row = response.rows[0];
-      if (!row || row.status === "failed" || !row.company_id) {
-        throw new Error(row?.reason ?? "HubSpot did not return a Saronic company id.");
-      }
-      const accountId = `hubspot-company-${row.company_id}`;
-      await createWorkItem({
-        title: "Qualify Saronic",
-        accountName: "Saronic Technologies",
-        accountId,
-        sourceSignalIds: [signal.id],
-        type: "research_task",
-        priority: "high",
-        evidence: "Missing evidence: CAGE, contact, qualified fit, and sourced component need.",
-      });
-      await createWorkItem({
-        title: "Draft intro outreach for Saronic",
-        accountName: "Saronic Technologies",
-        accountId,
-        sourceSignalIds: [signal.id],
-        type: "outreach_draft",
-        priority: "normal",
-        evidence: signal.artifact?.item_id ?? signal.id,
-      });
-      setConfirmingSaronicId(null);
-      setSignalStatus(signal.id, `Saronic company ${row.company_id} and two work items created.`);
-    } catch (error) {
-      setSignalStatus(signal.id, error instanceof Error ? error.message : "Could not create Saronic prospect.");
-    } finally {
-      setBusySignalId(null);
-    }
-  }
 
   const rows = useMemo<SignalRow[]>(() => {
     return world.analysis.valid.map((signal) => {
@@ -233,7 +158,7 @@ export function SignalFeed({ world }: { world: World }) {
   const visible = rows
     .filter((row) => filterRow(filter, row))
     .sort((a, b) => {
-      if (sort === "priority") return journeyPriority(a.signal) - journeyPriority(b.signal) || PRIORITY_RANK[b.priority] - PRIORITY_RANK[a.priority] || b.impact.total - a.impact.total;
+      if (sort === "priority") return PRIORITY_RANK[b.priority] - PRIORITY_RANK[a.priority] || b.impact.total - a.impact.total || b.signal.confidence - a.signal.confidence;
       if (sort === "newest") return b.signal.detected_at.localeCompare(a.signal.detected_at);
       if (sort === "confidence") return b.signal.confidence - a.signal.confidence;
       return b.impact.total - a.impact.total || b.signal.confidence - a.signal.confidence;
@@ -268,26 +193,14 @@ export function SignalFeed({ world }: { world: World }) {
 
       <div className="signal-list">
         {visible.map((row) => {
-          const expanded = expandedSignalId === row.signal.id || confirmingSaronicId === row.signal.id;
-          const primaryAction = isLockheedSignal(row.signal) && row.signal.scope === "specific_account"
-            ? (
-                <button type="button" onClick={() => setState({ activeTab: "accounts", activeCompanyId: row.signal.subject_id, brainResponse: null })} disabled={busySignalId === row.signal.id}>
-                  Open account
-                </button>
-              )
-            : isSaronicSignal(row.signal)
-              ? (
-                  <button type="button" onClick={() => setState({ activeTab: "prospecting", activeCompanyId: "saronic-technologies", brainResponse: null })} disabled={busySignalId === row.signal.id}>
-                    Open prospect
-                  </button>
-                )
-              : (
-                  <button type="button" onClick={() => setExpandedSignalId(expanded ? null : row.signal.id)}>
-                    {expanded ? "Hide details" : "Details"}
-                  </button>
-                );
+          const expanded = expandedSignalId === row.signal.id;
+          const openTarget = row.signal.scope === "specific_account"
+            ? row.motion === "Prospecting"
+              ? { activeTab: "prospecting" as const, activeCompanyId: row.signal.subject_id }
+              : { activeTab: "accounts" as const, activeCompanyId: row.signal.subject_id }
+            : { activeTab: "programs" as const, activeCompanyId: null };
           return (
-          <article key={row.signal.id} className={`signal-inbox-card ${isLockheedSignal(row.signal) || isSaronicSignal(row.signal) ? "signal-inbox-card-pinned" : ""}`}>
+          <article key={row.signal.id} className="signal-inbox-card">
             <div className="signal-summary-line">
               <span className="sig-type">{titleCase(row.signal.event_type)}</span>
               <div className="signal-summary-main">
@@ -296,7 +209,11 @@ export function SignalFeed({ world }: { world: World }) {
               </div>
               <span className="signal-summary-why">{row.why}</span>
               <span className="confidence-chip">{row.confidenceLabel}</span>
-              <div className="signal-primary-action">{primaryAction}</div>
+              <div className="signal-primary-action">
+                <button type="button" onClick={() => setState({ ...openTarget, brainResponse: null })}>
+                  {row.signal.scope === "specific_account" ? "Open account" : "Open signal"}
+                </button>
+              </div>
             </div>
             <button
               type="button"
@@ -351,39 +268,12 @@ export function SignalFeed({ world }: { world: World }) {
               </div>
               {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor engine document" : "No source link in the current context"}</em>}
             </div>
-            {isSaronicSignal(row.signal) && (
-              <div className="qualification-gaps">
-                <strong>Needs qualification</strong>
-                <span>No CAGE match</span>
-                <span>No BTX contact</span>
-                <span>Fit unconfirmed</span>
-                <span>Supplier need not verified</span>
-              </div>
-            )}
-
                 <div className="signal-actions">
               <AskChatpilButton label="Explain" prompt={expandSignalPrompt(row.signal, row.companyName)} />
               <AskChatpilButton
                 label="What should I do?"
                 prompt={nextActionPrompt(row.companyName, `Signal inbox item. Event ${row.signal.event_type}. Motion ${row.motion}. Score impact ${row.impact.text}. Recommended action: ${row.actionText}. Evidence: ${row.signal.source_quote}`)}
               />
-                </div>
-              </div>
-            )}
-            {statusBySignalId[row.signal.id] && <div className="live-inline-status">{statusBySignalId[row.signal.id]}</div>}
-            {confirmingSaronicId === row.signal.id && (
-              <div className="signal-confirm-panel">
-                <strong>Confirm HubSpot write</strong>
-                <span>Company: Saronic Technologies</span>
-                <span>Domain: saronic.com</span>
-                <span>Location: Austin, TX</span>
-                <span>Known evidence: $1.75B raise, $9.25B valuation, $392M Navy production contract, autonomous maritime vessels.</span>
-                <span>Left empty on purpose: CAGE, contact, fit, and qualified supplier need.</span>
-                <div>
-                  <button type="button" onClick={() => void createSaronicProspect(row.signal)} disabled={busySignalId === row.signal.id}>
-                    Confirm and create
-                  </button>
-                  <button type="button" onClick={() => setConfirmingSaronicId(null)}>Cancel</button>
                 </div>
               </div>
             )}

@@ -23,8 +23,8 @@ export type BusinessMotion =
 
 export interface Location {
   city: string;
-  lat: number;
-  lon: number;
+  lat: number | null;
+  lon: number | null;
   address?: string;
   state?: string;
   postal_code?: string;
@@ -73,8 +73,8 @@ export interface Facility {
   state?: string;
   postal_code?: string;
   country?: string;
-  lat: number;
-  lon: number;
+  lat: number | null;
+  lon: number | null;
   kind: "HQ" | "plant";
   source_url?: string;
 }
@@ -87,13 +87,13 @@ export interface Opportunity {
   name: string;
   account_status?: AccountStatus;
   business_motion?: BusinessMotion;
-  value: number;
+  value: number | null;
   stage: OppStage;
   source_url?: string;
   contract_url?: string;
   document_url?: string;
   /** ISO date (YYYY-MM-DD). */
-  close_date: string;
+  close_date: string | null;
 }
 
 /** A news article + its ground-truth signal. The extraction layer re-derives the

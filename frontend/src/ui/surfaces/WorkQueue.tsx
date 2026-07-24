@@ -4,7 +4,20 @@ import { useWorkItems, type WorkItemStatus } from "../../app/workItems.ts";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
 import { SurfaceHeader } from "../primitives.tsx";
 
-const STATUSES: Array<WorkItemStatus | "all"> = ["all", "proposed", "approved", "in_progress", "done", "dismissed"];
+const STATUSES: Array<WorkItemStatus | "all"> = [
+  "all",
+  "detected",
+  "triaged",
+  "prepared",
+  "awaiting_approval",
+  "approved",
+  "in_progress",
+  "executed",
+  "verified",
+  "outcome_recorded",
+  "closed",
+  "dismissed",
+];
 
 function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());

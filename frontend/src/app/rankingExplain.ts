@@ -65,7 +65,7 @@ export function rankingExplanation(
   const rec = world.analysis.recById.get(company.id);
   const openOpps = world.opportunities.filter((o) => o.company_id === company.id && o.stage !== "won" && o.stage !== "lost");
   const wonOpps = world.opportunities.filter((o) => o.company_id === company.id && o.stage === "won");
-  const openValue = openOpps.reduce((sum, o) => sum + o.value, 0);
+  const openValue = openOpps.reduce((sum, o) => sum + (o.value ?? 0), 0);
   const facilities = world.facilities.filter((f) => f.company_id === company.id);
   const rankText = options.rank ? `Rank #${options.rank}` : options.heading ?? "Ranked item";
   const scoreValue = primary?.score ?? 0;

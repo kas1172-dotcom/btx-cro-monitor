@@ -1,15 +1,10 @@
-import revenueData from "../../data/demo/btx/account_monthly_revenue.json";
-import pipelineSnapshotsData from "../../data/demo/btx/pipeline_snapshots.json";
-import bookingsBacklogData from "../../data/demo/btx/bookings_backlog.json";
-import capacityUtilizationData from "../../data/demo/btx/capacity_utilization.json";
-import winLossData from "../../data/demo/btx/win_loss_history.json";
 import type { World } from "../app/useWorld.ts";
 import { computeMetric, METRICS } from "./catalog.ts";
 import type { ChartLegend, ChartResult, ChartSpec } from "./types.ts";
 import { inMonthRange } from "./time.ts";
 
 export function formatMetricValue(value: number | null, unit: string): string {
-  if (value === null) return "\u2014";
+  if (value === null) return "Not available";
   if (unit === "$") {
     if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
     if (value >= 1_000) return `$${Math.round(value / 1_000)}k`;
@@ -26,11 +21,11 @@ interface BookingsRow { month: string; bookings: number; backlog: number; shipme
 interface CapacityRow { month: string; utilization_pct: number }
 interface WinLossRow { month: string; wins: number; losses: number; win_value: number }
 
-const revenueRows = revenueData as RevenueRow[];
-const pipelineRows = pipelineSnapshotsData as PipelineRow[];
-const bookingsRows = bookingsBacklogData as BookingsRow[];
-const capacityRows = capacityUtilizationData as CapacityRow[];
-const winLossRows = winLossData as WinLossRow[];
+const revenueRows: RevenueRow[] = [];
+const pipelineRows: PipelineRow[] = [];
+const bookingsRows: BookingsRow[] = [];
+const capacityRows: CapacityRow[] = [];
+const winLossRows: WinLossRow[] = [];
 
 function quarter(month: string): string {
   const [year, monthText] = month.split("-");

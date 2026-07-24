@@ -3,15 +3,17 @@ import { executeHubSpotTask, type WorkItem } from "../../app/workItems.ts";
 import type { World } from "../../app/useWorld.ts";
 import { EmptyState } from "../primitives.tsx";
 
+const TERMINAL_STATUSES = new Set(["done", "dismissed", "closed", "verified", "outcome_recorded"]);
+
 function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function WorkItemSourceNote({ source, error }: { source: "backend" | "derived"; error: string | null }) {
+export function WorkItemSourceNote({ source, error }: { source: "backend" | "unavailable"; error: string | null }) {
   if (source === "backend") return null;
   return (
     <div className="live-inline-status" title={error ?? undefined}>
-      {error ? "Queue generated from current signals while the work-item service is unavailable." : "Work items are derived from the current operating context until backend data is available."}
+      {error ? "Backend work-item service is unavailable. No local queue was generated." : "Backend work items are not loaded yet."}
     </div>
   );
 }
@@ -51,8 +53,7 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
         const evidence = linkedEvidence(item, world);
         const canExecute = ["account_action", "meeting_brief", "outreach_draft", "research_task", "qualified_opportunity"]
           .includes(item.type)
-          && item.status !== "done"
-          && item.status !== "dismissed";
+          && !TERMINAL_STATUSES.has(item.status);
         const expanded = expandedId === item.id || confirmingId === item.id;
         return (
           <article key={item.id} className="work-item-row">

@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
-import { createDataAdapter } from "../adapters/createDataAdapter.ts";
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
-
-const adapter = createDataAdapter();
+import { operatingSnapshotFromWorld, revenueDataClient } from "./revenueDataClient.ts";
 
 export function useOperatingSnapshot(): OperatingSnapshot | null {
   const [snapshot, setSnapshot] = useState<OperatingSnapshot | null>(null);
 
   useEffect(() => {
     let alive = true;
-    void adapter.getOperatingSnapshot().then((next) => {
-      if (alive) setSnapshot(next);
-    });
+    void revenueDataClient
+      .getWorldSnapshot()
+      .then(operatingSnapshotFromWorld)
+      .then((next) => {
+        if (alive) setSnapshot(next);
+      })
+      .catch(() => {
+        if (alive) setSnapshot(null);
+      });
     return () => {
       alive = false;
     };

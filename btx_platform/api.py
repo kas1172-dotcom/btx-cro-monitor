@@ -28,6 +28,23 @@ from btx_platform.engine_config import config_history, latest_config, put_config
 from btx_platform.health import platform_health
 from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
 from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload, map_companies
+from btx_platform.intelligence import (
+    MINIMUM_RELATIONSHIP_CONFIDENCE,
+    SCORING_CONFIG_VERSION,
+    canonical_account_to_company,
+    ensure_default_scoring_config,
+    is_confirmed_account_signal,
+    relationship_to_dict,
+    remap_child_company_ids,
+    resolve_signal_relationships,
+    score_account,
+    score_snapshot_summary,
+    signal_to_dict,
+    signal_confidence,
+    persist_score_snapshot,
+    upsert_canonical_accounts,
+    validate_weight_config,
+)
 from btx_platform.ingest import IngestError, ingest
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
@@ -66,10 +83,18 @@ MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 # a Clerk session (the caller is a machine, not a signed-in user).
 WEBHOOK_PATH_PREFIX = "/webhooks/"
 WORK_ITEM_TRANSITIONS = {
+    "detected": {"triaged", "dismissed", "closed"},
+    "triaged": {"prepared", "awaiting_approval", "in_progress", "dismissed", "closed"},
+    "prepared": {"awaiting_approval", "approved", "dismissed", "closed"},
+    "awaiting_approval": {"approved", "dismissed", "closed"},
     "proposed": {"approved", "dismissed"},
-    "approved": {"in_progress", "dismissed"},
-    "in_progress": {"done", "dismissed"},
+    "approved": {"in_progress", "executed", "dismissed", "closed"},
+    "in_progress": {"executed", "verified", "done", "dismissed"},
+    "executed": {"verified", "outcome_recorded", "done", "closed"},
+    "verified": {"outcome_recorded", "closed", "done"},
+    "outcome_recorded": {"closed", "done"},
     "done": set(),
+    "closed": set(),
     "dismissed": set(),
 }
 
@@ -82,11 +107,6 @@ def _three_business_days_from_now() -> str:
         if current.weekday() < 5:
             remaining -= 1
     return current.isoformat().replace("+00:00", "Z")
-
-
-def _baseline_json(name: str) -> object:
-    path = Path(__file__).resolve().parents[1] / "frontend" / "data" / "demo" / "btx" / name
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _hubspot_id(value: str | None, prefix: str) -> str | None:
@@ -163,7 +183,15 @@ def _work_item_snapshot(row: models.WorkItem) -> dict:
         "id": row.id,
         "type": row.type,
         "canonical_account_id": row.canonical_account_id,
+        "related_signal_id": row.related_signal_id,
+        "related_relationship_id": row.related_relationship_id,
+        "related_opportunity_id": row.related_opportunity_id,
+        "program_id": row.program_id,
+        "score_snapshot_ids": row.score_snapshot_ids or [],
         "source_signal_ids": row.source_signal_ids or [],
+        "supporting_evidence": row.supporting_evidence or [],
+        "missing_information": row.missing_information or [],
+        "dedupe_key": row.dedupe_key,
         "owner": row.owner,
         "priority": row.priority,
         "status": row.status,
@@ -380,6 +408,163 @@ def _sync_canonical_accounts(session_factory: sessionmaker, payload: dict, tenan
         session.commit()
 
 
+def _source_health(
+    *,
+    source_key: str,
+    display_name: str,
+    availability: str,
+    record_count: int | None = None,
+    last_successful_sync_at: str | None = None,
+    last_attempt_at: str | None = None,
+    freshness_threshold_minutes: int | None = None,
+    error_code: str | None = None,
+    error_message: str | None = None,
+) -> dict:
+    now = datetime.now(UTC).isoformat()
+    return {
+        "sourceKey": source_key,
+        "displayName": display_name,
+        "availability": availability,
+        "lastSuccessfulSyncAt": last_successful_sync_at,
+        "lastAttemptAt": last_attempt_at or now,
+        "freshnessThresholdMinutes": freshness_threshold_minutes,
+        "recordCount": record_count,
+        "errorCode": error_code,
+        "errorMessage": error_message,
+    }
+
+
+def _artifact_event_type(item: dict) -> str:
+    text_blob = " ".join(
+        str(value)
+        for value in [
+            item.get("title"),
+            item.get("raw_title"),
+            item.get("confidence_note"),
+            item.get("per_edition", {}).get("bd", {}).get("so_what") if isinstance(item.get("per_edition"), dict) else "",
+            " ".join(item.get("per_edition", {}).get("bd", {}).get("categories", []))
+            if isinstance(item.get("per_edition"), dict) and isinstance(item.get("per_edition", {}).get("bd", {}).get("categories"), list)
+            else "",
+        ]
+        if value
+    ).lower()
+    if "funding" in text_blob or "capital raise" in text_blob or "valuation" in text_blob:
+        return "funding_round"
+    if "award" in text_blob or "contract" in text_blob:
+        return "government_contract_award"
+    if "supply chain" in text_blob or "supplier" in text_blob:
+        return "supplier_delay"
+    if "demand" in text_blob or "rfq" in text_blob or "rfp" in text_blob:
+        return "demand_spike"
+    return "unknown"
+
+
+def _artifact_entities(item: dict) -> list[str]:
+    raw = item.get("entities")
+    if not isinstance(raw, list):
+        return []
+    names: list[str] = []
+    for entry in raw:
+        if isinstance(entry, dict) and isinstance(entry.get("name"), str) and entry["name"].strip():
+            names.append(entry["name"].strip())
+        elif isinstance(entry, str) and entry.strip():
+            names.append(entry.strip())
+    return list(dict.fromkeys(names))
+
+
+def _artifact_signal(item: dict, run_at: str) -> dict | None:
+    item_id = str(item.get("item_id") or "").strip()
+    title = str(item.get("raw_title") or item.get("title") or "").strip()
+    if not item_id or not title:
+        return None
+    per_edition = item.get("per_edition") if isinstance(item.get("per_edition"), dict) else {}
+    bd = per_edition.get("bd") if isinstance(per_edition.get("bd"), dict) else {}
+    relevance = bd.get("relevance_score") or item.get("importance_score") or 70
+    try:
+        confidence = max(0.0, min(float(relevance) / 100, 1.0))
+    except (TypeError, ValueError):
+        confidence = 0.7
+    detected_at = str(item.get("published_at") or item.get("collected_at") or run_at)
+    source_name = str(item.get("source_id") or "Monitor source")
+    so_what = str(bd.get("so_what") or "").strip()
+    now_what = str(bd.get("now_what") or "").strip()
+    quote = so_what or title
+    if now_what:
+        quote = f"{quote} Action: {now_what}"
+    url = str(item.get("url") or "").strip()
+    return {
+        "id": f"monitor-{item_id}",
+        "event_type": _artifact_event_type(item),
+        "entities": _artifact_entities(item) or [source_name],
+        "subject_id": "__portfolio__",
+        "scope": "market",
+        "confidence": confidence,
+        "source_quote": quote,
+        "source_url": url or None,
+        "document_url": url or None,
+        "detected_at": detected_at,
+        "artifact": {
+            "item_id": item_id,
+            "headline": title,
+            "source_name": source_name,
+            "source_date": detected_at,
+            "run_at": run_at,
+            "signal_type": _artifact_event_type(item),
+            "relevance_score": relevance,
+            "analysis_text": quote,
+            "source_url": url or None,
+            "dollar_figures": [],
+            "affected_entities": _artifact_entities(item),
+            "provenance": {"meta": {"run_at": run_at}, "item": item},
+        },
+    }
+
+
+def _monitor_records(settings: Settings) -> tuple[list[dict], dict]:
+    run_output_path = Path(settings.pipeline_output_dir) / "run_output.json"
+    threshold = settings.monitor_stale_after_days * 24 * 60
+    if not run_output_path.exists():
+        return [], _source_health(
+            source_key="monitor",
+            display_name="Monitor pipeline",
+            availability="unavailable",
+            freshness_threshold_minutes=threshold,
+            error_code="artifact_not_found",
+            error_message=f"Missing monitor artifact: {run_output_path}",
+        )
+    try:
+        run_output = json.loads(run_output_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [], _source_health(
+            source_key="monitor",
+            display_name="Monitor pipeline",
+            availability="error",
+            freshness_threshold_minutes=threshold,
+            error_code="artifact_invalid",
+            error_message=str(exc),
+        )
+    run_at = str(run_output.get("meta", {}).get("run_at") or datetime.now(UTC).isoformat())
+    items = run_output.get("items") if isinstance(run_output.get("items"), list) else []
+    signals = [signal for item in items if isinstance(item, dict) for signal in [_artifact_signal(item, run_at)] if signal]
+    availability = "available"
+    try:
+        age = datetime.now(UTC) - datetime.fromisoformat(run_at.replace("Z", "+00:00"))
+        if age.total_seconds() > threshold * 60:
+            availability = "stale"
+    except ValueError:
+        availability = "error"
+    return signals, _source_health(
+        source_key="monitor",
+        display_name="Monitor pipeline",
+        availability=availability,
+        record_count=len(signals),
+        last_successful_sync_at=run_at if availability in {"available", "stale"} else None,
+        freshness_threshold_minutes=threshold,
+        error_code=None if availability != "error" else "invalid_run_timestamp",
+        error_message=None if availability != "error" else f"Invalid monitor run timestamp: {run_at}",
+    )
+
+
 def _default_queue(settings: Settings) -> JobQueue:
     """InMemoryQueue for dev/test; a real Celery/Redis queue when configured.
     Imported lazily so the API process doesn't require Celery installed
@@ -540,24 +725,412 @@ def create_app(
     @app.get("/operating-baseline")
     def operating_baseline() -> Response:
         return JSONResponse({
-            "data_provenance": "Operating baseline - ERP integration pending",
-            "crm": _baseline_json("crm.json"),
-            "capacity": _baseline_json("erp_capacity.json"),
-            "pipeline": _baseline_json("pipeline.json"),
-            "integrations": _baseline_json("integrations.json"),
-            "assumptions": _baseline_json("assumptions.json"),
-            "facilities": _baseline_json("facilities.json"),
-            "opportunities": _baseline_json("opportunities.json"),
+            "data_provenance": "Backend source health",
+            "crm": [],
+            "capacity": [],
+            "pipeline": {"records": [], "summary": {}, "source_mode": "not_connected"},
+            "integrations": [],
+            "assumptions": {
+                "summary": "ERP, MES, and production operating data are not connected.",
+                "source_mode": "not_connected",
+            },
+            "facilities": [],
+            "opportunities": [],
         })
 
     def not_configured(service: str) -> JSONResponse:
         return JSONResponse(
             {
                 "code": "not_configured",
-                "detail": f"{service} is not configured. Static demo mode remains available in the frontend.",
+                "detail": f"{service} is not configured.",
             },
             status_code=501,
         )
+
+    def source_health_payload() -> list[dict]:
+        if settings.hubspot_access_token:
+            hubspot_health = _source_health(
+                source_key="hubspot",
+                display_name="HubSpot CRM",
+                availability="available",
+                freshness_threshold_minutes=15,
+            )
+        else:
+            hubspot_health = _source_health(
+                source_key="hubspot",
+                display_name="HubSpot CRM",
+                availability="not_configured",
+                record_count=0,
+                freshness_threshold_minutes=15,
+                error_code="not_configured",
+                error_message="BTX_HUBSPOT_ACCESS_TOKEN is not configured.",
+            )
+        _signals, monitor_health = _monitor_records(settings)
+        return [
+            hubspot_health,
+            monitor_health,
+            _source_health(
+                source_key="operating",
+                display_name="ERP / MES operating data",
+                availability="not_configured",
+                record_count=0,
+                freshness_threshold_minutes=60,
+                error_code="not_configured",
+                error_message="Operating data ingestion is not connected.",
+            ),
+        ]
+
+    def world_payload(request: Request) -> dict:
+        tenant_id = _tenant_id(request)
+        generated_at = datetime.now(UTC).isoformat()
+        source_health: list[dict] = []
+        accounts: list[dict] = []
+        contacts: list[dict] = []
+        opportunities: list[dict] = []
+        if settings.hubspot_access_token:
+            try:
+                client = HubSpotClient(settings.hubspot_access_token)
+                account_payload = hubspot_payload(client, "accounts")
+                contact_payload = hubspot_payload(client, "contacts")
+                deal_payload = hubspot_payload(client, "deals")
+                accounts = account_payload.get("records") if isinstance(account_payload.get("records"), list) else []
+                contacts = contact_payload.get("records") if isinstance(contact_payload.get("records"), list) else []
+                opportunities = deal_payload.get("records") if isinstance(deal_payload.get("records"), list) else []
+                _sync_canonical_accounts(session_factory, {"records": accounts}, tenant_id)
+                source_health.append(_source_health(
+                    source_key="hubspot",
+                    display_name="HubSpot CRM",
+                    availability="available",
+                    record_count=len(accounts) + len(contacts) + len(opportunities),
+                    last_successful_sync_at=generated_at,
+                    freshness_threshold_minutes=15,
+                ))
+            except HubSpotError as exc:
+                logger.warning("hubspot.world_snapshot_failed", extra={"status_code": exc.status_code})
+                source_health.append(_source_health(
+                    source_key="hubspot",
+                    display_name="HubSpot CRM",
+                    availability="error",
+                    record_count=0,
+                    freshness_threshold_minutes=15,
+                    error_code="hubspot_error",
+                    error_message=str(exc),
+                ))
+        else:
+            source_health.append(_source_health(
+                source_key="hubspot",
+                display_name="HubSpot CRM",
+                availability="not_configured",
+                record_count=0,
+                freshness_threshold_minutes=15,
+                error_code="not_configured",
+                error_message="BTX_HUBSPOT_ACCESS_TOKEN is not configured.",
+            ))
+
+        signals, monitor_health = _monitor_records(settings)
+        source_health.append(monitor_health)
+        source_health.append(_source_health(
+            source_key="operating",
+            display_name="ERP / MES operating data",
+            availability="not_configured",
+            record_count=0,
+            freshness_threshold_minutes=60,
+            error_code="not_configured",
+            error_message="Operating data ingestion is not connected.",
+        ))
+
+        session = session_factory()
+        try:
+            ensure_default_scoring_config(session, tenant_id, _actor(request))
+            source_data_version = f"{tenant_id}:{generated_at}"
+            id_map = upsert_canonical_accounts(session, accounts, tenant_id)
+            if accounts:
+                accounts = remap_source_records(accounts, id_map)
+                contacts = remap_child_company_ids(contacts, id_map)
+                opportunities = remap_child_company_ids(opportunities, id_map)
+            else:
+                accounts = [
+                    canonical_account_to_company(row)
+                    for row in session.query(models.CanonicalAccount)
+                    .filter(models.CanonicalAccount.tenant_id == tenant_id)
+                    .order_by(models.CanonicalAccount.display_name.asc(), models.CanonicalAccount.legal_name.asc())
+                    .all()
+                ]
+
+            for signal in signals:
+                resolve_signal_relationships(session, tenant_id=tenant_id, signal=signal)
+            session.commit()
+
+            relationship_rows = (
+                session.query(models.SignalAccountRelationship)
+                .filter(models.SignalAccountRelationship.tenant_id == tenant_id)
+                .order_by(models.SignalAccountRelationship.updated_at.desc(), models.SignalAccountRelationship.created_at.desc())
+                .all()
+            )
+            signal_rows = (
+                session.query(models.IntelligenceSignal)
+                .filter(models.IntelligenceSignal.tenant_id == tenant_id)
+                .order_by(models.IntelligenceSignal.updated_at.desc(), models.IntelligenceSignal.created_at.desc())
+                .all()
+            )
+            relationships_by_signal: dict[str, list[models.SignalAccountRelationship]] = {}
+            for relationship in relationship_rows:
+                relationships_by_signal.setdefault(relationship.signal_id, []).append(relationship)
+            signals = []
+            for row in signal_rows:
+                payload = signal_to_dict(row)
+                rels = relationships_by_signal.get(row.id, [])
+                payload["relationships"] = [relationship_to_dict(rel) for rel in rels]
+                if rels and any(is_confirmed_account_signal(row, rel, MINIMUM_RELATIONSHIP_CONFIDENCE) for rel in rels):
+                    payload["scope"] = "specific_account"
+                    payload["subject_id"] = sorted(rel.canonical_account_id for rel in rels if is_confirmed_account_signal(row, rel, MINIMUM_RELATIONSHIP_CONFIDENCE))[0]
+                elif rels:
+                    payload["scope"] = "unlinked"
+                signals.append(payload)
+
+            scores = {
+                "accountAttractiveness": [],
+                "signalConfidence": [],
+                "pursuitPwin": [],
+                "deliveryFeasibility": [],
+                "relationshipHealth": [],
+                "actionPriority": [],
+            }
+            account_rows = (
+                session.query(models.CanonicalAccount)
+                .filter(models.CanonicalAccount.tenant_id == tenant_id)
+                .order_by(models.CanonicalAccount.display_name.asc(), models.CanonicalAccount.legal_name.asc())
+                .all()
+            )
+            for account in account_rows:
+                account_scores = score_account(session, tenant_id, account, source_data_version)
+                for family, result in account_scores.items():
+                    snapshot = persist_score_snapshot(
+                        session,
+                        tenant_id,
+                        entity_type="account",
+                        entity_id=account.id,
+                        score_family=family,
+                        result=result,
+                    )
+                    scores[family].append(score_snapshot_summary(snapshot))
+            for signal_row in signal_rows:
+                result = signal_confidence(signal_row, relationships_by_signal.get(signal_row.id, []), source_data_version)
+                snapshot = persist_score_snapshot(
+                    session,
+                    tenant_id,
+                    entity_type="signal",
+                    entity_id=signal_row.id,
+                    score_family="signalConfidence",
+                    result=result,
+                )
+                scores["signalConfidence"].append(score_snapshot_summary(snapshot))
+            session.commit()
+
+            work_items = [
+                _work_item_response(row)
+                for row in session.query(models.WorkItem)
+                .filter(models.WorkItem.tenant_id == tenant_id)
+                .order_by(models.WorkItem.updated_at.desc(), models.WorkItem.created_at.desc())
+                .all()
+            ]
+            deliverables = [
+                {
+                    "id": row.id,
+                    "type": row.type,
+                    "title": row.title,
+                    "canonical_account_id": row.canonical_account_id,
+                    "program_id": row.program_id,
+                    "created_at": row.created_at.isoformat(),
+                    "updated_at": row.updated_at.isoformat(),
+                }
+                for row in session.query(models.Deliverable)
+                .filter(models.Deliverable.tenant_id == tenant_id)
+                .order_by(models.Deliverable.updated_at.desc(), models.Deliverable.created_at.desc())
+                .all()
+            ]
+            score_history = [
+                score_snapshot_summary(row)
+                for row in session.query(models.ScoreSnapshot)
+                .filter(models.ScoreSnapshot.tenant_id == tenant_id)
+                .order_by(models.ScoreSnapshot.calculated_at.desc())
+                .limit(50)
+                .all()
+            ]
+            canonical_accounts = [canonical_account_to_company(row) for row in account_rows]
+            account_identifiers = [
+                {
+                    "id": row.id,
+                    "tenantId": row.tenant_id,
+                    "canonicalAccountId": row.canonical_account_id,
+                    "identifierType": row.identifier_type,
+                    "normalizedValue": row.normalized_value,
+                    "originalValue": row.original_value,
+                    "sourceClassification": row.source_classification,
+                    "verified": row.verified,
+                    "verifiedByUserId": row.verified_by_user_id,
+                    "verifiedAt": row.verified_at.isoformat() if row.verified_at else None,
+                    "createdAt": row.created_at.isoformat(),
+                    "updatedAt": row.updated_at.isoformat(),
+                }
+                for row in session.query(models.AccountIdentifier)
+                .filter(models.AccountIdentifier.tenant_id == tenant_id)
+                .order_by(models.AccountIdentifier.identifier_type.asc(), models.AccountIdentifier.normalized_value.asc())
+                .all()
+            ]
+        finally:
+            session.close()
+
+        return {
+            "tenant": {"id": tenant_id, "displayName": "BTX Precision"},
+            "accounts": accounts,
+            "canonicalAccounts": canonical_accounts,
+            "accountIdentifiers": account_identifiers,
+            "contacts": contacts,
+            "opportunities": opportunities,
+            "programs": [],
+            "signals": signals,
+            "signalRelationships": [relationship_to_dict(row) for row in relationship_rows],
+            "relationshipReview": {
+                "records": [relationship_to_dict(row) for row in relationship_rows if row.review_status == "needs_review"],
+                "minimumRelationshipConfidence": MINIMUM_RELATIONSHIP_CONFIDENCE,
+            },
+            "facilities": [],
+            "operatingFacts": [],
+            "capacity": None,
+            "scores": scores,
+            "scoreHistory": {
+                "records": score_history,
+            },
+            "scoringConfiguration": {
+                "version": SCORING_CONFIG_VERSION,
+                "minimumRelationshipConfidence": MINIMUM_RELATIONSHIP_CONFIDENCE,
+            },
+            "workItems": work_items,
+            "deliverables": deliverables,
+            "sourceHealth": source_health,
+            "generatedAt": generated_at,
+            "dataVersion": source_data_version,
+        }
+
+    @app.get("/source-health")
+    def source_health(request: Request) -> Response:
+        return JSONResponse({"records": source_health_payload()})
+
+    @app.get("/world-snapshot")
+    def world_snapshot(request: Request) -> Response:
+        return JSONResponse(world_payload(request))
+
+    @app.get("/signal-relationships/review")
+    def relationship_review_queue(request: Request) -> Response:
+        tenant_id = _tenant_id(request)
+        session = session_factory()
+        try:
+            rows = (
+                session.query(models.SignalAccountRelationship)
+                .filter(
+                    models.SignalAccountRelationship.tenant_id == tenant_id,
+                    models.SignalAccountRelationship.review_status == "needs_review",
+                )
+                .order_by(models.SignalAccountRelationship.updated_at.desc(), models.SignalAccountRelationship.created_at.desc())
+                .all()
+            )
+            return JSONResponse({"records": [relationship_to_dict(row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.patch("/signal-relationships/{relationship_id}")
+    def patch_signal_relationship(relationship_id: str, payload: dict, request: Request) -> Response:
+        action = str(payload.get("action") or "").strip()
+        note = str(payload.get("note") or "").strip() or None
+        if action not in {"confirm", "reject", "reopen", "mark_market", "mark_program"}:
+            return JSONResponse({"code": "validation_error", "detail": "action must be confirm, reject, reopen, mark_market, or mark_program."}, status_code=422)
+        tenant_id = _tenant_id(request)
+        actor = _actor(request)
+        session = session_factory()
+        try:
+            row = (
+                session.query(models.SignalAccountRelationship)
+                .filter(
+                    models.SignalAccountRelationship.tenant_id == tenant_id,
+                    models.SignalAccountRelationship.id == relationship_id,
+                )
+                .one_or_none()
+            )
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No relationship {relationship_id}."}, status_code=404)
+            before = relationship_to_dict(row)
+            signal = session.get(models.IntelligenceSignal, row.signal_id)
+            if action == "confirm":
+                if not row.evidence_ids:
+                    return JSONResponse({"code": "validation_error", "detail": "Cannot confirm a relationship without evidence."}, status_code=422)
+                row.review_status = "confirmed"
+                row.match_method = "manual_confirmation" if row.match_method not in {"exact_public_identifier", "exact_uei", "exact_cage_code", "exact_hubspot_company_id", "exact_verified_domain", "exact_legal_name"} else row.match_method
+                row.confidence = max(float(row.confidence or 0), MINIMUM_RELATIONSHIP_CONFIDENCE)
+                row.confirmed_by_user_id = actor
+                row.confirmed_at = datetime.now(UTC)
+                row.rejected_by_user_id = None
+                row.rejected_at = None
+                row.rejection_reason = None
+                if signal is not None:
+                    raw = dict(signal.raw_payload or {})
+                    raw["scope"] = "specific_account"
+                    raw["subject_id"] = row.canonical_account_id
+                    signal.scope = "specific_account"
+                    signal.raw_payload = raw
+                    signal.updated_at = datetime.now(UTC)
+            elif action == "reject":
+                row.review_status = "rejected"
+                row.rejected_by_user_id = actor
+                row.rejected_at = datetime.now(UTC)
+                row.rejection_reason = note or "Rejected during relationship review."
+            elif action == "reopen":
+                row.review_status = "needs_review"
+                row.rejected_by_user_id = None
+                row.rejected_at = None
+                row.rejection_reason = None
+            else:
+                row.review_status = "rejected"
+                row.rejected_by_user_id = actor
+                row.rejected_at = datetime.now(UTC)
+                row.rejection_reason = f"Marked signal as {action.removeprefix('mark_')}-level."
+                if signal is not None:
+                    raw = dict(signal.raw_payload or {})
+                    raw["scope"] = action.removeprefix("mark_")
+                    raw["subject_id"] = "__portfolio__"
+                    signal.scope = raw["scope"]
+                    signal.raw_payload = raw
+                    signal.updated_at = datetime.now(UTC)
+            row.last_validated_at = datetime.now(UTC)
+            row.updated_at = datetime.now(UTC)
+            after = relationship_to_dict(row)
+            session.add(models.RelationshipAuditEvent(
+                tenant_id=tenant_id,
+                relationship_id=row.id,
+                action=action,
+                actor_user_id=actor,
+                note=note,
+                before=before,
+                after=after,
+            ))
+            if action in {"confirm", "reject", "mark_market", "mark_program"}:
+                for item in (
+                    session.query(models.WorkItem)
+                    .filter(models.WorkItem.tenant_id == tenant_id, models.WorkItem.related_relationship_id == row.id)
+                    .all()
+                ):
+                    if item.status not in {"done", "dismissed", "closed", "verified", "outcome_recorded"}:
+                        before_item = _work_item_snapshot(item)
+                        item.status = "closed"
+                        item.execution_state = "completed"
+                        item.outcome = f"Relationship review {action}."
+                        item.updated_at = datetime.now(UTC)
+                        _append_work_item_audit(item, action=f"relationship_{action}", actor=actor, before=before_item, after=_work_item_snapshot(item))
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(relationship_to_dict(row))
+        finally:
+            session.close()
 
     def cached_hubspot_response(kind: str, tenant_id: str) -> Response:
         if not settings.hubspot_access_token:
@@ -1122,7 +1695,15 @@ def create_app(
                 tenant_id=_tenant_id(request),
                 type=payload.type,
                 canonical_account_id=payload.canonical_account_id,
+                related_signal_id=payload.related_signal_id,
+                related_relationship_id=payload.related_relationship_id,
+                related_opportunity_id=payload.related_opportunity_id,
+                program_id=payload.program_id,
+                score_snapshot_ids=payload.score_snapshot_ids,
                 source_signal_ids=payload.source_signal_ids,
+                supporting_evidence=payload.supporting_evidence,
+                missing_information=payload.missing_information,
+                dedupe_key=payload.dedupe_key,
                 owner=payload.owner,
                 priority=payload.priority,
                 status=payload.status,
@@ -1181,7 +1762,7 @@ def create_app(
             now = datetime.now(UTC)
             if view == "needs_attention":
                 query = query.filter(
-                    models.WorkItem.status.notin_(["done", "dismissed"]),
+                    models.WorkItem.status.notin_(["done", "dismissed", "closed", "verified", "outcome_recorded"]),
                     (models.WorkItem.priority.in_(["high", "urgent"])) | (models.WorkItem.due_date < now),
                 )
             elif view == "prepared":
@@ -1189,7 +1770,7 @@ def create_app(
             elif view == "needs_approval":
                 query = query.filter(models.WorkItem.approval_state == "pending")
             elif view == "outcomes":
-                query = query.filter(models.WorkItem.status.in_(["done", "dismissed"]))
+                query = query.filter(models.WorkItem.status.in_(["done", "dismissed", "closed", "verified", "outcome_recorded"]))
             elif view == "what_changed":
                 query = query.filter(models.WorkItem.updated_at >= now - timedelta(days=7))
             elif view is not None:

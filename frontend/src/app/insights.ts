@@ -1,9 +1,3 @@
-// Loads the baked LLM narration (insights.json), committed by the CI workflow.
-// The file ships empty; the dossier falls back to the deterministic narrator when
-// a company has no baked insight, so the app works with or without the CI run.
-
-import insights from "../../data/demo/btx/insights.json";
-
 export interface CompanyInsight {
   /** LLM prose explaining "why this is a target" - grounded in the trace. */
   opportunity?: string;
@@ -11,7 +5,7 @@ export interface CompanyInsight {
   findings?: Record<string, string>;
 }
 
-const INSIGHTS = insights as Record<string, CompanyInsight>;
+const INSIGHTS: Record<string, CompanyInsight> = {};
 
 export function getInsight(companyId: string): CompanyInsight | undefined {
   return INSIGHTS[companyId];

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import httpx
@@ -14,6 +15,7 @@ from btx_platform import models  # noqa: E402
 from btx_platform.api import create_app  # noqa: E402
 from btx_platform.config import Settings  # noqa: E402
 from btx_platform.db import init_db, make_engine, make_session_factory  # noqa: E402
+from btx_platform.intelligence import upsert_canonical_accounts  # noqa: E402
 from btx_platform.ratelimit import RateLimiter  # noqa: E402
 from tests.auth_helpers import make_clerk_fixture  # noqa: E402
 
@@ -138,16 +140,142 @@ def test_latest_artifacts_public_and_reads_pipeline_output(tmp_path: Path):
     assert body["archive"]["runs"][0]["run_id"] == "r1"
 
 
-def test_operating_baseline_public_and_labeled_seeded(tmp_path: Path):
+def test_operating_baseline_public_and_no_fixture_records(tmp_path: Path):
     client, _sf, _settings = _build(tmp_path)
 
     response = client.get("/operating-baseline")
 
     assert response.status_code == 200
     body = response.json()
-    assert body["data_provenance"] == "Operating baseline - ERP integration pending"
-    assert body["capacity"]
-    assert body["pipeline"]["records"]
+    assert body["data_provenance"] == "Backend source health"
+    assert body["capacity"] == []
+    assert body["pipeline"]["records"] == []
+    assert body["assumptions"]["source_mode"] == "not_connected"
+
+
+def test_world_snapshot_reports_missing_sources_without_fixture_records(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path, hubspot_access_token=None)
+
+    response = client.get("/world-snapshot", headers=_headers(tenant_id="tenant-live-empty"))
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["tenant"]["id"] == "tenant-live-empty"
+    assert body["accounts"] == []
+    assert body["contacts"] == []
+    assert body["opportunities"] == []
+    assert body["facilities"] == []
+    assert body["capacity"] is None
+    assert body["workItems"] == []
+    assert body["deliverables"] == []
+    source_health = {row["sourceKey"]: row for row in body["sourceHealth"]}
+    assert source_health["hubspot"]["availability"] == "not_configured"
+    assert source_health["monitor"]["availability"] == "unavailable"
+    assert source_health["operating"]["availability"] == "not_configured"
+
+
+def test_world_snapshot_includes_tenant_scoped_persisted_work_items(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path, hubspot_access_token=None)
+    tenant_a = _headers(tenant_id="tenant-a")
+    tenant_b = _headers(tenant_id="tenant-b")
+
+    created = client.post(
+        "/work-items",
+        headers=tenant_a,
+        json={"type": "research_task", "recommended_action": "Qualify missing CRM context."},
+    )
+    assert created.status_code == 201
+
+    body_a = client.get("/world-snapshot", headers=tenant_a).json()
+    body_b = client.get("/world-snapshot", headers=tenant_b).json()
+
+    assert [item["id"] for item in body_a["workItems"]] == [created.json()["id"]]
+    assert body_b["workItems"] == []
+
+
+def test_world_snapshot_publishes_canonical_relationships_and_scores(tmp_path: Path):
+    output_dir = tmp_path / "artifacts"
+    output_dir.mkdir()
+    (output_dir / "run_output.json").write_text(
+        json.dumps({
+            "meta": {"run_at": "2026-07-23T12:00:00+00:00"},
+            "items": [
+                {
+                    "item_id": "acme-award",
+                    "raw_title": "Acme Precision Manufacturing wins aerospace machining award",
+                    "source_id": "SAM.gov",
+                    "published_at": "2026-07-23T11:00:00+00:00",
+                    "url": "https://example.test/acme-award",
+                    "entities": [{"name": "Acme Precision Manufacturing"}],
+                    "per_edition": {
+                        "bd": {
+                            "relevance_score": 92,
+                            "so_what": "Acme Precision Manufacturing has a specific aerospace machining award that may fit BTX precision machining.",
+                            "now_what": "Confirm package fit before outreach.",
+                            "categories": ["contract award", "machining"],
+                        },
+                    },
+                },
+            ],
+        }),
+        encoding="utf-8",
+    )
+    client, sf, _settings = _build(tmp_path, hubspot_access_token=None, pipeline_output_dir=str(output_dir))
+    with sf() as session:
+        upsert_canonical_accounts(session, [{
+            "id": "crm-acme",
+            "name": "Acme Precision Manufacturing",
+            "relationship": "customer",
+            "domains": ["acme.example"],
+            "known_programs": ["precision machining", "aerospace award"],
+            "known_customers": ["AS9100 aerospace production"],
+            "city": "Austin",
+            "state": "TX",
+        }], "tenant-a")
+        session.commit()
+
+    response = client.get("/world-snapshot", headers=_headers(tenant_id="tenant-a"))
+
+    assert response.status_code == 200
+    body = response.json()
+    account_id = body["canonicalAccounts"][0]["id"]
+    signal = body["signals"][0]
+    relationship = body["signalRelationships"][0]
+    assert signal["scope"] == "specific_account"
+    assert signal["subject_id"] == account_id
+    assert relationship["canonicalAccountId"] == account_id
+    assert relationship["reviewStatus"] == "confirmed"
+    assert relationship["confidence"] >= 0.8
+    assert body["relationshipReview"]["records"] == []
+    families = body["scores"]
+    assert set(families) >= {
+        "accountAttractiveness",
+        "signalConfidence",
+        "pursuitPwin",
+        "deliveryFeasibility",
+        "relationshipHealth",
+        "actionPriority",
+    }
+    account_score = families["accountAttractiveness"][0]
+    assert account_score["entityId"] == account_id
+    assert account_score["result"]["configurationVersion"] == body["scoringConfiguration"]["version"]
+    assert account_score["result"]["status"] in {"available", "provisional", "insufficient_data"}
+    pwin_score = families["pursuitPwin"][0]
+    assert pwin_score["result"]["status"] == "insufficient_data"
+    assert pwin_score["result"]["missingInputs"]
+
+
+def test_source_health_does_not_write_score_snapshots(tmp_path: Path):
+    client, sf, _settings = _build(tmp_path, hubspot_access_token=None)
+    with sf() as session:
+        before = session.query(models.ScoreSnapshot).count()
+
+    response = client.get("/source-health", headers=_headers(tenant_id="tenant-a"))
+
+    assert response.status_code == 200
+    assert {row["sourceKey"] for row in response.json()["records"]} == {"hubspot", "monitor", "operating"}
+    with sf() as session:
+        assert session.query(models.ScoreSnapshot).count() == before
 
 
 def test_auth_rejects_malformed_bearer_token(tmp_path: Path):

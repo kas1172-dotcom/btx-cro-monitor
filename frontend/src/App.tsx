@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useStore, setState, closeDemoAction, goHome, clearTourRequest, closeDeliverableWizard } from "./store/store.ts";
 import { useWorld } from "./app/useWorld.ts";
-import { CITIES } from "./app/config.ts";
 import { Dossier } from "./ui/company/Dossier.tsx";
 import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
 import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
@@ -57,6 +56,7 @@ export function App() {
   const homeActive = (activeHome || activeTab === "brief") && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const marketScoped = activeTab === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const viewWorld = marketScoped ? marketWorld ?? world : world;
+  const cityOptions = [...new Set((world?.companies ?? []).map((company) => company.location.city).filter(Boolean))].sort();
 
   // Right-panel: dossier takes priority over context panel, one at a time.
   const dossierOpen = !!activeCompanyId;
@@ -240,7 +240,7 @@ export function App() {
                 })}
               >
                 <option value={ALL_MARKETS_VALUE}>All Markets</option>
-                {CITIES.map((c) => (
+                {cityOptions.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>

@@ -258,20 +258,19 @@ When Phase 3 deploys or rebuilds the frontend against this backend, use:
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
 VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
-VITE_DATA_MODE=hybrid
-VITE_ARTIFACT_BASE_URL=../btx
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_or_live_xxx
 ```
 
 Add these repository secrets for the GitHub Pages frontend workflow:
 
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
-VITE_COCKPIT_PASSWORD=<demo access password>
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_or_live_xxx
 ```
 
 Do not add a shared backend bearer token to the Pages build. Set
-`VITE_CLERK_PUBLISHABLE_KEY` as a GitHub Actions secret/variable instead -
-the cockpit gates itself behind Clerk sign-in and sends each user's own
+`VITE_CLERK_PUBLISHABLE_KEY` as a GitHub Actions secret or variable instead.
+The cockpit gates itself behind Clerk sign-in and sends each user's own
 session token on backend calls.
 
 After those secrets are set, run the **30 Deploy Frontend Cockpit** workflow from

@@ -5,7 +5,7 @@ import type { Deliverable, DeliverableSection } from "./types.ts";
 
 export interface RevisionRequest {
   endpoint: string;
-  deliverable: Pick<Deliverable, "title" | "audience" | "form" | "sources">;
+  deliverable: Pick<Deliverable, "title" | "audience" | "form"> & Partial<Pick<Deliverable, "sources">>;
   section: DeliverableSection;
   instruction: string;
   bannedVocabulary?: string[];
@@ -21,7 +21,7 @@ export async function requestSectionRevision({
   fetchImpl = fetch,
 }: RevisionRequest): Promise<string> {
   const bannedLine = `Avoid these banned terms exactly: ${bannedVocabulary.join(", ")}.`;
-  const sourceContext = deliverable.sources.map((source) => ({
+  const sourceContext = (deliverable.sources ?? []).map((source) => ({
     source: source.source,
     reason: source.reason,
     records: source.records,

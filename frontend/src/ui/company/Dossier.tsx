@@ -52,8 +52,8 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const facilities = world.facilities.filter((f) => f.company_id === companyId);
   const openOpps = world.opportunities
     .filter((o) => o.company_id === companyId && o.stage !== "won" && o.stage !== "lost")
-    .sort((a, b) => b.value - a.value);
-  const pipelineValue = openOpps.reduce((s, o) => s + o.value, 0);
+    .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+  const pipelineValue = openOpps.reduce((s, o) => s + (o.value ?? 0), 0);
   const fmtM = (v: number) => `$${(v / 1e6).toFixed(1)}M`;
   const companyAddress = formatAddress(company.location);
   const links = companyLinks(company);
@@ -158,7 +158,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
               <li key={o.id}>
                 <span className={`opp-stage stage-${o.stage}`}>{o.stage}</span>
                 <span className="opp-name">{o.name}</span>
-                <span className="opp-val">{fmtM(o.value)}</span>
+                <span className="opp-val">{o.value === null ? "Value not provided" : fmtM(o.value)}</span>
                 <ProvenanceBadge label={provenanceForRecord(o)} />
                 <ExternalLink href={o.contract_url} label="Contract" />
                 <ExternalLink href={o.document_url} label="Document" />

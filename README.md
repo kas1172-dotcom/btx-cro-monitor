@@ -22,23 +22,23 @@ Public defense sources / configured APIs
 monitor_engine
         ↓
 run_output.json + archive.json + map_targets.json
-        ↓
-GitHub Pages /btx/*.json
-        ↓
-React cockpit
         ↕
 FastAPI backend on Fly.io
         ↕
 HubSpot / LLM / pipeline / settings
+        ↕
+React cockpit
 ```
 
 The cockpit has one runtime data path:
 
 - HubSpot CRM reads through the FastAPI backend.
-- Monitor-engine market signals from `clients/btx/artifacts/*.json`, served by the backend or Pages.
-- A backend-served seeded operating baseline for capacity, facilities, pipeline, and assumptions until the ERP integration is connected.
+- Monitor-engine market signals read by the backend from `clients/btx/artifacts/*.json`.
+- Operating-system facts, capacity, ERP, and MES records stay unavailable until those integrations are connected.
 
 Fixture JSON under `frontend/data/demo/btx/` is retained for tests and local development scaffolding only.
+
+Canonical account identity, signal-account relationship review, and backend score families are documented in `docs/CANONICAL_IDENTITY_AND_SCORING.md`.
 
 ## Local Frontend
 
@@ -54,7 +54,7 @@ Production-equivalent local build:
 cd frontend
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev \
 VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm \
-VITE_ARTIFACT_BASE_URL=../btx \
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_or_live_xxx \
 npm run build
 ```
 

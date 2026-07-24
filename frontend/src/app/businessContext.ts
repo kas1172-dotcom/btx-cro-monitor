@@ -35,7 +35,7 @@ export function businessContextForCompany(
   const pipelineRecord = snapshot?.pipeline.records.find((row) => row.company_id === company.id);
   const openOpps = world.opportunities.filter((o) => o.company_id === company.id && o.stage !== "won" && o.stage !== "lost");
   const wonOpps = world.opportunities.filter((o) => o.company_id === company.id && o.stage === "won");
-  const openValue = openOpps.reduce((sum, o) => sum + o.value, 0);
+  const openValue = openOpps.reduce((sum, o) => sum + (o.value ?? 0), 0);
   const bestCapacity = snapshot?.capacity
     .filter((row) => row.capacity_status !== "selective_capacity")
     .sort((a, b) => b.available_5_axis_hours_next_30d - a.available_5_axis_hours_next_30d)[0] ?? snapshot?.capacity[0];
@@ -45,7 +45,7 @@ export function businessContextForCompany(
     : "CRM: no owner or last-touch record is attached to this account.";
 
   const capacityLine = bestCapacity
-    ? `ERP/capacity: ${bestCapacity.facility_name} has ${bestCapacity.available_5_axis_hours_next_30d} available 5-axis hours and ${bestCapacity.available_turning_hours_next_30d} turning hours over 30 days; constraint is ${bestCapacity.constraint}; lead time ${bestCapacity.quoted_lead_time_days} days.`
+    ? `ERP/capacity: ${bestCapacity.facility_name} has operating context available; constraint is ${bestCapacity.constraint}.`
     : "ERP/capacity: no capacity snapshot is available.";
 
   const pipelineLine = pipelineRecord

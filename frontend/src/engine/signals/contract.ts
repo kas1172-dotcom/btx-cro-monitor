@@ -30,6 +30,16 @@ export type SignalScope =
   | "unlinked";
 
 export type SignalMatchMethod =
+  | "exact_public_identifier"
+  | "exact_uei"
+  | "exact_cage_code"
+  | "exact_hubspot_company_id"
+  | "exact_verified_domain"
+  | "exact_legal_name"
+  | "verified_alias"
+  | "parent_subsidiary_mapping"
+  | "verified_program_relationship"
+  | "manual_confirmation"
   | "exact_domain"
   | "cage_uei"
   | "alias"
@@ -38,14 +48,24 @@ export type SignalMatchMethod =
   | "manual";
 
 export interface SignalRelationship {
+  id?: string;
+  signalId?: string;
   canonical_account_id: string;
+  canonicalAccountId?: string;
   source_entity_name: string;
+  sourceEntityName?: string;
   match_method: SignalMatchMethod;
+  matchMethod?: SignalMatchMethod;
   evidence: string;
+  evidenceIds?: string[];
+  evidence_ids?: string[];
   confidence: number;
-  review_status: "accepted" | "needs_review" | "unconfirmed";
-  creation_source: "resolver" | "manual";
+  review_status: "confirmed" | "accepted" | "needs_review" | "unconfirmed" | "rejected";
+  reviewStatus?: "confirmed" | "needs_review" | "rejected";
+  creation_source: "resolver" | "manual" | "public_data" | "crm" | "derived";
+  creationSource?: "public_data" | "crm" | "manual" | "derived";
   last_validated_at: string | null;
+  lastValidatedAt?: string | null;
 }
 
 /**
@@ -92,4 +112,27 @@ export interface Signal {
     affected_entities: string[];
     provenance: unknown;
   };
+}
+
+export function relationshipAccountId(relationship: SignalRelationship): string {
+  return relationship.canonicalAccountId ?? relationship.canonical_account_id;
+}
+
+export function relationshipEvidenceIds(relationship: SignalRelationship): string[] {
+  return relationship.evidenceIds ?? relationship.evidence_ids ?? [];
+}
+
+export function relationshipReviewStatus(relationship: SignalRelationship): string {
+  return relationship.reviewStatus ?? relationship.review_status;
+}
+
+export function isConfirmedAccountSignal(signal: Signal, relationship: SignalRelationship, minimumConfidence = 0.8): boolean {
+  const accountId = relationshipAccountId(relationship);
+  return (
+    signal.scope === "specific_account" &&
+    relationshipReviewStatus(relationship) === "confirmed" &&
+    relationship.confidence >= minimumConfidence &&
+    relationshipEvidenceIds(relationship).length > 0 &&
+    accountId === signal.subject_id
+  );
 }

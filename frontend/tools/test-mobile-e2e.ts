@@ -2,8 +2,6 @@ import { spawn } from "node:child_process";
 import { mkdir, readFile } from "node:fs/promises";
 import { chromium, type Browser, type Page } from "playwright";
 
-const PASSWORD = "mobile-smoke";
-const PASSWORD_HASH = "c66fb02f84dfe02b09b681f00cda7aa8b08ef98c81fda5ffe76873c1ee823087";
 const BASE_URL = "http://127.0.0.1:4174";
 const SCREENSHOT_DIR = "/tmp/btx-mobile-smoke";
 
@@ -45,11 +43,6 @@ async function waitForPreview(): Promise<ReturnType<typeof spawn>> {
 
 async function unlock(page: Page): Promise<void> {
   await page.goto(BASE_URL, { waitUntil: "networkidle" });
-  const password = page.locator('input[type="password"]');
-  if (await password.count()) {
-    await password.fill(PASSWORD);
-    await page.getByRole("button", { name: "Enter" }).click();
-  }
   await page.locator("[data-surface-component='surface-todays-brief']").waitFor({ timeout: 15000 });
 }
 
@@ -88,7 +81,7 @@ async function assertLazyBundles(): Promise<void> {
 }
 
 await mkdir(SCREENSHOT_DIR, { recursive: true });
-await run("npm", ["run", "build"], { ...process.env, VITE_COCKPIT_PASSWORD_HASH: PASSWORD_HASH });
+await run("npm", ["run", "build"]);
 await assertLazyBundles();
 await run("npx", ["playwright", "install", "chromium"]);
 const preview = await waitForPreview();

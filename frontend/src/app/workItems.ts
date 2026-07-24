@@ -12,19 +12,44 @@ export type WorkItemType =
   | "meeting_brief"
   | "outreach_draft"
   | "qualified_opportunity"
+  | "relationship_review"
+  | "dismissal"
   | "dismissed";
 
-export type WorkItemStatus = "proposed" | "approved" | "in_progress" | "done" | "dismissed";
+export type WorkItemStatus =
+  | "detected"
+  | "triaged"
+  | "prepared"
+  | "awaiting_approval"
+  | "approved"
+  | "in_progress"
+  | "executed"
+  | "verified"
+  | "outcome_recorded"
+  | "dismissed"
+  | "closed"
+  | "proposed"
+  | "done";
 export type WorkItemPriority = "low" | "normal" | "high" | "urgent";
 export type ApprovalState = "not_required" | "pending" | "approved" | "rejected";
 export type ExecutionState = "not_started" | "queued" | "running" | "completed" | "failed";
 export type WorkItemView = "what_changed" | "needs_attention" | "prepared" | "needs_approval" | "outcomes";
 
+const TERMINAL_STATUSES = new Set<WorkItemStatus>(["done", "dismissed", "closed", "verified", "outcome_recorded"]);
+
 export interface WorkItem {
   id: string;
   type: WorkItemType;
   canonical_account_id: string | null;
+  related_signal_id: string | null;
+  related_relationship_id: string | null;
+  related_opportunity_id: string | null;
+  program_id: string | null;
+  score_snapshot_ids: string[];
   source_signal_ids: string[];
+  supporting_evidence: Array<Record<string, unknown>>;
+  missing_information: string[];
+  dedupe_key: string | null;
   owner: string | null;
   priority: WorkItemPriority;
   status: WorkItemStatus;
@@ -48,7 +73,15 @@ export interface WorkItem {
 export interface WorkItemCreate {
   type: WorkItemType;
   canonical_account_id?: string | null;
+  related_signal_id?: string | null;
+  related_relationship_id?: string | null;
+  related_opportunity_id?: string | null;
+  program_id?: string | null;
+  score_snapshot_ids?: string[];
   source_signal_ids?: string[];
+  supporting_evidence?: Array<Record<string, unknown>>;
+  missing_information?: string[];
+  dedupe_key?: string | null;
   owner?: string | null;
   priority?: WorkItemPriority;
   status?: WorkItemStatus;
@@ -74,7 +107,7 @@ export interface WorkItemDraft {
 
 export interface WorkItemState {
   items: WorkItem[];
-  source: "backend" | "derived";
+  source: "backend" | "unavailable";
   error: string | null;
 }
 
@@ -114,10 +147,18 @@ export function deriveWorkItems(world: World): WorkItem[] {
     id: `derived-rec-${rec.subject_id}`,
     type: "account_action",
     canonical_account_id: rec.subject_id,
+    related_signal_id: null,
+    related_relationship_id: null,
+    related_opportunity_id: null,
+    program_id: null,
+    score_snapshot_ids: [],
     source_signal_ids: world.analysis.valid.filter((signal) => signal.subject_id === rec.subject_id).slice(0, 3).map((signal) => signal.id),
+    supporting_evidence: [],
+    missing_information: [],
+    dedupe_key: null,
     owner: null,
     priority: rec.priority === "high" ? "high" : rec.priority === "medium" ? "normal" : "low",
-    status: "proposed",
+    status: "detected",
     due_date: isoDate(index < 3 ? 2 : 5),
     recommended_action: `${accountName(world, rec.subject_id)}: ${rec.reason}`,
     generated_artifact_ref: null,
@@ -139,10 +180,18 @@ export function deriveWorkItems(world: World): WorkItem[] {
     id: `derived-signal-${signal.id}`,
     type: signalAccountId(signal) ? "research_task" : "customer_question",
     canonical_account_id: signalAccountId(signal),
+    related_signal_id: signal.id,
+    related_relationship_id: null,
+    related_opportunity_id: null,
+    program_id: null,
+    score_snapshot_ids: [],
     source_signal_ids: [signal.id],
+    supporting_evidence: [],
+    missing_information: [],
+    dedupe_key: null,
     owner: null,
     priority: signal.confidence >= 0.9 ? "high" : "normal",
-    status: "proposed",
+    status: "detected",
     due_date: isoDate(3),
     recommended_action: signalAccountId(signal)
       ? `${accountName(world, signal.subject_id)}: review ${signal.event_type.replace(/_/g, " ")} from ${sourceLabel(signal)}.`
@@ -169,7 +218,15 @@ export function deriveWorkItems(world: World): WorkItem[] {
       id: `derived-opp-${opp.id}`,
       type: "meeting_brief",
       canonical_account_id: opp.company_id,
+      related_signal_id: null,
+      related_relationship_id: null,
+      related_opportunity_id: opp.id,
+      program_id: null,
+      score_snapshot_ids: [],
       source_signal_ids: world.analysis.valid.filter((signal) => signal.subject_id === opp.company_id).slice(0, 2).map((signal) => signal.id),
+      supporting_evidence: [],
+      missing_information: [],
+      dedupe_key: null,
       owner: null,
       priority: opp.stage === "proposal" ? "high" : "normal",
       status: "approved",
@@ -199,48 +256,47 @@ export function filterWorkItems(items: WorkItem[], view?: WorkItemView): WorkIte
     case "what_changed":
       return items.filter((item) => item.source_signal_ids.length > 0);
     case "needs_attention":
-      return items.filter((item) => !["done", "dismissed"].includes(item.status) && (item.priority === "urgent" || item.priority === "high" || (item.due_date ?? "9999-99-99") < now));
+      return items.filter((item) => !TERMINAL_STATUSES.has(item.status) && (item.priority === "urgent" || item.priority === "high" || (item.due_date ?? "9999-99-99") < now));
     case "prepared":
       return items.filter((item) => Boolean(item.generated_artifact_ref));
     case "needs_approval":
       return items.filter((item) => item.approval_state === "pending");
     case "outcomes":
-      return items.filter((item) => item.status === "done" || item.status === "dismissed");
+      return items.filter((item) => TERMINAL_STATUSES.has(item.status));
     default:
       return items;
   }
 }
 
 export async function loadWorkItems(world: World, view?: WorkItemView): Promise<WorkItemState> {
-  const derived = filterWorkItems(deriveWorkItems(world), view);
-  if (!BACKEND_ENDPOINT) return { items: derived, source: "derived", error: null };
+  if (!BACKEND_ENDPOINT) return { items: [], source: "unavailable", error: "VITE_BACKEND_ENDPOINT is not configured." };
   try {
     const query = view ? `?${VIEW_PARAMS[view]}` : "";
     const response = await backendJson<{ records: WorkItem[] }>(`/work-items${query}`);
     return { items: response.records, source: "backend", error: null };
   } catch (error) {
     return {
-      items: derived,
-      source: "derived",
+      items: [],
+      source: "unavailable",
       error: error instanceof Error ? error.message : "Could not load backend work items.",
     };
   }
 }
 
 export function useWorkItems(world: World, view?: WorkItemView): WorkItemState {
-  const fallback = useMemo(() => filterWorkItems(deriveWorkItems(world), view), [view, world]);
-  const [state, setState] = useState<WorkItemState>({ items: fallback, source: "derived", error: null });
+  const empty = useMemo<WorkItemState>(() => ({ items: [], source: "unavailable", error: null }), []);
+  const [state, setState] = useState<WorkItemState>(empty);
 
   useEffect(() => {
     let alive = true;
-    setState({ items: fallback, source: "derived", error: null });
+    setState(empty);
     void loadWorkItems(world, view).then((next) => {
       if (alive) setState(next);
     });
     return () => {
       alive = false;
     };
-  }, [fallback, view, world]);
+  }, [empty, view, world]);
 
   return state;
 }
@@ -251,7 +307,7 @@ export function draftToCreatePayload(draft: WorkItemDraft): WorkItemCreate {
     canonical_account_id: draft.accountId ?? null,
     source_signal_ids: draft.sourceSignalIds ?? [],
     priority: draft.priority ?? "normal",
-    status: "proposed",
+    status: "awaiting_approval",
     due_date: draft.dueDate ?? isoDate(3),
     recommended_action: draft.title,
     generated_artifact_ref: draft.evidence ?? null,

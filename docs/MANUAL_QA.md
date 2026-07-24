@@ -22,20 +22,20 @@ Use this checklist for UI behaviors that are not covered by the deterministic Ty
 - Overflow auditor (DEV only): in the browser console run `window.__btxAudit?.()` after navigating to each tab. No red warnings should appear. If any appear, record the selector and report.
 - Width sweep: at 1512, 1280, and 1024px - verify no column is squished to zero, no button label is cut mid-word, no table overflows its container, and no rail badge overlaps the nav icon.
 
-## Artifact mode smoke test
+## Backend world snapshot smoke test
 
-Artifact mode uses Vite-bundled JSON imports from `clients/btx/artifacts/run_output.json` and `archive.json`. This works on GitHub Pages because the artifacts are compiled into the static JS bundle; there is no backend route or absolute asset path to configure.
+The cockpit uses the backend `WorldSnapshot` endpoint. Missing integrations must show as unavailable source-health states instead of local fixture fallback.
 
-1. Start the frontend with `VITE_DATA_MODE=artifact npm run dev` or build with `VITE_DATA_MODE=artifact npm run build`.
-2. Confirm the topbar shows "Monitor run" with the artifact run timestamp. If the run is older than 7 days, confirm the visible "stale data" state appears.
-3. Open Signals. Confirm rows show real source names/dates such as `SpaceNews` or `Federal Register`, and CRM/capacity/pipeline panes still identify simulated operating data.
-4. Generate a meeting brief from an account with a signal. In "Live Signals", confirm the evidence includes a real source/date citation inline.
-5. Temporarily break the artifact JSON shape in a local throwaway copy, rebuild, and confirm artifact mode falls back to demo signals with a visible "Artifact fallback" notice. Restore the artifact before committing.
+1. Start the backend, then start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, and `VITE_CLERK_PUBLISHABLE_KEY`.
+2. Sign in through Clerk. Confirm `/world-snapshot` succeeds in the browser network tab.
+3. Open Signals. Confirm rows show monitor source names/dates when artifacts exist, or a clear unavailable state when they do not.
+4. Open Accounts and Work Queue. Confirm missing CRM or work-item sources show empty states, not fixture accounts or derived local queues.
+5. Generate a meeting brief from an account with real CRM data. Confirm missing values remain labeled as unavailable or not provided.
 
 ## Backend live-mode Settings smoke test
 
 1. Start `btx_platform` with `CLERK_SECRET_KEY`, `BTX_CLERK_ISSUER`, `BTX_ANTHROPIC_API_KEY`, and either `BTX_PIPELINE_MECHANISM=subprocess` locally or `github` in production.
-2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, `VITE_DATA_MODE=live`, and `VITE_CLERK_PUBLISHABLE_KEY`. Sign in through the Clerk gate; the browser now sends a per-user session token, never a shared secret.
+2. Start the frontend with `VITE_BACKEND_ENDPOINT`, `VITE_COPILOT_ENDPOINT=<backend>/llm`, and `VITE_CLERK_PUBLISHABLE_KEY`. Sign in through the Clerk gate; the browser now sends a per-user session token, never a shared secret.
 3. Open Settings → Engine tuning. Confirm the panel shows `Backend scoring_weights`, a version number, and editable scoring rows. Change one weight, save, and confirm the version/status updates.
 4. Open Settings → Sources. Toggle a source, save, reload, and confirm the saved enabled state returns from the backend.
 5. Click `Run collection now`. Confirm the button reports the run status, recent runs populate, and a second click inside the rate-limit window is refused with a visible message.

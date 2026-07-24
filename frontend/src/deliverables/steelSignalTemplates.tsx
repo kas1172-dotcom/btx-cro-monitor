@@ -302,7 +302,7 @@ const newsletterFallbacks: Array<{ title: string; tell: string }> = [
 ];
 
 function heatValue(world: World, company: Company, rowIndex: number, colIndex: number): number {
-  const base = world.opportunities.filter((opp) => opp.company_id === company.id).reduce((sum, opp) => sum + opp.value, 0) / 1000;
+  const base = world.opportunities.filter((opp) => opp.company_id === company.id).reduce((sum, opp) => sum + (opp.value ?? 0), 0) / 1000;
   return Math.round((base || 120 + rowIndex * 85) * (0.72 + colIndex * 0.09));
 }
 

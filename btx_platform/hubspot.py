@@ -358,19 +358,19 @@ def _clean(value: Any) -> str | None:
     return text or None
 
 
-def _number(value: Any) -> float:
+def _number(value: Any) -> float | None:
     if value is None or value == "":
-        return 0.0
+        return None
     try:
         return float(value)
     except (TypeError, ValueError):
-        return 0.0
+        return None
 
 
-def _iso_date(value: Any) -> str:
+def _iso_date(value: Any) -> str | None:
     text = _clean(value)
     if not text:
-        return (datetime.now(UTC) + timedelta(days=90)).date().isoformat()
+        return None
     return text[:10]
 
 
@@ -443,9 +443,9 @@ def map_companies(
             "account_status": account_status,
             "business_motion": "grow_existing_business" if deal_ids else "prospect_new_business",
             "location": {
-                "city": _clean(props.get("city")) or "Unknown",
-                "lat": 0,
-                "lon": 0,
+                "city": _clean(props.get("city")) or "",
+                "lat": None,
+                "lon": None,
                 "address": _clean(props.get("address")),
                 "state": _clean(props.get("state")),
                 "postal_code": _clean(props.get("zip")),

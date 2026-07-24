@@ -1,5 +1,5 @@
 // Geographic prospecting map. Plots the scored companies in the selected market;
-// prospects (targets + customers) glow by opportunity. Click a pin -> the store's
+// prospects (targets + customers) scale by backend account attractiveness. Click a pin -> the store's
 // activeCompanyId updates -> the dossier opens. The map is just a lens on engine
 // output; it computes nothing.
 
@@ -54,7 +54,7 @@ function FitMapBounds({ points, watchKey }: { points: Array<[number, number]>; w
 
 export function ProspectMap({ world }: { world: World }) {
   const { activeCompanyId } = useStore();
-  const markers = buildMapMarkers(world.companies, world.analysis.byId);
+  const markers = buildMapMarkers(world.companies, world.analysis.byId, world.scoreResults);
   const center = mapCenter(mappableCompanies(world.companies));
   const omittedCount = world.companies.length - markers.length;
   const marketLabel = world.city ?? "All Markets";
@@ -68,7 +68,7 @@ export function ProspectMap({ world }: { world: World }) {
         <FitMapBounds points={markers.map((marker) => marker.center)} watchKey={watchKey} />
         <ZoomControl position="bottomright" />
         <DarkMapTiles />
-        {markers.map(({ company: c, center: markerCenter, opportunity: opp, prospect, radius }) => {
+        {markers.map(({ company: c, center: markerCenter, opportunity: opp, scoreStatus, prospect, radius }) => {
           const active = c.id === activeCompanyId;
           const color = prospect ? uiTokens.color.success : uiTokens.color.textMuted;
           return (
@@ -86,7 +86,7 @@ export function ProspectMap({ world }: { world: World }) {
             >
               <Tooltip direction="top" opacity={0.93} permanent={false} sticky={false}>
                 <strong>{c.name}</strong>
-                {prospect ? `  ·  opp ${opp}` : `  ·  ${c.relationship}`}
+                {prospect ? `  ·  attractiveness ${Math.round(opp)} (${scoreStatus})` : `  ·  ${c.relationship}`}
               </Tooltip>
             </CircleMarker>
           );
@@ -120,17 +120,17 @@ export function ProspectMap({ world }: { world: World }) {
               <span className="map-prospect-main">
                 <strong>{p.company.name}</strong>
                 <em>
-                  Opp {p.opportunity} · {qualification.label} · {p.company.location.city}
+                  Attractiveness {p.opportunity} · {qualification.label} · {p.company.location.city}
                 </em>
                 {p.topSignal && <small>{p.topSignal.event_type}: {p.topSignal.source_quote}</small>}
                 <span className="map-prospect-actions">
                   <AskChatpilButton
                     label="Explain"
-                    prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Opportunity ${p.opportunity}, ${qualification.label}, missing ${qualification.gaps.join(", ") || "none"}, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
+                    prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Account attractiveness ${p.opportunity}, ${qualification.label}, missing ${qualification.gaps.join(", ") || "none"}, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
                   />
                   <AskChatpilButton
                     label="Draft outreach"
-                    prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Opportunity ${p.opportunity}, ${qualification.label}, contact ${p.contact?.name ?? "not available"}.`)}
+                    prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Account attractiveness ${p.opportunity}, ${qualification.label}, contact ${p.contact?.name ?? "not available"}.`)}
                   />
                 </span>
               </span>
@@ -143,9 +143,9 @@ export function ProspectMap({ world }: { world: World }) {
           <span><i className="legend-other" /> supplier/competitor/self</span>
         </div>
         <div className="map-legend">
-          <span><AccountToken name="G" riskScore={10} size="sm" /> growing</span>
-          <span><AccountToken name="A" riskScore={50} size="sm" /> at risk</span>
-          <span><AccountToken name="C" riskScore={80} size="sm" /> churned</span>
+          <span><AccountToken name="L" riskScore={10} size="sm" /> low urgency</span>
+          <span><AccountToken name="M" riskScore={50} size="sm" /> medium urgency</span>
+          <span><AccountToken name="H" riskScore={80} size="sm" /> high urgency</span>
         </div>
       </aside>
     </div>

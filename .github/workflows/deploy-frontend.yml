@@ -27,5 +27,4 @@ jobs:
         uses: ./.github/actions/deploy-pages
         with:
           vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
-          vite_cockpit_password: ${{ secrets.VITE_COCKPIT_PASSWORD }}
           vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}

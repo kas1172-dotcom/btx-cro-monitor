@@ -1,18 +1,20 @@
 import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
+import type { ScoreSnapshot } from "../../app/revenueDataClient.ts";
 import { PROFILE } from "../../app/config.ts";
 import { scoreFit } from "../../engine/decision/fit.ts";
 import { actionLabel } from "../../app/actionLabels.ts";
 import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
+import { isConfirmedAccountSignal, relationshipAccountId } from "../../engine/signals/contract.ts";
 import { WorkItemList } from "./WorkItemList.tsx";
-import { deriveWorkItems } from "../../app/workItems.ts";
 import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 import { AccountToken } from "../common/AccountToken.tsx";
 import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
 import { openDeliverableWizard } from "../../store/store.ts";
 
-function money(value: number): string {
+function money(value: number | null): string {
+  if (value === null) return "Value not provided";
   return value >= 1_000_000 ? `$${(value / 1_000_000).toFixed(1)}M` : `$${Math.round(value / 1000)}k`;
 }
 
@@ -22,12 +24,38 @@ function fitLabel(score: number): string {
   return "needs qualification";
 }
 
+const SCORE_LABELS: Array<[keyof NonNullable<World["scoreResults"]>, string]> = [
+  ["accountAttractiveness", "Account attractiveness"],
+  ["signalConfidence", "Signal confidence"],
+  ["pursuitPwin", "Pursuit / PWIN"],
+  ["deliveryFeasibility", "Delivery feasibility"],
+  ["relationshipHealth", "Relationship health"],
+];
+
+function latestAccountScore(world: World, accountId: string, family: keyof NonNullable<World["scoreResults"]>): ScoreSnapshot | null {
+  return world.scoreResults?.[family]
+    .filter((score) => score.entityType === "account" && score.entityId === accountId)
+    .sort((a, b) => b.calculatedAt.localeCompare(a.calculatedAt))[0] ?? null;
+}
+
+function scoreDisplay(score: ScoreSnapshot | null): string {
+  if (!score) return "Insufficient data";
+  if (score.result.status === "insufficient_data") return "Insufficient data";
+  if (score.result.status === "provisional") return score.score === null ? "Provisional" : `${Math.round(score.score)} provisional`;
+  if (score.result.status === "disqualified") return "Disqualified";
+  return score.score === null ? "Insufficient data" : String(Math.round(score.score));
+}
+
+function scoreStatus(score: ScoreSnapshot | null): string {
+  return score?.result.status.replace(/_/g, " ") ?? "insufficient data";
+}
+
 function relationshipBackedSignals(world: World, accountId: string) {
   return world.analysis.valid
     .filter((signal) =>
       signal.scope === "specific_account" &&
       signal.subject_id === accountId &&
-      (signal.relationships ?? []).some((relationship) => relationship.canonical_account_id === accountId)
+      (signal.relationships ?? []).some((relationship) => relationshipAccountId(relationship) === accountId && isConfirmedAccountSignal(signal, relationship))
     )
     .sort((a, b) => b.detected_at.localeCompare(a.detected_at));
 }
@@ -41,10 +69,11 @@ export function Account360({ world }: { world: World }) {
         score: world.analysis.byId.get(company.id),
         rec: world.analysis.recById.get(company.id),
         linkedSignals: relationshipBackedSignals(world, company.id),
-        openPipeline: world.opportunities.filter((opp) => opp.company_id === company.id && opp.stage !== "won" && opp.stage !== "lost").reduce((sum, opp) => sum + opp.value, 0),
+        attractiveness: latestAccountScore(world, company.id, "accountAttractiveness"),
+        openPipeline: world.opportunities.filter((opp) => opp.company_id === company.id && opp.stage !== "won" && opp.stage !== "lost").reduce((sum, opp) => sum + (opp.value ?? 0), 0),
       }))
       .sort((a, b) =>
-        (b.score?.dimensions.opportunity.score ?? 0) - (a.score?.dimensions.opportunity.score ?? 0) ||
+        (b.attractiveness?.score ?? -1) - (a.attractiveness?.score ?? -1) ||
         b.linkedSignals.length - a.linkedSignals.length ||
         a.company.name.localeCompare(b.company.name)
       );
@@ -54,7 +83,7 @@ export function Account360({ world }: { world: World }) {
   const contacts = selected ? world.contacts.filter((contact) => contact.company_id === selected.company.id) : [];
   const deals = selected ? world.opportunities.filter((opp) => opp.company_id === selected.company.id) : [];
   const facilities = selected ? world.facilities.filter((facility) => facility.company_id === selected.company.id) : [];
-  const workItems = selected ? deriveWorkItems(world).filter((item) => item.canonical_account_id === selected.company.id).slice(0, 5) : [];
+  const workItems = selected ? (world.worldSnapshot?.workItems ?? []).filter((item) => item.canonical_account_id === selected.company.id).slice(0, 5) : [];
 
   if (!selected) {
     return (
@@ -66,7 +95,6 @@ export function Account360({ world }: { world: World }) {
   }
 
   const company = selected.company;
-  const score = selected.score;
   const rec = selected.rec;
   const fit = scoreFit(company.needs, PROFILE.capabilities);
 
@@ -85,8 +113,8 @@ export function Account360({ world }: { world: World }) {
               <AccountToken name={row.company.name} riskScore={row.score?.dimensions.risk.score} size="sm" />
               <span className="account360-list-row-main">
                 <strong>{row.company.name}</strong>
-                <span>opp {row.score?.dimensions.opportunity.score ?? 0} · risk {row.score?.dimensions.risk.score ?? 0}</span>
-                <em>{row.linkedSignals.length} linked signal{row.linkedSignals.length === 1 ? "" : "s"} · {money(row.openPipeline)} open</em>
+                <span>{scoreDisplay(row.attractiveness)} attractiveness</span>
+                <em>{row.linkedSignals.length} confirmed signal{row.linkedSignals.length === 1 ? "" : "s"} · {money(row.openPipeline)} open</em>
               </span>
             </button>
           ))}
@@ -94,11 +122,45 @@ export function Account360({ world }: { world: World }) {
 
         <div className="account360-detail">
           <div className="account360-kpis">
-            <div><span>Health</span><strong>{score?.dimensions.risk.score ?? 0} risk</strong></div>
-            <div><span>Opportunity</span><strong>{score?.dimensions.opportunity.score ?? 0}</strong></div>
-            <div><span>Capacity fit</span><strong>{fitLabel(fit.score)}</strong></div>
-            <div><span>Pipeline</span><strong>{money(selected.openPipeline)}</strong></div>
+            {SCORE_LABELS.map(([family, label]) => {
+              const scoreResult = latestAccountScore(world, company.id, family);
+              return (
+                <div key={family}>
+                  <span>{label}</span>
+                  <strong>{scoreDisplay(scoreResult)}</strong>
+                  <em>{scoreStatus(scoreResult)}</em>
+                </div>
+              );
+            })}
+            <div><span>Capability fit</span><strong>{fitLabel(fit.score)}</strong><em>not capacity</em></div>
           </div>
+
+          <section className="surface-panel">
+            <div className="panel-head"><h2>Score explanations</h2></div>
+            <div className="score-explain-list">
+              {SCORE_LABELS.map(([family, label]) => {
+                const scoreResult = latestAccountScore(world, company.id, family);
+                const result = scoreResult?.result;
+                return (
+                  <details key={family}>
+                    <summary>{label}: {scoreDisplay(scoreResult)}</summary>
+                    {result ? (
+                      <div>
+                        <p>Status: {scoreStatus(scoreResult)}. Completeness: {Math.round(result.dataCompleteness * 100)}%. Config {result.configurationVersion}.</p>
+                        {result.missingInputs.length > 0 && <p>Missing: {result.missingInputs.join("; ")}</p>}
+                        {result.hardGateFailures.length > 0 && <p>Hard gates: {result.hardGateFailures.join("; ")}</p>}
+                        {[...result.positiveFactors, ...result.negativeFactors, ...result.neutralFactors].map((factor) => (
+                          <p key={factor.key}><strong>{factor.label}</strong>: {factor.contribution === null ? "not available" : factor.contribution.toFixed(1)} contribution. {factor.explanation}</p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p>No backend score snapshot is available for this account.</p>
+                    )}
+                  </details>
+                );
+              })}
+            </div>
+          </section>
 
           <section className="surface-panel primary-action-panel">
             <div>
@@ -160,7 +222,7 @@ export function Account360({ world }: { world: World }) {
               {deals.length === 0 && <div className="rail-quiet-empty">No deals available.</div>}
             </section>
             <section className="surface-panel">
-              <div className="panel-head"><h2>Capacity fit</h2></div>
+              <div className="panel-head"><h2>Capability fit</h2></div>
               <p>{fit.matched.length ? fit.matched.join(", ") : "No direct capability overlap."}</p>
               <p className="muted">{facilities.length} facility record{facilities.length === 1 ? "" : "s"} in the current production view.</p>
             </section>

@@ -26,12 +26,14 @@ export interface HubSpotActivityItem {
   sortDate: string;
 }
 
-function money(value: number): string {
+function money(value: number | null): string {
+  if (value === null) return "Value not provided";
   if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
   return `$${Math.round(value / 1_000)}k`;
 }
 
-function dateLabel(value: string): string {
+function dateLabel(value: string | null): string {
+  if (!value) return "date unavailable";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "date unavailable";
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
@@ -51,7 +53,7 @@ export function recentHubSpotActivity(world: World, limit = 8): HubSpotActivityI
     label: deal.name,
     kind: "deal" as const,
     detail: `${deal.stage.replace(/_/g, " ")} · ${money(deal.value)} · closes ${dateLabel(deal.close_date)}`,
-    sortDate: deal.close_date,
+    sortDate: deal.close_date ?? "",
   }));
   const contactItems = world.contacts.map((contact) => ({
     id: contact.id,
@@ -70,7 +72,7 @@ export function pipelineSnapshotByStage(opportunities: Opportunity[]): Array<{ s
   for (const opportunity of opportunities) {
     const row = rows.get(opportunity.stage) ?? { stage: opportunity.stage, count: 0, value: 0 };
     row.count += 1;
-    row.value += opportunity.value;
+    row.value += opportunity.value ?? 0;
     rows.set(opportunity.stage, row);
   }
   return [...rows.values()].sort((a, b) => b.value - a.value);

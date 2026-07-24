@@ -5,9 +5,6 @@ inputs:
   vite_backend_endpoint:
     description: Backend endpoint exposed to the Vite build.
     required: true
-  vite_cockpit_password:
-    description: Demo cockpit password to hash into the static build.
-    required: true
   vite_clerk_publishable_key:
     description: Browser-safe Clerk publishable key.
     required: true
@@ -43,15 +40,12 @@ runs:
       env:
         VITE_BACKEND_ENDPOINT: ${{ inputs.vite_backend_endpoint }}
         VITE_COPILOT_ENDPOINT: ${{ inputs.vite_backend_endpoint }}/llm
-        VITE_ARTIFACT_BASE_URL: ../btx
         VITE_CLERK_PUBLISHABLE_KEY: ${{ inputs.vite_clerk_publishable_key }}
-        COCKPIT_PASSWORD: ${{ inputs.vite_cockpit_password }}
       run: |
-        if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$COCKPIT_PASSWORD" ] || [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ]; then
-          echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_COCKPIT_PASSWORD, VITE_CLERK_PUBLISHABLE_KEY"
+        if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ]; then
+          echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_CLERK_PUBLISHABLE_KEY"
           exit 1
         fi
-        export VITE_COCKPIT_PASSWORD_HASH="$(printf '%s' "$COCKPIT_PASSWORD" | sha256sum | awk '{print $1}')"
         npm ci
         npm run build
 

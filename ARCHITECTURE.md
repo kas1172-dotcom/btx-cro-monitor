@@ -106,26 +106,21 @@ The monitor engine is responsible for:
 
 It is not responsible for rendering the product UI.
 
-## Adapter Modes
+## Runtime Data Path
 
-`VITE_DATA_MODE` selects the frontend adapter:
+The production cockpit has one adapter path: authenticated frontend calls to the backend `WorldSnapshot` API. The backend is responsible for CRM reads, monitor artifact reads, persisted work items, persisted deliverables, and source-health disclosure.
 
-- `hybrid`: intended production demo default. HubSpot CRM reads are real, monitor signals are real artifacts, non-integrated operating context uses labeled demo fallback. Monitor artifacts remain market/portfolio-level unless the interim fit guard links them strongly to an account; unlinked artifacts do not affect account scores.
-- `live`: live backend-backed mode. It should surface backend issues clearly.
-- `artifact`: monitor-artifact mode for signal consumption without live CRM.
-- `demo`: deterministic dev/test scaffolding from `frontend/data/demo/btx/`.
-
-Demo data remains load-bearing for local development, tests, and hybrid fallback until backend integrations cover those domains end to end.
+Demo JSON under `frontend/data/demo/btx/` is test scaffolding only. It must not be selected by a production Vite flag or used as a runtime fallback when a backend source is missing.
 
 ## Provenance
 
-Hybrid mode must label data-bearing UI with provenance:
+The backend must label data-bearing UI with provenance:
 
 - HubSpot: live CRM records,
 - Monitor: public monitor artifacts,
-- Demo: fallback operating context.
+- Unavailable: systems that are not connected yet, such as ERP, MES, capacity, and production schedule.
 
-Deliverables should not blend real and demo facts without provenance disclosure.
+Deliverables should not blend real and unavailable facts. Missing values should remain missing and show a clear source-health state.
 
 ## Deployment
 

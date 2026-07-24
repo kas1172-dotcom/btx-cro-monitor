@@ -277,9 +277,25 @@ WorkItemType = Literal[
     "meeting_brief",
     "outreach_draft",
     "qualified_opportunity",
+    "relationship_review",
+    "dismissal",
     "dismissed",
 ]
-WorkItemStatus = Literal["proposed", "approved", "in_progress", "done", "dismissed"]
+WorkItemStatus = Literal[
+    "detected",
+    "triaged",
+    "prepared",
+    "awaiting_approval",
+    "approved",
+    "in_progress",
+    "executed",
+    "verified",
+    "outcome_recorded",
+    "dismissed",
+    "closed",
+    "proposed",
+    "done",
+]
 WorkItemPriority = Literal["low", "normal", "high", "urgent"]
 ApprovalState = Literal["not_required", "pending", "approved", "rejected"]
 ExecutionState = Literal["not_started", "queued", "running", "completed", "failed"]
@@ -289,7 +305,15 @@ WorkItemView = Literal["what_changed", "needs_attention", "prepared", "needs_app
 class WorkItemCreate(BaseModel):
     type: WorkItemType
     canonical_account_id: str | None = None
+    related_signal_id: str | None = None
+    related_relationship_id: str | None = None
+    related_opportunity_id: str | None = None
+    program_id: str | None = None
+    score_snapshot_ids: list[str] = []
     source_signal_ids: list[str] = []
+    supporting_evidence: list[dict] = []
+    missing_information: list[str] = []
+    dedupe_key: str | None = None
     owner: str | None = None
     priority: WorkItemPriority = "normal"
     status: WorkItemStatus = "proposed"
@@ -335,7 +359,15 @@ class WorkItemResponse(BaseModel):
     id: str
     type: str
     canonical_account_id: str | None = None
+    related_signal_id: str | None = None
+    related_relationship_id: str | None = None
+    related_opportunity_id: str | None = None
+    program_id: str | None = None
+    score_snapshot_ids: list[str]
     source_signal_ids: list[str]
+    supporting_evidence: list[dict]
+    missing_information: list[str]
+    dedupe_key: str | None = None
     owner: str | None = None
     priority: str
     status: str

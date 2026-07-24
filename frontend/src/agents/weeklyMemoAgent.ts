@@ -56,7 +56,7 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
     const topAction = topOpportunity ? world.analysis.recById.get(topOpportunity.company.id) : world.analysis.recommendations[0];
     const pipelineValue = world.opportunities
       .filter((o) => o.stage !== "won" && o.stage !== "lost")
-      .reduce((sum, o) => sum + o.value, 0);
+      .reduce((sum, o) => sum + (o.value ?? 0), 0);
     const nameOf = (id?: string | null) => world.companies.find((c) => c.id === id)?.name ?? "No account available";
     const topSignalAccount = nameOf(topSignal?.subject_id);
     const topRiskAccount = nameOf(topRisk?.subject_id);

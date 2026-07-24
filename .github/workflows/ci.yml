@@ -66,6 +66,9 @@ jobs:
       - name: test:phase0
         run: npm run test:phase0
 
+      - name: test:architecture
+        run: npm run test:architecture
+
       - name: test:identity
         run: npm run test:identity
 
@@ -104,6 +107,9 @@ jobs:
 
       - name: Install engine + platform
         run: pip install -e ".[dev,platform]"
+
+      - name: Secret and artifact scan
+        run: python3 tooling/secret_scan.py
 
       - name: pytest
         run: python3 -m pytest -q

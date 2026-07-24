@@ -1,5 +1,6 @@
 import type { Company } from "../../engine/brain/entities.ts";
 import type { CompanyScore } from "../../engine/decision/score.ts";
+import type { ScoreFamilies } from "../../app/revenueDataClient.ts";
 
 const FALLBACK_CENTER: [number, number] = [31.5, -97];
 
@@ -23,6 +24,7 @@ export interface MapMarker {
   company: Company;
   center: [number, number];
   opportunity: number;
+  scoreStatus: string;
   prospect: boolean;
   radius: number;
 }
@@ -69,14 +71,24 @@ export function opportunityRadius(opportunity: number, prospect: boolean): numbe
   return prospect ? Math.min(16, 7 + opportunity / 12) : 5;
 }
 
-export function buildMapMarkers(companies: Company[], byId: Map<string, CompanyScore>): MapMarker[] {
+function attractivenessForCompany(company: Company, scores?: ScoreFamilies | null): { value: number; status: string } | null {
+  const result = scores?.accountAttractiveness
+    .filter((score) => score.entityType === "account" && (score.entityId === company.id || score.entityId === company.canonical_account_id))
+    .sort((a, b) => b.calculatedAt.localeCompare(a.calculatedAt))[0];
+  if (!result) return null;
+  return { value: result.score ?? 0, status: result.status.replace(/_/g, " ") };
+}
+
+export function buildMapMarkers(companies: Company[], byId: Map<string, CompanyScore>, scores?: ScoreFamilies | null): MapMarker[] {
   return mappableCompanies(companies).map((point) => {
-    const opportunity = scoreForCompany(point.company, byId)?.dimensions.opportunity.score ?? 0;
+    const attractiveness = attractivenessForCompany(point.company, scores);
+    const opportunity = attractiveness?.value ?? scoreForCompany(point.company, byId)?.dimensions.opportunity.score ?? 0;
     const prospect = isProspect(point.company.relationship);
     return {
       company: point.company,
       center: [point.lat, point.lon] as [number, number],
       opportunity,
+      scoreStatus: attractiveness?.status ?? "legacy fallback",
       prospect,
       radius: opportunityRadius(opportunity, prospect),
     };

@@ -12,7 +12,7 @@ export function pipelineHealth(opps: Opportunity[]): number | null {
 
   const weightedOpen = relevant
     .filter((o) => o.stage in STAGE_WEIGHT)
-    .reduce((sum, o) => sum + o.value * STAGE_WEIGHT[o.stage], 0);
+    .reduce((sum, o) => sum + (o.value ?? 0) * STAGE_WEIGHT[o.stage], 0);
   const won = relevant.filter((o) => o.stage === "won").length;
   const lost = relevant.filter((o) => o.stage === "lost").length;
   // Baseline 40; up to +35 for a strong weighted open book; wins lift, losses drag.

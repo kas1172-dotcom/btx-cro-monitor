@@ -46,11 +46,16 @@ def test_migration_applies_and_matches_current_models(tmp_path: Path):
         "connections", "events", "idempotency_keys", "outbound_log", "dead_letters",
         "engine_configs", "canonical_accounts", "pipeline_runs", "work_items",
         "hubspot_task_audits", "deliverables", "alembic_version",
+        "account_identifiers", "intelligence_signals", "signal_account_relationships",
+        "relationship_audit_events", "scoring_config_versions", "score_snapshots",
     ):
         assert expected in tables, f"migration did not create {expected}"
 
     work_item_columns = {c["name"] for c in inspector.get_columns("work_items")}
     assert "tenant_id" in work_item_columns  # WP10-A column present in the initial migration
+    assert {"related_signal_id", "related_relationship_id", "score_snapshot_ids", "dedupe_key"} <= work_item_columns
+    canonical_columns = {c["name"] for c in inspector.get_columns("canonical_accounts")}
+    assert {"legal_name", "display_name", "account_type", "public_recipient_ids"} <= canonical_columns
     deliverable_columns = {c["name"] for c in inspector.get_columns("deliverables")}
     assert {"tenant_id", "canonical_account_id", "program_id", "trip_id", "document"} <= deliverable_columns
 
@@ -88,7 +93,14 @@ def test_deliverables_migration_downgrade_one_step_removes_table(tmp_path: Path)
     engine = make_engine(f"sqlite:///{db_path}")
     assert "deliverables" in set(inspect(engine).get_table_names())
     columns_after_down_one = {column["name"] for column in inspect(engine).get_columns("deliverables")}
-    assert "entity_ids" not in columns_after_down_one
+    assert "entity_ids" in columns_after_down_one
+    assert "score_snapshots" not in set(inspect(engine).get_table_names())
+
+    command.downgrade(config, "-1")
+    engine = make_engine(f"sqlite:///{db_path}")
+    assert "deliverables" in set(inspect(engine).get_table_names())
+    columns_after_down_two = {column["name"] for column in inspect(engine).get_columns("deliverables")}
+    assert "entity_ids" not in columns_after_down_two
 
     command.downgrade(config, "-1")
     engine = make_engine(f"sqlite:///{db_path}")

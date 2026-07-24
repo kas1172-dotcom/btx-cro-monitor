@@ -59,7 +59,7 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const health = pipelineHealth(opportunities);
   const rec = world.analysis.recById.get(accountId);
   const score = world.analysis.byId.get(accountId);
-  const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + o.value, 0);
+  const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + (o.value ?? 0), 0);
   const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
   const confidence = evidenceConfidence({
     hasVerifiedLink: company.relationship === "customer" || Boolean(topSignal?.relationships?.some((relationship) => relationship.canonical_account_id === accountId && relationship.review_status === "accepted")),

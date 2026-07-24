@@ -7,12 +7,20 @@ The cockpit work loop is backed by durable `work_items` stored in the BTX backen
 `WorkItem`
 
 - `id`: server-assigned id
-- `type`: `account_action`, `research_task`, `customer_question`, `capacity_check`, `meeting_brief`, `outreach_draft`, `qualified_opportunity`, or `dismissed`
+- `type`: `account_action`, `research_task`, `customer_question`, `capacity_check`, `meeting_brief`, `outreach_draft`, `qualified_opportunity`, `relationship_review`, `dismissal`, or `dismissed`
 - `canonical_account_id`: stable account id, when account-scoped
+- `related_signal_id`: primary signal that caused the item
+- `related_relationship_id`: signal-account relationship record, usually for review work
+- `related_opportunity_id`: opportunity/deal record, when opportunity-scoped
+- `program_id`: program context, when program-scoped
+- `score_snapshot_ids`: score snapshots used to justify the recommendation
 - `source_signal_ids`: monitor or analysis signal ids that caused the item
+- `supporting_evidence`: structured evidence snippets, source IDs, or relationship evidence
+- `missing_information`: open data required before execution
+- `dedupe_key`: stable duplicate-prevention key
 - `owner`: assigned user/team
 - `priority`: `low`, `normal`, `high`, or `urgent`
-- `status`: `proposed`, `approved`, `in_progress`, `done`, or `dismissed`
+- `status`: `detected`, `triaged`, `prepared`, `awaiting_approval`, `approved`, `in_progress`, `executed`, `verified`, `outcome_recorded`, `closed`, or `dismissed`
 - `due_date`: ISO date/datetime
 - `recommended_action`: human-readable next action
 - `generated_artifact_ref`: reference to a generated brief/draft/deck
@@ -27,11 +35,11 @@ The cockpit work loop is backed by durable `work_items` stored in the BTX backen
 - `execution_error`: last real execution error, if any
 - `audit_history`: append-only list of `{ timestamp, actor, action, before, after }`
 
-Status transitions are:
+Current status transitions are:
 
-`proposed -> approved -> in_progress -> done`
+`detected -> triaged -> prepared -> awaiting_approval -> approved -> in_progress -> executed -> verified -> outcome_recorded -> closed`
 
-Any non-terminal state can transition to `dismissed`. A dismissed item must record a reason in `outcome`; the `/dismiss` route enforces this.
+Any non-terminal state can transition to `dismissed` or `closed` where the backend transition table allows it. A dismissed item must record a reason in `outcome`; the `/dismiss` route enforces this. The legacy `proposed` and `done` statuses remain accepted for older clients and tests, but the cockpit UI uses the lifecycle above.
 
 ## Endpoints
 
@@ -56,7 +64,7 @@ Derived views:
 - `needs_attention`: high/urgent or overdue non-terminal items
 - `prepared`: items with `generated_artifact_ref`
 - `needs_approval`: `approval_state=pending`
-- `outcomes`: recently terminal work, currently `done` or `dismissed`
+- `outcomes`: terminal work, currently `done`, `dismissed`, `closed`, `verified`, or `outcome_recorded`
 
 `PATCH /work-items/{id}`
 
@@ -116,11 +124,30 @@ Failure behavior:
 - failed execution leaves the work item not done, sets `execution_state=failed`, stores `execution_error`, and appends an audit entry
 - retrying with the same idempotency key after success returns the same verified task with `duplicate=true`
 
+## Relationship Review
+
+`GET /signal-relationships/review`
+
+Returns candidate signal-account links that need a human decision.
+
+`PATCH /signal-relationships/{relationship_id}`
+
+Body:
+
+```json
+{
+  "action": "confirm",
+  "note": "Exact legal-name evidence verified."
+}
+```
+
+Allowed actions are `confirm`, `reject`, `reopen`, `mark_market`, and `mark_program`. Confirmed relationships need supporting evidence and are raised to the minimum confidence threshold before they can affect account-specific signal views or scores.
+
 ## Deferred Manual Verification
 
 After the map/live-join branch is merged and deployed, run this cockpit check:
 
-1. Load the map in `demo` mode. Confirm pins render, high-opportunity pins glow larger, and the map is not blank or collapsed.
+1. Load the map. Confirm pins render, account-attractiveness pins scale correctly, and the map is not blank or collapsed.
 2. Load the cockpit against a live backend in `hybrid` mode once browser-safe CRM auth exists.
 3. Confirm live CRM accounts plot.
 4. Confirm linked monitor signals attach only to the correct canonical accounts.

@@ -1,8 +1,8 @@
 name: 10 Monitor Pipeline
 
 on:
-  # Manual trigger ONLY — nothing runs automatically. The pipeline (collect →
-  # analyse → commit) and its test gate fire solely when dispatched from the
+  # Manual trigger ONLY - nothing runs automatically. The pipeline (collect ->
+  # analyse -> commit) and its test gate fire solely when dispatched from the
   # Actions tab. push/pull_request triggers are intentionally omitted so no run
   # (and no API spend) ever starts on its own. Re-enable weekly runs later by
   # uncommenting the schedule:
@@ -104,12 +104,12 @@ jobs:
       - name: Install engine
         run: pip install -e ".[dev]"
 
-      # ── Run pipeline ─────────────────────────────────────────────────
+      # Run pipeline
       # The pipeline exits with code 1 on any failure (missing env vars,
       # network errors that lose all sources, schema validation failure).
       # GitHub Actions treats non-zero exit codes as step failures, so this
       # step will fail loudly without any extra shell error-trapping needed.
-      - name: Run pipeline – ${{ matrix.client }}
+      - name: Run pipeline - ${{ matrix.client }}
         run: |
           python -m monitor_engine \
             --config "clients/${{ matrix.client }}/config.json" \
@@ -120,21 +120,21 @@ jobs:
           SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
           CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
 
-      # ── Build the account map data ──────────────────────────────────
+      # Build the account map data
       # Pulls target accounts (CSV + any configured APIs), scores fit, and
       # writes map_targets.json alongside the monitor artifacts. No LLM spend.
-      - name: Build account map – ${{ matrix.client }}
+      - name: Build account map - ${{ matrix.client }}
         run: |
           python -m monitor_engine.targets \
             --config "clients/${{ matrix.client }}/config.json" \
             --output "clients/${{ matrix.client }}/artifacts" \
-            || echo "No account_map configured for ${{ matrix.client }} — skipping."
+            || echo "No account_map configured for ${{ matrix.client }} - skipping."
 
-      # ── Belt-and-suspenders validation ──────────────────────────────
+      # Belt-and-suspenders validation
       # The pipeline already validates its own output, but this step
       # re-reads the written artifact independently, catching any file-
       # system write error that might slip through.
-      - name: Validate artifact – ${{ matrix.client }}
+      - name: Validate artifact - ${{ matrix.client }}
         run: |
           python -c "
           import sys
@@ -152,12 +152,12 @@ jobs:
               sys.exit(1)
           "
 
-      # ── Dark-source alert ───────────────────────────────────────────
+      # Dark-source alert
       # Surface any source that errored or returned nothing into the run's
       # Step Summary and as ::warning:: annotations, so the operator is
       # alerted on the run page. Non-failing (one dead source must not block
       # the brief); the pipeline already tolerates per-source failures.
-      - name: Source health alert – ${{ matrix.client }}
+      - name: Source health alert - ${{ matrix.client }}
         if: always()
         run: |
           python - "clients/${{ matrix.client }}/artifacts/run_output.json" <<'PY'
@@ -169,7 +169,7 @@ jobs:
           health = json.loads(p.read_text()).get("source_health") or {}
           bad = {k: v for k, v in health.items() if v.get("error") or v.get("zero_results")}
           summary = os.environ.get("GITHUB_STEP_SUMMARY")
-          lines = [f"### Source health — ${{ matrix.client }}",
+          lines = [f"### Source health - ${{ matrix.client }}",
                    f"{len(bad)} of {len(health)} sources need attention." if bad
                    else f"All {len(health)} sources healthy."]
           for sid, v in bad.items():
@@ -181,11 +181,11 @@ jobs:
           print("\n".join(lines))
           PY
 
-      # ── Commit artifacts back to the repo ───────────────────────────
+      # Commit artifacts back to the repo
       # JSON artifacts are the output contract. run_output.json powers the
       # cockpit signal feed, archive.json is the rolling history, and
       # map_targets.json powers the account map. These are committed.
-      - name: Commit artifacts – ${{ matrix.client }}
+      - name: Commit artifacts - ${{ matrix.client }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -201,17 +201,17 @@ jobs:
           BRANCH="${{ github.ref_name }}"
           for attempt in 1 2 3; do
             git push origin "HEAD:$BRANCH" && break
-            echo "push rejected (attempt $attempt) — rebasing on origin/$BRANCH"
+            echo "push rejected (attempt $attempt) - rebasing on origin/$BRANCH"
             git pull --rebase origin "$BRANCH"
           done
 
-  # ── Publish ─────────────────────────────────────────────────────────────
+  # Publish
   # Final step of the one-button pipeline: once the run job has committed fresh
   # artifacts, publish all dashboards to Pages. Reuses the internal deploy-pages
   # action so the deploy logic lives in exactly one place.
   deploy:
     needs: run
-    # Publish whenever the pipeline actually ran — even if one client failed, the
+    # Publish whenever the pipeline actually ran - even if one client failed, the
     # others' fresh artifacts (and every client's last-good) should still go live.
     # Only from the default branch: the github-pages environment restricts
     # deployments to main, so attempting it from a feature branch just fails the
@@ -230,5 +230,4 @@ jobs:
         uses: ./.github/actions/deploy-pages
         with:
           vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
-          vite_cockpit_password: ${{ secrets.VITE_COCKPIT_PASSWORD }}
           vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}

@@ -31,7 +31,7 @@ type AttentionCard = {
   link: BriefLink;
 };
 
-const DEMO_MINI_BRIEF_LIMIT = 2;
+const MINI_BRIEF_LIMIT = 4;
 
 function nameOf(world: World, id: string | null | undefined): string {
   if (!id) return "Portfolio";
@@ -113,36 +113,6 @@ function signalToBriefItem(world: World, signal: Signal): BriefItem {
   };
 }
 
-function saronicProspectBriefItem(world: World): BriefItem | null {
-  const company = world.companies.find((candidate) => candidate.name.toLowerCase().includes("saronic"));
-  if (!company) return null;
-  return {
-    id: `prospect-${company.id}`,
-    title: `${company.name}: qualify the Austin prospect before outreach`,
-    reason: "Prospecting signal needs qualification before it becomes a CRM action.",
-    meta: "Prospecting - Austin visit plan",
-    link: { label: "Open prospecting", surface: "prospecting" },
-    seed: `Build a qualification plan for ${company.name} before outreach.`,
-  };
-}
-
-function demoPriority(signal: Signal): number {
-  const text = [
-    signal.id,
-    signal.artifact?.headline,
-    signal.source_quote,
-    signal.subject_id,
-    signal.entities.join(" "),
-  ].filter(Boolean).join(" ").toLowerCase();
-  if (text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s")) return 0;
-  if (text.includes("saronic") || text.includes("corsair")) return 1;
-  return 2;
-}
-
-function briefItemSearchText(item: BriefItem): string {
-  return [item.title, item.reason, item.meta, item.seed].map(String).join(" ").toLowerCase();
-}
-
 function isThisWeek(value: string | null | undefined, anchor = new Date()): boolean {
   if (!value) return false;
   const date = new Date(value);
@@ -161,36 +131,22 @@ export function TodayBrief({ world }: { world: World }) {
   const selectedSignalIds = new Set(
     attention.items
       .flatMap((item) => item.source_signal_ids)
-      .filter((id) => {
-        const signal = signalById.get(id);
-        return !signal || demoPriority(signal) > 1;
-      }),
+      .filter((id) => Boolean(signalById.get(id))),
   );
   const topSignals = [...world.analysis.valid]
     .filter((signal) => !selectedSignalIds.has(signal.id))
-    .sort((a, b) => demoPriority(a) - demoPriority(b) || b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at))
+    .sort((a, b) => b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at) || a.id.localeCompare(b.id))
     .slice(0, 8);
   const signalBriefs = topSignals.map((signal) => signalToBriefItem(world, signal));
   const attentionBriefs = attention.items.map((item) => workItemToBriefItem(world, item));
-  const lockheedSignal = signalBriefs.find((item) => {
-    const text = briefItemSearchText(item);
-    return text.includes("lockheed") || text.includes("f-35");
-  });
-  const saronicSignal = signalBriefs.find((item) => {
-    const text = briefItemSearchText(item);
-    return text.includes("saronic") || text.includes("corsair");
-  });
-  const saronicWork = attentionBriefs.find((item) => briefItemSearchText(item).includes("saronic"));
-  const saronicProspect = saronicProspectBriefItem(world);
-  const reservedBriefs = [lockheedSignal, saronicSignal ?? saronicWork ?? saronicProspect].filter((item): item is BriefItem => Boolean(item));
   const seenBriefIds = new Set<string>();
-  const miniBrief = reservedBriefs
+  const miniBrief = [...attentionBriefs, ...signalBriefs]
     .filter((item) => {
       if (seenBriefIds.has(item.id)) return false;
       seenBriefIds.add(item.id);
       return true;
     })
-    .slice(0, DEMO_MINI_BRIEF_LIMIT);
+    .slice(0, MINI_BRIEF_LIMIT);
   const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
   const deadlineCount = [
     ...attention.items.map((item) => item.due_date),
@@ -233,7 +189,7 @@ export function TodayBrief({ world }: { world: World }) {
         </div>
         <div className="today-brief-list">
           {miniBrief.map((item, index) => (
-            <article key={item.id} className={index < reservedBriefs.length ? "today-brief-item pinned" : "today-brief-item"}>
+            <article key={item.id} className={index < attentionBriefs.length ? "today-brief-item pinned" : "today-brief-item"}>
               <div>
                 <strong>{item.title}</strong>
                 <p>{item.reason}</p>

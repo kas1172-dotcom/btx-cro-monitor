@@ -4,11 +4,6 @@ import { setState, requestTour } from "../../store/store.ts";
 import { processBrainQuestion } from "../../brain/brainEngine.ts";
 import { saveBrainMemoryNote, useMemory } from "../../memory/localMemory.ts";
 import { signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
-import sampleLibraryData from "../../../data/demo/btx/sample_library.json";
-import type { Deliverable } from "../../deliverables/types.ts";
-import type { ChartSpec } from "../../metrics/types.ts";
-
-const SAMPLE_LIBRARY = sampleLibraryData as Deliverable[];
 
 function money(value?: number): string | null {
   if (value === undefined) return null;
@@ -43,15 +38,6 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
     setState({ brainResponse: response, activeTab: response.activatedTabs[0] ?? "analysis" });
   }
 
-  function openSample(sample: Deliverable) {
-    const chartBlock = sample.sections.flatMap((section) => section.blocks).find((block) => block.kind === "chart-spec");
-    if (sample.type === "analysis_view" && chartBlock?.kind === "chart-spec") {
-      setState({ activeAnalysisSpec: chartBlock.spec as unknown as ChartSpec, activeTab: "analysis", brainResponse: null, activeDeliverable: null });
-      return;
-    }
-    setState({ activeDeliverable: sample, activeTab: sample.brainArea, brainResponse: null, activeAnalysisSpec: null });
-  }
-
   const recent = memory.activity[0];
   function recentLine(): string {
     if (!recent) return "Recent activity and notes will appear here as the brain starts saving work.";
@@ -83,16 +69,8 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
       </div>
       <div className="sample-library">
         <div className="sample-library-head">
-          <span>Library</span>
+          <span>Navigation</span>
           <button onClick={requestTour}>Guided tour</button>
-        </div>
-        <div className="sample-library-list">
-          {SAMPLE_LIBRARY.slice(0, 6).map((sample) => (
-            <button key={sample.id} title={sample.title} onClick={() => openSample(sample)}>
-              <strong>{sample.title}</strong>
-              <em>{sample.type.replace(/_/g, " ")}</em>
-            </button>
-          ))}
         </div>
       </div>
     </div>

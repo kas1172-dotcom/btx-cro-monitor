@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    Boolean,
     JSON,
     DateTime,
     ForeignKey,
@@ -127,27 +128,148 @@ class EngineConfig(Base):
 
 
 class CanonicalAccount(Base):
-    """Stable account identity derived from HubSpot company records.
+    """Stable tenant-scoped account identity.
 
-    The HubSpot company id is the source-of-truth join key; enrichment columns
-    are optional because most portals will not have BTX custom properties yet.
+    HubSpot company ids and public identifiers live as identifiers. They can
+    point to a canonical account, but they are not the account's identity.
     """
     __tablename__ = "canonical_accounts"
     __table_args__ = (UniqueConstraint("tenant_id", "hubspot_company_id", name="uq_canonical_hubspot_company"),)
 
     id: Mapped[str] = mapped_column(String(80), primary_key=True)
     tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
-    hubspot_company_id: Mapped[str] = mapped_column(String(80), nullable=False, index=True)
+    legal_name: Mapped[str] = mapped_column(String(300), default="", index=True)
+    display_name: Mapped[str] = mapped_column(String(300), default="", index=True)
+    domain: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    account_type: Mapped[str] = mapped_column(String(40), default="other", index=True)
+    hubspot_company_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     domains: Mapped[list | None] = mapped_column(JSON, nullable=True)
     aliases: Mapped[list | None] = mapped_column(JSON, nullable=True)
     facility_names: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    parent_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     parent_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
     subsidiary_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     cage_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
     uei: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    public_recipient_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     known_programs: Mapped[list | None] = mapped_column(JSON, nullable=True)
     known_customers: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
+class AccountIdentifier(Base):
+    """Tenant-aware external identifier attached to one canonical account."""
+    __tablename__ = "account_identifiers"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "identifier_type", "normalized_value", name="uq_account_identifier_value"),
+    )
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    canonical_account_id: Mapped[str] = mapped_column(String(80), ForeignKey("canonical_accounts.id"), index=True)
+    identifier_type: Mapped[str] = mapped_column(String(40), index=True)
+    normalized_value: Mapped[str] = mapped_column(String(300), index=True)
+    original_value: Mapped[str] = mapped_column(String(300))
+    source_classification: Mapped[str] = mapped_column(String(24), index=True)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    verified_by_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class IntelligenceSignal(Base):
+    """Durable normalized external signal with provenance preserved."""
+    __tablename__ = "intelligence_signals"
+    __table_args__ = (UniqueConstraint("tenant_id", "id", name="uq_intelligence_signal_tenant_id"),)
+
+    id: Mapped[str] = mapped_column(String(120), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    title: Mapped[str] = mapped_column(String(500))
+    summary: Mapped[str] = mapped_column(Text)
+    analysis: Mapped[str | None] = mapped_column(Text, nullable=True)
+    scope: Mapped[str] = mapped_column(String(32), default="market", index=True)
+    event_type: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
+    event_type_status: Mapped[str] = mapped_column(String(32), default="unknown", index=True)
+    occurred_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    source_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    evidence_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    extraction_confidence: Mapped[float | None] = mapped_column(nullable=True)
+    raw_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class SignalAccountRelationship(Base):
+    """Durable candidate or confirmed relationship between a signal and account."""
+    __tablename__ = "signal_account_relationships"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "signal_id", "canonical_account_id", "source_entity_name", name="uq_signal_account_candidate"),
+    )
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    signal_id: Mapped[str] = mapped_column(String(120), ForeignKey("intelligence_signals.id"), index=True)
+    canonical_account_id: Mapped[str] = mapped_column(String(80), ForeignKey("canonical_accounts.id"), index=True)
+    source_entity_name: Mapped[str] = mapped_column(String(300))
+    match_method: Mapped[str] = mapped_column(String(60), index=True)
+    confidence: Mapped[float] = mapped_column(default=0.0)
+    review_status: Mapped[str] = mapped_column(String(32), default="needs_review", index=True)
+    creation_source: Mapped[str] = mapped_column(String(32), default="derived", index=True)
+    evidence_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    confirmed_by_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    rejected_by_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    rejected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    last_validated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class RelationshipAuditEvent(Base):
+    __tablename__ = "relationship_audit_events"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    relationship_id: Mapped[str] = mapped_column(String(32), ForeignKey("signal_account_relationships.id"), index=True)
+    action: Mapped[str] = mapped_column(String(60), index=True)
+    actor_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    before: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    after: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+
+
+class ScoringConfigVersion(Base):
+    __tablename__ = "scoring_config_versions"
+    __table_args__ = (UniqueConstraint("tenant_id", "version", name="uq_scoring_config_version"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    version: Mapped[str] = mapped_column(String(40), index=True)
+    document: Mapped[dict] = mapped_column(JSON)
+    created_by_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+
+
+class ScoreSnapshot(Base):
+    __tablename__ = "score_snapshots"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    entity_type: Mapped[str] = mapped_column(String(40), index=True)
+    entity_id: Mapped[str] = mapped_column(String(120), index=True)
+    score_family: Mapped[str] = mapped_column(String(60), index=True)
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    score: Mapped[float | None] = mapped_column(nullable=True)
+    result: Mapped[dict] = mapped_column(JSON)
+    configuration_version: Mapped[str] = mapped_column(String(40), index=True)
+    source_data_version: Mapped[str] = mapped_column(String(120), index=True)
+    calculated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
 
 class PipelineRun(Base):
@@ -190,7 +312,15 @@ class WorkItem(Base):
     tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
     type: Mapped[str] = mapped_column(String(40), index=True)
     canonical_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    related_signal_id: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
+    related_relationship_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    related_opportunity_id: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
+    program_id: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
+    score_snapshot_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     source_signal_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    supporting_evidence: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    missing_information: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    dedupe_key: Mapped[str | None] = mapped_column(String(256), nullable=True, index=True)
     owner: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
     priority: Mapped[str] = mapped_column(String(32), default="normal", index=True)
     status: Mapped[str] = mapped_column(String(32), default="proposed", index=True)

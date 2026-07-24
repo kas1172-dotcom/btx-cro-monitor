@@ -28,12 +28,10 @@ The cockpit is built by GitHub Actions, so production Vite values come from repo
 
 ```text
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
-VITE_COCKPIT_PASSWORD=<demo access password>
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_or_live_xxx
 ```
 
-`VITE_COCKPIT_PASSWORD` is hashed during the workflow and only the SHA-256 digest is bundled into the static frontend. This is a light demo-safety gate, not real authentication.
-
-The Pages build intentionally does not bundle a shared backend bearer token. Browser-safe backend auth is deferred to WP10; protected backend calls may reject public cockpit requests until then.
+The Pages build intentionally does not bundle a shared backend bearer token or a shared cockpit password. The browser receives only the Clerk publishable key and sends each signed-in user's session token to the backend.
 
 ## Workflow Behavior
 
@@ -49,10 +47,9 @@ The Pages build intentionally does not bundle a shared backend bearer token. Bro
 The Pages workflow sets:
 
 ```text
-VITE_DATA_MODE=hybrid
 VITE_BACKEND_ENDPOINT=https://btx-platform.fly.dev
 VITE_COPILOT_ENDPOINT=https://btx-platform.fly.dev/llm
-VITE_ARTIFACT_BASE_URL=../btx
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_or_live_xxx
 ```
 
 Run **30 Deploy Frontend Cockpit** from the Actions tab to republish without re-running the monitor pipeline.

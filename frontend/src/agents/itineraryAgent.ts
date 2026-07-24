@@ -1,6 +1,8 @@
 import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
+import type { Prospect } from "../app/intelligence.ts";
 import type { Deliverable, DeliverableSection } from "../deliverables/types.ts";
+import type { Company, Location } from "../engine/brain/entities.ts";
 import { signalEvidenceForCompany } from "../app/signalProvenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
@@ -36,6 +38,19 @@ interface ItineraryContext extends AgentContext {
   stops: ItineraryStop[];
 }
 
+type LocatedLocation = Location & {
+  lat: number;
+  lon: number;
+};
+
+type LocatedCompany = Company & {
+  location: LocatedLocation;
+};
+
+type LocatedProspect = Prospect & {
+  company: LocatedCompany;
+};
+
 const sectionSpec = [
   { id: "schedule", heading: "Day-by-Day Schedule", required: true },
   { id: "map", heading: "Visit Map", required: true },
@@ -54,9 +69,19 @@ function miles(a: { lat: number; lon: number }, b: { lat: number; lon: number })
   return Math.round(earth * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
 }
 
+function hasCoordinates(location: Location): location is LocatedLocation {
+  return typeof location.lat === "number" && typeof location.lon === "number";
+}
+
+function hasCompanyCoordinates(prospect: Prospect): prospect is LocatedProspect {
+  return hasCoordinates(prospect.company.location);
+}
+
 function marketCenter(city: string, world: World) {
-  const companies = world.companies.filter((c) => c.location.city === city);
-  const pool = companies.length ? companies : world.companies;
+  const companies = world.companies.filter((c): c is LocatedCompany => c.location.city === city && hasCoordinates(c.location));
+  const fallback = world.companies.filter((c): c is LocatedCompany => hasCoordinates(c.location));
+  const pool = companies.length ? companies : fallback;
+  if (pool.length === 0) return { lat: 0, lon: 0 };
   return {
     lat: pool.reduce((sum, c) => sum + c.location.lat, 0) / Math.max(pool.length, 1),
     lon: pool.reduce((sum, c) => sum + c.location.lon, 0) / Math.max(pool.length, 1),
@@ -84,7 +109,7 @@ function fullTalkingPoint(capability: string, trigger: string): string {
   return `Lead with ${cleanCapability} because the validated signal points to active production need. Connect the source evidence to where BTX can reduce delivery risk or help the account move faster. Evidence: ${cleanTrigger}`;
 }
 
-function clusterStops<T extends { company: { location: { lat: number; lon: number } } }>(
+function clusterStops<T extends LocatedProspect>(
   prospects: T[],
   center: { lat: number; lon: number },
   days: number,
@@ -136,6 +161,7 @@ export const itineraryAgent: DeliverableAgent<Inputs> = {
         if (inputs.focus === "customers" && p.company.relationship !== "customer") return false;
         return true;
       })
+      .filter(hasCompanyCoordinates)
       .map((p) => ({ ...p, distance: miles(center, p.company.location) }))
       .sort((a, b) => (a.distance - b.distance) || (b.opportunity + b.fit.score - (a.opportunity + a.fit.score)))
       .slice(0, 14);

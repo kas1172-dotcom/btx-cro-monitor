@@ -11,6 +11,7 @@
 // trail.
 
 import { SCORE_DIMENSIONS } from "../signals/contract.ts";
+import { isConfirmedAccountSignal, relationshipAccountId } from "../signals/contract.ts";
 import type { ScoreDimension, Signal } from "../signals/contract.ts";
 import type { WeightsConfig } from "./weights.ts";
 
@@ -47,7 +48,7 @@ function clamp(value: number, max: number): number {
 function scoresSubject(signal: Signal, subjectId: string): boolean {
   if (signal.scope === undefined) return signal.subject_id === subjectId;
   if (signal.scope !== "specific_account") return false;
-  return signal.relationships?.some((record) => record.canonical_account_id === subjectId) === true;
+  return signal.relationships?.some((record) => relationshipAccountId(record) === subjectId && isConfirmedAccountSignal(signal, record)) === true;
 }
 
 /**

@@ -2,7 +2,6 @@ import type { World } from "../app/useWorld.ts";
 import { displayLabel } from "../app/displayLabels.ts";
 import { qualitativeSignalConfidence, prospectQualificationLabel } from "../app/confidence.ts";
 import { signalHeadline, signalSourceName } from "../app/signalProvenance.ts";
-import { deriveWorkItems } from "../app/workItems.ts";
 import { backendHeaders } from "../app/backendApi.ts";
 import { COPILOT_ENDPOINT, checkAiStatus, markAiLive, markAiOffline } from "../app/aiStatus.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
@@ -14,7 +13,8 @@ export interface GroundedAssistantResult {
   source: "llm" | "offline";
 }
 
-function money(value: number): string {
+function money(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "not provided";
   if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
   if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
   return `$${Math.round(value / 1000)}k`;
@@ -46,7 +46,7 @@ function contextPack(world: World): string {
       `UEI: ${company.uei ?? "not provided"}`,
       `known programs: ${company.known_programs?.join(", ") || "not provided"}`,
       `contact: ${contact ? `${contact.name}, ${contact.title}` : "not provided"}`,
-      `pipeline: ${deals.length ? deals.map((deal) => `${deal.name}, ${deal.stage}, ${money(deal.value)}, close ${deal.close_date}`).join(" | ") : "not provided"}`,
+      `pipeline: ${deals.length ? deals.map((deal) => `${deal.name}, ${deal.stage}, ${money(deal.value)}, close ${deal.close_date ?? "not provided"}`).join(" | ") : "not provided"}`,
       `qualification: ${qualification.label}${qualification.gaps.length ? `, missing ${qualification.gaps.join(", ")}` : ""}`,
     ].join("\n");
   });
@@ -80,7 +80,7 @@ function contextPack(world: World): string {
     ].join("\n");
   });
 
-  const workItems = deriveWorkItems(world).slice(0, 8).map((item) => {
+  const workItems = (world.worldSnapshot?.workItems ?? []).slice(0, 8).map((item) => {
     const company = world.companies.find((row) => row.id === item.canonical_account_id);
     return [
       `Work item: ${item.recommended_action}`,

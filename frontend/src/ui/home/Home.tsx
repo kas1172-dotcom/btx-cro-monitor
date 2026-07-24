@@ -33,7 +33,7 @@ export function Home({ world, cityWorld }: { world: World; cityWorld: World | nu
   const currentIds = new Set(currentCompanies.map((c) => c.id));
   const prospectIds = new Set(prospectCompanies.map((c) => c.id));
   const currentOpen = open.filter((o) => currentIds.has(o.company_id) || o.account_status === "active_pipeline");
-  const currentPipeline = currentOpen.reduce((sum, o) => sum + o.value, 0);
+  const currentPipeline = currentOpen.reduce((sum, o) => sum + (o.value ?? 0), 0);
   const currentRiskSignals = world.analysis.valid.filter(
     (s) => currentIds.has(s.subject_id) && (s.business_motion === "reduce_risk" || RISK_EVENTS.has(s.event_type)),
   );
@@ -46,7 +46,7 @@ export function Home({ world, cityWorld }: { world: World; cityWorld: World | nu
     const score = world.analysis.byId.get(c.id);
     const risky = (score?.dimensions.risk.score ?? 0) >= 50 || (score?.dimensions.capacityRisk.score ?? 0) >= 50;
     if (!risky) return sum;
-    return sum + currentOpen.filter((o) => o.company_id === c.id).reduce((oppSum, o) => oppSum + o.value, 0);
+    return sum + currentOpen.filter((o) => o.company_id === c.id).reduce((oppSum, o) => oppSum + (o.value ?? 0), 0);
   }, 0);
   const expansionOpportunities = currentCompanies.filter((c) => (world.analysis.byId.get(c.id)?.dimensions.opportunity.score ?? 0) >= 40).length;
   const highFitProspects = world.prospects.filter((p) => prospectIds.has(p.company.id) && p.fit.score >= 60).length;
@@ -55,7 +55,7 @@ export function Home({ world, cityWorld }: { world: World; cityWorld: World | nu
   );
   const prospectOpportunityValue = world.opportunities
     .filter((o) => prospectIds.has(o.company_id) && o.stage !== "lost")
-    .reduce((sum, o) => sum + o.value, 0);
+    .reduce((sum, o) => sum + (o.value ?? 0), 0);
   const outreachActions = world.prospects.filter((p) => prospectIds.has(p.company.id) && p.contact).length;
   const topActions = world.analysis.recommendations.filter((r) => r.priority !== "low").slice(0, 3);
   const localProspects = (cityWorld?.prospects ?? []).slice(0, 3);

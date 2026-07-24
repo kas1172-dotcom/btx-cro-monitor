@@ -108,7 +108,7 @@ export function Prospecting({ world }: { world: World }) {
       const contact = world.contacts.find((c) => c.company_id === company.id);
       const revenue = world.opportunities
         .filter((o) => o.company_id === company.id && o.stage !== "lost")
-        .reduce((sum, o) => sum + o.value, 0);
+        .reduce((sum, o) => sum + (o.value ?? 0), 0);
       const opportunity = score?.dimensions.opportunity.score ?? rankedProspect?.opportunity ?? 0;
       const fit = rankedProspect?.fit.score ?? 0;
       const qualification = prospectQualificationLabel({

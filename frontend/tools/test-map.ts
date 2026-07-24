@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { SCORE_DIMENSIONS, type ScoreDimension } from "../src/engine/signals/contract.ts";
 import type { Company } from "../src/engine/brain/entities.ts";
 import type { CompanyScore, DimensionScore } from "../src/engine/decision/score.ts";
+import type { ScoreFamilies, ScoreSnapshot } from "../src/app/revenueDataClient.ts";
 
 function assert(condition: unknown, message: string): void {
   if (!condition) throw new Error(message);
@@ -68,8 +69,44 @@ const byId = new Map([
   ["canonical-live-4", score("canonical-live-4", 80)],
 ]);
 
+function backendScore(entityId: string, value: number): ScoreSnapshot {
+  return {
+    id: `score-${entityId}`,
+    tenantId: "tenant-a",
+    entityType: "account",
+    entityId,
+    family: "account_attractiveness",
+    score: value,
+    status: "available",
+    result: {
+      value,
+      status: "available",
+      dataCompleteness: 0.9,
+      dataClassification: "actual",
+      missingInputs: [],
+      hardGateFailures: [],
+      positiveFactors: [],
+      negativeFactors: [],
+      neutralFactors: [],
+      configurationVersion: "test",
+    },
+    configurationVersion: "test",
+    sourceDataVersion: "test",
+    calculatedAt: "2026-07-24T12:00:00Z",
+  };
+}
+
+const backendScores: ScoreFamilies = {
+  accountAttractiveness: [backendScore("canonical-live-1", 10), backendScore("canonical-live-2", 90)],
+  signalConfidence: [],
+  pursuitPwin: [],
+  deliveryFeasibility: [],
+  relationshipHealth: [],
+  actionPriority: [],
+};
+
 const points = mappableCompanies(companies);
-const markers = buildMapMarkers(companies, byId);
+const markers = buildMapMarkers(companies, byId, backendScores);
 const center = mapCenter(points);
 
 assert(points.length === 3, `expected 3 mappable companies, got ${points.length}`);
@@ -82,7 +119,8 @@ const large = markers.find((marker) => marker.company.id === "canonical-live-2")
 const supplier = markers.find((marker) => marker.company.id === "canonical-live-4");
 
 assert(Boolean(small && large && supplier), "expected all valid markers to be present");
-assert((large?.radius ?? 0) > (small?.radius ?? 0), `prospect radius did not scale by opportunity (${small?.radius} vs ${large?.radius})`);
+assert((large?.radius ?? 0) > (small?.radius ?? 0), `prospect radius did not scale by backend account attractiveness (${small?.radius} vs ${large?.radius})`);
+assert(small?.scoreStatus === "available", `expected backend score status, got ${small?.scoreStatus}`);
 assert(supplier?.radius === 5, `non-prospect radius should stay fixed at 5, got ${supplier?.radius}`);
 
 const prospectMapSource = readFileSync(new URL("../src/ui/map/ProspectMap.tsx", import.meta.url), "utf8");
@@ -91,4 +129,4 @@ assert(!/basemaps\.cartocdn|openstreetmap|TileLayer/.test(prospectMapSource), "P
 assert(!/basemaps\.cartocdn|TileLayer/.test(documentViewerSource), "Document maps must not depend on external raster tiles");
 assert(prospectMapSource.includes("DarkMapTiles"), "Prospect map must mount the bundled dark basemap");
 
-console.log("map ok: bundled dark tiles, mixed coordinates filtered, canonical fallback used, opportunity radius scales");
+console.log("map ok: bundled dark tiles, mixed coordinates filtered, canonical fallback used, backend attractiveness radius scales");

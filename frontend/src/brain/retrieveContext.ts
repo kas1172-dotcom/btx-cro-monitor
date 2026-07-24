@@ -54,7 +54,7 @@ export function retrieveContext(question: string, intent: QuestionIntent, activa
     atRiskAccounts,
     topSignals,
     contextUsed,
-    pipelineValue: openDeals.reduce((sum, deal) => sum + deal.value, 0),
+    pipelineValue: openDeals.reduce((sum, deal) => sum + (deal.value ?? 0), 0),
     openDealCount: openDeals.length,
   };
 }

@@ -73,7 +73,7 @@ function whyAccountMatters(world: World, company: Company): string {
   const score = world.analysis.byId.get(company.id);
   const openPipeline = world.opportunities
     .filter((o) => o.company_id === company.id && o.stage !== "won" && o.stage !== "lost")
-    .reduce((sum, o) => sum + o.value, 0);
+    .reduce((sum, o) => sum + (o.value ?? 0), 0);
   const risk = score?.dimensions.risk.score ?? 0;
   const capacity = score?.dimensions.capacityRisk.score ?? 0;
   const opportunity = score?.dimensions.opportunity.score ?? 0;
@@ -101,7 +101,7 @@ export function CurrentBusiness({ world }: { world: World }) {
   const currentIds = new Set(currentCompanies.map((c) => c.id));
   const openPipeline = currentOpportunities.filter((o) => o.stage !== "won" && o.stage !== "lost");
   const wonContracts = currentOpportunities.filter((o) => o.stage === "won");
-  const pipelineValue = openPipeline.reduce((sum, o) => sum + o.value, 0);
+  const pipelineValue = openPipeline.reduce((sum, o) => sum + (o.value ?? 0), 0);
   const riskSignals = currentSignals
     .filter((s) => s.business_motion === "reduce_risk" || RISK_EVENTS.has(s.event_type))
     .sort((a, b) => b.confidence - a.confidence)
@@ -113,7 +113,7 @@ export function CurrentBusiness({ world }: { world: World }) {
     .map((company) => {
       const score = world.analysis.byId.get(company.id);
       const rec = world.analysis.recById.get(company.id);
-      const openValue = openPipeline.filter((o) => o.company_id === company.id).reduce((sum, o) => sum + o.value, 0);
+      const openValue = openPipeline.filter((o) => o.company_id === company.id).reduce((sum, o) => sum + (o.value ?? 0), 0);
       const attention =
         (score?.dimensions.risk.score ?? 0) +
         (score?.dimensions.capacityRisk.score ?? 0) +
@@ -283,7 +283,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               <span className={`opp-stage stage-${opp.stage}`}>{opp.stage}</span>
               <strong>{nameOf(opp.company_id)}</strong>
               <span>{opp.name}</span>
-              <em>{money(opp.value)}</em>
+              <em>{opp.value === null ? "Value not provided" : money(opp.value)}</em>
               <ProvenanceBadge label={provenanceForRecord(opp)} />
               <span className="link-row">
                 <ExternalLink href={opp.contract_url} label="Contract" />

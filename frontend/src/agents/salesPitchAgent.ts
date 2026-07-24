@@ -72,7 +72,7 @@ export const salesPitchAgent: DeliverableAgent<Inputs> = {
     const contact = world.contacts.find((item) => item.company_id === prospect.company.id);
     const topSignal = prospect.topSignal;
     const capacity = world.snapshot?.capacity.find((item) => item.city === prospect.company.location.city) ?? world.snapshot?.capacity[0];
-    const openPipeline = world.opportunities.some((item) => item.company_id === prospect.company.id && item.stage !== "won" && item.stage !== "lost" && item.value > 0);
+    const openPipeline = world.opportunities.some((item) => item.company_id === prospect.company.id && item.stage !== "won" && item.stage !== "lost" && (item.value ?? 0) > 0);
     const confidence = evidenceConfidence({ hasCage: Boolean(prospect.company.cage_code), hasContact: Boolean(contact), hasPipeline: openPipeline, hasSignal: Boolean(topSignal), fitMatched: fit.matched });
     return {
       facts: {

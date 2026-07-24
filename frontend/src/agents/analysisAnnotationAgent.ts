@@ -45,14 +45,14 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
           name: c.name,
           value: computeMetric(metric, world, { accountId: c.id }, window).value,
         }))
-        .filter((av) => av.value > 0)
+        .filter((av): av is { name: string; value: number } => av.value !== null && av.value > 0)
         .sort((a, b) => b.value - a.value);
       activeAccountCount = accountValues.length;
       topAccountName = accountValues[0]?.name ?? "";
       topAccountValue = accountValues[0]?.value ?? 0;
     }
 
-    const qoqChange = priorResult.value > 0
+    const qoqChange = result.value !== null && priorResult.value !== null && priorResult.value > 0
       ? ((result.value - priorResult.value) / priorResult.value) * 100
       : 0;
 
@@ -69,7 +69,7 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
         topAccountName,
         topAccountValue,
         activeAccountCount,
-        topSharePct: result.value > 0 ? Math.round((topAccountValue / result.value) * 100) : 0,
+        topSharePct: result.value !== null && result.value > 0 ? Math.round((topAccountValue / result.value) * 100) : 0,
       },
       entityIds: world.companies.filter((c) => c.relationship === "customer").map((c) => c.id).slice(0, 6),
       sources: [...result.provenance, ...priorResult.provenance],
@@ -77,16 +77,17 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
   },
   async compose(ctx): Promise<Deliverable> {
     const f = ctx.facts;
-    const fmt = (v: number) => {
+    const fmt = (v: number | null) => {
+      if (v === null || !Number.isFinite(v)) return "not available";
       if (String(f.unit) === "$") return v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : `$${Math.round(v / 1000)}k`;
       if (String(f.unit) === "%") return `${Math.round(v)}%`;
       return v.toFixed(2);
     };
-    const value = Number(f.value);
-    const prior = Number(f.priorValue);
+    const value = typeof f.value === "number" ? f.value : null;
+    const prior = typeof f.priorValue === "number" ? f.priorValue : null;
     const qoq = Number(f.qoqChange);
     const trendWord = qoq > 5 ? "up" : qoq < -5 ? "down" : "roughly flat";
-    const trendSentence = prior > 0
+    const trendSentence = prior !== null && prior > 0
       ? `This is ${trendWord} ${Math.abs(Math.round(qoq))}% versus ${f.priorQuarter} (${fmt(prior)}).`
       : `No prior-quarter data available for comparison.`;
     const topShare = Number(f.topSharePct);
@@ -104,12 +105,12 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
     return {
       id: `deliv-${Date.now()}-analysis-annotation`,
       type: "analysis_view",
-      title: `${f.label} Annotation \u2014 ${f.quarter}`,
+      title: `${f.label} Annotation - ${f.quarter}`,
       createdAt: new Date().toISOString(),
       brainArea: "analysis",
       entityIds: ctx.entityIds,
-      confidence: prior > 0 ? "high" : "medium",
-      confidenceReason: prior > 0 ? "Current and prior quarter data both available." : "No prior quarter for comparison.",
+      confidence: prior !== null && prior > 0 ? "high" : "medium",
+      confidenceReason: prior !== null && prior > 0 ? "Current and prior quarter data both available." : "No prior quarter for comparison.",
       sections: [
         {
           id: "annotation",

@@ -8,7 +8,7 @@ export function CapacityAssessment({ world }: { world: World }) {
   const utilization = computeMetric("capacity_utilization", world);
   const delivery = computeMetric("on_time_delivery", world);
   const backlog = computeMetric("backlog", world);
-  const openDemand = world.opportunities.filter((opp) => opp.stage !== "won" && opp.stage !== "lost").reduce((sum, opp) => sum + opp.value, 0);
+  const openDemand = world.opportunities.filter((opp) => opp.stage !== "won" && opp.stage !== "lost").reduce((sum, opp) => sum + (opp.value ?? 0), 0);
 
   return (
     <section className="surface-page" data-surface-component="surface-capacity-assessment">

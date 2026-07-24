@@ -58,7 +58,7 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
     const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
     const opportunities = world.opportunities.filter((item) => item.company_id === company.id);
     const contact = world.contacts.find((item) => item.company_id === company.id);
-    const openPipeline = opportunities.some((item) => item.stage !== "won" && item.stage !== "lost" && item.value > 0);
+    const openPipeline = opportunities.some((item) => item.stage !== "won" && item.stage !== "lost" && (item.value ?? 0) > 0);
     const missingEvidence = [
       company.cage_code ? "" : "CAGE match",
       contact ? "" : "contact",

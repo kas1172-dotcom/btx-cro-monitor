@@ -18,8 +18,8 @@ import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { chromium, type Browser, type Page } from "playwright";
 
-// This suite exercises the real Clerk auth gate (WP10-A), not the legacy
-// VITE_COCKPIT_PASSWORD_HASH gate - that variable is left unset in the build.
+// This suite exercises the real Clerk auth gate. The retired shared password
+// gate is intentionally absent from the build.
 const BASE_URL = "http://127.0.0.1:4175";
 const SCREENSHOT_DIR = "/tmp/btx-e2e-smoke";
 

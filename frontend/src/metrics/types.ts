@@ -36,7 +36,7 @@ export interface QuarterWindow extends TimeRange {
 }
 
 export interface MetricResult {
-  value: number;
+  value: number | null;
   label: string;
   unit: "$" | "%" | "ratio" | "count";
   provenance: ProvenanceEntry[];

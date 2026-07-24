@@ -17,8 +17,7 @@ import type { AssumptionsSnapshot, CapacitySnapshotRecord, CrmSnapshotRecord, In
 import { BACKEND_ENDPOINT, backendHeaders, backendJson } from "../app/backendApi.ts";
 import { buildArtifactSignals, type ArtifactArchive, type ArtifactMappingResult } from "./artifact/artifactSignals.ts";
 
-const env = (import.meta as ImportMeta & { env?: { VITE_ARTIFACT_BASE_URL?: string } }).env;
-const MONITOR_BASE_URL = (env?.VITE_ARTIFACT_BASE_URL ?? "../btx").replace(/\/$/, "");
+const MONITOR_BASE_URL = "../btx";
 const PUBLISHED_RUN_OUTPUT_PATH = `${MONITOR_BASE_URL}/run_output.json`;
 const PUBLISHED_ARCHIVE_PATH = `${MONITOR_BASE_URL}/archive.json`;
 const BUNDLED_RUN_OUTPUT_PATH = "clients/btx/artifacts/run_output.json";
@@ -104,9 +103,9 @@ export function normalizeCompanies(response: RuntimeResponse<Company>): Company[
     hubspot_company_id: company.hubspot_company_id ?? (company as { hubspot_id?: string }).hubspot_id,
     relationship: company.relationship ?? "target",
     location: {
-      city: company.location?.city ?? "Unknown",
-      lat: company.location?.lat ?? 0,
-      lon: company.location?.lon ?? 0,
+      city: company.location?.city ?? "",
+      lat: company.location?.lat ?? null,
+      lon: company.location?.lon ?? null,
       address: company.location?.address,
       state: company.location?.state,
       postal_code: company.location?.postal_code,
@@ -125,9 +124,9 @@ export function normalizeOpportunities(response: RuntimeResponse<Opportunity>): 
   state.provenance = response.data_provenance ?? state.provenance;
   return response.records.map((opportunity) => ({
     ...opportunity,
-    value: Number.isFinite(Number(opportunity.value)) ? Number(opportunity.value) : 0,
+    value: opportunity.value !== null && Number.isFinite(Number(opportunity.value)) ? Number(opportunity.value) : null,
     stage: opportunity.stage ?? "prospecting",
-    close_date: opportunity.close_date || new Date().toISOString().slice(0, 10),
+    close_date: opportunity.close_date || null,
   }));
 }
 
