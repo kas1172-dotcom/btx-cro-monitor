@@ -1,4 +1,5 @@
 import { buildMapMarkers, mappableCompanies, mapCenter } from "../src/ui/map/mapModel.ts";
+import { readFileSync } from "node:fs";
 import { SCORE_DIMENSIONS, type ScoreDimension } from "../src/engine/signals/contract.ts";
 import type { Company } from "../src/engine/brain/entities.ts";
 import type { CompanyScore, DimensionScore } from "../src/engine/decision/score.ts";
@@ -84,4 +85,10 @@ assert(Boolean(small && large && supplier), "expected all valid markers to be pr
 assert((large?.radius ?? 0) > (small?.radius ?? 0), `prospect radius did not scale by opportunity (${small?.radius} vs ${large?.radius})`);
 assert(supplier?.radius === 5, `non-prospect radius should stay fixed at 5, got ${supplier?.radius}`);
 
-console.log("map ok: mixed coordinates filtered, canonical fallback used, opportunity radius scales");
+const prospectMapSource = readFileSync(new URL("../src/ui/map/ProspectMap.tsx", import.meta.url), "utf8");
+const documentViewerSource = readFileSync(new URL("../src/ui/deliverables/DocumentViewer.tsx", import.meta.url), "utf8");
+assert(!/basemaps\.cartocdn|openstreetmap|TileLayer/.test(prospectMapSource), "Prospect map must not depend on external raster tiles");
+assert(!/basemaps\.cartocdn|TileLayer/.test(documentViewerSource), "Document maps must not depend on external raster tiles");
+assert(prospectMapSource.includes("DarkMapTiles"), "Prospect map must mount the bundled dark basemap");
+
+console.log("map ok: bundled dark tiles, mixed coordinates filtered, canonical fallback used, opportunity radius scales");

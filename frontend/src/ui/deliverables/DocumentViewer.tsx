@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import L from "leaflet";
-import { MapContainer, Marker, Polyline, TileLayer, Tooltip, ZoomControl } from "react-leaflet";
+import { MapContainer, Marker, Polyline, Tooltip, ZoomControl } from "react-leaflet";
 import type { Deliverable, DeliverableSection } from "../../deliverables/types.ts";
 import type { World } from "../../app/useWorld.ts";
 import type { Company, Contact, Opportunity } from "../../engine/brain/entities.ts";
@@ -23,6 +23,7 @@ import {
 import { uiTokens } from "../../app/uiTokens.ts";
 import { deliverableMetaLabel, visibleSources } from "../../app/sourceLabels.ts";
 import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
+import { DarkMapTiles } from "../map/DarkMapTiles.tsx";
 import type { ChartSpec } from "../../metrics/types.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
@@ -348,10 +349,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
                 <div key={`${section.id}-${index}`} className="document-map">
                   <MapContainer center={center} zoom={8} className="document-map-canvas" scrollWheelZoom={false} zoomControl={false}>
                     <ZoomControl position="bottomright" />
-                    <TileLayer
-                      url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                      attribution='&copy; OpenStreetMap &copy; CARTO'
-                    />
+                    <DarkMapTiles />
                     {[...byDay.entries()].map(([day, points]) => (
                       <Polyline
                         key={day}

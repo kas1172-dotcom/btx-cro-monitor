@@ -4,7 +4,7 @@
 // output; it computes nothing.
 
 import { useEffect } from "react";
-import { MapContainer, TileLayer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet";
+import { MapContainer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet";
 import { useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { World } from "../../app/useWorld.ts";
@@ -15,6 +15,7 @@ import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { buildMapMarkers, mapCenter, mappableCompanies } from "./mapModel.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
 import { AccountToken } from "../common/AccountToken.tsx";
+import { DarkMapTiles } from "./DarkMapTiles.tsx";
 
 function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   const map = useMap();
@@ -50,10 +51,7 @@ export function ProspectMap({ world }: { world: World }) {
       <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
         <MapSizeInvalidator watchKey={watchKey} />
         <ZoomControl position="bottomright" />
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; OpenStreetMap &copy; CARTO'
-        />
+        <DarkMapTiles />
         {markers.map(({ company: c, center: markerCenter, opportunity: opp, prospect, radius }) => {
           const active = c.id === activeCompanyId;
           const color = prospect ? uiTokens.color.success : uiTokens.color.textMuted;
