@@ -42,6 +42,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
   const narrative = insight?.opportunity ?? narrateOpportunity(company, opp?.score ?? 0, fit, signals);
   const rec = world.analysis.recById.get(companyId);
   const health = pipelineHealth(world.opportunities.filter((o) => o.company_id === companyId));
+  const healthValue = health === null ? "N/A" : String(health);
   const facilities = world.facilities.filter((f) => f.company_id === companyId);
   const openOpps = world.opportunities
     .filter((o) => o.company_id === companyId && o.stage !== "won" && o.stage !== "lost")
@@ -128,7 +129,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           <div className="metric-lbl">fit to {PROFILE.name}</div>
         </div>
         <div className="metric">
-          <div className="metric-val">{health}</div>
+          <div className="metric-val">{healthValue}</div>
           <div className="metric-lbl">pipeline health</div>
         </div>
       </div>
@@ -139,7 +140,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         {oppGroups.length > 0 && <p className="audit">scoring: {summarizeGroups(oppGroups)}</p>}
         <AskChatpilButton
           label="Why this account?"
-          prompt={explainAccountPrompt(company, `Dossier narrative: ${narrative}. Opportunity ${opp?.score ?? 0}, fit ${fit.score}%, pipeline health ${health}.`)}
+          prompt={explainAccountPrompt(company, `Dossier narrative: ${narrative}. Opportunity ${opp?.score ?? 0}, fit ${fit.score}%, pipeline health ${healthValue}.`)}
         />
       </section>
 

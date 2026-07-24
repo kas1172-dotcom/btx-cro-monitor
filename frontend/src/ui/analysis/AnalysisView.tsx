@@ -49,7 +49,8 @@ function computeAnnotation(spec: ChartSpec, result: ChartResult): string {
     const first = points[0];
     const last = points[points.length - 1];
     const direction = last.y > first.y ? "upward" : last.y < first.y ? "downward" : "flat";
-    return `${result.meta.label} shows a ${direction} trend from ${fmtV(first.y)} (${first.x}) to ${fmtV(last.y)} (${last.x}) over ${points.length} periods.`;
+    const article = direction === "upward" ? "an" : "a";
+    return `${result.meta.label} shows ${article} ${direction} trend from ${fmtV(first.y)} (${first.x}) to ${fmtV(last.y)} (${last.x}) over ${points.length} periods.`;
   }
 
   if (spec.viz === "ranked_bar" && result.series) {

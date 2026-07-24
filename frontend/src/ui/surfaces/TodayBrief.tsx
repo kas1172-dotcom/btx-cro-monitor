@@ -24,6 +24,12 @@ type BriefItem = {
   seed: string;
 };
 
+type AttentionCard = {
+  label: string;
+  value: number;
+  link: BriefLink;
+};
+
 function nameOf(world: World, id: string | null | undefined): string {
   if (!id) return "Portfolio";
   return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
@@ -183,6 +189,23 @@ export function TodayBrief({ world }: { world: World }) {
   const activeAccountCount = world.companies.filter((company) => company.relationship === "customer" || company.relationship === "target").length;
   const summaryLine = `${activeAccountCount} active accounts, ${topSignals.length} validated signals, and ${attention.items.length} open work items are ready for review.`;
   const topSeed = miniBrief[0]?.seed;
+  const attentionCards: AttentionCard[] = [
+    {
+      label: "Accounts needing attention",
+      value: accountsNeedingAttention,
+      link: { label: "Open accounts", surface: "accounts" as const },
+    },
+    {
+      label: "Deliverables awaiting approval",
+      value: approval.items.length,
+      link: { label: "Open queue", surface: "work_queue" as const },
+    },
+    {
+      label: "Deadlines this week",
+      value: deadlineCount,
+      link: { label: "Open programs", surface: "programs" as const },
+    },
+  ].filter((card) => card.value > 0);
 
   return (
     <section className="surface-page today-brief-page" data-surface-component="surface-todays-brief">
@@ -217,20 +240,16 @@ export function TodayBrief({ world }: { world: World }) {
         </div>
       </section>
 
-      <section className="today-attention-strip" aria-label="Attention counters">
-        <button type="button" onClick={() => navigate({ label: "Open accounts", surface: "accounts" })}>
-          <span>Accounts needing attention</span>
-          <strong>{accountsNeedingAttention}</strong>
-        </button>
-        <button type="button" onClick={() => navigate({ label: "Open queue", surface: "work_queue" })}>
-          <span>Deliverables awaiting approval</span>
-          <strong>{approval.items.length}</strong>
-        </button>
-        <button type="button" onClick={() => navigate({ label: "Open programs", surface: "programs" })}>
-          <span>Deadlines this week</span>
-          <strong>{deadlineCount}</strong>
-        </button>
-      </section>
+      {attentionCards.length > 0 && (
+        <section className="today-attention-strip" aria-label="Attention counters">
+          {attentionCards.map((card) => (
+            <button key={card.label} type="button" onClick={() => navigate(card.link)}>
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+            </button>
+          ))}
+        </section>
+      )}
 
       <AskBrainBar world={world} seedPrompt={topSeed} />
     </section>

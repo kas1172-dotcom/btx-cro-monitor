@@ -159,8 +159,9 @@ export function engineContext(world: World): string {
   if (persp) {
     const d = persp.dimensions;
     const ph = pipelineHealth(world.opportunities.filter((o) => o.company_id === persp.subject_id));
+    const pipelineHealthText = ph === null ? healthLabel(ph) : `${ph} (${healthLabel(ph)})`;
     lines.push(
-      `${PROFILE.name} (self) — risk ${d.risk}, opportunity ${d.opportunity}, capacityRisk ${d.capacityRisk}, competitivePressure ${d.competitivePressure}, pipelineHealth ${ph} (${healthLabel(ph)}).`,
+      `${PROFILE.name} (self) — risk ${d.risk}, opportunity ${d.opportunity}, capacityRisk ${d.capacityRisk}, competitivePressure ${d.competitivePressure}, pipelineHealth ${pipelineHealthText}.`,
     );
   }
   lines.push("LEADERBOARD (top accounts; all four objective scores so you can explain any ranking):");

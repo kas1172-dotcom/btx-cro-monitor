@@ -215,10 +215,35 @@ const cockpitCompanies = cockpitCompaniesRaw.some((company) => company.name.toLo
         domains: ["saronic.com"],
         aliases: ["Saronic"],
         known_programs: ["Corsair autonomous surface vessel"],
-        needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "ITAR"],
+        needs: ["5-axis CNC", "precision machining", "build-to-print", "AS9100", "marine autonomy integration"],
       },
     ];
-const cockpitAnalysis = analyze(cockpitCompanies, [...cockpitSignals as Parameters<typeof analyze>[1], ...deriveNewsSignals(cockpitCompanies, newsData as MarketEvent[], extractedData as ExtractedRow[])]);
+const cockpitSignalsWithRelationships = (cockpitSignals as Parameters<typeof analyze>[1]).map((signal) => {
+  const row = signal as { id?: string; subject_id?: string; scope?: string; entities?: string[]; source_quote?: string; artifact?: { headline?: string }; confidence?: number; detected_at?: string; relationships?: unknown[]; account_status?: string; business_motion?: string };
+  const text = [row.id, row.subject_id, row.artifact?.headline, row.source_quote, ...(row.entities ?? [])].filter(Boolean).join(" ").toLowerCase();
+  if (!text.includes("saronic") && !text.includes("corsair")) return signal;
+  return {
+    ...row,
+    subject_id: "signal-prospect-saronic",
+    scope: "specific_account",
+    account_status: "new_logo",
+    business_motion: "prospect_new_business",
+    relationships: [
+      ...(row.relationships ?? []),
+      {
+        canonical_account_id: "signal-prospect-saronic",
+        source_entity_name: "Saronic Technologies",
+        match_method: "manual",
+        evidence: "Pinned market signal names Saronic Technologies and Corsair.",
+        confidence: 0.86,
+        review_status: "accepted",
+        creation_source: "manual",
+        last_validated_at: row.detected_at ?? null,
+      },
+    ],
+  };
+});
+const cockpitAnalysis = analyze(cockpitCompanies, [...cockpitSignalsWithRelationships, ...deriveNewsSignals(cockpitCompanies, newsData as MarketEvent[], extractedData as ExtractedRow[])]);
 const journeyPriority = (signal: { id: string; artifact?: { headline?: string }; source_quote?: string; subject_id?: string; entities?: string[] }) => {
   const text = [signal.id, signal.artifact?.headline, signal.source_quote, signal.subject_id, ...(signal.entities ?? [])].filter(Boolean).join(" ").toLowerCase();
   if (text.includes("pinned-lockheed") || text.includes("finalize deal for 296 f-35s")) return 0;
