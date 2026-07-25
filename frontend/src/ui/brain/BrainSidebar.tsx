@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
@@ -35,6 +36,7 @@ export function BrainSidebar({
   activeTab: TabId;
   counts: Partial<Record<TabId, number>>;
 }) {
+  const [moreOpen, setMoreOpen] = useState(false);
   const groups = [
     { label: "Primary", items: surfacesFor(PRIMARY_TAB_IDS) },
     { label: "Workspace", items: surfacesFor(SECONDARY_IDS) },
@@ -48,7 +50,7 @@ export function BrainSidebar({
         <strong>Steel & Signal</strong>
       </div>
       {groups.map((group) => (
-        <div key={group.label} className={group.label === "Tools" ? "brain-rail-group brain-rail-utility" : "brain-rail-group"}>
+        <div key={group.label} className={group.label === "Utilities" ? "brain-rail-group brain-rail-utility" : `brain-rail-group brain-rail-${group.label.toLowerCase()}`}>
           <div className="brain-rail-group-label">{group.label}</div>
           {group.items.map((surface) => (
             <button
@@ -64,6 +66,33 @@ export function BrainSidebar({
           ))}
         </div>
       ))}
+      <button
+        type="button"
+        className={moreOpen ? "brain-rail-btn brain-rail-more active" : "brain-rail-btn brain-rail-more"}
+        onClick={() => setMoreOpen((value) => !value)}
+        aria-expanded={moreOpen}
+        aria-controls="mobile-more-menu"
+      >
+        <span><UiIcon name="chevron" /></span>
+        <strong>More</strong>
+      </button>
+      {moreOpen && (
+        <div id="mobile-more-menu" className="mobile-more-menu">
+          {[...surfacesFor(SECONDARY_IDS), ...surfacesFor(UTILITY_IDS)].map((surface) => (
+            <button
+              key={surface.id}
+              type="button"
+              onClick={() => {
+                setMoreOpen(false);
+                openSurface(surface.id);
+              }}
+            >
+              <UiIcon name={surface.id} />
+              <span>{surface.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="rail-user-chip">
         <UiIcon name="user" />
         <span><strong>BTX operator</strong><em>Signed in</em></span>

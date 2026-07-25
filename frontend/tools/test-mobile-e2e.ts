@@ -56,8 +56,8 @@ async function smokeViewport(browser: Browser, width: number): Promise<void> {
   await unlock(page);
   const bodyText = await page.locator("body").innerText();
   assert(!bodyText.includes("mobile companion coming soon"), "Mobile blocker overlay is still present.");
-  await openSurface(page, /Today's Brief/i, "surface-todays-brief");
-  await openSurface(page, /Work Queue/i, "surface-work-queue");
+  await openSurface(page, /^Today/i, "surface-todays-brief");
+  await openSurface(page, /^Work/i, "surface-work-queue");
   await openSurface(page, /Accounts/i, "surface-account-360");
   await openSurface(page, /Ask/i, "surface-ask");
   const railBox = await page.locator(".brain-rail").boundingBox();

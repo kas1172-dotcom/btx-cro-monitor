@@ -15,6 +15,7 @@ import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
 import { AppShell, StatusChip } from "./ui/primitives.tsx";
+import { CommandPalette, ContextRibbon } from "./ui/CommandPalette.tsx";
 import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
 import type { Deliverable } from "./deliverables/types.ts";
 import { checkAiStatus, getAiStatusSnapshot, subscribeAiStatus } from "./app/aiStatus.ts";
@@ -50,6 +51,7 @@ export function App() {
   const route = useAppRoute();
   const routeTab = route.tab;
   const [workItemStatus, setWorkItemStatus] = useState("");
+  const [commandOpen, setCommandOpen] = useState(false);
   const handledWizardSaveIds = useRef(new Set<number>());
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
@@ -83,7 +85,17 @@ export function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen(true);
+        return;
+      }
       if (event.key !== "Escape") return;
+      if (commandOpen) {
+        event.stopPropagation();
+        setCommandOpen(false);
+        return;
+      }
       // Close topmost open panel only - never navigate away.
       if (previewAccountId) {
         event.stopPropagation();
@@ -99,7 +111,7 @@ export function App() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [brainResponse, previewAccountId]);
+  }, [brainResponse, commandOpen, previewAccountId]);
   const renderDefault = () => {
     if (route.id === "not_found") return <RouteNotFound path={route.path} />;
     if (settingsActive) return (
@@ -182,6 +194,7 @@ export function App() {
   const aiChip = aiStatus.state === "live"
     ? { tone: "success" as const, value: "live" }
     : { tone: "warning" as const, value: "offline" };
+  const commandShortcut = typeof navigator !== "undefined" && navigator.platform.toLowerCase().includes("mac") ? "⌘K" : "Ctrl K";
 
   async function handleWizardCommitted(deliverable: Deliverable) {
     const request = deliverableWizardRequest;
@@ -229,10 +242,13 @@ export function App() {
       topbar={(
         <header className="quiet-topbar">
           <div className="surface-title">
-            <span>Current surface</span>
+            <span>{world?.worldSnapshot?.tenant.displayName ?? "Workspace"}</span>
             <strong>{surfaceTitle}</strong>
           </div>
           <div className="topbar-status">
+            <button type="button" className="global-command-trigger" onClick={() => setCommandOpen(true)} aria-label="Open command palette">
+              Command <kbd>{commandShortcut}</kbd>
+            </button>
             {world?.provenanceSummary && (
               <StatusChip label="Sources" value={`${world.provenanceSources.length} connected`} />
             )}
@@ -356,8 +372,10 @@ export function App() {
         </>
       )}
     >
+      <ContextRibbon world={world} />
       <section className="quiet-stage">{renderDefault()}</section>
       {world && !homeActive && !settingsActive && routeTab !== "ask" && routeTab !== "deliverables" && <AskBrainBar world={viewWorld ?? world} />}
+      <CommandPalette world={world} open={commandOpen} onClose={() => setCommandOpen(false)} />
     </AppShell>
   );
 }

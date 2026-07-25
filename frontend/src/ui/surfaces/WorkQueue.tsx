@@ -18,6 +18,7 @@ import {
 } from "../../app/workItems.ts";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
+import { plainActionLabel, plainWorkStatus, primaryWorkAction } from "../../app/presentation.ts";
 
 const STATUSES: Array<WorkItemStatus | "all"> = [
   "all",
@@ -82,20 +83,7 @@ function updateFilter(filters: WorkItemFilters, patch: Partial<WorkItemFilters>)
 }
 
 function nextActionLabel(action: WorkItemTransitionAction): string {
-  return {
-    triage: "Mark triaged",
-    prepare: "Prepare work",
-    request_approval: "Request approval",
-    approve: "Approve action",
-    reject: "Reject with reason",
-    start: "Start work",
-    mark_executed: "Mark executed",
-    verify: "Verify external result",
-    record_outcome: "Record outcome",
-    dismiss: "Dismiss with reason",
-    close: "Close work",
-    reopen: "Reopen work",
-  }[action];
+  return plainActionLabel(action);
 }
 
 function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
@@ -112,6 +100,7 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<HubSpotTaskPreview | null>(null);
   const account = accountName(world, item.canonical_account_id);
+  const primary = primaryWorkAction(item);
 
   async function run(action: WorkItemTransitionAction) {
     setError(null);
@@ -135,6 +124,19 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
           <span>{titleCase(item.type)} · {account}</span>
         </div>
         <button type="button" onClick={() => navigateTo("/work")}>Back to queue</button>
+      </div>
+      <div className="work-decision-summary">
+        <div>
+          <span>Decision</span>
+          <strong>{plainWorkStatus(item.status)}</strong>
+          <em>{item.owner ? `Owned by ${item.owner}` : "Unassigned"}</em>
+        </div>
+        <div>
+          <span>Recommended next action</span>
+          <strong>{primary ? plainActionLabel(primary) : "Review current state"}</strong>
+          <em>{item.due_date ? `Due ${new Date(item.due_date).toLocaleDateString()}` : "No due date"}</em>
+        </div>
+        {primary && <button type="button" onClick={() => void run(primary)}>{plainActionLabel(primary)}</button>}
       </div>
       {message && <div className="live-inline-status" role="status">{message}</div>}
       {error && <div className="live-inline-status error" role="alert">{error}</div>}
@@ -163,16 +165,16 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
         Save assignment and schedule
       </button>
       <div className="work-state-strip">
-        <span>Status: {titleCase(item.status)}</span>
+        <span>Status: {plainWorkStatus(item.status)}</span>
         <span>Approval: {titleCase(item.approval_state)}</span>
         <span>Execution: {titleCase(item.execution_state)}</span>
         <span>Updated: {new Date(item.updated_at).toLocaleString()}</span>
       </div>
       <div className="surface-toolbar">
-        {item.allowed_actions.map((action) => (
+        {item.allowed_actions.filter((action) => action !== primary).map((action) => (
           <button key={action} type="button" onClick={() => void run(action)}>{nextActionLabel(action)}</button>
         ))}
-        {item.allowed_actions.length === 0 && <span>No permitted lifecycle actions for your role or this state.</span>}
+        {item.allowed_actions.filter((action) => action !== primary).length === 0 && <span>No additional permitted actions for your role or this state.</span>}
       </div>
       <div className="surface-toolbar">
         <button type="button" onClick={() => void previewHubSpotTask({ item, confirmed: false }).then(setPreview).catch((err) => setError(err instanceof Error ? err.message : "Could not preview HubSpot task."))}>Preview HubSpot task</button>

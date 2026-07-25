@@ -5,7 +5,8 @@ import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import type { TabId } from "../../app/surfaces.ts";
-import { accountPath, navigateTo, pathForTab } from "../../app/router.ts";
+import { accountPath, navigateTo, pathForTab, useAppRoute } from "../../app/router.ts";
+import { plainActionLabel, plainWorkStatus, primaryWorkAction, workItemAlertLevel } from "../../app/presentation.ts";
 import { AskBrainBar } from "../brain/AskBrainBar.tsx";
 import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
@@ -33,6 +34,12 @@ type AttentionCard = {
 };
 
 const MINI_BRIEF_LIMIT = 4;
+const HORIZONS = [
+  { id: "today", label: "Today", days: 1 },
+  { id: "week", label: "This week", days: 7 },
+  { id: "30", label: "30 days", days: 30 },
+  { id: "quarter", label: "Quarter", days: 92 },
+] as const;
 
 function nameOf(world: World, id: string | null | undefined): string {
   if (!id) return "Portfolio";
@@ -120,18 +127,29 @@ function signalToBriefItem(world: World, signal: Signal): BriefItem {
   };
 }
 
-function isThisWeek(value: string | null | undefined, anchor = new Date()): boolean {
+function inHorizon(value: string | null | undefined, days: number, anchor = new Date()): boolean {
   if (!value) return false;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return false;
   const start = new Date(anchor);
   start.setHours(0, 0, 0, 0);
   const end = new Date(start);
-  end.setDate(start.getDate() + 7);
+  end.setDate(start.getDate() + days);
   return date >= start && date <= end;
 }
 
+function alertLabel(item: WorkItem): string {
+  const level = workItemAlertLevel(item);
+  if (level === "critical") return "Critical";
+  if (level === "action_required") return "Action required";
+  if (level === "watch") return "Watch";
+  return "Informational";
+}
+
 export function TodayBrief({ world }: { world: World }) {
+  const route = useAppRoute();
+  const horizonId = route.query.get("horizon") ?? "week";
+  const horizon = HORIZONS.find((item) => item.id === horizonId) ?? HORIZONS[1];
   const attention = useWorkItems(world, "needs_attention");
   const approval = useWorkItems(world, "needs_approval");
   const signalById = new Map(world.analysis.valid.map((signal) => [signal.id, signal]));
@@ -140,7 +158,8 @@ export function TodayBrief({ world }: { world: World }) {
       .flatMap((item) => item.source_signal_ids)
       .filter((id) => Boolean(signalById.get(id))),
   );
-  const topSignals = [...world.analysis.valid]
+  const horizonSignals = world.analysis.valid.filter((signal) => inHorizon(signal.detected_at, horizon.days));
+  const topSignals = [...horizonSignals]
     .filter((signal) => !selectedSignalIds.has(signal.id))
     .sort((a, b) => b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at) || a.id.localeCompare(b.id))
     .slice(0, 8);
@@ -155,13 +174,22 @@ export function TodayBrief({ world }: { world: World }) {
     })
     .slice(0, MINI_BRIEF_LIMIT);
   const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
-  const deadlineCount = [
-    ...attention.items.map((item) => item.due_date),
-    ...world.opportunities.filter((opp) => opp.stage !== "won" && opp.stage !== "lost").map((opp) => opp.close_date),
-  ].filter((date) => isThisWeek(date)).length;
   const activeAccountCount = world.companies.filter((company) => company.relationship === "customer").length;
-  const summaryLine = `${activeAccountCount} customer account, ${miniBrief.length} signals shown, and ${attention.items.length} open work items are ready for review.`;
+  const summaryLine = `${activeAccountCount} customer account, ${miniBrief.length} priority item${miniBrief.length === 1 ? "" : "s"}, and ${attention.items.length} open work items need review.`;
   const topSeed = miniBrief[0]?.seed;
+  const rankedWork = [...attention.items]
+    .sort((a, b) => {
+      const priorityRank = { urgent: 4, high: 3, normal: 2, low: 1 };
+      return (priorityRank[b.priority] ?? 0) - (priorityRank[a.priority] ?? 0) || b.updated_at.localeCompare(a.updated_at);
+    })
+    .slice(0, 3);
+  const accountSignals = topSignals.filter((signal) => signal.scope === "specific_account").slice(0, 3);
+  const programSignals = topSignals.filter((signal) => signal.scope === "program").slice(0, 3);
+  const marketSignals = topSignals.filter((signal) => signal.scope !== "specific_account" && signal.scope !== "program").slice(0, 3);
+  const completed = (world.worldSnapshot?.workItems ?? [])
+    .filter((item) => ["verified", "outcome_recorded", "closed"].includes(item.status))
+    .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+    .slice(0, 3);
   const attentionCards: AttentionCard[] = [
     {
       label: "Accounts needing attention",
@@ -188,6 +216,45 @@ export function TodayBrief({ world }: { world: World }) {
         subline={summaryLine}
       />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
+
+      <div className="horizon-control" aria-label="Time horizon">
+        {HORIZONS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={item.id === horizon.id ? "active" : ""}
+            onClick={() => navigateTo(`/today?horizon=${item.id}`)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <section className="priority-stack" aria-labelledby="priority-stack-title">
+        <div className="panel-head">
+          <h2 id="priority-stack-title">Top priorities</h2>
+          <span>{horizon.label}</span>
+        </div>
+        {rankedWork.map((item, index) => {
+          const primary = primaryWorkAction(item);
+          return (
+            <article key={item.id} className={index === 0 ? "priority-card lead" : "priority-card"}>
+              <span className={`priority-alert ${workItemAlertLevel(item)}`}>{alertLabel(item)}</span>
+              <strong>{index + 1}. {item.recommended_action}</strong>
+              <p>{nameOf(world, item.canonical_account_id)} needs a decision because this work is {plainWorkStatus(item.status).toLowerCase()}.</p>
+              <div className="priority-meta">
+                <span>Owner: {item.owner ?? "Unassigned"}</span>
+                <span>{item.due_date ? `Due ${new Date(item.due_date).toLocaleDateString()}` : "No due date"}</span>
+                <span>{item.source_signal_ids.length ? "Evidence attached" : "Evidence needed"}</span>
+              </div>
+              <button type="button" className="priority-primary" onClick={() => navigateTo(`/work/${encodeURIComponent(item.id)}`)}>
+                {primary ? plainActionLabel(primary) : "Open work item"}
+              </button>
+            </article>
+          );
+        })}
+        {!rankedWork.length && <EmptyState headline="No immediate work" body="No urgent, overdue, or high-priority work is due in this horizon." icon="work_queue" />}
+      </section>
 
       <section className="surface-panel today-mini-brief" aria-labelledby="today-mini-brief-title">
         <div className="panel-head">
@@ -224,7 +291,47 @@ export function TodayBrief({ world }: { world: World }) {
         </section>
       )}
 
+      <section className="today-development-grid" aria-label="Recent developments">
+        <DevelopmentColumn title="Confirmed account developments" signals={accountSignals} world={world} />
+        <DevelopmentColumn title="Program developments" signals={programSignals} world={world} />
+        <DevelopmentColumn title="Market developments" signals={marketSignals} world={world} />
+      </section>
+
+      {completed.length > 0 && (
+        <section className="surface-panel">
+          <div className="panel-head"><h2>Completed recently</h2><span>{completed.length}</span></div>
+          <div className="today-completed-list">
+            {completed.map((item) => (
+              <button key={item.id} type="button" onClick={() => navigateTo(`/work/${encodeURIComponent(item.id)}`)}>
+                <strong>{item.recommended_action}</strong>
+                <span>{plainWorkStatus(item.status)} · {new Date(item.updated_at).toLocaleString()}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <AskBrainBar world={world} seedPrompt={topSeed} />
+    </section>
+  );
+}
+
+function DevelopmentColumn({ title, signals, world }: { title: string; signals: Signal[]; world: World }) {
+  return (
+    <section className="surface-panel">
+      <div className="panel-head"><h2>{title}</h2><span>{signals.length}</span></div>
+      <div className="today-development-list">
+        {signals.map((signal) => {
+          const link = signalLink(world, signal);
+          return (
+            <button key={signal.id} type="button" onClick={() => navigate(link)}>
+              <strong>{signalHeadline(signal)}</strong>
+              <span>{signalSourceName(signal)} · {signalSourceDate(signal)}</span>
+            </button>
+          );
+        })}
+        {!signals.length && <span className="rail-quiet-empty">No developments in this horizon.</span>}
+      </div>
     </section>
   );
 }

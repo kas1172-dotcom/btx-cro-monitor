@@ -12,6 +12,7 @@ import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 import { AccountToken } from "../common/AccountToken.tsx";
 import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
 import { openDeliverableWizard } from "../../store/store.ts";
+import { SCORE_FAMILY_LABELS, scoreAvailability, scoreInterpretation } from "../../app/presentation.ts";
 
 function money(value: number | null): string {
   if (value === null) return "Value not provided";
@@ -25,11 +26,11 @@ function fitLabel(score: number): string {
 }
 
 const SCORE_LABELS: Array<[keyof NonNullable<World["scoreResults"]>, string]> = [
-  ["accountAttractiveness", "Account attractiveness"],
-  ["signalConfidence", "Signal confidence"],
-  ["pursuitPwin", "Pursuit / PWIN"],
-  ["deliveryFeasibility", "Delivery feasibility"],
-  ["relationshipHealth", "Relationship health"],
+  ["accountAttractiveness", SCORE_FAMILY_LABELS.accountAttractiveness],
+  ["signalConfidence", SCORE_FAMILY_LABELS.signalConfidence],
+  ["pursuitPwin", SCORE_FAMILY_LABELS.pursuitPwin],
+  ["deliveryFeasibility", SCORE_FAMILY_LABELS.deliveryFeasibility],
+  ["relationshipHealth", SCORE_FAMILY_LABELS.relationshipHealth],
 ];
 
 function latestAccountScore(world: World, accountId: string, family: keyof NonNullable<World["scoreResults"]>): ScoreSnapshot | null {
@@ -39,11 +40,11 @@ function latestAccountScore(world: World, accountId: string, family: keyof NonNu
 }
 
 function scoreDisplay(score: ScoreSnapshot | null): string {
-  if (!score) return "Insufficient data";
-  if (score.result.status === "insufficient_data") return "Insufficient data";
+  if (!score) return "More information needed";
+  if (score.result.status === "insufficient_data") return "More information needed";
   if (score.result.status === "provisional") return score.score === null ? "Provisional" : `${Math.round(score.score)} provisional`;
   if (score.result.status === "disqualified") return "Disqualified";
-  return score.score === null ? "Insufficient data" : String(Math.round(score.score));
+  return score.score === null ? "More information needed" : String(Math.round(score.score));
 }
 
 function scoreStatus(score: ScoreSnapshot | null): string {
@@ -107,6 +108,15 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const company = selected.company;
   const rec = selected.rec;
   const fit = scoreFit(company.needs, PROFILE.capabilities);
+  const strongestScore = latestAccountScore(world, company.id, "accountAttractiveness");
+  const relationshipScore = latestAccountScore(world, company.id, "relationshipHealth");
+  const deliveryScore = latestAccountScore(world, company.id, "deliveryFeasibility");
+  const missingInputs = [
+    ...(strongestScore?.result.missingInputs ?? []),
+    ...(relationshipScore?.result.missingInputs ?? []),
+    ...(deliveryScore?.result.missingInputs ?? []),
+  ];
+  const primaryMissing = missingInputs[0] ?? (contacts.length ? "No major missing input surfaced." : "No verified contact provided.");
 
   return (
     <section className="surface-page account360" data-surface-component="surface-account-360">
@@ -131,6 +141,25 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
         </aside>
 
         <div className="account360-detail">
+          <section className="account-decision-strip" aria-labelledby="account-decision-title">
+            <div>
+              <span>Recommended</span>
+              <h2 id="account-decision-title">{rec ? actionLabel(rec.action) : "Review account context"}</h2>
+              <p>{rec?.reason ?? "The current records do not include a specific recommendation yet."}</p>
+            </div>
+            <div>
+              <span>Why</span>
+              <strong>{scoreInterpretation(strongestScore, SCORE_FAMILY_LABELS.accountAttractiveness)}</strong>
+              <em>{selected.linkedSignals.length} confirmed account development{selected.linkedSignals.length === 1 ? "" : "s"}</em>
+            </div>
+            <div>
+              <span>Missing</span>
+              <strong>{primaryMissing}</strong>
+              <em>{scoreAvailability(deliveryScore)}</em>
+            </div>
+            <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create executive brief</button>
+          </section>
+
           <div className="account360-kpis">
             {SCORE_LABELS.map(([family, label]) => {
               const scoreResult = latestAccountScore(world, company.id, family);
@@ -138,7 +167,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                 <div key={family}>
                   <span>{label}</span>
                   <strong>{scoreDisplay(scoreResult)}</strong>
-                  <em>{scoreStatus(scoreResult)}</em>
+                  <em>{scoreInterpretation(scoreResult, label)}</em>
                 </div>
               );
             })}
