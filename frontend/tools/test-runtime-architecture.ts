@@ -42,6 +42,10 @@ for (const path of walk(srcRoot)) {
   const rel = relative(root, path);
   if (rel.startsWith("src/adapters/demo/")) continue;
   const text = readFileSync(path, "utf8");
+  if (rel === "src/app/presentation.ts") {
+    assert(!text.includes("tenant.id.includes"), "demo workspace notice must use backend tenant marker, not an id/name guess");
+    assert(text.includes("tenant.isDemonstration"), "demo workspace notice must use backend tenant marker");
+  }
   for (const token of forbiddenRuntimeTokens) {
     assert(!text.includes(token), `${rel} references removed runtime token ${token}`);
   }

@@ -104,6 +104,29 @@ for how Clerk auth is configured.
 
 Fly.io deployment instructions live in `docs/DEPLOY_BACKEND.md`.
 
+## Demonstration Workspace
+
+The backend includes a deterministic demonstration tenant for repeatable cockpit demos:
+
+```text
+btx-demo-command-cockpit
+```
+
+Reset it through the normal backend database path:
+
+```bash
+python3 tooling/reset_demo_tenant.py --tenant btx-demo-command-cockpit
+```
+
+Dry-run and verification modes are available:
+
+```bash
+python3 tooling/reset_demo_tenant.py --tenant btx-demo-command-cockpit --dry-run
+python3 tooling/reset_demo_tenant.py --tenant btx-demo-command-cockpit --verify-only
+```
+
+The reset refuses unknown and non-demo tenants, does not call external integrations, and keeps public intelligence separate from simulated internal BTX records. Details live in `docs/DEMONSTRATION_WORKSPACE.md`.
+
 ## Monitor Engine
 
 Run source connectivity:

@@ -52,6 +52,7 @@ def init_db(engine: Engine) -> None:
     _ensure_hubspot_task_audit_columns(engine)
     _ensure_tenant_id_columns(engine)
     _ensure_connection_destination_column(engine)
+    _ensure_demo_tenant_marker(engine)
 
 
 def _ensure_work_item_action_columns(engine: Engine) -> None:
@@ -126,6 +127,28 @@ def _ensure_connection_destination_column(engine: Engine) -> None:
         return
     with engine.begin() as connection:
         connection.execute(text("ALTER TABLE connections ADD COLUMN destination_url TEXT"))
+
+
+def _ensure_demo_tenant_marker(engine: Engine) -> None:
+    inspector = inspect(engine)
+    if "tenants" not in inspector.get_table_names():
+        return
+    with engine.begin() as connection:
+        existing = connection.execute(
+            text("SELECT id FROM tenants WHERE id = :tenant"),
+            {"tenant": "btx-demo-command-cockpit"},
+        ).scalar()
+        if existing:
+            return
+        connection.execute(
+            text(
+                """
+                INSERT INTO tenants (id, display_name, is_demonstration, demo_reference_date, demo_metadata, created_at, updated_at)
+                VALUES (:tenant, :display_name, 1, NULL, '{}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """
+            ),
+            {"tenant": "btx-demo-command-cockpit", "display_name": "BTX Demonstration Workspace"},
+        )
 
 
 def assert_schema_current(engine: Engine) -> None:

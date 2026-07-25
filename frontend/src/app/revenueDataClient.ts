@@ -7,7 +7,7 @@ import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 import type { Signal } from "../engine/signals/contract.ts";
 import type { SignalRelationship } from "../engine/signals/contract.ts";
 
-export type SourceAvailability = "available" | "stale" | "unavailable" | "not_configured" | "error";
+export type SourceAvailability = "available" | "stale" | "unavailable" | "not_configured" | "error" | "simulated";
 
 export interface SourceHealth {
   sourceKey: string;
@@ -24,6 +24,9 @@ export interface SourceHealth {
 export interface TenantSummary {
   id: string;
   displayName: string;
+  isDemonstration?: boolean;
+  demoReferenceDate?: string | null;
+  demoNotice?: string | null;
 }
 
 export type ScoreStatus = "available" | "insufficient_data" | "provisional" | "disqualified";
@@ -224,12 +227,12 @@ export function operatingSnapshotFromWorld(snapshot: WorldSnapshot): OperatingSn
     integrations: snapshot.sourceHealth.map((source) => ({
       id: source.sourceKey,
       name: source.displayName,
-      category: source.sourceKey === "hubspot" ? "CRM" : source.sourceKey === "monitor" ? "Market signals" : "Operating data",
+      category: source.sourceKey.includes("hubspot") ? "CRM" : source.sourceKey === "monitor" ? "Market signals" : "Operating data",
       status: source.availability === "available" ? "connected" : source.availability === "not_configured" ? "not_connected" : "available",
       source_ref: source.sourceKey,
       production_method: source.availability,
       description: source.errorMessage ?? `${source.displayName} status is ${source.availability}.`,
-      source_kind: source.sourceKey === "hubspot" ? "live" : source.sourceKey === "monitor" ? "monitor" : "planned",
+      source_kind: source.availability === "simulated" ? "planned" : source.sourceKey.includes("hubspot") ? "live" : source.sourceKey === "monitor" ? "monitor" : "planned",
     })),
     assumptions: {
       as_of: snapshot.generatedAt.slice(0, 10),

@@ -83,6 +83,7 @@ export function scoreInterpretation(score: ScoreSnapshot | null, familyLabel: st
 
 export function sourceFreshnessLabel(source: SourceHealth): AvailabilityLabel {
   if (source.availability === "available") return "Available";
+  if (source.availability === "simulated") return "Inferred";
   if (source.availability === "stale") return "Stale";
   if (source.availability === "not_configured") return "Not connected";
   return "Unable to verify";
@@ -106,8 +107,8 @@ export function contextRibbonItems(world: World): Array<{ id: string; label: str
 }
 
 export function demoWorkspaceNotice(world: World): string | null {
-  if (world.worldSnapshot?.tenant.id.includes("demo")) {
-    return "Demonstration workspace. Public intelligence is sourced. Internal BTX records are illustrative.";
+  if (world.worldSnapshot?.tenant.isDemonstration) {
+    return `Demonstration workspace. ${world.worldSnapshot.tenant.demoNotice ?? "Public intelligence is sourced. Internal BTX records are illustrative."}`;
   }
   return null;
 }

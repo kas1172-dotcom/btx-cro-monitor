@@ -48,7 +48,7 @@ def test_migration_applies_and_matches_current_models(tmp_path: Path):
         "hubspot_task_audits", "deliverables", "alembic_version",
         "account_identifiers", "intelligence_signals", "signal_account_relationships",
         "relationship_audit_events", "scoring_config_versions", "score_snapshots",
-        "work_item_notes",
+        "work_item_notes", "tenants",
     ):
         assert expected in tables, f"migration did not create {expected}"
 
@@ -60,6 +60,11 @@ def test_migration_applies_and_matches_current_models(tmp_path: Path):
     assert {"legal_name", "display_name", "account_type", "public_recipient_ids"} <= canonical_columns
     deliverable_columns = {c["name"] for c in inspector.get_columns("deliverables")}
     assert {"tenant_id", "canonical_account_id", "program_id", "trip_id", "document"} <= deliverable_columns
+    tenant_columns = {c["name"] for c in inspector.get_columns("tenants")}
+    assert {"id", "display_name", "is_demonstration", "demo_reference_date", "demo_metadata"} <= tenant_columns
+    with engine.connect() as connection:
+        demo = connection.execute(text("SELECT is_demonstration FROM tenants WHERE id = 'btx-demo-command-cockpit'")).scalar()
+    assert demo in {1, True}
 
 
 def test_migration_round_trips_upgrade_downgrade_upgrade(tmp_path: Path):
@@ -90,6 +95,12 @@ def test_deliverables_migration_downgrade_steps_remove_expected_tables(tmp_path:
     assert "deliverables" in set(inspect(engine).get_table_names())
     columns = {column["name"] for column in inspect(engine).get_columns("deliverables")}
     assert "entity_ids" in columns
+
+    command.downgrade(config, "-1")
+    engine = make_engine(f"sqlite:///{db_path}")
+    assert "deliverables" in set(inspect(engine).get_table_names())
+    assert "tenants" not in set(inspect(engine).get_table_names())
+    assert "work_item_notes" in set(inspect(engine).get_table_names())
 
     command.downgrade(config, "-1")
     engine = make_engine(f"sqlite:///{db_path}")

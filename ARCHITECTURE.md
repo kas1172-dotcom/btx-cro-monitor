@@ -112,6 +112,12 @@ The production cockpit has one adapter path: authenticated frontend calls to the
 
 Demo JSON under `frontend/data/demo/btx/` is test scaffolding only. It must not be selected by a production Vite flag or used as a runtime fallback when a backend source is missing.
 
+## Demonstration Tenant
+
+The deterministic demo workspace is a backend tenant, not a frontend mode. The tenant row `btx-demo-command-cockpit` is marked by `tenants.is_demonstration = true`; reset tooling refuses all normal tenants. Seeded accounts, signals, relationships, score snapshots, work items, notes, and deliverables use the normal database tables and load through `/world-snapshot`.
+
+Public intelligence in the seed retains source metadata. Internal BTX CRM/workflow context is illustrative and classified as simulated. Resetting the demo tenant does not call HubSpot or mutate external systems.
+
 ## Provenance
 
 The backend must label data-bearing UI with provenance:

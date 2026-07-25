@@ -36,6 +36,7 @@ from btx_platform.intelligence import (
     is_confirmed_account_signal,
     relationship_to_dict,
     remap_child_company_ids,
+    remap_source_records,
     resolve_signal_relationships,
     score_account,
     score_snapshot_summary,
@@ -181,6 +182,24 @@ def _actor_user_id(request: Request) -> str | None:
 def _tenant_id(request: Request) -> str:
     auth: AuthContext | None = getattr(request.state, "auth", None)
     return auth.tenant_id if auth is not None else models.DEFAULT_TENANT_ID
+
+
+def _tenant_summary(session, tenant_id: str) -> dict:
+    row = session.get(models.Tenant, tenant_id)
+    return {
+        "id": tenant_id,
+        "displayName": row.display_name if row else "BTX Precision",
+        "isDemonstration": bool(row.is_demonstration) if row else False,
+        "demoReferenceDate": row.demo_reference_date.isoformat() if row and row.demo_reference_date else None,
+        "demoNotice": row.demo_metadata.get("notice") if row and isinstance(row.demo_metadata, dict) else None,
+    }
+
+
+def _tenant_demo_metadata(session, tenant_id: str) -> dict:
+    row = session.get(models.Tenant, tenant_id)
+    if row is None or not row.is_demonstration or not isinstance(row.demo_metadata, dict):
+        return {}
+    return row.demo_metadata
 
 
 def _has_role(request: Request, minimum: str) -> bool:
@@ -608,6 +627,20 @@ def _source_health(
     }
 
 
+def _source_health_from_metadata(record: dict, generated_at: str) -> dict:
+    return _source_health(
+        source_key=str(record.get("sourceKey") or "demo"),
+        display_name=str(record.get("displayName") or "Demo source"),
+        availability=str(record.get("availability") or "simulated"),
+        record_count=record.get("recordCount") if isinstance(record.get("recordCount"), int) else None,
+        last_successful_sync_at=record.get("lastSuccessfulSyncAt") if isinstance(record.get("lastSuccessfulSyncAt"), str) else None,
+        last_attempt_at=record.get("lastAttemptAt") if isinstance(record.get("lastAttemptAt"), str) else generated_at,
+        freshness_threshold_minutes=record.get("freshnessThresholdMinutes") if isinstance(record.get("freshnessThresholdMinutes"), int) else None,
+        error_code=record.get("errorCode") if isinstance(record.get("errorCode"), str) else None,
+        error_message=record.get("errorMessage") if isinstance(record.get("errorMessage"), str) else None,
+    )
+
+
 def _artifact_event_type(item: dict) -> str:
     text_blob = " ".join(
         str(value)
@@ -961,6 +994,8 @@ def create_app(
         accounts: list[dict] = []
         contacts: list[dict] = []
         opportunities: list[dict] = []
+        tenant_payload = {"id": tenant_id, "displayName": "BTX Precision", "isDemonstration": False, "demoReferenceDate": None, "demoNotice": None}
+        demo_metadata: dict = {}
         if settings.hubspot_access_token:
             try:
                 client = HubSpotClient(settings.hubspot_access_token)
@@ -1015,6 +1050,16 @@ def create_app(
 
         session = session_factory()
         try:
+            tenant_payload = _tenant_summary(session, tenant_id)
+            demo_metadata = _tenant_demo_metadata(session, tenant_id)
+            if demo_metadata:
+                contacts = [dict(row) for row in demo_metadata.get("contacts", []) if isinstance(row, dict)]
+                opportunities = [dict(row) for row in demo_metadata.get("opportunities", []) if isinstance(row, dict)]
+                source_health = [
+                    _source_health_from_metadata(row, generated_at)
+                    for row in demo_metadata.get("sourceHealth", [])
+                    if isinstance(row, dict)
+                ] or source_health
             ensure_default_scoring_config(session, tenant_id, _actor(request))
             source_data_version = f"{tenant_id}:{generated_at}"
             id_map = upsert_canonical_accounts(session, accounts, tenant_id)
@@ -1030,6 +1075,15 @@ def create_app(
                     .order_by(models.CanonicalAccount.display_name.asc(), models.CanonicalAccount.legal_name.asc())
                     .all()
                 ]
+            account_overrides = demo_metadata.get("accountOverrides") if isinstance(demo_metadata.get("accountOverrides"), dict) else {}
+            if account_overrides:
+                accounts = [
+                    {**account, **account_overrides.get(account.get("id"), {})}
+                    for account in accounts
+                ]
+                contacts = remap_child_company_ids(contacts, id_map)
+                opportunities = remap_child_company_ids(opportunities, id_map)
+            facilities = [dict(row) for row in demo_metadata.get("facilities", []) if isinstance(row, dict)] if demo_metadata else []
 
             for signal in signals:
                 resolve_signal_relationships(session, tenant_id=tenant_id, signal=signal)
@@ -1132,6 +1186,11 @@ def create_app(
                 .all()
             ]
             canonical_accounts = [canonical_account_to_company(row) for row in account_rows]
+            if account_overrides:
+                canonical_accounts = [
+                    {**account, **account_overrides.get(account.get("id"), {})}
+                    for account in canonical_accounts
+                ]
             account_identifiers = [
                 {
                     "id": row.id,
@@ -1156,20 +1215,20 @@ def create_app(
             session.close()
 
         return {
-            "tenant": {"id": tenant_id, "displayName": "BTX Precision"},
+            "tenant": tenant_payload,
             "accounts": accounts,
             "canonicalAccounts": canonical_accounts,
             "accountIdentifiers": account_identifiers,
             "contacts": contacts,
             "opportunities": opportunities,
-            "programs": [],
+            "programs": demo_metadata.get("programs", []) if demo_metadata else [],
             "signals": signals,
             "signalRelationships": [relationship_to_dict(row) for row in relationship_rows],
             "relationshipReview": {
                 "records": [relationship_to_dict(row) for row in relationship_rows if row.review_status == "needs_review"],
                 "minimumRelationshipConfidence": MINIMUM_RELATIONSHIP_CONFIDENCE,
             },
-            "facilities": [],
+            "facilities": facilities,
             "operatingFacts": [],
             "capacity": None,
             "scores": scores,

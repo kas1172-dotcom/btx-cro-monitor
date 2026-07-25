@@ -113,6 +113,24 @@ class DeadLetter(Base):
     replayed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
+class Tenant(Base):
+    """Tenant metadata used for workspace-level safety and display.
+
+    Record data remains tenant-scoped on the production tables below; this row
+    supplies the durable marker that lets maintenance tools distinguish a real
+    customer tenant from a resettable demonstration workspace.
+    """
+    __tablename__ = "tenants"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    display_name: Mapped[str] = mapped_column(String(200))
+    is_demonstration: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    demo_reference_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    demo_metadata: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
 class EngineConfig(Base):
     """Versioned JSON configuration edited from the frontend."""
     __tablename__ = "engine_configs"
