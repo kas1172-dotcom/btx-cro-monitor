@@ -65,6 +65,11 @@ def _ensure_work_item_action_columns(engine: Engine) -> None:
         return
     existing = {column["name"] for column in inspector.get_columns("work_items")}
     columns = {
+        "priority_status": "VARCHAR(32)",
+        "description": "TEXT",
+        "outcome_category": "VARCHAR(80)",
+        "dismissal_reason": "TEXT",
+        "rejection_reason": "TEXT",
         "external_system": "VARCHAR(40)",
         "external_record_id": "VARCHAR(120)",
         "external_record_url": "TEXT",

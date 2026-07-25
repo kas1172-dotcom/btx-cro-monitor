@@ -69,8 +69,10 @@ from btx_platform.schemas import (
     PipelineRunResponse,
     WorkItemCreate,
     WorkItemDismiss,
+    WorkItemNoteCreate,
     WorkItemPatch,
     WorkItemResponse,
+    WorkItemTransitionRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -82,21 +84,22 @@ MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 # /webhooks/* is authenticated by its own per-connection HMAC signature, not
 # a Clerk session (the caller is a machine, not a signed-in user).
 WEBHOOK_PATH_PREFIX = "/webhooks/"
-WORK_ITEM_TRANSITIONS = {
-    "detected": {"triaged", "dismissed", "closed"},
-    "triaged": {"prepared", "awaiting_approval", "in_progress", "dismissed", "closed"},
-    "prepared": {"awaiting_approval", "approved", "dismissed", "closed"},
-    "awaiting_approval": {"approved", "dismissed", "closed"},
-    "proposed": {"approved", "dismissed"},
-    "approved": {"in_progress", "executed", "dismissed", "closed"},
-    "in_progress": {"executed", "verified", "done", "dismissed"},
-    "executed": {"verified", "outcome_recorded", "done", "closed"},
-    "verified": {"outcome_recorded", "closed", "done"},
-    "outcome_recorded": {"closed", "done"},
-    "done": set(),
-    "closed": set(),
-    "dismissed": set(),
+WORK_ITEM_TRANSITIONS: dict[str, dict[str, str]] = {
+    "detected": {"triage": "triaged", "dismiss": "dismissed"},
+    "triaged": {"prepare": "prepared", "dismiss": "dismissed"},
+    "prepared": {"request_approval": "awaiting_approval", "start": "in_progress", "dismiss": "dismissed"},
+    "awaiting_approval": {"approve": "approved", "reject": "prepared", "dismiss": "dismissed"},
+    "approved": {"start": "in_progress", "dismiss": "dismissed"},
+    "in_progress": {"mark_executed": "executed", "dismiss": "dismissed"},
+    "executed": {"verify": "verified", "start": "in_progress"},
+    "verified": {"record_outcome": "outcome_recorded", "close": "closed"},
+    "outcome_recorded": {"close": "closed"},
+    "dismissed": {"reopen": "triaged"},
+    "closed": {"reopen": "triaged"},
 }
+LEGACY_STATUS_MAP = {"proposed": "detected", "done": "closed"}
+LEGACY_EXECUTION_STATE_MAP = {"queued": "pending", "running": "pending", "completed": "verified"}
+TERMINAL_WORK_ITEM_STATUSES = {"dismissed", "closed"}
 
 
 def _three_business_days_from_now() -> str:
@@ -161,9 +164,32 @@ def _actor(request: Request) -> str:
     return auth.email or auth.user_id
 
 
+def _auth_context(request: Request) -> AuthContext | None:
+    return getattr(request.state, "auth", None)
+
+
+def _role(request: Request) -> str:
+    auth = _auth_context(request)
+    return auth.role if auth is not None else "admin"
+
+
+def _actor_user_id(request: Request) -> str | None:
+    auth = _auth_context(request)
+    return auth.user_id if auth is not None else None
+
+
 def _tenant_id(request: Request) -> str:
     auth: AuthContext | None = getattr(request.state, "auth", None)
     return auth.tenant_id if auth is not None else models.DEFAULT_TENANT_ID
+
+
+def _has_role(request: Request, minimum: str) -> bool:
+    auth = _auth_context(request)
+    return True if auth is None else auth.has_role(minimum)
+
+
+def _forbidden(detail: str) -> JSONResponse:
+    return JSONResponse({"code": "forbidden", "detail": detail}, status_code=403)
 
 
 def _parse_datetime(value: str | None, field_name: str) -> datetime | None:
@@ -176,6 +202,53 @@ def _parse_datetime(value: str | None, field_name: str) -> datetime | None:
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=UTC)
     return parsed
+
+
+def _canonical_work_status(value: str | None) -> str:
+    return LEGACY_STATUS_MAP.get(value or "detected", value or "detected")
+
+
+def _canonical_execution_state(value: str | None) -> str:
+    return LEGACY_EXECUTION_STATE_MAP.get(value or "not_started", value or "not_started")
+
+
+def _notes_for_work_item(session, row: models.WorkItem) -> list[dict]:
+    notes = (
+        session.query(models.WorkItemNote)
+        .filter(models.WorkItemNote.tenant_id == row.tenant_id, models.WorkItemNote.work_item_id == row.id)
+        .order_by(models.WorkItemNote.created_at.asc())
+        .all()
+    )
+    return [
+        {
+            "id": note.id,
+            "work_item_id": note.work_item_id,
+            "author_user_id": note.author_user_id,
+            "body": note.body,
+            "note_type": note.note_type,
+            "evidence_ids": note.evidence_ids or [],
+            "created_at": note.created_at.isoformat(),
+        }
+        for note in notes
+    ]
+
+
+def _allowed_work_item_actions(row: models.WorkItem, role: str) -> list[str]:
+    status = _canonical_work_status(row.status)
+    actions = set(WORK_ITEM_TRANSITIONS.get(status, {}).keys())
+    if status == "prepared" and row.approval_state == "not_required":
+        actions.add("start")
+    if role not in {"cro", "admin"}:
+        actions.discard("approve")
+        actions.discard("reject")
+        actions.discard("reopen")
+    if role != "admin" and status == "approved":
+        actions.discard("dismiss")
+    if role == "viewer":
+        return []
+    if row.external_system and status == "executed" and not row.external_record_id:
+        actions.discard("verify")
+    return sorted(actions)
 
 
 def _work_item_snapshot(row: models.WorkItem) -> dict:
@@ -194,13 +267,18 @@ def _work_item_snapshot(row: models.WorkItem) -> dict:
         "dedupe_key": row.dedupe_key,
         "owner": row.owner,
         "priority": row.priority,
-        "status": row.status,
+        "priority_status": row.priority_status or "available",
+        "status": _canonical_work_status(row.status),
         "due_date": row.due_date.isoformat() if row.due_date else None,
+        "description": row.description,
         "recommended_action": row.recommended_action,
         "generated_artifact_ref": row.generated_artifact_ref,
         "approval_state": row.approval_state,
-        "execution_state": row.execution_state,
+        "execution_state": _canonical_execution_state(row.execution_state),
         "outcome": row.outcome,
+        "outcome_category": row.outcome_category,
+        "dismissal_reason": row.dismissal_reason,
+        "rejection_reason": row.rejection_reason,
         "follow_up_date": row.follow_up_date.isoformat() if row.follow_up_date else None,
         "external_system": row.external_system,
         "external_record_id": row.external_record_id,
@@ -213,27 +291,123 @@ def _work_item_snapshot(row: models.WorkItem) -> dict:
     }
 
 
-def _work_item_response(row: models.WorkItem) -> dict:
-    return WorkItemResponse(**_work_item_snapshot(row)).model_dump()
+def _work_item_response(row: models.WorkItem, *, role: str = "viewer", notes: list[dict] | None = None) -> dict:
+    return WorkItemResponse(
+        **_work_item_snapshot(row),
+        allowed_actions=_allowed_work_item_actions(row, role),
+        notes=notes or [],
+    ).model_dump()
 
 
-def _append_work_item_audit(row: models.WorkItem, *, action: str, actor: str, before: dict | None, after: dict | None) -> None:
+def _append_work_item_audit(
+    row: models.WorkItem,
+    *,
+    action: str,
+    actor: str,
+    before: dict | None,
+    after: dict | None,
+    note: str | None = None,
+    reason: str | None = None,
+    metadata: dict | None = None,
+) -> None:
     audit = list(row.audit_history or [])
     audit.append({
+        "id": models._uuid(),
         "timestamp": datetime.now(UTC).isoformat(),
         "actor": actor,
+        "actor_type": "system" if actor == "system" else "user",
         "action": action,
+        "event_type": action,
+        "from_state": before.get("status") if before else None,
+        "to_state": after.get("status") if after else None,
+        "note": note,
+        "reason": reason,
+        "metadata": metadata or {},
         "before": before,
         "after": after,
     })
     row.audit_history = audit
 
 
-def _validate_work_item_transition(current: str, next_status: str) -> None:
-    if next_status == current:
-        return
-    if next_status not in WORK_ITEM_TRANSITIONS.get(current, set()):
-        raise ValueError(f"invalid status transition {current} -> {next_status}")
+def _transition_error(row: models.WorkItem, action: str, role: str) -> dict:
+    return {
+        "code": "invalid_transition",
+        "detail": f"Cannot apply action {action!r} from status {_canonical_work_status(row.status)!r}.",
+        "current_status": _canonical_work_status(row.status),
+        "allowed_actions": _allowed_work_item_actions(row, role),
+    }
+
+
+def _apply_work_item_transition(
+    row: models.WorkItem,
+    payload: WorkItemTransitionRequest,
+    *,
+    actor: str,
+    actor_role: str,
+) -> None:
+    action = payload.action
+    current = _canonical_work_status(row.status)
+    if action in {"approve", "reject", "reopen"} and actor_role not in {"cro", "admin"}:
+        raise PermissionError(f"Role '{actor_role}' cannot {action.replace('_', ' ')} work items.")
+    if action == "dismiss" and not (payload.reason or "").strip():
+        raise ValueError("Dismissal requires a reason.")
+    if action == "reject" and not (payload.reason or "").strip():
+        raise ValueError("Rejection requires a reason.")
+    if action == "record_outcome" and not (payload.outcome or "").strip():
+        raise ValueError("Recording an outcome requires an outcome.")
+    if action == "verify" and row.external_system and not row.external_record_id:
+        raise ValueError("External work cannot be verified until the external record has been verified.")
+
+    next_status = WORK_ITEM_TRANSITIONS.get(current, {}).get(action)
+    if next_status is None:
+        raise LookupError(action)
+
+    now = datetime.now(UTC)
+    row.status = next_status
+    if action == "request_approval":
+        row.approval_state = "pending"
+    elif action == "approve":
+        row.approval_state = "approved"
+    elif action == "reject":
+        row.approval_state = "rejected"
+        row.rejection_reason = payload.reason
+    elif action == "start":
+        row.execution_state = "pending"
+    elif action == "mark_executed":
+        row.execution_state = "executed"
+    elif action == "verify":
+        row.execution_state = "verified"
+    elif action == "record_outcome":
+        row.outcome = payload.outcome
+        row.outcome_category = payload.outcome_category
+        row.follow_up_date = _parse_datetime(payload.follow_up_date, "follow_up_date")
+    elif action == "dismiss":
+        row.dismissal_reason = payload.reason
+        row.outcome = payload.reason
+    elif action == "reopen":
+        row.approval_state = "not_required"
+        row.execution_state = "not_started"
+        row.execution_error = None
+        row.dismissal_reason = None
+        row.rejection_reason = None
+    row.updated_at = now
+
+
+def _transition_event_type(action: str) -> str:
+    return {
+        "triage": "status_transition",
+        "prepare": "status_transition",
+        "request_approval": "approval_requested",
+        "approve": "approved",
+        "reject": "rejected",
+        "start": "execution_started",
+        "mark_executed": "execution_succeeded",
+        "verify": "verification_succeeded",
+        "record_outcome": "outcome_recorded",
+        "dismiss": "dismissed",
+        "close": "status_transition",
+        "reopen": "reopened",
+    }.get(action, "status_transition")
 
 
 def _hubspot_task_record_url(task_id: str) -> str:
@@ -928,7 +1102,7 @@ def create_app(
             session.commit()
 
             work_items = [
-                _work_item_response(row)
+                _work_item_response(row, role=_role(request))
                 for row in session.query(models.WorkItem)
                 .filter(models.WorkItem.tenant_id == tenant_id)
                 .order_by(models.WorkItem.updated_at.desc(), models.WorkItem.created_at.desc())
@@ -1119,10 +1293,10 @@ def create_app(
                     .filter(models.WorkItem.tenant_id == tenant_id, models.WorkItem.related_relationship_id == row.id)
                     .all()
                 ):
-                    if item.status not in {"done", "dismissed", "closed", "verified", "outcome_recorded"}:
+                    if _canonical_work_status(item.status) not in {"dismissed", "closed"}:
                         before_item = _work_item_snapshot(item)
                         item.status = "closed"
-                        item.execution_state = "completed"
+                        item.execution_state = "verified"
                         item.outcome = f"Relationship review {action}."
                         item.updated_at = datetime.now(UTC)
                         _append_work_item_audit(item, action=f"relationship_{action}", actor=actor, before=before_item, after=_work_item_snapshot(item))
@@ -1417,12 +1591,57 @@ def create_app(
             app.state.crm_list_idempotency[("crm_task", idempotency_key)] = response_body
         return JSONResponse(response_body)
 
+    @app.post("/work-items/{item_id}/preview/hubspot-task")
+    def preview_work_item_hubspot_task(item_id: str, payload: dict | None, request: Request) -> Response:
+        tenant_id = _tenant_id(request)
+        session = session_factory()
+        try:
+            row = _get_tenant_work_item(session, item_id, tenant_id)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+            values = payload or {}
+            idempotency_key = request.headers.get(settings.idempotency_header) or f"work-item:{item_id}:hubspot-task"
+            task_subject = str(values.get("task_text") or row.recommended_action).strip()
+            evidence = str(values.get("evidence") or row.generated_artifact_ref or ", ".join(row.source_signal_ids or [])).strip()
+            company_id = str(values.get("company_id") or row.canonical_account_id or "").strip() or None
+            due_at = str(values.get("due_at") or (row.due_date.isoformat() if row.due_date else _three_business_days_from_now()))
+            body = str(values.get("body") or "\n".join([task_subject, f"Evidence: {evidence}" if evidence else ""]).strip())
+            associations = _task_associations_from_values(
+                company_id=company_id,
+                contact_id=values.get("contact_id") if isinstance(values.get("contact_id"), str) else None,
+                deal_id=values.get("deal_id") if isinstance(values.get("deal_id"), str) else None,
+            )
+            return JSONResponse({
+                "status": "preview",
+                "integration_availability": "configured_unverified" if settings.hubspot_access_token else "not_configured",
+                "can_execute": bool(settings.hubspot_access_token) and row.approval_state == "approved" and _has_role(request, "cro"),
+                "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)),
+                "hubspot_task": {
+                    "canonical_account_id": row.canonical_account_id,
+                    "company_id": company_id,
+                    "owner_id": values.get("owner_id") or row.owner,
+                    "due_at": due_at,
+                    "task_type": "TODO",
+                    "subject": task_subject,
+                    "body": body,
+                    "supporting_evidence": row.supporting_evidence or [],
+                    "source_signal_ids": row.source_signal_ids or [],
+                    "related_work_item_id": row.id,
+                    "idempotency_key": idempotency_key,
+                    "associations": [association.__dict__ for association in associations],
+                },
+            })
+        finally:
+            session.close()
+
     @app.post("/work-items/{item_id}/execute/hubspot-task")
     def execute_work_item_hubspot_task(item_id: str, payload: HubSpotTaskExecuteRequest, request: Request) -> Response:
         if not payload.confirmed:
             return JSONResponse({"code": "confirmation_required", "detail": "Explicit confirmation is required before writing to HubSpot."}, status_code=422)
         if not settings.hubspot_access_token:
             return not_configured("HubSpot task creation")
+        if not _has_role(request, "cro"):
+            return _forbidden("Only CRO or admin users can execute approved HubSpot tasks.")
 
         idempotency_key = request.headers.get(settings.idempotency_header) or f"work-item:{item_id}:hubspot-task"
         actor = _actor(request)
@@ -1439,7 +1658,7 @@ def create_app(
                         "status": "verified",
                         "duplicate": True,
                         "idempotency_key": idempotency_key,
-                        "work_item": _work_item_response(row),
+                        "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)),
                         "hubspot_task": {
                             "id": row.external_record_id,
                             "record_url": row.external_record_url,
@@ -1448,7 +1667,13 @@ def create_app(
                 return JSONResponse({
                     "code": "already_executed",
                     "detail": "This work item already has a verified HubSpot task. Use the original idempotency key to retry safely.",
-                    "work_item": _work_item_response(row),
+                    "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)),
+                }, status_code=409)
+            if row.approval_state != "approved" or _canonical_work_status(row.status) not in {"approved", "in_progress"}:
+                return JSONResponse({
+                    "code": "approval_required",
+                    "detail": "HubSpot execution requires an approved work item.",
+                    "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)),
                 }, status_code=409)
 
             task_subject = (payload.task_text or row.recommended_action).strip()
@@ -1473,7 +1698,8 @@ def create_app(
             audit_associations = [association.__dict__ for association in associations]
             before = _work_item_snapshot(row)
             row.approval_state = "approved"
-            row.execution_state = "running"
+            row.status = "in_progress"
+            row.execution_state = "pending"
             row.execution_idempotency_key = idempotency_key
             row.execution_error = None
             row.updated_at = datetime.now(UTC)
@@ -1519,7 +1745,6 @@ def create_app(
                 before_failure = _work_item_snapshot(row)
                 row.execution_state = "failed"
                 row.execution_error = str(exc)
-                row.outcome = str(exc)
                 row.updated_at = datetime.now(UTC)
                 _append_work_item_audit(
                     row,
@@ -1531,12 +1756,12 @@ def create_app(
                 session.commit()
                 session.refresh(row)
                 logger.warning("hubspot.work_item_task_failed", extra={"status_code": exc.status_code, "work_item_id": item_id})
-                return JSONResponse({"code": "hubspot_error", "detail": str(exc), "work_item": _work_item_response(row)}, status_code=502)
+                return JSONResponse({"code": "hubspot_error", "detail": str(exc), "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row))}, status_code=502)
 
             record_url = _hubspot_task_record_url(task_id)
             before_success = _work_item_snapshot(row)
-            row.status = "done"
-            row.execution_state = "completed"
+            row.status = "verified"
+            row.execution_state = "verified"
             row.outcome = f"Created and verified HubSpot task {task_id}."
             row.external_system = "hubspot"
             row.external_record_id = task_id
@@ -1573,7 +1798,7 @@ def create_app(
                 "status": "verified",
                 "duplicate": False,
                 "idempotency_key": idempotency_key,
-                "work_item": _work_item_response(row),
+                "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)),
                 "hubspot_task": {
                     "id": task_id,
                     "record_url": record_url,
@@ -1691,8 +1916,22 @@ def create_app(
             return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
         session = session_factory()
         try:
+            tenant_id = _tenant_id(request)
+            if payload.dedupe_key:
+                existing = (
+                    session.query(models.WorkItem)
+                    .filter(
+                        models.WorkItem.tenant_id == tenant_id,
+                        models.WorkItem.dedupe_key == payload.dedupe_key,
+                        models.WorkItem.status.notin_(list(TERMINAL_WORK_ITEM_STATUSES)),
+                    )
+                    .order_by(models.WorkItem.updated_at.desc())
+                    .first()
+                )
+                if existing is not None:
+                    return JSONResponse(_work_item_response(existing, role=_role(request), notes=_notes_for_work_item(session, existing)), status_code=200)
             row = models.WorkItem(
-                tenant_id=_tenant_id(request),
+                tenant_id=tenant_id,
                 type=payload.type,
                 canonical_account_id=payload.canonical_account_id,
                 related_signal_id=payload.related_signal_id,
@@ -1706,12 +1945,12 @@ def create_app(
                 dedupe_key=payload.dedupe_key,
                 owner=payload.owner,
                 priority=payload.priority,
-                status=payload.status,
+                status=_canonical_work_status(payload.status),
                 due_date=due_date,
                 recommended_action=payload.recommended_action,
                 generated_artifact_ref=payload.generated_artifact_ref,
                 approval_state=payload.approval_state,
-                execution_state=payload.execution_state,
+                execution_state=_canonical_execution_state(payload.execution_state),
                 outcome=payload.outcome,
                 follow_up_date=follow_up_date,
                 audit_history=[],
@@ -1727,7 +1966,18 @@ def create_app(
             )
             session.commit()
             session.refresh(row)
-            return JSONResponse(_work_item_response(row), status_code=201)
+            return JSONResponse(_work_item_response(row, role=_role(request), notes=[]), status_code=201)
+        finally:
+            session.close()
+
+    @app.get("/work-items/{item_id}")
+    def get_work_item(item_id: str, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_work_item(session, item_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+            return JSONResponse(_work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)))
         finally:
             session.close()
 
@@ -1736,10 +1986,17 @@ def create_app(
         request: Request,
         account: str | None = None,
         status: str | None = None,
+        type: str | None = None,
         owner: str | None = None,
+        priority: str | None = None,
+        approval: str | None = None,
+        execution: str | None = None,
+        overdue: bool | None = None,
+        program: str | None = None,
         due_from: str | None = None,
         due_to: str | None = None,
         view: str | None = None,
+        sort: str | None = None,
     ) -> Response:
         try:
             due_from_dt = _parse_datetime(due_from, "due_from")
@@ -1752,17 +2009,29 @@ def create_app(
             if account:
                 query = query.filter(models.WorkItem.canonical_account_id == account)
             if status:
-                query = query.filter(models.WorkItem.status == status)
+                query = query.filter(models.WorkItem.status == _canonical_work_status(status))
+            if type:
+                query = query.filter(models.WorkItem.type == type)
             if owner:
-                query = query.filter(models.WorkItem.owner == owner)
+                query = query.filter(models.WorkItem.owner.is_(None) if owner == "unassigned" else models.WorkItem.owner == owner)
+            if priority:
+                query = query.filter(models.WorkItem.priority == priority)
+            if approval:
+                query = query.filter(models.WorkItem.approval_state == approval)
+            if execution:
+                query = query.filter(models.WorkItem.execution_state == execution)
+            if program:
+                query = query.filter(models.WorkItem.program_id == program)
             if due_from_dt:
                 query = query.filter(models.WorkItem.due_date >= due_from_dt)
             if due_to_dt:
                 query = query.filter(models.WorkItem.due_date <= due_to_dt)
             now = datetime.now(UTC)
+            if overdue:
+                query = query.filter(models.WorkItem.due_date < now, models.WorkItem.status.notin_(list(TERMINAL_WORK_ITEM_STATUSES)))
             if view == "needs_attention":
                 query = query.filter(
-                    models.WorkItem.status.notin_(["done", "dismissed", "closed", "verified", "outcome_recorded"]),
+                    models.WorkItem.status.notin_(list(TERMINAL_WORK_ITEM_STATUSES)),
                     (models.WorkItem.priority.in_(["high", "urgent"])) | (models.WorkItem.due_date < now),
                 )
             elif view == "prepared":
@@ -1770,13 +2039,21 @@ def create_app(
             elif view == "needs_approval":
                 query = query.filter(models.WorkItem.approval_state == "pending")
             elif view == "outcomes":
-                query = query.filter(models.WorkItem.status.in_(["done", "dismissed", "closed", "verified", "outcome_recorded"]))
+                query = query.filter(models.WorkItem.status.in_(["verified", "outcome_recorded", "dismissed", "closed"]))
             elif view == "what_changed":
                 query = query.filter(models.WorkItem.updated_at >= now - timedelta(days=7))
             elif view is not None:
                 return JSONResponse({"code": "validation_error", "detail": f"Unknown work item view {view}."}, status_code=422)
-            rows = query.order_by(models.WorkItem.updated_at.desc(), models.WorkItem.created_at.desc()).all()
-            return JSONResponse({"records": [_work_item_response(row) for row in rows]})
+            if sort == "priority":
+                query = query.order_by(models.WorkItem.priority.desc(), models.WorkItem.updated_at.desc())
+            elif sort == "due_date":
+                query = query.order_by(models.WorkItem.due_date.asc().nullslast(), models.WorkItem.updated_at.desc())
+            elif sort == "account":
+                query = query.order_by(models.WorkItem.canonical_account_id.asc().nullslast(), models.WorkItem.updated_at.desc())
+            else:
+                query = query.order_by(models.WorkItem.updated_at.desc(), models.WorkItem.created_at.desc())
+            rows = query.all()
+            return JSONResponse({"records": [_work_item_response(row, role=_role(request)) for row in rows]})
         finally:
             session.close()
 
@@ -1790,9 +2067,6 @@ def create_app(
             before = _work_item_snapshot(row)
             fields = payload.model_fields_set
             try:
-                if "status" in fields and payload.status is not None:
-                    _validate_work_item_transition(row.status, payload.status)
-                    row.status = payload.status
                 if "due_date" in fields:
                     row.due_date = _parse_datetime(payload.due_date, "due_date")
                 if "follow_up_date" in fields:
@@ -1805,20 +2079,84 @@ def create_app(
                 row.priority = payload.priority
             if "recommended_action" in fields and payload.recommended_action is not None:
                 row.recommended_action = payload.recommended_action
+            if "description" in fields:
+                row.description = payload.description
             if "generated_artifact_ref" in fields:
                 row.generated_artifact_ref = payload.generated_artifact_ref
-            if "approval_state" in fields and payload.approval_state is not None:
-                row.approval_state = payload.approval_state
-            if "execution_state" in fields and payload.execution_state is not None:
-                row.execution_state = payload.execution_state
-            if "outcome" in fields:
-                row.outcome = payload.outcome
             row.updated_at = datetime.now(UTC)
             after = _work_item_snapshot(row)
-            _append_work_item_audit(row, action="patch", actor=_actor(request), before=before, after=after)
+            _append_work_item_audit(row, action="updated", actor=_actor(request), before=before, after=after)
             session.commit()
             session.refresh(row)
-            return JSONResponse(_work_item_response(row))
+            return JSONResponse(_work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)))
+        finally:
+            session.close()
+
+    @app.post("/work-items/{item_id}/transition")
+    def transition_work_item(item_id: str, payload: WorkItemTransitionRequest, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_work_item(session, item_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+            role = _role(request)
+            before = _work_item_snapshot(row)
+            try:
+                _apply_work_item_transition(row, payload, actor=_actor(request), actor_role=role)
+            except PermissionError as exc:
+                return _forbidden(str(exc))
+            except LookupError:
+                return JSONResponse(_transition_error(row, payload.action, role), status_code=409)
+            except ValueError as exc:
+                return JSONResponse({"code": "validation_error", "detail": str(exc), "allowed_actions": _allowed_work_item_actions(row, role)}, status_code=422)
+            after = _work_item_snapshot(row)
+            _append_work_item_audit(
+                row,
+                action=_transition_event_type(payload.action),
+                actor=_actor(request),
+                before=before,
+                after=after,
+                note=payload.note,
+                reason=payload.reason,
+                metadata={"command": payload.action, "outcome_category": payload.outcome_category},
+            )
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(_work_item_response(row, role=role, notes=_notes_for_work_item(session, row)))
+        finally:
+            session.close()
+
+    @app.post("/work-items/{item_id}/notes")
+    def add_work_item_note(item_id: str, payload: WorkItemNoteCreate, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = _get_tenant_work_item(session, item_id, _tenant_id(request))
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
+            note = models.WorkItemNote(
+                tenant_id=row.tenant_id,
+                work_item_id=row.id,
+                author_user_id=_actor_user_id(request),
+                body=payload.body,
+                note_type=payload.note_type,
+                evidence_ids=payload.evidence_ids,
+            )
+            before = _work_item_snapshot(row)
+            row.updated_at = datetime.now(UTC)
+            session.add(note)
+            session.flush()
+            _append_work_item_audit(
+                row,
+                action="note_added",
+                actor=_actor(request),
+                before=before,
+                after=_work_item_snapshot(row),
+                note=payload.body,
+                metadata={"note_id": note.id, "note_type": payload.note_type, "evidence_ids": payload.evidence_ids},
+            )
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(_work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)), status_code=201)
         finally:
             session.close()
 
@@ -1829,20 +2167,18 @@ def create_app(
             row = _get_tenant_work_item(session, item_id, _tenant_id(request))
             if row is None:
                 return JSONResponse({"code": "not_found", "detail": f"No work item {item_id}."}, status_code=404)
-            try:
-                _validate_work_item_transition(row.status, "dismissed")
-            except ValueError as exc:
-                return JSONResponse({"code": "validation_error", "detail": str(exc)}, status_code=422)
             before = _work_item_snapshot(row)
+            if "dismiss" not in _allowed_work_item_actions(row, _role(request)):
+                return JSONResponse(_transition_error(row, "dismiss", _role(request)), status_code=409)
             row.status = "dismissed"
             row.outcome = payload.reason
-            row.execution_state = "completed"
+            row.dismissal_reason = payload.reason
             row.updated_at = datetime.now(UTC)
             after = _work_item_snapshot(row)
-            _append_work_item_audit(row, action="dismiss", actor=_actor(request), before=before, after=after)
+            _append_work_item_audit(row, action="dismissed", actor=_actor(request), before=before, after=after, reason=payload.reason)
             session.commit()
             session.refresh(row)
-            return JSONResponse(_work_item_response(row))
+            return JSONResponse(_work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)))
         finally:
             session.close()
 

@@ -594,7 +594,7 @@ def resolve_signal_relationships(session: Session, *, tenant_id: str, signal: di
 
 def ensure_relationship_review_work_item(session: Session, *, relationship: models.SignalAccountRelationship) -> models.WorkItem:
     dedupe_key = f"relationship_review:{relationship.tenant_id}:{relationship.id}"
-    active_statuses = ["detected", "triaged", "prepared", "awaiting_approval", "approved", "in_progress", "proposed"]
+    active_statuses = ["detected", "triaged", "prepared", "awaiting_approval", "approved", "in_progress"]
     existing = (
         session.query(models.WorkItem)
         .filter(models.WorkItem.tenant_id == relationship.tenant_id, models.WorkItem.dedupe_key == dedupe_key, models.WorkItem.status.in_(active_statuses))

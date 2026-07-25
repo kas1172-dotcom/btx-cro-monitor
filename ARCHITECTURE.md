@@ -108,7 +108,7 @@ It is not responsible for rendering the product UI.
 
 ## Runtime Data Path
 
-The production cockpit has one adapter path: authenticated frontend calls to the backend `WorldSnapshot` API. The backend is responsible for CRM reads, monitor artifact reads, persisted work items, persisted deliverables, and source-health disclosure.
+The production cockpit has one adapter path: authenticated frontend calls to the backend `WorldSnapshot` API. The backend is responsible for CRM reads, monitor artifact reads, persisted work items, persisted work-item lifecycle commands, durable notes, persisted deliverables, and source-health disclosure.
 
 Demo JSON under `frontend/data/demo/btx/` is test scaffolding only. It must not be selected by a production Vite flag or used as a runtime fallback when a backend source is missing.
 
@@ -130,7 +130,7 @@ GitHub Actions are manual-dispatch by default.
 - `Deploy Pages` publishes the cockpit under `/cockpit/` and selected JSON artifacts under `/btx/`.
 - Fly.io hosts `btx_platform`.
 
-The Pages build does not bake any shared backend bearer token. Browser-safe backend auth is deferred to WP10; until then, protected backend routes may reject public cockpit calls.
+The Pages build does not bake any shared backend bearer token. Clerk session tokens are attached to backend requests in the browser and validated by the backend per request.
 
 ## Architecture Rules
 

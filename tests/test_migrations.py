@@ -48,12 +48,14 @@ def test_migration_applies_and_matches_current_models(tmp_path: Path):
         "hubspot_task_audits", "deliverables", "alembic_version",
         "account_identifiers", "intelligence_signals", "signal_account_relationships",
         "relationship_audit_events", "scoring_config_versions", "score_snapshots",
+        "work_item_notes",
     ):
         assert expected in tables, f"migration did not create {expected}"
 
     work_item_columns = {c["name"] for c in inspector.get_columns("work_items")}
     assert "tenant_id" in work_item_columns  # WP10-A column present in the initial migration
     assert {"related_signal_id", "related_relationship_id", "score_snapshot_ids", "dedupe_key"} <= work_item_columns
+    assert {"priority_status", "description", "outcome_category", "dismissal_reason", "rejection_reason"} <= work_item_columns
     canonical_columns = {c["name"] for c in inspector.get_columns("canonical_accounts")}
     assert {"legal_name", "display_name", "account_type", "public_recipient_ids"} <= canonical_columns
     deliverable_columns = {c["name"] for c in inspector.get_columns("deliverables")}
@@ -79,7 +81,7 @@ def test_migration_round_trips_upgrade_downgrade_upgrade(tmp_path: Path):
     assert tables_after_reup == tables_after_up
 
 
-def test_deliverables_migration_downgrade_one_step_removes_table(tmp_path: Path):
+def test_deliverables_migration_downgrade_steps_remove_expected_tables(tmp_path: Path):
     db_path = tmp_path / "deliverables_roundtrip_test.db"
     config = _alembic_config(db_path)
 
@@ -94,6 +96,11 @@ def test_deliverables_migration_downgrade_one_step_removes_table(tmp_path: Path)
     assert "deliverables" in set(inspect(engine).get_table_names())
     columns_after_down_one = {column["name"] for column in inspect(engine).get_columns("deliverables")}
     assert "entity_ids" in columns_after_down_one
+    assert "work_item_notes" not in set(inspect(engine).get_table_names())
+    assert "score_snapshots" in set(inspect(engine).get_table_names())
+
+    command.downgrade(config, "-1")
+    engine = make_engine(f"sqlite:///{db_path}")
     assert "score_snapshots" not in set(inspect(engine).get_table_names())
 
     command.downgrade(config, "-1")

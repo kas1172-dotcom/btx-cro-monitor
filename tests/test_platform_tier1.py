@@ -469,39 +469,61 @@ def test_work_item_full_lifecycle_and_audit(tmp_path: Path):
     )
     assert created.status_code == 201
     body = created.json()
-    assert body["status"] == "proposed"
+    assert body["status"] == "detected"
+    assert body["allowed_actions"] == ["dismiss", "triage"]
     assert body["audit_history"][0]["action"] == "create"
     assert body["audit_history"][0]["actor"] == "analyst@example.com"
     item_id = body["id"]
 
-    approved = client.patch(
-        f"/work-items/{item_id}",
+    triaged = client.post(
+        f"/work-items/{item_id}/transition",
         headers=_headers(email="manager@example.com"),
-        json={"status": "approved", "approval_state": "approved"},
+        json={"action": "triage"},
+    )
+    assert triaged.status_code == 200
+    prepared = client.post(f"/work-items/{item_id}/transition", headers=_headers(), json={"action": "prepare"})
+    assert prepared.status_code == 200
+    awaiting = client.post(f"/work-items/{item_id}/transition", headers=_headers(), json={"action": "request_approval"})
+    assert awaiting.status_code == 200
+    approved = client.post(
+        f"/work-items/{item_id}/transition",
+        headers=_headers(role="cro", email="manager@example.com"),
+        json={"action": "approve"},
     )
     assert approved.status_code == 200
     assert approved.json()["status"] == "approved"
 
-    started = client.patch(
-        f"/work-items/{item_id}",
+    started = client.post(
+        f"/work-items/{item_id}/transition",
         headers=_headers(),
-        json={"status": "in_progress", "owner": "Morgan"},
+        json={"action": "start"},
     )
     assert started.status_code == 200
-    assert started.json()["owner"] == "Morgan"
+    assigned = client.patch(f"/work-items/{item_id}", headers=_headers(), json={"owner": "Morgan"})
+    assert assigned.status_code == 200
+    assert assigned.json()["owner"] == "Morgan"
 
-    done = client.patch(
-        f"/work-items/{item_id}",
+    executed = client.post(
+        f"/work-items/{item_id}/transition",
         headers=_headers(email="morgan@example.com"),
-        json={"status": "done", "execution_state": "completed", "outcome": "Customer meeting booked."},
+        json={"action": "mark_executed"},
     )
-    assert done.status_code == 200
-    final = done.json()
-    assert final["status"] == "done"
+    assert executed.status_code == 200
+    verified = client.post(f"/work-items/{item_id}/transition", headers=_headers(), json={"action": "verify"})
+    assert verified.status_code == 200
+    outcome = client.post(
+        f"/work-items/{item_id}/transition",
+        headers=_headers(role="cro", email="morgan@example.com"),
+        json={"action": "record_outcome", "outcome": "Customer meeting booked.", "outcome_category": "meeting_booked"},
+    )
+    assert outcome.status_code == 200
+    final = outcome.json()
+    assert final["status"] == "outcome_recorded"
     assert final["outcome"] == "Customer meeting booked."
-    assert [entry["action"] for entry in final["audit_history"]] == ["create", "patch", "patch", "patch"]
-    assert final["audit_history"][-1]["before"]["status"] == "in_progress"
-    assert final["audit_history"][-1]["after"]["status"] == "done"
+    assert final["outcome_category"] == "meeting_booked"
+    assert "status_transition" in [entry["action"] for entry in final["audit_history"]]
+    assert final["audit_history"][-1]["before"]["status"] == "verified"
+    assert final["audit_history"][-1]["after"]["status"] == "outcome_recorded"
 
 
 def test_work_item_dismiss_requires_reason_and_records_it(tmp_path: Path):
@@ -525,7 +547,7 @@ def test_work_item_dismiss_requires_reason_and_records_it(tmp_path: Path):
     body = dismissed.json()
     assert body["status"] == "dismissed"
     assert body["outcome"] == "Not relevant to this account."
-    assert body["audit_history"][-1]["action"] == "dismiss"
+    assert body["audit_history"][-1]["action"] == "dismissed"
     assert body["audit_history"][-1]["actor"] == "reviewer@example.com"
 
     invalid = client.post(
@@ -534,6 +556,52 @@ def test_work_item_dismiss_requires_reason_and_records_it(tmp_path: Path):
         json={"type": "dismissed", "status": "dismissed", "recommended_action": "Dismiss without reason."},
     )
     assert invalid.status_code == 422
+
+
+def test_work_item_rejects_invalid_transition_and_direct_status_patch(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+    created = client.post(
+        "/work-items",
+        headers=_headers(),
+        json={"type": "research_task", "recommended_action": "Research a signal."},
+    )
+    item_id = created.json()["id"]
+
+    invalid = client.post(f"/work-items/{item_id}/transition", headers=_headers(), json={"action": "verify"})
+    assert invalid.status_code == 409
+    assert invalid.json()["code"] == "invalid_transition"
+    assert invalid.json()["allowed_actions"] == ["dismiss", "triage"]
+
+    bypass = client.patch(f"/work-items/{item_id}", headers=_headers(), json={"status": "verified"})
+    assert bypass.status_code == 422
+
+
+def test_work_item_notes_persist_and_viewer_cannot_add(tmp_path: Path):
+    client, _sf, _settings = _build(tmp_path)
+    created = client.post(
+        "/work-items",
+        headers=_headers(user_id="analyst-1"),
+        json={"type": "research_task", "recommended_action": "Research a signal."},
+    )
+    item_id = created.json()["id"]
+
+    note = client.post(
+        f"/work-items/{item_id}/notes",
+        headers=_headers(user_id="analyst-1"),
+        json={"body": "Confirmed the source is current.", "note_type": "finding", "evidence_ids": ["sig-1"]},
+    )
+    assert note.status_code == 201
+    body = note.json()
+    assert body["notes"][0]["author_user_id"] == "analyst-1"
+    assert body["notes"][0]["note_type"] == "finding"
+    assert body["audit_history"][-1]["action"] == "note_added"
+
+    viewer = client.post(
+        f"/work-items/{item_id}/notes",
+        headers=_headers(role="viewer"),
+        json={"body": "Viewer should not write."},
+    )
+    assert viewer.status_code == 403
 
 
 def test_work_item_filters_and_derived_views(tmp_path: Path):
@@ -575,9 +643,12 @@ def test_work_item_filters_and_derived_views(tmp_path: Path):
         "priority": "normal",
         "recommended_action": "Answer customer question.",
     })
-    client.patch(f"/work-items/{outcome['id']}", headers=_headers(), json={"status": "approved"})
-    client.patch(f"/work-items/{outcome['id']}", headers=_headers(), json={"status": "in_progress"})
-    client.patch(f"/work-items/{outcome['id']}", headers=_headers(), json={"status": "done", "outcome": "Answered."})
+    client.post(f"/work-items/{outcome['id']}/transition", headers=_headers(), json={"action": "triage"})
+    client.post(f"/work-items/{outcome['id']}/transition", headers=_headers(), json={"action": "prepare"})
+    client.post(f"/work-items/{outcome['id']}/transition", headers=_headers(), json={"action": "start"})
+    client.post(f"/work-items/{outcome['id']}/transition", headers=_headers(), json={"action": "mark_executed"})
+    client.post(f"/work-items/{outcome['id']}/transition", headers=_headers(), json={"action": "verify"})
+    client.post(f"/work-items/{outcome['id']}/transition", headers=_headers(role="cro"), json={"action": "record_outcome", "outcome": "Answered."})
 
     by_account = client.get("/work-items?account=acct-2", headers=_headers()).json()["records"]
     assert {item["id"] for item in by_account} == {prepared["id"], approval["id"]}

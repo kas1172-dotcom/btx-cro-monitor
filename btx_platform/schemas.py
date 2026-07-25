@@ -278,6 +278,7 @@ WorkItemType = Literal[
     "outreach_draft",
     "qualified_opportunity",
     "relationship_review",
+    "hubspot_task",
     "dismissal",
     "dismissed",
 ]
@@ -293,13 +294,26 @@ WorkItemStatus = Literal[
     "outcome_recorded",
     "dismissed",
     "closed",
-    "proposed",
-    "done",
 ]
 WorkItemPriority = Literal["low", "normal", "high", "urgent"]
 ApprovalState = Literal["not_required", "pending", "approved", "rejected"]
-ExecutionState = Literal["not_started", "queued", "running", "completed", "failed"]
+ExecutionState = Literal["not_started", "pending", "executed", "verified", "failed"]
 WorkItemView = Literal["what_changed", "needs_attention", "prepared", "needs_approval", "outcomes"]
+WorkItemTransitionAction = Literal[
+    "triage",
+    "prepare",
+    "request_approval",
+    "approve",
+    "reject",
+    "start",
+    "mark_executed",
+    "verify",
+    "record_outcome",
+    "dismiss",
+    "close",
+    "reopen",
+]
+WorkItemNoteType = Literal["general", "finding", "approval", "rejection", "execution", "verification", "outcome"]
 
 
 class WorkItemCreate(BaseModel):
@@ -316,7 +330,7 @@ class WorkItemCreate(BaseModel):
     dedupe_key: str | None = None
     owner: str | None = None
     priority: WorkItemPriority = "normal"
-    status: WorkItemStatus = "proposed"
+    status: WorkItemStatus = "detected"
     due_date: str | None = None
     recommended_action: str = Field(min_length=1)
     generated_artifact_ref: str | None = None
@@ -333,26 +347,48 @@ class WorkItemCreate(BaseModel):
 
 
 class WorkItemPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     owner: str | None = None
     priority: WorkItemPriority | None = None
-    status: WorkItemStatus | None = None
     due_date: str | None = None
-    recommended_action: str | None = None
-    generated_artifact_ref: str | None = None
-    approval_state: ApprovalState | None = None
-    execution_state: ExecutionState | None = None
-    outcome: str | None = None
     follow_up_date: str | None = None
-
-    @model_validator(mode="after")
-    def dismissed_requires_reason(self):
-        if self.status == "dismissed" and not (self.outcome or "").strip():
-            raise ValueError("dismissed transitions require outcome/reason; use /dismiss")
-        return self
+    recommended_action: str | None = None
+    description: str | None = None
+    generated_artifact_ref: str | None = None
 
 
 class WorkItemDismiss(BaseModel):
     reason: str = Field(min_length=1)
+
+
+class WorkItemTransitionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: WorkItemTransitionAction
+    note: str | None = None
+    reason: str | None = None
+    outcome: str | None = None
+    outcome_category: str | None = None
+    follow_up_date: str | None = None
+
+
+class WorkItemNoteCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    body: str = Field(min_length=1)
+    note_type: WorkItemNoteType = "general"
+    evidence_ids: list[str] = []
+
+
+class WorkItemNoteResponse(BaseModel):
+    id: str
+    work_item_id: str
+    author_user_id: str | None = None
+    body: str
+    note_type: str
+    evidence_ids: list[str]
+    created_at: str
 
 
 class WorkItemResponse(BaseModel):
@@ -370,19 +406,26 @@ class WorkItemResponse(BaseModel):
     dedupe_key: str | None = None
     owner: str | None = None
     priority: str
+    priority_status: str = "available"
     status: str
     due_date: str | None = None
+    description: str | None = None
     recommended_action: str
     generated_artifact_ref: str | None = None
     approval_state: str
     execution_state: str
     outcome: str | None = None
+    outcome_category: str | None = None
+    dismissal_reason: str | None = None
+    rejection_reason: str | None = None
     follow_up_date: str | None = None
     external_system: str | None = None
     external_record_id: str | None = None
     external_record_url: str | None = None
     execution_idempotency_key: str | None = None
     execution_error: str | None = None
+    allowed_actions: list[str] = []
     audit_history: list[dict]
+    notes: list[WorkItemNoteResponse] = []
     created_at: str
     updated_at: str

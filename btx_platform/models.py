@@ -323,13 +323,18 @@ class WorkItem(Base):
     dedupe_key: Mapped[str | None] = mapped_column(String(256), nullable=True, index=True)
     owner: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
     priority: Mapped[str] = mapped_column(String(32), default="normal", index=True)
-    status: Mapped[str] = mapped_column(String(32), default="proposed", index=True)
+    priority_status: Mapped[str] = mapped_column(String(32), default="available", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="detected", index=True)
     due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     recommended_action: Mapped[str] = mapped_column(Text)
     generated_artifact_ref: Mapped[str | None] = mapped_column(Text, nullable=True)
     approval_state: Mapped[str] = mapped_column(String(32), default="not_required", index=True)
     execution_state: Mapped[str] = mapped_column(String(32), default="not_started", index=True)
     outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
+    outcome_category: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    dismissal_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     follow_up_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
     external_system: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
     external_record_id: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
@@ -339,6 +344,20 @@ class WorkItem(Base):
     audit_history: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class WorkItemNote(Base):
+    """Durable note/finding trail attached to a work item."""
+    __tablename__ = "work_item_notes"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    work_item_id: Mapped[str] = mapped_column(String(32), ForeignKey("work_items.id"), index=True)
+    author_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
+    body: Mapped[str] = mapped_column(Text)
+    note_type: Mapped[str] = mapped_column(String(32), default="general", index=True)
+    evidence_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
 
 class HubSpotTaskAudit(Base):
