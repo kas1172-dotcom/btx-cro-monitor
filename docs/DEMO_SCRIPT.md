@@ -21,7 +21,7 @@
    Narration: "The brief stays grounded in account context, source evidence, and explicit provenance."
 6. Go to Work Queue.
    Narration: "The brief also creates a durable work item for the Lockheed call."
-7. Click Create HubSpot task on the Lockheed work item, review the preview, then confirm.
+7. Open the Lockheed work item, move it through approval, preview the HubSpot task, then execute the approved task.
    Narration: "The final step writes a real HubSpot task against the test portal and verifies the task id."
 
 ## Journey 2: Saronic Prospect From A Public Signal
@@ -34,11 +34,11 @@
    Narration: "Saronic appears as an Austin prospect pin because the signal supports a location hypothesis, not because it is a verified customer."
 4. Return to the Saronic signal and click Create Saronic prospect.
    Narration: "Before writing to HubSpot, the cockpit previews the company fields and the unknowns left blank."
-5. Confirm and create.
+5. Preview and create from the backend-confirmed form.
    Narration: "The system creates the Saronic company in HubSpot and creates two durable work items: qualify the account and draft intro outreach."
 6. Go to Work Queue.
    Narration: "The queue now separates research, outreach, and execution so BTX can move from public signal to controlled follow-up."
-7. Create HubSpot tasks from the Saronic work items only after reviewing the preview.
+7. Execute HubSpot tasks from the Saronic work items only after approval and preview.
    Narration: "Every external write is confirmed before it reaches HubSpot."
 
 ## Camera-Safe Tab Sweep
