@@ -15,8 +15,8 @@ export interface SurfaceSpec {
 }
 
 export const CORE_SURFACES: SurfaceSpec[] = [
-  { id: "brief", label: "Brief", group: "core", componentId: "surface-todays-brief", title: "What changed and what needs you today." },
-  { id: "work_queue", label: "Work Queue", group: "core", componentId: "surface-work-queue", title: "Your open tasks, who owns them, and what is due." },
+  { id: "brief", label: "Today", group: "core", componentId: "surface-todays-brief", title: "What changed and what needs you today." },
+  { id: "work_queue", label: "Work", group: "core", componentId: "surface-work-queue", title: "Your open tasks, who owns them, and what is due." },
   { id: "accounts", label: "Accounts", group: "core", componentId: "surface-account-360", title: "Everything on a customer: health, signals, contacts, deals, and next steps." },
   { id: "ask", label: "Ask", group: "core", componentId: "surface-ask", title: "Primary conversational assistant." },
 ];
@@ -27,23 +27,23 @@ export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
   { id: "map", label: "Map", group: "analytical", componentId: "surface-map", title: "Geographic account and prospect map." },
   { id: "analysis", label: "Analysis", group: "analytical", componentId: "surface-analysis-dashboard", title: "Pipeline, bookings, backlog, win/loss, and production-load analysis." },
   { id: "capacity", label: "Capacity", group: "analytical", componentId: "surface-capacity-assessment", title: "Machining capacity against backlog and demand." },
-  { id: "programs", label: "Signals", group: "analytical", componentId: "surface-program-contract-tracker", title: "Contract and program news relevant to BTX." },
+  { id: "programs", label: "Programs", group: "analytical", componentId: "surface-program-contract-tracker", title: "Contract and program news relevant to BTX." },
 ];
 
 export const UTILITY_SURFACES: SurfaceSpec[] = [
   { id: "deliverables", label: "Deliverables", group: "utility", componentId: "surface-deliverable-library", title: "Draft, edit, and send client-ready documents." },
-  { id: "hubspot", label: "HubSpot", group: "utility", componentId: "surface-hubspot-viewer", title: "Curated HubSpot activity, pipeline, lookup, and client list creation." },
+  { id: "hubspot", label: "Integrations", group: "utility", componentId: "surface-hubspot-viewer", title: "Configured CRM and source integration status." },
   { id: "settings", label: "Settings", group: "utility", componentId: "surface-settings", title: "Sources, connections, and how the engine scores." },
 ];
 
 export const ALL_SURFACES = [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES];
 
 export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "prospecting", "trip_planner", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"];
-export const PRIMARY_TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "prospecting", "programs", "deliverables", "settings"];
+export const PRIMARY_TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask"];
 
 export const TAB_LABELS: Record<TabId, string> = {
-  brief: "Brief",
-  work_queue: "Work Queue",
+  brief: "Today",
+  work_queue: "Work",
   accounts: "Accounts",
   ask: "Ask",
   prospecting: "Prospects",
@@ -51,9 +51,9 @@ export const TAB_LABELS: Record<TabId, string> = {
   map: "Map",
   analysis: "Analysis",
   capacity: "Capacity",
-  programs: "Signals",
+  programs: "Programs",
   deliverables: "Deliverables",
-  hubspot: "HubSpot",
+  hubspot: "Integrations",
   settings: "Settings",
 };
 

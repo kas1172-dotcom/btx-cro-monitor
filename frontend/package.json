@@ -22,6 +22,7 @@
     "test:hubspot-viewer": "tsx tools/test-hubspot-viewer.ts",
     "test:phase0": "tsx tools/test-phase0-safe-honest.ts",
     "test:architecture": "tsx tools/test-runtime-architecture.ts",
+    "test:routing": "tsx tools/test-routing.ts",
     "test:identity": "tsx tools/test-canonical-identity.ts",
     "test:map": "tsx tools/test-map.ts",
     "test:tour": "tsx tools/test-tour.ts",

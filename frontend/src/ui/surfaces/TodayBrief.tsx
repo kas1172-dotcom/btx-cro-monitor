@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import { setState } from "../../store/store.ts";
 import type { World } from "../../app/useWorld.ts";
 import { useWorkItems, type WorkItem } from "../../app/workItems.ts";
 import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import type { TabId } from "../../app/surfaces.ts";
+import { accountPath, navigateTo, pathForTab } from "../../app/router.ts";
 import { AskBrainBar } from "../brain/AskBrainBar.tsx";
 import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
@@ -68,13 +68,15 @@ function signalLink(world: World, signal: Signal): BriefLink {
 }
 
 function navigate(link: BriefLink): void {
-  setState({
-    activeTab: link.surface,
-    activeCompanyId: link.accountId ?? null,
-    brainResponse: null,
-    activeDeliverable: null,
-    activeAnalysisSpec: null,
-  });
+  if (link.accountId && link.surface === "accounts") {
+    navigateTo(accountPath(link.accountId));
+    return;
+  }
+  if (link.accountId && link.surface === "prospecting") {
+    navigateTo(`/prospecting?account=${encodeURIComponent(link.accountId)}`);
+    return;
+  }
+  navigateTo(pathForTab(link.surface));
 }
 
 function workItemToBriefItem(world: World, item: WorkItem): BriefItem {

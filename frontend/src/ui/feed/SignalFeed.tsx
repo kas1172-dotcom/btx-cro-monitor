@@ -10,7 +10,7 @@ import { formatAddress } from "../../app/format.ts";
 import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/signalProvenance.ts";
 import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
-import { setState } from "../../store/store.ts";
+import { accountPath, navigateTo, pathForTab } from "../../app/router.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState } from "../primitives.tsx";
@@ -196,9 +196,9 @@ export function SignalFeed({ world }: { world: World }) {
           const expanded = expandedSignalId === row.signal.id;
           const openTarget = row.signal.scope === "specific_account"
             ? row.motion === "Prospecting"
-              ? { activeTab: "prospecting" as const, activeCompanyId: row.signal.subject_id }
-              : { activeTab: "accounts" as const, activeCompanyId: row.signal.subject_id }
-            : { activeTab: "programs" as const, activeCompanyId: null };
+              ? `/prospecting?account=${encodeURIComponent(row.signal.subject_id)}`
+              : accountPath(row.signal.subject_id)
+            : pathForTab("programs");
           return (
           <article key={row.signal.id} className="signal-inbox-card">
             <div className="signal-summary-line">
@@ -210,7 +210,7 @@ export function SignalFeed({ world }: { world: World }) {
               <span className="signal-summary-why">{row.why}</span>
               <span className="confidence-chip">{row.confidenceLabel}</span>
               <div className="signal-primary-action">
-                <button type="button" onClick={() => setState({ ...openTarget, brainResponse: null })}>
+                <button type="button" onClick={() => navigateTo(openTarget)}>
                   {row.signal.scope === "specific_account" ? "Open account" : "Open signal"}
                 </button>
               </div>

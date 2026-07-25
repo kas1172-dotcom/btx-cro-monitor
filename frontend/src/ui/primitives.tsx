@@ -106,7 +106,9 @@ export function SignalCard({
   scope,
   body,
   provenance,
-  actionLabel = "Review",
+  actionLabel,
+  actionHref,
+  onAction,
 }: {
   title: ReactNode;
   source: ReactNode;
@@ -115,6 +117,8 @@ export function SignalCard({
   body: ReactNode;
   provenance?: { entity?: string; method?: string; confidence?: number };
   actionLabel?: string;
+  actionHref?: string;
+  onAction?: () => void;
 }) {
   const linked = scope === "specific_account";
   return (
@@ -126,7 +130,8 @@ export function SignalCard({
           <p>{body}</p>
           {provenance ? <ProvenanceStrip {...provenance} /> : null}
         </div>
-        <a className="accent-action" href="#top" onClick={(event) => event.preventDefault()}>{actionLabel}<UiIcon name="chevron" /></a>
+        {actionLabel && actionHref ? <a className="accent-action" href={actionHref}>{actionLabel}<UiIcon name="chevron" /></a> : null}
+        {actionLabel && onAction ? <button className="accent-action" type="button" onClick={onAction}>{actionLabel}<UiIcon name="chevron" /></button> : null}
       </article>
     </ConfidenceEdge>
   );
@@ -142,12 +147,13 @@ export function EmptyState({ headline, body, icon = "empty" }: { headline: strin
   );
 }
 
-export function ListRow({ name, subtitle, action = "Review" }: { name: ReactNode; subtitle: ReactNode; action?: string }) {
+export function ListRow({ name, subtitle, action, href, onAction }: { name: ReactNode; subtitle: ReactNode; action?: string; href?: string; onAction?: () => void }) {
   return (
     <div className="list-row">
       <UiIcon name="document" />
       <div><strong>{name}</strong><span>{subtitle}</span></div>
-      <a className="accent-action" href="#top" onClick={(event) => event.preventDefault()}>{action}<UiIcon name="chevron" /></a>
+      {action && href ? <a className="accent-action" href={href}>{action}<UiIcon name="chevron" /></a> : null}
+      {action && onAction ? <button className="accent-action" type="button" onClick={onAction}>{action}<UiIcon name="chevron" /></button> : null}
     </div>
   );
 }

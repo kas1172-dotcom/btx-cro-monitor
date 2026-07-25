@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { World } from "../../app/useWorld.ts";
 import type { ScoreSnapshot } from "../../app/revenueDataClient.ts";
 import { PROFILE } from "../../app/config.ts";
@@ -60,7 +60,7 @@ function relationshipBackedSignals(world: World, accountId: string) {
     .sort((a, b) => b.detected_at.localeCompare(a.detected_at));
 }
 
-export function Account360({ world }: { world: World }) {
+export function Account360({ world, accountId, onSelectAccount }: { world: World; accountId?: string | null; onSelectAccount?: (accountId: string) => void }) {
   const accountRows = useMemo(() => {
     return world.companies
       .filter((company) => company.relationship === "customer")
@@ -78,12 +78,22 @@ export function Account360({ world }: { world: World }) {
         a.company.name.localeCompare(b.company.name)
       );
   }, [world]);
-  const [selectedId, setSelectedId] = useState(accountRows[0]?.company.id ?? "");
-  const selected = accountRows.find((row) => row.company.id === selectedId) ?? accountRows[0];
+  const selected = accountId
+    ? accountRows.find((row) => row.company.id === accountId || row.company.canonical_account_id === accountId) ?? null
+    : accountRows[0] ?? null;
   const contacts = selected ? world.contacts.filter((contact) => contact.company_id === selected.company.id) : [];
   const deals = selected ? world.opportunities.filter((opp) => opp.company_id === selected.company.id) : [];
   const facilities = selected ? world.facilities.filter((facility) => facility.company_id === selected.company.id) : [];
   const workItems = selected ? (world.worldSnapshot?.workItems ?? []).filter((item) => item.canonical_account_id === selected.company.id).slice(0, 5) : [];
+
+  if (!selected && accountId) {
+    return (
+      <section className="surface-page" data-surface-component="surface-account-360">
+        <SurfaceHeader eyebrow="Accounts / Account 360" headline="Account not found" />
+        <EmptyState headline="Account not found" body="The requested account ID is not in the current backend world snapshot." icon="accounts" />
+      </section>
+    );
+  }
 
   if (!selected) {
     return (
@@ -109,7 +119,7 @@ export function Account360({ world }: { world: World }) {
       <div className="account360-layout">
         <aside className="account360-list">
           {accountRows.map((row) => (
-            <button key={row.company.id} className={row.company.id === company.id ? "active account360-list-row" : "account360-list-row"} onClick={() => setSelectedId(row.company.id)}>
+            <button key={row.company.id} className={row.company.id === company.id ? "active account360-list-row" : "account360-list-row"} onClick={() => onSelectAccount?.(row.company.id)}>
               <AccountToken name={row.company.name} riskScore={row.score?.dimensions.risk.score} size="sm" />
               <span className="account360-list-row-main">
                 <strong>{row.company.name}</strong>

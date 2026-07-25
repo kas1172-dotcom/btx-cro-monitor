@@ -1,4 +1,3 @@
-import { setState } from "../../store/store.ts";
 import {
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
@@ -7,10 +6,11 @@ import {
   type SurfaceSpec,
   type TabId,
 } from "../../app/surfaces.ts";
+import { navigateTo, pathForTab } from "../../app/router.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
 
-const PIPELINE_IDS: TabId[] = ["accounts", "prospecting", "programs"];
-const TOOLS_IDS: TabId[] = ["deliverables", "settings"];
+const SECONDARY_IDS: TabId[] = ["programs", "prospecting", "capacity", "analysis", "map"];
+const UTILITY_IDS: TabId[] = ["deliverables", "hubspot", "settings"];
 
 const surfaceById = new Map(
   [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES].map((surface) => [surface.id, surface]),
@@ -21,22 +21,10 @@ function surfacesFor(ids: TabId[]): SurfaceSpec[] {
 }
 
 function openSurface(surface: TabId): void {
-  setState({
-    activeTab: surface,
-    activeSettings: surface === "settings",
-    activeHome: surface === "brief",
-    brainResponse: null,
-    activeDeliverable: null,
-    activeAnalysisSpec: null,
-    activeCompanyId: null,
-  });
+  navigateTo(pathForTab(surface));
 }
 
 function primaryTabFor(surface: TabId): TabId {
-  if (surface === "hubspot" || surface === "capacity") return "accounts";
-  if (surface === "map" || surface === "trip_planner") return "prospecting";
-  if (surface === "analysis") return "deliverables";
-  if (surface === "ask") return "brief";
   return surface;
 }
 
@@ -48,9 +36,9 @@ export function BrainSidebar({
   counts: Partial<Record<TabId, number>>;
 }) {
   const groups = [
-    { label: "Today", items: surfacesFor(PRIMARY_TAB_IDS.slice(0, 2)) },
-    { label: "Pipeline", items: surfacesFor(PIPELINE_IDS) },
-    { label: "Tools", items: surfacesFor(TOOLS_IDS) },
+    { label: "Primary", items: surfacesFor(PRIMARY_TAB_IDS) },
+    { label: "Workspace", items: surfacesFor(SECONDARY_IDS) },
+    { label: "Utilities", items: surfacesFor(UTILITY_IDS) },
   ];
   const primaryActiveTab = primaryTabFor(activeTab);
   return (

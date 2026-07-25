@@ -40,6 +40,8 @@ Fixture JSON under `frontend/data/demo/btx/` is retained for tests and local dev
 
 Canonical account identity, signal-account relationship review, and backend score families are documented in `docs/CANONICAL_IDENTITY_AND_SCORING.md`.
 
+Frontend URL routing, selected-account behavior, and shared server-state conventions are documented in `docs/ROUTING_AND_STATE.md`.
+
 ## Local Frontend
 
 ```bash

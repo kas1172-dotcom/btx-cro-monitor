@@ -18,6 +18,7 @@ import { AppShell, StatusChip } from "./ui/primitives.tsx";
 import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
 import type { Deliverable } from "./deliverables/types.ts";
 import { checkAiStatus, getAiStatusSnapshot, subscribeAiStatus } from "./app/aiStatus.ts";
+import { accountPath, navigateTo, useAppRoute } from "./app/router.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const AnalysisView = lazy(() => import("./ui/analysis/AnalysisView.tsx").then((module) => ({ default: module.AnalysisView })));
@@ -45,21 +46,25 @@ function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" |
 }
 
 export function App() {
-  const { city, activeHome, activeSettings, activeTab, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested, deliverableWizardRequest } = useStore();
+  const { city, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested, deliverableWizardRequest } = useStore();
+  const route = useAppRoute();
+  const routeTab = route.tab;
   const [workItemStatus, setWorkItemStatus] = useState("");
   const handledWizardSaveIds = useRef(new Set<number>());
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global - dashboard, graph, and the dossier
   const aiStatus = useSyncExternalStore(subscribeAiStatus, getAiStatusSnapshot, getAiStatusSnapshot);
-  const settingsActive = (activeSettings || activeTab === "settings") && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const homeActive = (activeHome || activeTab === "brief") && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const marketScoped = activeTab === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const settingsActive = routeTab === "settings" && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const homeActive = routeTab === "brief" && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const marketScoped = routeTab === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
   const viewWorld = marketScoped ? marketWorld ?? world : world;
   const cityOptions = [...new Set((world?.companies ?? []).map((company) => company.location.city).filter(Boolean))].sort();
 
   // Right-panel: dossier takes priority over context panel, one at a time.
-  const dossierOpen = !!activeCompanyId;
+  const routedAccountId = route.id === "accounts" ? route.accountId : null;
+  const previewAccountId = route.id === "accounts" ? null : (route.accountId ?? activeCompanyId);
+  const dossierOpen = !!previewAccountId;
   const contextPanelOpen = !dossierOpen && !!brainResponse;
   const rightW = dossierOpen ? "minmax(360px, 420px)" : contextPanelOpen ? "320px" : "0px";
 
@@ -68,10 +73,19 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    setState({
+      activeTab: routeTab,
+      activeHome: routeTab === "brief",
+      activeSettings: routeTab === "settings",
+      activeCompanyId: previewAccountId,
+    });
+  }, [previewAccountId, routeTab]);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       // Close topmost open panel only - never navigate away.
-      if (activeCompanyId) {
+      if (previewAccountId) {
         event.stopPropagation();
         setState({ activeCompanyId: null });
         return;
@@ -85,8 +99,9 @@ export function App() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [activeCompanyId, brainResponse]);
+  }, [brainResponse, previewAccountId]);
   const renderDefault = () => {
+    if (route.id === "not_found") return <RouteNotFound path={route.path} />;
     if (settingsActive) return (
       <Suspense fallback={<div className="loading">loading settings...</div>}>
         <SettingsWorkspace />
@@ -104,10 +119,10 @@ export function App() {
       </Suspense>
     );
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
-    switch (activeTab) {
+    switch (routeTab) {
       case "brief": return <TodayBrief world={world} />;
       case "work_queue": return <WorkQueue world={world} />;
-      case "accounts": return <Account360 world={world} />;
+      case "accounts": return <Account360 world={world} accountId={routedAccountId} onSelectAccount={(accountId) => navigateTo(accountPath(accountId))} />;
       case "ask": return <AskSurface world={world} />;
       case "prospecting": return (
         <Suspense fallback={<div className="loading">loading prospecting...</div>}>
@@ -121,7 +136,7 @@ export function App() {
       );
       case "map": return viewWorld ? (
         <Suspense fallback={<div className="loading">loading map…</div>}>
-          <ProspectMap world={viewWorld} />
+          <ProspectMap world={viewWorld} selectedAccountId={previewAccountId} onSelectAccount={(accountId) => navigateTo(`/map?account=${encodeURIComponent(accountId)}`)} />
         </Suspense>
       ) : <div className="loading">loading map…</div>;
       case "analysis": return (
@@ -162,7 +177,7 @@ export function App() {
   ) as Partial<Record<TabId, number>>;
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
-  const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : activeTab))?.label ?? "Cockpit";
+  const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : routeTab))?.label ?? "Cockpit";
   const backendStatus = liveDataStatus(world);
   const aiChip = aiStatus.state === "live"
     ? { tone: "success" as const, value: "live" }
@@ -210,7 +225,7 @@ export function App() {
     <AppShell
       className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
       rightW={rightW}
-      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : activeTab} counts={counts} />}
+      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : routeTab} counts={counts} />}
       topbar={(
         <header className="quiet-topbar">
           <div className="surface-title">
@@ -250,7 +265,7 @@ export function App() {
         </header>
       )}
       onMainClickCapture={() => {
-        if (activeCompanyId) setState({ activeCompanyId: null });
+        if (previewAccountId) setState({ activeCompanyId: null });
       }}
       side={(
         <>
@@ -261,8 +276,8 @@ export function App() {
                 <button className="inspector-back" onClick={() => setState({ activeCompanyId: null })} aria-label="Close dossier">×</button>
               </div>
             )}
-            {world && activeCompanyId ? (
-              <Dossier world={world} companyId={activeCompanyId} />
+            {world && previewAccountId ? (
+              <Dossier world={world} companyId={previewAccountId} />
             ) : null}
           </aside>
 
@@ -304,7 +319,7 @@ export function App() {
                         window.setTimeout(() => {
                           closeDemoAction();
                           setWorkItemStatus("");
-                          setState({ activeTab: "work_queue" });
+                          navigateTo("/work");
                         }, 800);
                       }).catch((error) => {
                         setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
@@ -342,7 +357,20 @@ export function App() {
       )}
     >
       <section className="quiet-stage">{renderDefault()}</section>
-      {world && !homeActive && !settingsActive && activeTab !== "ask" && activeTab !== "deliverables" && <AskBrainBar world={viewWorld ?? world} />}
+      {world && !homeActive && !settingsActive && routeTab !== "ask" && routeTab !== "deliverables" && <AskBrainBar world={viewWorld ?? world} />}
     </AppShell>
+  );
+}
+
+function RouteNotFound({ path }: { path: string }) {
+  return (
+    <section className="surface-page" data-surface-component="surface-not-found">
+      <div className="surface-panel">
+        <p className="eyebrow">Not found</p>
+        <h1>That page is not available.</h1>
+        <p>The route <code>{path}</code> does not match a cockpit workspace.</p>
+        <button type="button" onClick={() => navigateTo("/today", { replace: true })}>Open Today</button>
+      </div>
+    </section>
   );
 }

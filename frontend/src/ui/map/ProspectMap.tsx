@@ -1,6 +1,6 @@
 // Geographic prospecting map. Plots the scored companies in the selected market;
-// prospects (targets + customers) scale by backend account attractiveness. Click a pin -> the store's
-// activeCompanyId updates -> the dossier opens. The map is just a lens on engine
+// prospects (targets + customers) scale by backend account attractiveness. Click a pin -> the route's
+// selected account updates -> the dossier opens. The map is just a lens on engine
 // output; it computes nothing.
 
 import { useEffect } from "react";
@@ -9,7 +9,6 @@ import { MapContainer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet"
 import { useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { World } from "../../app/useWorld.ts";
-import { setState, useStore } from "../../store/store.ts";
 import { explainRankingPrompt, outreachPrompt } from "../../app/copilotPrompts.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
@@ -52,14 +51,13 @@ function FitMapBounds({ points, watchKey }: { points: Array<[number, number]>; w
   return null;
 }
 
-export function ProspectMap({ world }: { world: World }) {
-  const { activeCompanyId } = useStore();
+export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { world: World; selectedAccountId?: string | null; onSelectAccount?: (accountId: string) => void }) {
   const markers = buildMapMarkers(world.companies, world.analysis.byId, world.scoreResults);
   const center = mapCenter(mappableCompanies(world.companies));
   const omittedCount = world.companies.length - markers.length;
   const marketLabel = world.city ?? "All Markets";
   const initialZoom = world.city ? 11 : 4;
-  const watchKey = `${world.city ?? "all"}:${markers.length}:${activeCompanyId ?? "none"}`;
+  const watchKey = `${world.city ?? "all"}:${markers.length}:${selectedAccountId ?? "none"}`;
 
   return (
     <div className="map-shell" data-surface-component="surface-map">
@@ -69,7 +67,7 @@ export function ProspectMap({ world }: { world: World }) {
         <ZoomControl position="bottomright" />
         <DarkMapTiles />
         {markers.map(({ company: c, center: markerCenter, opportunity: opp, scoreStatus, prospect, radius }) => {
-          const active = c.id === activeCompanyId;
+          const active = c.id === selectedAccountId;
           const color = prospect ? uiTokens.color.success : uiTokens.color.textMuted;
           return (
             <CircleMarker
@@ -82,7 +80,7 @@ export function ProspectMap({ world }: { world: World }) {
                 fillColor: color,
                 fillOpacity: prospect ? 0.78 : 0.45,
               }}
-              eventHandlers={{ click: () => setState({ activeCompanyId: c.id }) }}
+              eventHandlers={{ click: () => onSelectAccount?.(c.id) }}
             >
               <Tooltip direction="top" opacity={0.93} permanent={false} sticky={false}>
                 <strong>{c.name}</strong>
@@ -110,8 +108,8 @@ export function ProspectMap({ world }: { world: World }) {
             return (
             <button
               key={p.company.id}
-              className={p.company.id === activeCompanyId ? "map-prospect active" : "map-prospect"}
-              onClick={() => setState({ activeCompanyId: p.company.id })}
+              className={p.company.id === selectedAccountId ? "map-prospect active" : "map-prospect"}
+              onClick={() => onSelectAccount?.(p.company.id)}
             >
               <span className="map-prospect-rank">
                 <span className="rank-badge">#{i + 1}</span>
