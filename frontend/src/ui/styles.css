@@ -4658,7 +4658,372 @@ button.work-item-summary:focus-visible {
 .deliverable-wizard-done p { color: var(--text-secondary); }
 .library-new-deliverable { border-color: var(--accent); color: var(--accent-text); }
 
+/* Evidence, timeline, focus, and briefing presentation layer */
+.evidence-drawer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 7200;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(var(--page-rgb), .46);
+}
+.evidence-drawer {
+  width: min(560px, 100vw);
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto) auto auto;
+  gap: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: -24px 0 70px var(--shadow);
+}
+.evidence-drawer-head,
+.briefing-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.evidence-drawer-head span,
+.evidence-drawer-head p,
+.briefing-head span {
+  color: var(--text-secondary);
+  margin: 0;
+}
+.evidence-drawer-head h2,
+.briefing-head h1,
+.briefing-card h2 {
+  margin: 2px 0;
+  letter-spacing: 0;
+}
+.evidence-close,
+.evidence-drawer-actions button,
+.evidence-record-actions button,
+.evidence-record-actions a,
+.mode-action-strip button,
+.priority-secondary,
+.today-evidence-link,
+.timeline-event-actions button,
+.briefing-actions button,
+.briefing-nav button,
+.ask-context-actions button,
+.ask-citation-card > button,
+.document-provenance button,
+.account360-kpis button,
+.decision-action-stack button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text-primary);
+  padding: 8px 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.evidence-close:hover,
+.evidence-drawer-actions button:hover,
+.evidence-record-actions button:hover,
+.evidence-record-actions a:hover,
+.mode-action-strip button:hover,
+.priority-secondary:hover,
+.today-evidence-link:hover,
+.timeline-event-actions button:hover,
+.briefing-actions button:hover,
+.briefing-nav button:hover,
+.ask-context-actions button:hover,
+.ask-citation-card > button:hover,
+.document-provenance button:hover,
+.account360-kpis button:hover,
+.decision-action-stack button:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.evidence-section,
+.evidence-record,
+.meaningful-timeline,
+.briefing-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 14px;
+}
+.evidence-section h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.evidence-status-grid,
+.briefing-card dl,
+.briefing-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.evidence-status-grid span,
+.briefing-card dl div,
+.briefing-score-grid div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--panel);
+}
+.evidence-status-grid strong,
+.briefing-card dt,
+.briefing-score-grid span {
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.evidence-record {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+.evidence-record dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.evidence-record dt { color: var(--text-muted); font-size: 11px; }
+.evidence-record dd { margin: 0; color: var(--text-secondary); }
+.evidence-record-actions,
+.evidence-drawer-actions,
+.timeline-event-actions,
+.mode-action-strip,
+.ask-context-actions,
+.briefing-actions,
+.decision-action-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.evidence-advanced {
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--panel);
+}
+.timeline-list {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.timeline-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+}
+.timeline-marker {
+  width: 10px;
+  height: 10px;
+  margin-top: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .12);
+}
+.timeline-event.supporting .timeline-marker { background: var(--text-muted); box-shadow: none; }
+.timeline-event article {
+  min-width: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 12px;
+}
+.timeline-event article:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.timeline-event-head,
+.timeline-event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.timeline-event-head span {
+  color: var(--accent-text);
+  text-transform: capitalize;
+}
+.mode-action-strip {
+  margin: 14px 0;
+}
+.priority-card .priority-secondary {
+  margin-top: 8px;
+}
+.today-development-row {
+  display: grid;
+  gap: 6px;
+}
+.today-development-row + .today-development-row {
+  margin-top: 10px;
+}
+.account360-kpis button {
+  width: fit-content;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.app-focus-mode {
+  grid-template-columns: 72px minmax(0, 1fr) 0px;
+}
+.app-focus-mode .quiet-topbar .topbar-status,
+.record-focus-mode .account360-list,
+.record-focus-mode .editor-assistant,
+.record-focus-mode .document-provenance,
+.record-focus-mode .work-audit,
+.record-focus-mode .ask-conversation-sidebar,
+.record-focus-mode .ask-citation-panel {
+  display: none;
+}
+.record-focus-mode.account360 .account360-layout,
+.record-focus-mode.ask-workspace .ask-workspace-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.briefing-mode {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  padding: clamp(20px, 4vw, 48px);
+  background: var(--bg);
+}
+.briefing-head h1 {
+  font-size: clamp(30px, 4vw, 54px);
+  line-height: 1.02;
+}
+.briefing-card {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-height: min(62vh, 620px);
+  padding: clamp(22px, 4vw, 44px);
+}
+.briefing-card h2 { font-size: clamp(24px, 3vw, 38px); }
+.briefing-card p,
+.briefing-card li,
+.briefing-card dd {
+  color: var(--text-secondary);
+  font-size: clamp(16px, 1.5vw, 22px);
+}
+.briefing-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.briefing-nav div {
+  display: flex;
+  gap: 6px;
+}
+.briefing-nav button.active {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent-text);
+}
+.ask-citation-card {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.ask-citation-card > button:first-child {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+}
+
+@media print {
+  body { background: #fff; color: #111; }
+  .brain-rail,
+  .quiet-topbar,
+  .briefing-actions,
+  .briefing-nav,
+  .evidence-drawer-layer,
+  .editor-assistant,
+  .document-actions,
+  .document-provenance {
+    display: none !important;
+  }
+  .quiet-cockpit,
+  .app-briefing-mode {
+    display: block;
+    height: auto;
+    overflow: visible;
+    background: #fff;
+  }
+  .quiet-main,
+  .editor-overlay,
+  .briefing-mode {
+    display: block;
+    height: auto;
+    overflow: visible;
+    padding: 0;
+    background: #fff;
+    color: #111;
+  }
+  .briefing-card,
+  .document-section {
+    break-inside: avoid;
+    border: 0;
+    background: #fff;
+    color: #111;
+  }
+  .briefing-card p,
+  .briefing-card li,
+  .briefing-card dd {
+    color: #222;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiet-cockpit,
+  .evidence-drawer,
+  .timeline-event article,
+  .briefing-mode {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
 @media (max-width: 760px) {
+  .evidence-drawer-layer {
+    align-items: flex-end;
+  }
+  .evidence-drawer {
+    width: 100vw;
+    height: 100dvh;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .evidence-status-grid,
+  .evidence-record dl,
+  .briefing-card dl,
+  .briefing-score-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .briefing-mode {
+    min-height: 100dvh;
+    padding: 16px;
+  }
+  .briefing-head,
+  .briefing-nav {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .briefing-nav div {
+    flex-wrap: wrap;
+  }
   .quiet-cockpit {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;

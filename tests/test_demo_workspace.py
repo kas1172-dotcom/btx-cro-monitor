@@ -145,6 +145,10 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
     assert any(item["status"] == "verified" and not item["outcome"] for item in body["workItems"])
     assert any(item["outcome_category"] == "learning" for item in body["workItems"])
     assert body["deliverables"][0]["id"] == "demo-deliv-lockheed-brief"
+    assert body["deliverables"][0]["title"] == "Executive Account and Meeting Brief - Lockheed Martin Corporation"
+    detail = client.get("/deliverables/demo-deliv-lockheed-brief", headers=_headers(tenant_id=DEMO_TENANT_ID, role="cro")).json()
+    headings = {section["heading"] for section in detail["document"]["sections"]}
+    assert {"Cover", "Executive Summary", "Decision Summary", "Sources And Data Notes"} <= headings
     assert {row["availability"] for row in body["sourceHealth"]} >= {"simulated", "stale", "not_configured"}
 
 

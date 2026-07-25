@@ -234,6 +234,7 @@ Core suite:
 cd frontend
 npm ci
 npm run typecheck
+npm run test:evidence
 npm run build
 npm run test:metrics
 npm run test:rail
@@ -257,3 +258,7 @@ Known local auth caveat: the full monitor command needs `ANTHROPIC_API_KEY` for 
 | `.github/workflows/` | Manual pipeline and deployment workflows |
 
 Avoid committing generated frontend build output, local databases, virtualenvs, or local env files.
+
+## Demo Presentation Layer
+
+The cockpit now supports a presenter-ready flow: Today priorities, Account 360 evidence inspection, meaningful timelines, URL-backed Focus mode, URL-backed Briefing mode, Ask citation inspection, and an `Executive Account and Meeting Brief`. See `docs/DEMO_RUNBOOK.md` for the exact demo route sequence and reset/verify commands.

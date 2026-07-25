@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { useWorkItems, type WorkItem } from "../../app/workItems.ts";
 import { qualitativeSignalConfidence } from "../../app/confidence.ts";
@@ -9,6 +9,8 @@ import { accountPath, navigateTo, pathForTab, useAppRoute } from "../../app/rout
 import { plainActionLabel, plainWorkStatus, primaryWorkAction, workItemAlertLevel } from "../../app/presentation.ts";
 import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
+import { buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
+import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 
 type BriefLink = {
   label: string;
@@ -147,6 +149,8 @@ function alertLabel(item: WorkItem): string {
 
 export function TodayBrief({ world }: { world: World }) {
   const route = useAppRoute();
+  const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const horizonId = route.query.get("horizon") ?? "week";
   const horizon = HORIZONS.find((item) => item.id === horizonId) ?? HORIZONS[1];
   const attention = useWorkItems(world, "needs_attention");
@@ -207,6 +211,11 @@ export function TodayBrief({ world }: { world: World }) {
     },
   ].filter((card) => card.value > 0);
 
+  function openEvidence(next: EvidencePackage, trigger?: HTMLButtonElement | null) {
+    evidenceTriggerRef.current = trigger ?? null;
+    setEvidence(next);
+  }
+
   return (
     <section className="surface-page today-brief-page" data-surface-component="surface-todays-brief">
       <SurfaceHeader
@@ -248,6 +257,9 @@ export function TodayBrief({ world }: { world: World }) {
               </div>
               <button type="button" className="priority-primary" onClick={() => navigateTo(`/work/${encodeURIComponent(item.id)}`)}>
                 {primary ? plainActionLabel(primary) : "Open work item"}
+              </button>
+              <button type="button" className="priority-secondary" onClick={(event) => openEvidence(buildWorkItemEvidence(world, item), event.currentTarget)}>
+                View evidence
               </button>
             </article>
           );
@@ -291,9 +303,9 @@ export function TodayBrief({ world }: { world: World }) {
       )}
 
       <section className="today-development-grid" aria-label="Recent developments">
-        <DevelopmentColumn title="Confirmed account developments" signals={accountSignals} world={world} />
-        <DevelopmentColumn title="Program developments" signals={programSignals} world={world} />
-        <DevelopmentColumn title="Market developments" signals={marketSignals} world={world} />
+        <DevelopmentColumn title="Confirmed account developments" signals={accountSignals} world={world} onEvidence={openEvidence} />
+        <DevelopmentColumn title="Program developments" signals={programSignals} world={world} onEvidence={openEvidence} />
+        <DevelopmentColumn title="Market developments" signals={marketSignals} world={world} onEvidence={openEvidence} />
       </section>
 
       {completed.length > 0 && (
@@ -311,13 +323,14 @@ export function TodayBrief({ world }: { world: World }) {
       )}
 
       <div className="today-ask-row">
-        <button type="button" onClick={() => navigateTo(`/ask?prompt=${encodeURIComponent(topSeed)}`)}>Ask about today</button>
+        <button type="button" onClick={() => navigateTo(`/ask?prompt=${encodeURIComponent(topSeed ?? "What changed today and what should I do first?")}`)}>Ask about today</button>
       </div>
+      <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} triggerRef={evidenceTriggerRef} />
     </section>
   );
 }
 
-function DevelopmentColumn({ title, signals, world }: { title: string; signals: Signal[]; world: World }) {
+function DevelopmentColumn({ title, signals, world, onEvidence }: { title: string; signals: Signal[]; world: World; onEvidence: (evidence: EvidencePackage, trigger?: HTMLButtonElement | null) => void }) {
   return (
     <section className="surface-panel">
       <div className="panel-head"><h2>{title}</h2><span>{signals.length}</span></div>
@@ -325,10 +338,15 @@ function DevelopmentColumn({ title, signals, world }: { title: string; signals: 
         {signals.map((signal) => {
           const link = signalLink(world, signal);
           return (
-            <button key={signal.id} type="button" onClick={() => navigate(link)}>
-              <strong>{signalHeadline(signal)}</strong>
-              <span>{signalSourceName(signal)} · {signalSourceDate(signal)}</span>
-            </button>
+            <div key={signal.id} className="today-development-row">
+              <button type="button" onClick={() => navigate(link)}>
+                <strong>{signalHeadline(signal)}</strong>
+                <span>{signalSourceName(signal)} · {signalSourceDate(signal)}</span>
+              </button>
+              <button type="button" className="today-evidence-link" onClick={(event) => onEvidence(buildSignalEvidence(world, signal), event.currentTarget)}>
+                View evidence
+              </button>
+            </div>
           );
         })}
         {!signals.length && <span className="rail-quiet-empty">No developments in this horizon.</span>}

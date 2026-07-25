@@ -399,27 +399,32 @@ def _draft_deliverable(
         return None
     account_name = account.display_name or account.legal_name
     score = scores[0] if scores else None
+    freshness = "; ".join([
+        "Prepared date not supplied by user",
+        *(f"{row.get('displayName')}: {row.get('availability')}" for row in source_health[:3]),
+    ])
     sections = [
-        {"id": "purpose", "heading": "Purpose", "blocks": [{"kind": "text", "text": f"Prepare a supported executive brief for {account_name}."}]},
-        {"id": "executive-summary", "heading": "Executive summary", "blocks": [{"kind": "text", "text": f"{account_name} has internal account context and {len(signals)} confirmed account-linked development(s)."}]},
-        {"id": "why-it-matters", "heading": "Why the account matters", "blocks": [{"kind": "text", "text": "; ".join((account.known_programs or [])[:3]) or "No supported program list is available."}]},
-        {"id": "confirmed-developments", "heading": "Confirmed developments", "blocks": [{"kind": "text", "text": "\n".join(signal.title for _, signal in signals) or "No confirmed account-linked developments are available."}]},
-        {"id": "score-summary", "heading": "Score summary", "blocks": [{"kind": "text", "text": _first_score_line(score)}]},
-        {"id": "missing-information", "heading": "Missing information", "blocks": [{"kind": "text", "text": "Owner, live capacity, and unconfirmed relationship details remain missing unless a cited internal record says otherwise."}]},
-        {"id": "next-actions", "heading": "Recommended next actions", "blocks": [{"kind": "text", "text": "\n".join(item.recommended_action for item in work_items[:3]) or "No open work item is available."}]},
+        {"id": "cover", "heading": "Cover", "blocks": [{"kind": "text", "text": f"Account: {account_name}. Meeting purpose: evidence-backed account discussion. Meeting date: not supplied. Prepared for: BTX leadership and revenue team. Data freshness: {freshness}."}]},
+        {"id": "executive-summary", "heading": "Executive Summary", "blocks": [{"kind": "text", "text": f"{account_name} has internal account context and {len(signals)} confirmed account-linked development(s). Recommended posture: review the account and validate the next outreach step. Most important uncertainty: live capacity, customer access, and timing remain unavailable unless cited."}]},
+        {"id": "account-context", "heading": "Account Context", "blocks": [{"kind": "text", "text": "; ".join((account.known_programs or [])[:3]) or "No supported program list is available."}]},
+        {"id": "recent-developments", "heading": "Recent Developments", "blocks": [{"kind": "text", "text": "\n".join(signal.title for _, signal in signals) or "No confirmed account-linked developments are available."}]},
+        {"id": "decision-summary", "heading": "Decision Summary", "blocks": [{"kind": "text", "text": _first_score_line(score)}]},
+        {"id": "meeting-preparation", "heading": "Meeting Preparation", "blocks": [{"kind": "text", "text": "Objectives: confirm timing, decision process, qualification requirements, and follow-up owner. Risks to avoid: unsupported capacity claims, invented participants, or treating attractiveness as win probability."}]},
+        {"id": "current-work", "heading": "Current Work", "blocks": [{"kind": "text", "text": "\n".join(item.recommended_action for item in work_items[:3]) or "No open work item is available."}]},
+        {"id": "sources-and-data-notes", "heading": "Sources And Data Notes", "blocks": [{"kind": "text", "text": "Sources are internal citations returned with this assistant draft. Live internet research, email execution, calendar execution, ERP, and MES integrations are not part of this action."}]},
     ]
     return {
         "requires_confirmation": True,
         "create_via": "POST /deliverables",
         "payload": {
             "type": "meeting_brief",
-            "title": f"{account_name} executive account brief",
+            "title": f"Executive Account and Meeting Brief - {account_name}",
             "canonical_account_id": account.id,
             "program_id": signals[0][0].signal_id if signals else None,
             "entity_ids": [account.id, *[signal.id for _, signal in signals[:4]]],
             "document": {
                 "type": "meeting_brief",
-                "title": f"{account_name} executive account brief",
+                "title": f"Executive Account and Meeting Brief - {account_name}",
                 "brainArea": "accounts",
                 "dataClassification": "internal",
                 "sections": sections,

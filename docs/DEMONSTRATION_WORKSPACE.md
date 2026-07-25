@@ -107,6 +107,28 @@ The command uses `BTX_DATABASE_URL` or `DATABASE_URL` through the normal backend
 
 Today should show a clear priority stack led by the Lockheed directed-energy follow-up approval. Account 360 should explain why Lockheed matters, show public source evidence, and keep missing delivery-feasibility inputs unavailable. Work Queue should include approval, relationship review, capacity check, approved, verified, and closed states.
 
+The deterministic story supports this journey:
+
+1. sourced development detected
+2. relationship confirmed
+3. score snapshot explains evidence strength
+4. work item created
+5. action approved
+6. HubSpot task represented honestly as demo verification
+7. outcome remains visible
+8. Ask explains the recommendation with citations
+9. Executive Account and Meeting Brief opens from program memory
+10. Briefing mode presents the conclusion
+
+Useful demo routes:
+
+- `/today`
+- `/accounts/demo-acct-lockheed`
+- `/accounts/demo-acct-lockheed?view=focus`
+- `/accounts/demo-acct-lockheed?view=briefing`
+- `/work/demo-wi-approve-lockheed`
+- `/ask/demo-assist-lockheed`
+
 ## Integration Limitations
 
 HubSpot execution is previewable from approved work items, but real execution remains disabled unless a sandbox HubSpot token is configured and the user has the required role. ERP/MES operating data is not connected; capacity context is illustrative and marked through the demo notice and work-item context.

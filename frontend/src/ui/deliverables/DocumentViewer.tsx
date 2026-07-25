@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import { MapContainer, Marker, Polyline, Tooltip, ZoomControl } from "react-leaflet";
 import type { Deliverable, DeliverableSection } from "../../deliverables/types.ts";
@@ -22,8 +22,12 @@ import {
 } from "../../deliverables/export.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
 import { deliverableMetaLabel, visibleSources } from "../../app/sourceLabels.ts";
+import { evidenceFromDeliverableSource, type EvidencePackage } from "../../app/evidence.ts";
+import { navigateTo, useAppRoute } from "../../app/router.ts";
 import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
 import { DarkMapTiles } from "../map/DarkMapTiles.tsx";
+import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
+import { DeliverableBriefingMode } from "../modes/BriefingMode.tsx";
 import type { ChartSpec } from "../../metrics/types.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
@@ -84,6 +88,7 @@ function bannedHits(text: string): string[] {
 }
 
 export function DocumentViewer({ deliverable, world, openedFrom = "generation" }: { deliverable: Deliverable; world?: World; openedFrom?: "generation" | "library" }) {
+  const route = useAppRoute();
   const [sections, setSections] = useState(() => editableSections(deliverable.sections));
   const [title, setTitle] = useState(deliverable.title);
   const [dirty, setDirty] = useState(false);
@@ -93,8 +98,13 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [versions, setVersions] = useState<VersionEntry[]>(() => [{ id: `${Date.now()}`, label: "v1 original", sections: editableSections(deliverable.sections) }]);
   const [taskDialog, setTaskDialog] = useState<TaskDialog | null>(null);
+  const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const current = useMemo(() => ({ ...deliverable, title, sections }), [deliverable, sections, title]);
   const markdown = useMemo(() => deliverableToMarkdown(current), [current]);
+  const viewMode = route.query.get("view");
+  const isFocus = viewMode === "focus";
+  const isBriefing = viewMode === "briefing";
 
   useEffect(() => {
     setSections(editableSections(deliverable.sections));
@@ -250,6 +260,14 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
     openDemoAction({ title: "Create CRM task", action: "crm_task", evidence: deliverable.title });
   }
 
+  function pathWithView(nextView: string | null): string {
+    const params = new URLSearchParams(route.query);
+    if (nextView) params.set("view", nextView);
+    else params.delete("view");
+    const query = params.toString();
+    return `${route.path}${query ? `?${query}` : ""}`;
+  }
+
   async function confirmTask() {
     if (!taskDialog || taskDialog.status === "created" || taskDialog.status === "creating") return;
     const draft = { subject: taskDialog.subject, body: taskDialog.body, target: taskDialog.target };
@@ -300,8 +318,16 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   ];
   const sendBlocked = checklist.some((item) => !item.ok) || suggestions.some((item) => Boolean(item.warning));
 
+  if (isBriefing) {
+    return (
+      <div className="editor-overlay briefing-overlay" role="dialog" aria-modal="true">
+        <DeliverableBriefingMode deliverable={current} onExit={() => navigateTo(pathWithView(null))} />
+      </div>
+    );
+  }
+
   return (
-    <div className="editor-overlay" role="dialog" aria-modal="true">
+    <div className={isFocus ? "editor-overlay record-focus-mode" : "editor-overlay"} role="dialog" aria-modal="true">
     <article className="document-viewer editor-window">
       <header className="document-head">
         <div>
@@ -317,6 +343,8 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
           <button onClick={closeEditor} aria-label={openedFrom === "library" ? "Back to library" : "Close editor"}>{openedFrom === "library" ? "Back" : "×"}</button>
           <button onClick={() => void saveCurrent()}>Save to Library</button>
           <button onClick={copyMarkdown}>Copy</button>
+          <button onClick={() => navigateTo(pathWithView(isFocus ? null : "focus"))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
+          <button onClick={() => navigateTo(pathWithView("briefing"))}>Briefing mode</button>
           <div className="download-menu">
             <button onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen}>Download</button>
             {menuOpen && (
@@ -463,6 +491,16 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
             <strong>{source.label}</strong>
             <span>{source.reason}</span>
             <em>{source.records}</em>
+            <button
+              ref={index === 0 ? evidenceTriggerRef : undefined}
+              type="button"
+              onClick={(event) => {
+                evidenceTriggerRef.current = event.currentTarget;
+                setEvidence(evidenceFromDeliverableSource(current, deliverable.sources[index]));
+              }}
+            >
+              View evidence
+            </button>
           </div>
         ))}
       </aside>
@@ -512,6 +550,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
           ))}
         </div>
       </aside>
+      <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} triggerRef={evidenceTriggerRef} />
     </article>
     </div>
   );

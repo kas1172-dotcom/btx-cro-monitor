@@ -93,3 +93,17 @@ Implemented scope:
 - Work-item and deliverable draft previews with explicit confirmation.
 - Backend-seeded active and archived demo conversations.
 - Ask workspace with conversation sidebar, thread, citations, composer, contextual routes, archive/restore, rename, copy, retry, and mobile stacking.
+
+## Evidence, Timeline, And Briefing Checkpoint
+
+Implemented scope:
+
+- Shared Evidence Drawer fed by existing signals, score snapshots, work items, Ask citations, and deliverable source entries.
+- Evidence entry points on Today priorities, Account 360 recommendations, score explanations, confirmed signals, Program signals, Work detail, Ask citations, and executive brief source references.
+- Meaningful Account 360 and Work detail timelines using business events instead of raw audit history.
+- URL-backed Focus mode for Account 360, Work detail, Ask, and Deliverable preview.
+- URL-backed Briefing mode for Account 360 and Deliverable preview.
+- Executive Account and Meeting Brief structure across the wizard agent, Ask draft payloads, and demo seed.
+- Demo runbook in `docs/DEMO_RUNBOOK.md`.
+
+Validation for this checkpoint is tracked by `cd frontend && npm run test:evidence` plus the standard backend/frontend suites.

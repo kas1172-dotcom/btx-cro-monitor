@@ -16,8 +16,8 @@ export interface DeliverableTemplateOption {
 export const DELIVERABLE_TEMPLATE_OPTIONS: DeliverableTemplateOption[] = [
   {
     id: "meeting_brief",
-    label: "Meeting brief",
-    description: "Prep notes, evidence, contacts, and next actions for a target account.",
+    label: "Executive account and meeting brief",
+    description: "A polished account brief with decision readiness, evidence, missing information, and meeting prep.",
     requiresAccount: true,
   },
   {

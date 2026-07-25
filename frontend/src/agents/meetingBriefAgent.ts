@@ -20,11 +20,14 @@ const Inputs = z.object({
 type Inputs = z.infer<typeof Inputs>;
 
 const sectionSpec = [
-  { id: "overview", heading: "Overview", required: true },
-  { id: "relationship", heading: "Relationship & History", required: true },
-  { id: "signals", heading: "Live Signals", required: true },
-  { id: "talking-points", heading: "Talking Points", required: true },
-  { id: "risks", heading: "Risks & Open Questions", required: true },
+  { id: "cover", heading: "Cover", required: true },
+  { id: "executive-summary", heading: "Executive Summary", required: true },
+  { id: "account-context", heading: "Account Context", required: true },
+  { id: "recent-developments", heading: "Recent Developments", required: true },
+  { id: "decision-summary", heading: "Decision Summary", required: true },
+  { id: "meeting-preparation", heading: "Meeting Preparation", required: true },
+  { id: "current-work", heading: "Current Work", required: true },
+  { id: "sources-and-data-notes", heading: "Sources And Data Notes", required: true },
 ];
 
 function money(value: number): string {
@@ -35,6 +38,20 @@ function money(value: number): string {
 function riskPhrase(value: unknown): string {
   const score = Number(value);
   return score > 0 ? `risk score is ${score}` : "there are no active risk signals";
+}
+
+function scoreSnapshot(world: World, accountId: string, family: keyof NonNullable<World["scoreResults"]>) {
+  return world.scoreResults?.[family]
+    .filter((score) => score.entityType === "account" && score.entityId === accountId)
+    .sort((a, b) => b.calculatedAt.localeCompare(a.calculatedAt))[0] ?? null;
+}
+
+function scoreBrief(snapshot: ReturnType<typeof scoreSnapshot>, label: string): string {
+  if (!snapshot || snapshot.score === null || snapshot.result.status === "insufficient_data") return `${label}: unavailable. Missing information remains.`;
+  const value = snapshot.result.status === "provisional" ? `${Math.round(snapshot.score)} provisional` : snapshot.result.status === "disqualified" ? "disqualified" : String(Math.round(snapshot.score));
+  const factor = snapshot.result.positiveFactors[0]?.label ?? snapshot.result.negativeFactors[0]?.label ?? "current evidence set";
+  const missing = snapshot.result.missingInputs[0] ?? "no major missing input surfaced";
+  return `${label}: ${value}. Main factor: ${factor}. Missing: ${missing}.`;
 }
 
 function evidenceConfidence(input: { hasVerifiedLink: boolean; hasContact: boolean; hasPipeline: boolean; hasDatedSignal: boolean }): { confidence: Deliverable["confidence"]; reason: string } {
@@ -72,6 +89,22 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const contactSource = contacts.some((contact) => provenanceForRecord(contact) === "CRM") ? "HubSpot CRM" : "Contact baseline";
   const opportunitySource = opportunities.some((opportunity) => provenanceForRecord(opportunity) === "CRM") ? "HubSpot CRM" : "Pipeline baseline";
   const signalSource = topSignal?.artifact ? "Monitor engine" : "Monitor engine + public sources";
+  const workItems = (world.worldSnapshot?.workItems ?? []).filter((item) => item.canonical_account_id === accountId);
+  const freshness = [
+    `Prepared date ${new Date().toISOString().slice(0, 10)}`,
+    `Workspace generated ${world.worldSnapshot?.generatedAt ? world.worldSnapshot.generatedAt.slice(0, 10) : "unavailable"}`,
+    `Monitor run ${world.snapshot?.publicSignals.run_at ? world.snapshot.publicSignals.run_at.slice(0, 10) : "unavailable"}`,
+  ].join("; ");
+  const classification = world.worldSnapshot?.tenant.isDemonstration
+    ? "Demonstration workspace. Internal CRM, work, and operating records are illustrative."
+    : "Internal workspace record.";
+  const decisionScoreText = [
+    scoreBrief(scoreSnapshot(world, accountId, "accountAttractiveness"), "Strategic attractiveness"),
+    scoreBrief(scoreSnapshot(world, accountId, "signalConfidence"), "Evidence strength"),
+    scoreBrief(scoreSnapshot(world, accountId, "pursuitPwin"), "Likelihood to win"),
+    scoreBrief(scoreSnapshot(world, accountId, "deliveryFeasibility"), "Ability to deliver"),
+    scoreBrief(scoreSnapshot(world, accountId, "relationshipHealth"), "Relationship strength"),
+  ].join(" ");
 
   return {
     facts: {
@@ -92,9 +125,15 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       contactSource,
       opportunitySource,
       signalSource,
+      freshness,
+      classification,
       topSignal: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal) : "No monitor signal available.",
       artifactSignalFigures: signalFigureContext(topSignal ? [topSignal, ...signals] : signals),
       recommendedAction: rec ? `${actionLabel(rec.action)}: ${rec.reason}` : "Monitor until a stronger signal appears.",
+      decisionScoreText,
+      workSummary: workItems.length
+        ? workItems.slice(0, 4).map((item) => `${item.recommended_action} Owner: ${item.owner ?? "Unassigned"}. Due: ${item.due_date ?? "not set"}. Approval: ${item.approval_state.replace(/_/g, " ")}.`).join(" ")
+        : "No open account-specific work items are available.",
       deliverableConfidence: confidence.confidence,
       deliverableConfidenceReason: confidence.reason,
     },
@@ -114,7 +153,7 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
   return {
     id: `deliv-${Date.now()}-${f.accountId}`,
     type: "meeting_brief",
-    title: `Meeting Brief - ${f.accountName}`,
+    title: `Executive Account and Meeting Brief - ${f.accountName}`,
     createdAt: new Date().toISOString(),
     brainArea: "accounts",
     entityIds: ctx.entityIds,
@@ -122,38 +161,67 @@ export function composeMeetingBrief(ctx: AgentContext): Deliverable {
     confidenceReason: String(f.deliverableConfidenceReason),
     sections: [
       {
-        id: "overview",
-        heading: "Overview",
+        id: "cover",
+        heading: "Cover",
         blocks: [
-          { kind: "text", text: `${f.accountName} is a ${f.relationship} account in ${f.city}. Opportunity score is ${f.opportunityScore}, ${riskPhrase(f.riskScore)}, and ${PROFILE.name} capability fit is ${Number(f.fitScore) >= 70 ? "strong" : Number(f.fitScore) >= 45 ? "partial" : "limited"}.` },
+          { kind: "table", columns: ["Field", "Value"], rows: [
+            ["Account", String(f.accountName)],
+            ["Meeting purpose", "Prepare an evidence-backed account discussion."],
+            ["Meeting date", "Not supplied"],
+            ["Prepared for", "BTX leadership and revenue team"],
+            ["Prepared date and data freshness", String(f.freshness)],
+            ["Classification", String(f.classification)],
+          ] },
         ],
       },
       {
-        id: "relationship",
-        heading: "Relationship & History",
+        id: "executive-summary",
+        heading: "Executive Summary",
+        blocks: [
+          { kind: "text", text: `${f.accountName} matters because it combines ${money(Number(f.openPipelineValue))} open pipeline, ${String(f.pipelineHealth).toLowerCase()} pipeline health, and ${Number(f.fitScore) >= 70 ? "strong" : Number(f.fitScore) >= 45 ? "partial" : "limited"} capability alignment with ${PROFILE.name}. What changed: ${String(f.topSignal)} Recommended posture: ${String(f.recommendedAction)} Most important uncertainty: confirm decision process, timing, qualification requirements, and delivery window before overcommitting.` },
+        ],
+      },
+      {
+        id: "account-context",
+        heading: "Account Context",
         blocks: [
           { kind: "table", columns: ["Status", "Contact", "Open pipeline", "Pipeline health", "Source"], rows: [[displayLabel(String(f.accountStatus)), String(f.contact), money(Number(f.openPipelineValue)), String(f.pipelineHealth), `${f.contactSource} / ${f.opportunitySource}`]] },
+          { kind: "text", text: `Capabilities aligned to stated needs: ${f.matchedCapabilities}. Gaps or qualification topics: ${f.missingCapabilities}.` },
         ],
       },
       {
-        id: "signals",
-        heading: "Live Signals",
+        id: "recent-developments",
+        heading: "Recent Developments",
         blocks: [
-          { kind: "text", text: `${String(f.topSignal)}` },
+          { kind: "text", text: `${String(f.topSignal)} Program and market context should remain separate unless an account relationship is confirmed in the source records.` },
         ],
       },
       {
-        id: "talking-points",
-        heading: "Talking Points",
+        id: "decision-summary",
+        heading: "Decision Summary",
         blocks: [
-          { kind: "text", text: `Lead with ${f.matchedCapabilities} because those capabilities match the account's stated needs. Be transparent about gaps such as ${f.missingCapabilities} and frame them as qualification questions or teaming needs.` },
+          { kind: "text", text: String(f.decisionScoreText) },
         ],
       },
       {
-        id: "risks",
-        heading: "Risks & Open Questions",
+        id: "meeting-preparation",
+        heading: "Meeting Preparation",
         blocks: [
-          { kind: "text", text: `Confirm decision process, delivery timing, qualification requirements, and whether ${PROFILE.name} capacity can support the next production window.` },
+          { kind: "text", text: `Objectives: confirm account timing, validate the opportunity, identify stakeholders, and define the next qualified action. Talking points: lead with ${f.matchedCapabilities}; ask about decision criteria, print package readiness, certifications, timing, pricing expectations, and follow-up ownership. Risks to avoid: unsupported capacity claims, invented savings, or treating attractiveness as win probability. Desired outcome: a qualified next step with evidence, owner, due date, and approval state.` },
+        ],
+      },
+      {
+        id: "current-work",
+        heading: "Current Work",
+        blocks: [
+          { kind: "text", text: String(f.workSummary) },
+        ],
+      },
+      {
+        id: "sources-and-data-notes",
+        heading: "Sources And Data Notes",
+        blocks: [
+          { kind: "text", text: `Sources: ${ctx.sources.map((source) => `${source.source} (${source.records.length} records)`).join("; ")}. Data notes: ${String(f.freshness)}. Classification: ${String(f.classification)} Missing systems: live ERP/MES capacity and autonomous email/calendar execution are not available in this brief.` },
         ],
       },
     ],

@@ -6,6 +6,8 @@ import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import type { Signal } from "../../engine/signals/contract.ts";
 import { EmptyState, ProvenanceStrip, ScopePill, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
+import { buildSignalEvidence, type EvidencePackage } from "../../app/evidence.ts";
+import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 
 function accountName(world: World, id: string): string {
   return world.companies.find((company) => company.id === id)?.name ?? "Portfolio";
@@ -31,6 +33,7 @@ function soWhat(signal: Signal): string {
 
 export function ProgramContractTracker({ world }: { world: World }) {
   const [expandedSignalId, setExpandedSignalId] = useState<string | null>(null);
+  const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
   const programSignals = [...world.analysis.valid].sort((a, b) => b.detected_at.localeCompare(a.detected_at));
 
   return (
@@ -77,6 +80,7 @@ export function ProgramContractTracker({ world }: { world: World }) {
                     <span>Evidence</span>
                     <p>{signal.source_quote}</p>
                     <div className="link-row">
+                      <button type="button" onClick={() => setEvidence(buildSignalEvidence(world, signal))}>View evidence</button>
                       <ExternalLink href={signal.source_url} label="Open source" />
                       <ExternalLink href={signal.document_url} label="Document" />
                     </div>
@@ -88,6 +92,7 @@ export function ProgramContractTracker({ world }: { world: World }) {
         })}
         {programSignals.length === 0 && <EmptyState headline="No program signals" body="Contract and program signals will appear after the monitor validates new evidence." icon="signal" />}
       </div>
+      <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} />
     </section>
   );
 }

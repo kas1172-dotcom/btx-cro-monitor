@@ -4,6 +4,8 @@
 
 The cockpit has the right backend foundation: authenticated backend state, canonical accounts, score snapshots, work-item lifecycle, notes, audit history, and verified HubSpot task execution. The remaining risk is experience clarity. A CRO can reach the needed records, but the product still exposes too much implementation language, spreads decision context across surfaces, and lacks a compact global command layer.
 
+Latest implementation pass adds the missing inspection and presentation layer: one shared Evidence Drawer, meaningful account/work timelines, URL-backed Focus mode, URL-backed Briefing mode, Ask citation inspection, and a polished Executive Account and Meeting Brief.
+
 The demo should lead with:
 
 1. What changed
@@ -51,6 +53,7 @@ The demo should lead with:
 - Attention counts should link to exact Work Queue filters.
 - Confirmed account, program, and market developments should be separated.
 - Completed/verified work should appear to demonstrate system response.
+- Implemented: ranked priority cards and development columns now expose "View evidence" without leaving Today.
 
 ### Work Queue
 
@@ -58,6 +61,7 @@ The demo should lead with:
 - Default view should prioritize actionable work: assigned to me, awaiting approval, overdue, failed execution, due soon, and unassigned high priority.
 - List rows should stay simple. Evidence, notes, audit history, and execution detail belong on detail.
 - Detail needs a business-first hierarchy before audit/state-machine detail.
+- Implemented: Work detail now has Focus mode, shared evidence, and a meaningful timeline before the raw audit history.
 
 ### Account 360
 
@@ -70,16 +74,19 @@ The demo should lead with:
   - Relationship strength
 - Missing scores must be "More information needed" or "Not connected," never zero.
 - Current work should use the same backend work-item records as Work Queue.
+- Implemented: Account 360 now has score evidence buttons, account evidence, meaningful timeline, Focus mode, and Briefing mode.
 
 ### Ask
 
 - Keep one user-facing assistant identity.
 - Answers must cite internal records and distinguish confirmed, inferred, missing, simulated, and unavailable data.
 - Persistent conversation support is still a separate backend milestone.
+- Implemented: Ask citations now open the shared Evidence Drawer, and contextual Ask actions cover evidence, changes, missing information, talking points, and executive brief drafting.
 
 ### Deliverables
 
 - Existing deliverable tooling works, but the primary demo needs one polished executive account and meeting brief template with sources, missing information, data freshness, and classification.
+- Implemented: the meeting brief is now "Executive Account and Meeting Brief" with cover, executive summary, account context, recent developments, decision summary, meeting prep, current work, and sources/data notes. Deliverable view supports Focus and Briefing modes.
 
 ### Integrations And Source Health
 
@@ -111,3 +118,20 @@ Frontend presentation helpers should own only labels, grouping, severity, and vi
 6. Add deterministic demo reset and runbook.
 7. Consolidate assistant identity and persistent conversations.
 8. Add briefing/focus modes and executive brief.
+
+## Current Evidence And Timeline Audit
+
+- Evidence was previously fragmented across signal cards, score details, deliverable sources, and Ask citations. The new shared Evidence Drawer normalizes summary, supporting records, relationship status, score contribution, uncertainty, and advanced details.
+- Citations previously navigated away from Ask. Ask citations now inspect evidence in place and still provide an explicit "Open record" route.
+- Program signals previously showed source text but not the shared evidence pattern. Expanded program signals now use the drawer.
+- Score explanations previously showed technical factor detail before an executive-friendly evidence action. Score KPIs and details now expose "View evidence."
+- Work item audit history remains available, but meaningful business events now appear first.
+- Focus mode hides secondary panes and navigation density on Account 360, Work detail, Ask, and Deliverable preview while preserving the same URL and record.
+- Briefing mode is read-only, keyboard navigable, and print-friendly for Account 360 and Deliverable preview.
+
+## Remaining UX Limits
+
+- Live internet research is intentionally not implemented.
+- External web citations are limited to records already stored in the workspace.
+- ERP/MES capacity, email execution, and calendar execution remain unavailable.
+- Compare mode, statistical PWIN calibration, and self-learning score changes remain deferred.

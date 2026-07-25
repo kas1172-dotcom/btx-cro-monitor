@@ -194,6 +194,13 @@ export function App() {
     ? { tone: "success" as const, value: "live" }
     : { tone: "warning" as const, value: "offline" };
   const commandShortcut = typeof navigator !== "undefined" && navigator.platform.toLowerCase().includes("mac") ? "⌘K" : "Ctrl K";
+  const globalViewMode = route.query.get("view");
+  const shellClassName = [
+    "quiet-cockpit",
+    rightPanelOpen ? "right-panel-open" : "",
+    globalViewMode === "focus" ? "app-focus-mode" : "",
+    globalViewMode === "briefing" ? "app-briefing-mode" : "",
+  ].filter(Boolean).join(" ");
 
   async function handleWizardCommitted(deliverable: Deliverable) {
     const request = deliverableWizardRequest;
@@ -235,7 +242,7 @@ export function App() {
 
   return (
     <AppShell
-      className={rightPanelOpen ? "quiet-cockpit right-panel-open" : "quiet-cockpit"}
+      className={shellClassName}
       rightW={rightW}
       rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : routeTab} counts={counts} />}
       topbar={(

@@ -114,6 +114,12 @@ The production cockpit has one adapter path: authenticated frontend calls to bac
 
 Ask is the single production assistant identity. It stores tenant-scoped conversations and messages in the backend, retrieves only internal records, returns citations for supported claims, and creates only preview drafts until the user confirms through the normal work-item or deliverable APIs. Details live in `docs/ASSISTANT_ARCHITECTURE.md`.
 
+## Presentation Layer
+
+The frontend owns shared presentation view models only. `frontend/src/app/evidence.ts` derives drawer-ready evidence packages from existing signals, score snapshots, work items, deliverable provenance, and Ask citations. `frontend/src/app/timeline.ts` derives meaningful business timeline events from existing signals, relationships, score snapshots, work audit history, notes, and outcomes. Neither module creates a new authoritative evidence store or scoring path.
+
+Focus mode and Briefing mode are URL query states such as `/accounts/:id?view=focus` and `/accounts/:id?view=briefing`. They reuse the same backend world snapshot, permissions, and record routes.
+
 Demo JSON under `frontend/data/demo/btx/` is test scaffolding only. It must not be selected by a production Vite flag or used as a runtime fallback when a backend source is missing.
 
 ## Demonstration Tenant

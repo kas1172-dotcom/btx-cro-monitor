@@ -502,6 +502,12 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     _assert(by_status["demo-wi-verified-sim"].execution_state == "verified", "Verified simulated action was not restored.")
     _assert(by_status["demo-wi-verified-sim"].external_system == "hubspot-demo", "Simulated verification classification is missing.")
     _assert(by_status["demo-wi-closed-outcome"].outcome_category == "learning", "Completed outcome was not restored.")
+    deliverable_by_id = {row.id: row for row in deliverables}
+    executive_brief = deliverable_by_id.get("demo-deliv-lockheed-brief")
+    _assert(executive_brief is not None, "Seeded executive brief was not restored.")
+    _assert(executive_brief.title == "Executive Account and Meeting Brief - Lockheed Martin Corporation", "Seeded executive brief title is incorrect.")
+    headings = {section.get("heading") for section in (executive_brief.document or {}).get("sections", [])}
+    _assert({"Cover", "Executive Summary", "Decision Summary", "Sources And Data Notes"} <= headings, "Seeded executive brief is missing required sections.")
     _assert(all(row.raw_payload.get("dataClassification") == "public" for row in signals), "Public source records lost classification.")
     _assert(all(row.raw_payload.get("source_url") for row in signals), "Public source metadata is incomplete.")
     _assert(all(row.result["sourceDataVersion"].startswith(f"{tenant_id}:demo-reset:") for row in snapshots), "Score snapshots do not reference demo source data.")

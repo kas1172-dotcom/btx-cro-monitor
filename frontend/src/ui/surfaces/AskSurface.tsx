@@ -16,6 +16,8 @@ import type { World } from "../../app/useWorld.ts";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
 import { useWorkItems } from "../../app/workItems.ts";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
+import { evidenceFromCitation, type EvidencePackage } from "../../app/evidence.ts";
+import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 
 function displayTime(value: string): string {
   return new Date(value).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
@@ -183,8 +185,11 @@ export function AskSurface({ world }: { world: World }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdRoute, setCreatedRoute] = useState<string | null>(null);
+  const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const appliedPrompt = useRef<string | null>(null);
   const attention = useWorkItems(world, "needs_attention");
+  const isFocus = route.query.get("view") === "focus";
 
   async function loadConversations(nextSelectedId = routeConversationId) {
     setLoading(true);
@@ -275,12 +280,20 @@ export function AskSurface({ world }: { world: World }) {
     world.refresh();
   }
 
+  function pathWithFocus(nextFocus: boolean): string {
+    const params = new URLSearchParams(route.query);
+    if (nextFocus) params.set("view", "focus");
+    else params.delete("view");
+    const query = params.toString();
+    return `${route.path}${query ? `?${query}` : ""}`;
+  }
+
   const selectedContext = selected?.context ?? context;
   const contextLabel = compactContext(selectedContext, world);
   const conversations = [...activeConversations, ...archivedConversations];
 
   return (
-    <section className="surface-page ask-surface ask-workspace" data-surface-component="surface-ask">
+    <section className={isFocus ? "surface-page ask-surface ask-workspace record-focus-mode" : "surface-page ask-surface ask-workspace"} data-surface-component="surface-ask">
       <SurfaceHeader
         eyebrow="Ask"
         headline="Ask"
@@ -332,6 +345,7 @@ export function AskSurface({ world }: { world: World }) {
                   <p>{contextLabel}</p>
                 </div>
                 <div className="ask-thread-actions">
+                  <button type="button" onClick={() => navigateTo(pathWithFocus(!isFocus))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
                   <button type="button" onClick={() => void renameConversation(selected)}>Rename</button>
                   {selected.status === "archived"
                     ? <button type="button" onClick={() => void setConversationStatus(selected, "active")}>Restore</button>
@@ -365,6 +379,19 @@ export function AskSurface({ world }: { world: World }) {
               <strong>{contextLabel}</strong>
               {Object.values(context).some(Boolean) && <button type="button" onClick={() => setContext({})}>Remove</button>}
             </div>
+            <div className="ask-context-actions" aria-label="Contextual Ask actions">
+              {[
+                "Explain this evidence",
+                "Summarize what changed",
+                "Identify missing information",
+                "Prepare talking points",
+                "Draft the executive brief",
+              ].map((action) => (
+                <button key={action} type="button" onClick={() => setDraft(action)}>
+                  {action}
+                </button>
+              ))}
+            </div>
             <label>
               <span>Message Ask</span>
               <textarea
@@ -383,11 +410,15 @@ export function AskSurface({ world }: { world: World }) {
           <section>
             <h2>Citations</h2>
             {selected?.messages.flatMap((message) => message.citations).slice(-8).map((citation) => (
-              <button key={citation.id} type="button" onClick={() => navigateTo(citation.route)}>
-                <strong>{citation.title}</strong>
-                <span>{citation.claim_classification} · {citation.data_classification}{citation.relationship_status ? ` · ${citation.relationship_status}` : ""}</span>
-                <em>{citation.claim}</em>
-              </button>
+              <div key={citation.id} className="ask-citation-card">
+                <button type="button" onClick={(event) => { evidenceTriggerRef.current = event.currentTarget; setEvidence(evidenceFromCitation(citation)); }}>
+                  <strong>{citation.title}</strong>
+                  <span>{citation.claim_classification} · {citation.data_classification}{citation.relationship_status ? ` · ${citation.relationship_status}` : ""}</span>
+                  <em>{citation.claim}</em>
+                </button>
+                <button type="button" onClick={(event) => { evidenceTriggerRef.current = event.currentTarget; setEvidence(evidenceFromCitation(citation)); }}>View evidence</button>
+                <button type="button" onClick={() => navigateTo(citation.route)}>Open record</button>
+              </div>
             ))}
             {selected && selected.messages.every((message) => message.citations.length === 0) && <div className="rail-quiet-empty">No citations yet.</div>}
           </section>
@@ -398,6 +429,7 @@ export function AskSurface({ world }: { world: World }) {
           </section>
         </aside>
       </div>
+      <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} triggerRef={evidenceTriggerRef} />
     </section>
   );
 }

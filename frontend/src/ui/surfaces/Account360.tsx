@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import type { ScoreSnapshot } from "../../app/revenueDataClient.ts";
 import { PROFILE } from "../../app/config.ts";
@@ -13,7 +13,12 @@ import { AccountToken } from "../common/AccountToken.tsx";
 import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
 import { openDeliverableWizard } from "../../store/store.ts";
 import { SCORE_FAMILY_LABELS, scoreAvailability, scoreInterpretation } from "../../app/presentation.ts";
-import { navigateTo } from "../../app/router.ts";
+import { navigateTo, useAppRoute } from "../../app/router.ts";
+import { buildAccountEvidence, buildScoreEvidence, buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
+import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
+import { buildAccountTimeline } from "../../app/timeline.ts";
+import { MeaningfulTimeline } from "../timeline/MeaningfulTimeline.tsx";
+import { AccountBriefingMode } from "../modes/BriefingMode.tsx";
 
 function money(value: number | null): string {
   if (value === null) return "Value not provided";
@@ -63,6 +68,9 @@ function relationshipBackedSignals(world: World, accountId: string) {
 }
 
 export function Account360({ world, accountId, onSelectAccount }: { world: World; accountId?: string | null; onSelectAccount?: (accountId: string) => void }) {
+  const route = useAppRoute();
+  const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const accountRows = useMemo(() => {
     return world.companies
       .filter((company) => company.relationship === "customer")
@@ -118,9 +126,42 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
     ...(deliveryScore?.result.missingInputs ?? []),
   ];
   const primaryMissing = missingInputs[0] ?? (contacts.length ? "No major missing input surfaced." : "No verified contact provided.");
+  const viewMode = route.query.get("view");
+  const isFocus = viewMode === "focus";
+  const isBriefing = viewMode === "briefing";
+  const accountTimeline = buildAccountTimeline(world, company.id);
+
+  function pathWithView(nextView: string | null): string {
+    const params = new URLSearchParams(route.query);
+    if (nextView) params.set("view", nextView);
+    else params.delete("view");
+    const query = params.toString();
+    return `${route.path}${query ? `?${query}` : ""}`;
+  }
+
+  function openEvidence(next: EvidencePackage, trigger?: HTMLButtonElement | null) {
+    evidenceTriggerRef.current = trigger ?? null;
+    setEvidence(next);
+  }
+
+  if (isBriefing) {
+    return (
+      <>
+        <AccountBriefingMode
+          world={world}
+          company={company}
+          signals={selected.linkedSignals}
+          workItems={workItems}
+          onExit={() => navigateTo(pathWithView(null))}
+          onEvidence={(next) => openEvidence(next)}
+        />
+        <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} triggerRef={evidenceTriggerRef} />
+      </>
+    );
+  }
 
   return (
-    <section className="surface-page account360" data-surface-component="surface-account-360">
+    <section className={isFocus ? "surface-page account360 record-focus-mode" : "surface-page account360"} data-surface-component="surface-account-360">
       <SurfaceHeader
         eyebrow="Accounts / Account 360"
         headline={company.name}
@@ -158,8 +199,17 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               <strong>{primaryMissing}</strong>
               <em>{scoreAvailability(deliveryScore)}</em>
             </div>
-            <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create executive brief</button>
+            <div className="decision-action-stack">
+              <button ref={evidenceTriggerRef} type="button" onClick={() => openEvidence(buildAccountEvidence(world, company, strongestScore, selected.linkedSignals), evidenceTriggerRef.current)}>View evidence</button>
+              <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create executive brief</button>
+            </div>
           </section>
+
+          <div className="mode-action-strip">
+            <button type="button" onClick={() => navigateTo(pathWithView(isFocus ? null : "focus"))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
+            <button type="button" onClick={() => navigateTo(pathWithView("briefing"))}>Briefing mode</button>
+            <button type="button" onClick={() => navigateTo(`/ask?account=${encodeURIComponent(company.id)}&prompt=${encodeURIComponent(`Why did the system recommend this action, and what should I discuss with ${company.name}?`)}`)}>Ask with context</button>
+          </div>
 
           <div className="account360-kpis">
             {SCORE_LABELS.map(([family, label]) => {
@@ -169,6 +219,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                   <span>{label}</span>
                   <strong>{scoreDisplay(scoreResult)}</strong>
                   <em>{scoreInterpretation(scoreResult, label)}</em>
+                  <button type="button" onClick={(event) => openEvidence(buildScoreEvidence(world, scoreResult, family, company.id), event.currentTarget)}>View evidence</button>
                 </div>
               );
             })}
@@ -192,6 +243,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                         {[...result.positiveFactors, ...result.negativeFactors, ...result.neutralFactors].map((factor) => (
                           <p key={factor.key}><strong>{factor.label}</strong>: {factor.contribution === null ? "not available" : factor.contribution.toFixed(1)} contribution. {factor.explanation}</p>
                         ))}
+                        <button type="button" onClick={(event) => openEvidence(buildScoreEvidence(world, scoreResult, family, company.id), event.currentTarget)}>View score evidence</button>
                       </div>
                     ) : (
                       <p>No backend score snapshot is available for this account.</p>
@@ -207,10 +259,10 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               <h2>Next actions</h2>
               <p>Create a deliverable or confirm a HubSpot task from this account context.</p>
             </div>
-            <div className="primary-action-row">
-              <button type="button" onClick={() => navigateTo(`/ask?account=${encodeURIComponent(company.id)}&prompt=${encodeURIComponent(`What should we do next with ${company.name}?`)}`)}>Ask about this account</button>
-              <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create deliverable</button>
-            </div>
+              <div className="primary-action-row">
+                <button type="button" onClick={() => navigateTo(`/ask?account=${encodeURIComponent(company.id)}&prompt=${encodeURIComponent(`What should we do next with ${company.name}?`)}`)}>Ask about this account</button>
+                <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create deliverable</button>
+              </div>
             <CrmWriteActions
               company={company}
               contact={contacts[0]}
@@ -243,6 +295,8 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                     method: signal.relationships?.[0]?.match_method,
                     confidence: signal.relationships?.[0]?.confidence ?? signal.confidence,
                   }}
+                  actionLabel="View evidence"
+                  onAction={() => openEvidence(buildSignalEvidence(world, signal))}
                 />
               ))}
               {selected.linkedSignals.length === 0 && (
@@ -272,8 +326,28 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               <WorkItemList items={workItems} empty="No account-specific work items." world={world} />
             </section>
           </div>
+          <MeaningfulTimeline
+            events={accountTimeline}
+            onEvidence={(next) => openEvidence(next)}
+            evidenceById={(event) => {
+              if (event.evidenceId?.startsWith("signal-")) {
+                const signal = selected.linkedSignals.find((item) => `signal-${item.id}` === event.evidenceId);
+                return signal ? buildSignalEvidence(world, signal) : null;
+              }
+              if (event.evidenceId?.startsWith("score-")) {
+                const family = String(event.evidenceId.split("-")[1]);
+                return buildScoreEvidence(world, latestAccountScore(world, company.id, family as keyof NonNullable<World["scoreResults"]>), family, company.id);
+              }
+              if (event.evidenceId?.startsWith("work-")) {
+                const item = workItems.find((work) => `work-${work.id}` === event.evidenceId);
+                return item ? buildWorkItemEvidence(world, item) : null;
+              }
+              return null;
+            }}
+          />
         </div>
       </div>
+      <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} triggerRef={evidenceTriggerRef} />
     </section>
   );
 }

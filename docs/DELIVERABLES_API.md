@@ -21,19 +21,17 @@ List filters include `account` and `type`. Cross-tenant reads and updates return
 
 Ask can prepare an executive account and meeting brief preview using only supported internal records:
 
-- purpose
+- cover/header with account, meeting purpose, prepared date, data freshness, and classification
 - executive summary
-- why the account matters
-- confirmed developments
-- relevant programs
-- score summary
-- missing information
-- talking points or next actions
-- open work
-- internal citations
-- source freshness
-- data classifications
+- account context
+- recent developments
+- decision summary
+- meeting preparation
+- current work
+- sources and data notes
 
 The preview is not persisted until the user confirms. Confirmation calls `POST /deliverables`, then the UI refreshes shared backend state and returns a route to the created deliverable.
 
 Ask must not include unconfirmed relationships as facts, unsupported opportunity values, invented capacity, or external web claims.
+
+Deliverable preview supports Focus mode and Briefing mode from the same document object. Source entries can open the shared Evidence Drawer; exports continue to use the existing markdown, Word, PDF-print, PowerPoint, spreadsheet, CSV, and calendar export code paths where those formats are supported for the deliverable type.

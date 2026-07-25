@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { navigateTo, useAppRoute } from "../../app/router.ts";
 import type { World } from "../../app/useWorld.ts";
 import {
@@ -19,6 +19,10 @@ import {
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
 import { plainActionLabel, plainWorkStatus, primaryWorkAction } from "../../app/presentation.ts";
+import { buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
+import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
+import { buildWorkTimeline } from "../../app/timeline.ts";
+import { MeaningfulTimeline } from "../timeline/MeaningfulTimeline.tsx";
 
 const STATUSES: Array<WorkItemStatus | "all"> = [
   "all",
@@ -87,6 +91,7 @@ function nextActionLabel(action: WorkItemTransitionAction): string {
 }
 
 function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
+  const route = useAppRoute();
   const [draft, setDraft] = useState({
     owner: item.owner ?? "",
     priority: item.priority,
@@ -99,8 +104,25 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<HubSpotTaskPreview | null>(null);
+  const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const account = accountName(world, item.canonical_account_id);
   const primary = primaryWorkAction(item);
+  const timeline = buildWorkTimeline(world, item);
+  const isFocus = route.query.get("view") === "focus";
+
+  function pathWithFocus(nextFocus: boolean): string {
+    const params = new URLSearchParams(route.query);
+    if (nextFocus) params.set("view", "focus");
+    else params.delete("view");
+    const query = params.toString();
+    return `${route.path}${query ? `?${query}` : ""}`;
+  }
+
+  function openEvidence(next: EvidencePackage, trigger?: HTMLButtonElement | null) {
+    evidenceTriggerRef.current = trigger ?? null;
+    setEvidence(next);
+  }
 
   async function run(action: WorkItemTransitionAction) {
     setError(null);
@@ -117,13 +139,15 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
   }
 
   return (
-    <section className="surface-panel work-detail" aria-labelledby="work-detail-title">
+    <section className={isFocus ? "surface-panel work-detail record-focus-mode" : "surface-panel work-detail"} aria-labelledby="work-detail-title">
       <div className="panel-head">
         <div>
           <h2 id="work-detail-title">{item.recommended_action}</h2>
           <span>{titleCase(item.type)} · {account}</span>
         </div>
         <div className="panel-action-group">
+          <button type="button" onClick={() => navigateTo(pathWithFocus(!isFocus))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
+          <button ref={evidenceTriggerRef} type="button" onClick={() => openEvidence(buildWorkItemEvidence(world, item), evidenceTriggerRef.current)}>View evidence</button>
           <button type="button" onClick={() => navigateTo(`/ask?work=${encodeURIComponent(item.id)}${item.canonical_account_id ? `&account=${encodeURIComponent(item.canonical_account_id)}` : ""}&prompt=${encodeURIComponent("What is the next safe action for this work item?")}`)}>Ask about this work</button>
           <button type="button" onClick={() => navigateTo("/work")}>Back to queue</button>
         </div>
@@ -196,6 +220,19 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
           <button type="button" onClick={() => setPreview(null)}>Close preview</button>
         </div>
       )}
+      <MeaningfulTimeline
+        events={timeline}
+        title="Work timeline"
+        onEvidence={(next) => openEvidence(next)}
+        evidenceById={(event) => {
+          if (event.evidenceId?.startsWith("signal-")) {
+            const signal = world.analysis.valid.find((itemSignal) => `signal-${itemSignal.id}` === event.evidenceId);
+            return signal ? buildSignalEvidence(world, signal) : null;
+          }
+          if (event.evidenceId === `work-${item.id}`) return buildWorkItemEvidence(world, item);
+          return null;
+        }}
+      />
       <section className="work-notes" aria-labelledby="work-notes-title">
         <h3 id="work-notes-title">Notes and findings</h3>
         <label>Add note<textarea value={note} onChange={(event) => setNote(event.target.value)} /></label>
@@ -211,6 +248,7 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
           </p>
         ))}
       </section>
+      <EvidenceDrawer evidence={evidence} onClose={() => setEvidence(null)} triggerRef={evidenceTriggerRef} />
     </section>
   );
 }

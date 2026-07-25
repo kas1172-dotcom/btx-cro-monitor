@@ -63,6 +63,8 @@ Claim classifications are `fact`, `derived`, `inference`, `missing`, and `simula
 
 Account answers use confirmed relationships as account facts. Pending relationships stay labeled as needing review. Scores cite persisted `score_snapshots`; missing scores are described as unavailable, not zero.
 
+Ask citations are inspectable in the shared Evidence Drawer. The citation still carries its route, so the user can inspect evidence in place or open the supporting account, work item, score, signal, or deliverable record.
+
 ## Drafts
 
 Ask may return previews for:
@@ -71,6 +73,8 @@ Ask may return previews for:
 - executive account and meeting brief drafts that create through `POST /deliverables`
 
 The UI requires explicit confirmation before creating either record. Created records enter the normal backend lifecycle and the UI refreshes shared backend state.
+
+Supported contextual Ask actions include explaining evidence, summarizing what changed, identifying missing information, preparing talking points, and drafting the executive brief. These actions use the same `/assistant/ask` orchestration path and internal citations.
 
 ## Permissions
 
