@@ -21,7 +21,12 @@ export const CORE_SURFACES: SurfaceSpec[] = [
   { id: "ask", label: "Ask", group: "core", componentId: "surface-ask", title: "Primary conversational assistant." },
 ];
 
-export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
+/**
+ * Retired on 2026-07-25. The cockpit presents four primary surfaces, so these no
+ * longer appear in the rail. Their routes and components are intentionally kept so
+ * existing deep links still resolve and the decision stays reversible.
+ */
+export const RETIRED_SURFACES: SurfaceSpec[] = [
   { id: "prospecting", label: "Prospects", group: "analytical", componentId: "surface-prospecting", title: "New companies worth pursuing and why." },
   { id: "trip_planner", label: "Trip Planner", group: "analytical", componentId: "surface-trip-planner", title: "Field itinerary planning with map context, account fit, and calendar-ready deliverables." },
   { id: "map", label: "Map", group: "analytical", componentId: "surface-map", title: "Geographic account and prospect map." },
@@ -29,6 +34,8 @@ export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
   { id: "capacity", label: "Capacity", group: "analytical", componentId: "surface-capacity-assessment", title: "Machining capacity against backlog and demand." },
   { id: "programs", label: "Programs", group: "analytical", componentId: "surface-program-contract-tracker", title: "Contract and program news relevant to BTX." },
 ];
+
+export const ANALYTICAL_SURFACES: SurfaceSpec[] = [];
 
 export const UTILITY_SURFACES: SurfaceSpec[] = [
   { id: "deliverables", label: "Deliverables", group: "utility", componentId: "surface-deliverable-library", title: "Draft, edit, and send client-ready documents." },
@@ -38,7 +45,7 @@ export const UTILITY_SURFACES: SurfaceSpec[] = [
 
 export const ALL_SURFACES = [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES];
 
-export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "prospecting", "trip_planner", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"];
+export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "deliverables", "hubspot", "settings"];
 export const PRIMARY_TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask"];
 
 export const TAB_LABELS: Record<TabId, string> = {

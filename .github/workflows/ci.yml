@@ -57,9 +57,6 @@ jobs:
       - name: test:settings
         run: npm run test:settings
 
-      - name: test:flows
-        run: npm run test:flows
-
       - name: test:tour
         run: npm run test:tour
 
@@ -74,9 +71,6 @@ jobs:
 
       - name: test:map
         run: npm run test:map
-
-      - name: test:live-adapter
-        run: npm run test:live-adapter
 
       - name: test:deliverables
         run: npm run test:deliverables

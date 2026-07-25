@@ -495,8 +495,17 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     by_status = {row.id: row for row in work_items}
     _assert(any(row.review_status == "confirmed" for row in relationships), "No confirmed relationship exists.")
     _assert(any(row.review_status == "needs_review" for row in relationships), "No unresolved relationship review exists.")
-    _assert(any(row.scope == "program" for row in signals), "No program-level signal exists.")
+    _assert(any(row.scope == "specific_account" for row in signals), "No account-linked signal exists.")
     _assert(any(row.scope == "market" for row in signals), "No market-level signal exists.")
+    # The demo is exactly two journeys: Lockheed as a current customer, nLIGHT as a prospect.
+    account_types = {row.id: row.account_type for row in accounts}
+    _assert(account_types.get("demo-acct-lockheed") == "customer", "Lockheed customer journey is missing.")
+    _assert(account_types.get("demo-acct-nlight") == "prospect", "nLIGHT prospect journey is missing.")
+    nlight_research = by_status.get("demo-wi-research-nlight")
+    _assert(nlight_research is not None, "nLIGHT prospect-research work item is missing.")
+    _assert(len(nlight_research.missing_information or []) >= 4, "nLIGHT prospect research must name its missing evidence.")
+    nlight_account = next((row for row in accounts if row.id == "demo-acct-nlight"), None)
+    _assert(not (nlight_account.cage_code if nlight_account else None), "nLIGHT must not carry an invented CAGE code.")
     _assert(by_status["demo-wi-approve-lockheed"].approval_state == "pending", "Awaiting-approval item was not restored.")
     _assert(by_status["demo-wi-approved-pulse"].approval_state == "approved", "Approved item was not restored.")
     _assert(by_status["demo-wi-verified-sim"].execution_state == "verified", "Verified simulated action was not restored.")

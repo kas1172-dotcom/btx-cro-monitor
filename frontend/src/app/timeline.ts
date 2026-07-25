@@ -1,3 +1,4 @@
+import { relationshipMatchDescription } from "./confidence.ts";
 import { SCORE_FAMILY_LABELS, plainWorkStatus } from "./presentation.ts";
 import { signalHeadline, signalSourceName } from "./signalProvenance.ts";
 import type { ScoreSnapshot } from "./revenueDataClient.ts";
@@ -70,7 +71,7 @@ function relationshipEvents(signal: Signal): MeaningfulTimelineEvent[] {
     occurredAt: eventTime(relationship.last_validated_at ?? relationship.lastValidatedAt, signal.detected_at),
     category: "relationship",
     title: relationship.review_status === "confirmed" || relationship.review_status === "accepted" ? "Evidence confirmed" : relationship.review_status === "rejected" ? "Relationship rejected" : "Relationship awaiting review",
-    summary: `${relationship.source_entity_name} matched by ${relationship.match_method.replace(/_/g, " ")} with ${Math.round(relationship.confidence * 100)}% confidence.`,
+    summary: `${relationship.source_entity_name}. ${relationshipMatchDescription(relationship)}`,
     actorLabel: relationship.creation_source.replace(/_/g, " "),
     sourceRecordType: "signal_relationship",
     sourceRecordId: relationship.id ?? signal.id,

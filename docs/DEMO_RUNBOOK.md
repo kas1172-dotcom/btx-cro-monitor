@@ -58,29 +58,64 @@ Open the Vite URL and sign in through Clerk when auth is enabled.
 
 ## Expected Demo State
 
+The demo tenant is exactly two journeys plus one supporting prospect account.
+
+- Accounts: 3. Lockheed Martin Corporation (current customer), nLIGHT, Inc. (prospect),
+  Pulse Space Technologies (supporting prospect).
+- Signals: 3. Programs: 2. Relationships: 2. Work items: 6. Deliverables: 1. Notes: 3.
 - Source health: illustrative CRM seed, stale monitor pipeline, ERP/MES not configured.
-- Main account: Lockheed Martin Corporation.
 - Work states include pending approval, verified simulated HubSpot task, and recorded outcome history.
 - Seeded deliverable: `Executive Account and Meeting Brief - Lockheed Martin Corporation`.
 - Ask conversation: seeded Lockheed account conversation with citations.
+- Navigation is the four-surface cockpit: Today, Work, Accounts, Ask. Deliverables,
+  Integrations, and Settings remain reachable as utilities. The analytical surfaces
+  (Prospects, Trip Planner, Map, Analysis, Capacity, Programs) were retired on 2026-07-25
+  and are not in the rail.
 
 ## Route Sequence
 
-1. `/today`
-2. `/accounts/demo-acct-lockheed`
-3. Open `View evidence`.
+### Journey 1: Lockheed Martin, current customer
+
+1. `/today`. The sourced directed-energy development is the item that needs attention.
+2. `/accounts/demo-acct-lockheed`. Current-customer context, confirmed account link.
+3. Open `View evidence`. Confidence reads as a qualitative band with its reason, never a percentage.
 4. Review the account timeline.
-5. `/work/demo-wi-approve-lockheed`
-6. Add a note only during rehearsal, then reset before recording.
-7. `/work/demo-wi-approved-pulse`
-8. Open `Preview HubSpot task`; keep execution simulated unless staging is explicitly configured for a safe write target.
-9. `/ask/demo-assist-lockheed`
-10. Ask the three rehearsal questions below and inspect citations.
-11. `/deliverables`
-12. Open `Executive Account and Meeting Brief - Lockheed Martin Corporation`.
-13. Use `Focus mode` and `Briefing mode`.
-14. `/accounts/demo-acct-lockheed?view=focus`
-15. `/accounts/demo-acct-lockheed?view=briefing`
+5. `/work/demo-wi-approve-lockheed`. The approval-gated work item.
+6. Open `Preview HubSpot task`. Keep execution simulated. Reset never issues a real external mutation.
+7. `/deliverables`, open `Executive Account and Meeting Brief - Lockheed Martin Corporation`.
+8. `/accounts/demo-acct-lockheed?view=briefing` for the briefing view.
+
+### Journey 2: nLIGHT, prospect
+
+9. `/accounts/demo-acct-nlight`. Classified as a prospect, not a customer.
+10. The nLIGHT signal comes from the same public Breaking Defense source as Journey 1,
+    but its account link is `needs_review`, so it is held as a prospect to qualify.
+11. `/work/demo-wi-research-nlight`. The prospect-research item names its four gaps:
+    no CAGE code, no named contact, unconfirmed supplier fit, and no assessed capacity.
+12. `/work/demo-wi-review-nlight`. The relationship review that must happen before
+    nLIGHT is treated as an account fact.
+13. `/ask/demo-assist-lockheed`. Ask answers from stored records and states its limits.
+
+## Go Or No-Go
+
+Status as of 2026-07-25: **NO-GO pending the on-camera surface audit.**
+
+Verified by this pass:
+
+- Reset is deterministic and idempotent. Two consecutive resets produce identical
+  counts and fingerprints, and verify-only passes against the result.
+- Backend `pytest`: 454 passed.
+- Frontend typecheck clean, production build succeeds, `check:design` and `check:voice` pass.
+- Repo-wide em-dash grep is clean apart from one `.gitignore` comment.
+- No surface renders a fabricated percentage confidence.
+
+Not yet verified, and required before a GO:
+
+- The live click-through of both journeys in a running browser, including loading,
+  empty, stale, and failure states on each of the four primary surfaces.
+- Confirmation that AI status shows live when the LLM is configured.
+- `test:phase0` and `test:identity` are red. Both were already red on `main` before this
+  consolidation and both run in CI, so CI is currently red for a pre-existing reason.
 
 ## Exact Ask Questions
 

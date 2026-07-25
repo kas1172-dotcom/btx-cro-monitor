@@ -26,6 +26,19 @@ export function qualitativeSignalConfidence(signal: Signal): { band: EvidenceBan
   };
 }
 
+/**
+ * Describes how an account link was matched and whether a human has accepted it.
+ * The stored match score is an internal resolver value, not a calibrated
+ * probability, so it is never rendered as a percentage.
+ */
+export function relationshipMatchDescription(relationship: { match_method: string; review_status?: string | null }): string {
+  const method = relationship.match_method.replace(/_/g, " ");
+  const status = relationship.review_status;
+  if (status === "confirmed" || status === "accepted") return `Matched by ${method} and confirmed by review.`;
+  if (status === "rejected") return `Matched by ${method}, then rejected on review.`;
+  return `Matched by ${method}. Not yet reviewed, so treat the account link as unconfirmed.`;
+}
+
 export function prospectQualificationLabel(input: {
   company: Company;
   contact?: Contact;

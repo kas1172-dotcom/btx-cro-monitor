@@ -294,8 +294,8 @@ build; it identifies the Clerk instance and is not a secret.
 
 `.github/workflows/ci.yml` (`01 CI`) runs on every PR into `main` and on push to `main`:
 frontend typecheck, build, and the fast test suites (`test:metrics`,
-`test:rail`, `test:settings`, `test:flows`, `test:tour`, `test:phase0`,
-`test:identity`, `test:map`, `test:live-adapter`, `test:deliverables`), plus
+`test:rail`, `test:settings`, `test:tour`, `test:phase0`,
+`test:identity`, `test:map`, `test:deliverables`), plus
 backend `pytest`.
 
 The same workflow also contains an optional `e2e` job for the Playwright

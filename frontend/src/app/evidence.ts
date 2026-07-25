@@ -1,4 +1,5 @@
 import type { AssistantCitation } from "./assistantApi.ts";
+import { qualitativeSignalConfidence } from "./confidence.ts";
 import { SCORE_FAMILY_LABELS } from "./presentation.ts";
 import type { ScoreSnapshot } from "./revenueDataClient.ts";
 import { humanSourceLabel, humanSourceReason } from "./sourceLabels.ts";
@@ -154,7 +155,8 @@ export function buildSignalEvidence(world: World, signal: Signal): EvidencePacka
     advanced: [
       { label: "Signal id", value: signal.id },
       { label: "Scope", value: signal.scope ?? "market" },
-      { label: "Confidence", value: `${Math.round(signal.confidence * 100)}%` },
+      { label: "Confidence", value: qualitativeSignalConfidence(signal).label },
+      { label: "Why this confidence", value: qualitativeSignalConfidence(signal).reason },
       { label: "Detected", value: dateOrNull(signal.detected_at) ?? signal.detected_at },
     ],
     askPrompt: `Explain this evidence and what BTX should do next. Signal: ${signalHeadline(signal)}. Evidence: ${signal.source_quote}`,

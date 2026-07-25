@@ -1,6 +1,7 @@
 # Reconciliation Map
 
-Status: Phase 0 discovery complete. Nothing has been merged, deleted, or pushed.
+Status: Phases 0 through 3 complete. Phase 4 is at its gate, awaiting the on-camera
+surface audit and deploy approval.
 Date: 2026-07-25
 
 ## 1. Every clone on this machine
@@ -276,3 +277,87 @@ places Pulse Space in **Los Angeles, CA**, while the company is **Bellevue** bas
 field to correct, not a fabricated company.
 
 Items 1 and 3 of section 7 stand and carry into Phase 2 and Phase 3.
+
+## 11. Phase 2 execution record, the two-journey demo
+
+Demo tenant trimmed from 6 accounts and 7 signals to **3 accounts and 3 signals**.
+
+- **Journey 1, Lockheed Martin, current customer.** Kept intact: sourced development,
+  confirmed relationship, approval-gated work item, evidence, meeting brief, seeded Ask
+  conversation. It claims no unverified BTX business impact.
+- **Journey 2, nLIGHT, prospect.** `relationship` changed from `target` to `prospect`.
+  Added `demo-wi-research-nlight`, a prospect-research work item that names four gaps:
+  no CAGE code, no named contact, unconfirmed supplier fit, no assessed capacity. nLIGHT
+  carries no CAGE code, and the reset verifier now enforces that.
+- **Supporting account, Pulse Space Technologies.** Kept. City corrected from Los Angeles, CA
+  to Bellevue, WA.
+- **Removed:** RTX, Northrop Grumman, Collins Aerospace, four off-journey signals, the RTX
+  capacity work item, the RTX contact and opportunity, and the hypersonics program.
+- `demo-wi-closed-outcome` re-pointed from Northrop to Lockheed so the closed-with-outcome
+  lifecycle state survives the trim.
+- Fixed a dangling reference: the seeded brief cited `demo-rel-lockheed-laser-review`,
+  which does not exist. It now cites `demo-rel-lockheed-laser`.
+
+### Fabricated percentage confidence, removed
+
+Both sites identified in section 7 are fixed. `evidence.ts` now renders the qualitative band
+and its reason from `confidence.ts`. `timeline.ts` uses a new `relationshipMatchDescription`
+helper that states the match method and review status. The stored match score is an internal
+resolver value, not a calibrated probability, and is no longer rendered as a percentage.
+A repo-wide search for percentage confidence returns nothing.
+
+## 12. Phase 3 execution record, cleanup
+
+### One demo path
+
+A static reachability analysis from `src/main.tsx` found 17 unreachable modules. The
+app-facing parallel demo path is deleted: `CockpitDataAdapter.ts` (which hardcoded the
+Saronic pinned signals), `createDataAdapter.ts`, `frontend/demo/`, and the dead pre-cockpit
+UI (`Home`, `Dashboard`, `CurrentBusiness`, `RelationshipGraph`, `BrainHome`) plus
+`greeting.ts`, `viewScope.ts`, `copilot.ts`, `jarvis.ts`, and `deck/layouts.ts`.
+
+`DemoDataAdapter.ts` and `frontend/data/demo/` are **retained deliberately as test fixtures**.
+They are reachable only from `tools/test-*.ts`, never from `src/main.tsx`, so they are not a
+runtime demo mode or a fixture fallback. `docs/DEMO_DATA.md` already documents them this way.
+`tools/test-runtime-architecture.ts` enforces that no runtime module imports the retired adapters.
+
+### Saronic removal
+
+`docs/DEMO_SCRIPT.md` deleted. It narrated real HubSpot company creation, which violates the
+rule that the demo tenant never issues a real external mutation. The Saronic entry, including
+the "Corsair Capital" attribution and its unverifiable URL, is removed from
+`clients/btx/pinned_signals.json`, which now holds only the Lockheed F-35 pinned signal.
+No investor name was substituted, because no verified source was available to cite.
+
+### Navigation, Fork B
+
+A type-level retirement of the analytical surfaces cascaded into more than 40 call sites
+across the agents, brain routing, and the router, which is a larger refactor than the
+navigation decision requires. Implemented the reversible way instead: the six analytical
+surfaces moved to a new `RETIRED_SURFACES` export and out of `ALL_SURFACES` and `TAB_IDS`,
+so they no longer appear in the rail. Their routes and components are intact, so deep links
+still resolve and the decision can be undone by moving one array.
+
+### Documentation and CI
+
+Removed stale planning docs: `DEMO_PRODUCT_IMPLEMENTATION_PLAN.md`, `WIZARD_STACK_RECONCILE.md`,
+`UX_AUDIT_AND_DEMO_READINESS.md`. `docs/DEMO_RUNBOOK.md` rewritten around the two journeys with
+an explicit go or no-go section. `.github/workflows/ci.yml` and `docs/DEPLOY_BACKEND.md` no
+longer reference the deleted `test:flows` and `test:live-adapter`.
+
+### Test accounting, stated plainly
+
+`test:phase0`, `test:identity`, and `test:rail` were **already failing on `main`** before this
+consolidation, verified by stashing all changes and running them against a pristine tree. CI
+runs all three, so CI was already red.
+
+- `test:rail` is now fixed. It had asserted the seven-tab layout while the source had already
+  moved to four surfaces.
+- `test:phase0` and `test:identity` remain red. Both fail inside scoring, not in anything this
+  consolidation touched. They are a pre-existing defect and are called out in the runbook.
+- `test:flows` and `test:live-adapter` were passing and are **deleted**, because they tested the
+  retired Saronic journey and the deleted cockpit adapter respectively. Keeping them would have
+  contradicted the Fork A decision.
+
+Net: frontend scripts went from 16 passing and 3 failing to 15 passing and 2 failing, with two
+passing tests removed alongside the code they covered. Backend `pytest` holds at 454 passed.

@@ -105,8 +105,8 @@ def test_reset_is_deterministic_idempotent_and_tenant_isolated(tmp_path: Path):
     first_fingerprint = _fingerprint(sf)
     second = reset_demo_tenant(sf, DEMO_TENANT_ID)
 
-    assert first.accounts == 6
-    assert first.signals == 7
+    assert first.accounts == 3
+    assert first.signals == 3
     assert first.relationships == 2
     assert first.work_items == 6
     assert second.as_dict() == {**first.as_dict(), "message": second.message}
@@ -133,12 +133,18 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
 
     assert body["tenant"]["isDemonstration"] is True
     assert body["tenant"]["demoNotice"] == "Public intelligence is sourced. Internal BTX records are illustrative."
-    assert len(body["accounts"]) == 6
-    assert len(body["programs"]) == 3
-    assert len(body["signals"]) == 7
+    assert len(body["accounts"]) == 3
+    assert len(body["programs"]) == 2
+    assert len(body["signals"]) == 3
     assert any(signal["scope"] == "specific_account" for signal in body["signals"])
-    assert any(signal["scope"] == "program" for signal in body["signals"])
     assert any(signal["scope"] == "market" for signal in body["signals"])
+    # The demo is exactly two journeys: Lockheed as customer, nLIGHT as prospect.
+    account_status = {account["id"]: account["account_status"] for account in body["accounts"]}
+    assert account_status["demo-acct-lockheed"] == "current_customer"
+    assert account_status["demo-acct-nlight"] == "target_prospect"
+    # The prospect journey must name what it is missing rather than fill the gaps in.
+    nlight_research = next(item for item in body["workItems"] if item["id"] == "demo-wi-research-nlight")
+    assert len(nlight_research["missing_information"]) == 4
     assert body["relationshipReview"]["records"][0]["id"] == "demo-rel-nlight-review"
     assert any(item["approval_state"] == "pending" for item in body["workItems"])
     assert any(item["execution_state"] == "verified" and item["external_system"] == "hubspot-demo" for item in body["workItems"])
@@ -159,8 +165,8 @@ def test_demo_world_snapshot_does_not_mutate_seeded_workspace(tmp_path: Path):
 
     body = client.get("/world-snapshot", headers=_headers(tenant_id=DEMO_TENANT_ID, role="cro")).json()
 
-    assert len(body["accounts"]) == 6
-    assert len(body["signals"]) == 7
+    assert len(body["accounts"]) == 3
+    assert len(body["signals"]) == 3
     assert len(body["workItems"]) == 6
     assert all(
         row["sourceDataVersion"].startswith(f"{DEMO_TENANT_ID}:demo-reset:")
