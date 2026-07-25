@@ -57,7 +57,7 @@
       }
     ],
     "actions": [
-      { "id": "create-task", "label": "Create HubSpot task", "kind": "simulated_crm_task" },
+      { "id": "preview-task", "label": "Preview HubSpot task", "kind": "simulated_crm_task" },
       { "id": "download-markdown", "label": "Download markdown", "kind": "download_markdown" }
     ]
   },
@@ -115,7 +115,7 @@
     ],
     "actions": [
       { "id": "add-company", "label": "Add company to HubSpot", "kind": "simulated_crm_task" },
-      { "id": "create-task", "label": "Create HubSpot task", "kind": "simulated_crm_task" }
+      { "id": "preview-task", "label": "Preview HubSpot task", "kind": "simulated_crm_task" }
     ]
   }
 ]

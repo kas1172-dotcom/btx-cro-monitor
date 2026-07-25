@@ -119,7 +119,7 @@ export interface WorkItemFilters {
   owner?: string;
 }
 
-export type WorkItemPatch = Partial<Pick<WorkItem, "owner" | "priority" | "status" | "due_date" | "recommended_action" | "approval_state" | "execution_state" | "outcome" | "follow_up_date">>;
+export type WorkItemPatch = Partial<Pick<WorkItem, "owner" | "priority" | "due_date" | "recommended_action" | "description" | "generated_artifact_ref" | "follow_up_date">>;
 export type WorkItemActionRequest = Record<string, unknown>;
 export type WorkItemActionResult = Record<string, unknown>;
 export type DeliverableFilters = { account?: string; type?: string };

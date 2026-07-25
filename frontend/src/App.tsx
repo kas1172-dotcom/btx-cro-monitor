@@ -121,7 +121,7 @@ export function App() {
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
     switch (routeTab) {
       case "brief": return <TodayBrief world={world} />;
-      case "work_queue": return <WorkQueue world={world} />;
+      case "work_queue": return <WorkQueue world={world} workItemId={route.workItemId} />;
       case "accounts": return <Account360 world={world} accountId={routedAccountId} onSelectAccount={(accountId) => navigateTo(accountPath(accountId))} />;
       case "ask": return <AskSurface world={world} />;
       case "prospecting": return (

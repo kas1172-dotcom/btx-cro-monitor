@@ -14,6 +14,7 @@ type BriefLink = {
   label: string;
   surface: TabId;
   accountId?: string | null;
+  path?: string;
 };
 
 type BriefItem = {
@@ -68,6 +69,10 @@ function signalLink(world: World, signal: Signal): BriefLink {
 }
 
 function navigate(link: BriefLink): void {
+  if (link.path) {
+    navigateTo(link.path);
+    return;
+  }
   if (link.accountId && link.surface === "accounts") {
     navigateTo(accountPath(link.accountId));
     return;
@@ -83,8 +88,8 @@ function workItemToBriefItem(world: World, item: WorkItem): BriefItem {
   const accountName = nameOf(world, item.canonical_account_id);
   const due = item.due_date ? `Due ${item.due_date}` : "No due date";
   const link = item.canonical_account_id
-    ? { label: "Open account", surface: "accounts" as const, accountId: item.canonical_account_id }
-    : { label: "Open queue", surface: "work_queue" as const };
+    ? { label: "Open work item", surface: "work_queue" as const, path: `/work/${encodeURIComponent(item.id)}` }
+    : { label: "Open work item", surface: "work_queue" as const, path: `/work/${encodeURIComponent(item.id)}` };
   return {
     id: `work-${item.id}`,
     title: item.recommended_action,
@@ -161,17 +166,17 @@ export function TodayBrief({ world }: { world: World }) {
     {
       label: "Accounts needing attention",
       value: accountsNeedingAttention,
-      link: { label: "Open accounts", surface: "accounts" as const },
+      link: { label: "Open work", surface: "work_queue" as const, path: "/work?view=needs_attention" },
     },
     {
-      label: "Deliverables awaiting approval",
+      label: "Work awaiting approval",
       value: approval.items.length,
-      link: { label: "Open queue", surface: "work_queue" as const },
+      link: { label: "Open approvals", surface: "work_queue" as const, path: "/work?approval=pending" },
     },
     {
-      label: "Deadlines this week",
-      value: deadlineCount,
-      link: { label: "Open programs", surface: "programs" as const },
+      label: "Overdue work",
+      value: attention.items.filter((item) => item.due_date && new Date(item.due_date) < new Date()).length,
+      link: { label: "Open overdue", surface: "work_queue" as const, path: "/work?overdue=true" },
     },
   ].filter((card) => card.value > 0);
 

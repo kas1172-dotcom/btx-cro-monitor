@@ -167,7 +167,7 @@ function actionsFromAnswer(answer: string, world: World): string[] {
   const namedCompany = world.companies.find((company) => lower.includes(company.name.toLowerCase()));
   if (namedCompany) actions.push(`Open ${namedCompany.name}`);
   if (/brief|call prep|meeting/.test(lower)) actions.push("Create deliverable");
-  if (/task|follow up|qualif|research|outreach/.test(lower)) actions.push("Create HubSpot task");
+  if (/task|follow up|qualif|research|outreach/.test(lower)) actions.push("Open Work Queue");
   if (/prospect|saronic|qualif/.test(lower)) actions.push("Open prospecting");
   return [...new Set(actions)].slice(0, 4);
 }

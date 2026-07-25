@@ -120,15 +120,24 @@ async function seedWorkItem(backendEndpoint: string, authHeaders: Record<string,
     headers: { "content-type": "application/json", ...authHeaders },
     body: JSON.stringify({
       type: "account_action",
-      recommended_action: "E2E: confirm and create a HubSpot task for this account.",
+      recommended_action: "E2E: execute an approved HubSpot task for this account.",
       priority: "high",
-      status: "proposed",
+      status: "detected",
       approval_state: "pending",
     }),
   });
   if (!response.ok) throw new Error(`seedWorkItem failed (${response.status}): ${await response.text()}`);
   const body = (await response.json()) as { id: string };
   return body.id;
+}
+
+async function transitionWorkItem(backendEndpoint: string, authHeaders: Record<string, string>, itemId: string, action: string): Promise<void> {
+  const response = await fetch(`${backendEndpoint}/work-items/${itemId}/transition`, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...authHeaders },
+    body: JSON.stringify({ action }),
+  });
+  if (!response.ok) throw new Error(`transition ${action} failed (${response.status}): ${await response.text()}`);
 }
 
 async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
@@ -140,25 +149,22 @@ async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
   const authHeaders = { authorization: `Bearer ${clerkToken}` };
 
   const itemId = await seedWorkItem(backendEndpoint, authHeaders);
+  for (const action of ["triage", "prepare", "request_approval", "approve"]) {
+    await transitionWorkItem(backendEndpoint, authHeaders, itemId, action);
+  }
   console.log(`e2e: seeded work item ${itemId} for the HubSpot task loop.`);
 
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await signInWithClerkIfConfigured(page);
-  await openSurface(page, /Work Queue/i, "surface-work-queue");
+  await page.goto(`${BASE_URL}/work/${encodeURIComponent(itemId)}`, { waitUntil: "networkidle" });
+  await page.locator("[data-surface-component='surface-work-queue']").waitFor({ timeout: 10000 });
 
-  await page.getByRole("button", { name: "Create HubSpot task" }).first().click();
-  await page.getByRole("button", { name: "Confirm and create in HubSpot" }).click();
+  await page.getByRole("button", { name: "Preview HubSpot task" }).click();
+  await page.getByRole("button", { name: "Execute approved task" }).click();
 
-  const successLocator = page.locator("text=/Verified HubSpot task/i");
+  const successLocator = page.locator("text=/HubSpot task executed and verified/i");
   await successLocator.waitFor({ timeout: 20000 });
   assert(await successLocator.count(), "HubSpot task loop did not report a verified task.");
-
-  const retryButton = page.getByRole("button", { name: "Create HubSpot task" });
-  if (await retryButton.count()) {
-    // Item is now done; there should be nothing left to confirm - the retry
-    // affordance only appears for account_action items still open.
-    console.log("e2e: work item already completed, skipping duplicate-retry click (expected).");
-  }
 
   await page.close();
   console.log("e2e: HubSpot task loop verified end to end.");

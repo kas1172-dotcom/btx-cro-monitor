@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { BACKEND_ENDPOINT, backendJson } from "./backendApi.ts";
+import { invalidateQueries, queryKey, useQuery } from "./serverState.ts";
 import type { World } from "./useWorld.ts";
 import { signalSourceDate, signalSourceName } from "./signalProvenance.ts";
 import type { Signal } from "../engine/signals/contract.ts";
@@ -13,6 +14,7 @@ export type WorkItemType =
   | "outreach_draft"
   | "qualified_opportunity"
   | "relationship_review"
+  | "hubspot_task"
   | "dismissal"
   | "dismissed";
 
@@ -27,15 +29,37 @@ export type WorkItemStatus =
   | "verified"
   | "outcome_recorded"
   | "dismissed"
-  | "closed"
-  | "proposed"
-  | "done";
+  | "closed";
 export type WorkItemPriority = "low" | "normal" | "high" | "urgent";
 export type ApprovalState = "not_required" | "pending" | "approved" | "rejected";
-export type ExecutionState = "not_started" | "queued" | "running" | "completed" | "failed";
+export type ExecutionState = "not_started" | "pending" | "executed" | "verified" | "failed";
 export type WorkItemView = "what_changed" | "needs_attention" | "prepared" | "needs_approval" | "outcomes";
+export type WorkItemTransitionAction =
+  | "triage"
+  | "prepare"
+  | "request_approval"
+  | "approve"
+  | "reject"
+  | "start"
+  | "mark_executed"
+  | "verify"
+  | "record_outcome"
+  | "dismiss"
+  | "close"
+  | "reopen";
+export type WorkItemNoteType = "general" | "finding" | "approval" | "rejection" | "execution" | "verification" | "outcome";
 
-const TERMINAL_STATUSES = new Set<WorkItemStatus>(["done", "dismissed", "closed", "verified", "outcome_recorded"]);
+const TERMINAL_STATUSES = new Set<WorkItemStatus>(["dismissed", "closed"]);
+
+export interface WorkItemNote {
+  id: string;
+  work_item_id: string;
+  author_user_id: string | null;
+  body: string;
+  note_type: WorkItemNoteType;
+  evidence_ids: string[];
+  created_at: string;
+}
 
 export interface WorkItem {
   id: string;
@@ -52,20 +76,27 @@ export interface WorkItem {
   dedupe_key: string | null;
   owner: string | null;
   priority: WorkItemPriority;
+  priority_status: "available" | "insufficient_data" | "provisional" | "disqualified";
   status: WorkItemStatus;
   due_date: string | null;
+  description: string | null;
   recommended_action: string;
   generated_artifact_ref: string | null;
   approval_state: ApprovalState;
   execution_state: ExecutionState;
   outcome: string | null;
+  outcome_category: string | null;
+  dismissal_reason: string | null;
+  rejection_reason: string | null;
   follow_up_date: string | null;
   external_system: string | null;
   external_record_id: string | null;
   external_record_url: string | null;
   execution_idempotency_key: string | null;
   execution_error: string | null;
+  allowed_actions: WorkItemTransitionAction[];
   audit_history: Array<Record<string, unknown>>;
+  notes: WorkItemNote[];
   created_at: string;
   updated_at: string;
 }
@@ -109,6 +140,20 @@ export interface WorkItemState {
   items: WorkItem[];
   source: "backend" | "unavailable";
   error: string | null;
+}
+
+export interface WorkItemFilters {
+  view?: WorkItemView;
+  status?: WorkItemStatus | "all";
+  type?: WorkItemType | "all";
+  owner?: string;
+  account?: string;
+  program?: string;
+  priority?: WorkItemPriority | "all";
+  approval?: ApprovalState | "all";
+  execution?: ExecutionState | "all";
+  overdue?: boolean;
+  sort?: "updated" | "priority" | "due_date" | "account";
 }
 
 const VIEW_PARAMS: Record<WorkItemView, string> = {
@@ -158,20 +203,27 @@ export function deriveWorkItems(world: World): WorkItem[] {
     dedupe_key: null,
     owner: null,
     priority: rec.priority === "high" ? "high" : rec.priority === "medium" ? "normal" : "low",
+    priority_status: "available",
     status: "detected",
     due_date: isoDate(index < 3 ? 2 : 5),
+    description: null,
     recommended_action: `${accountName(world, rec.subject_id)}: ${rec.reason}`,
     generated_artifact_ref: null,
     approval_state: "not_required",
     execution_state: "not_started",
     outcome: null,
+    outcome_category: null,
+    dismissal_reason: null,
+    rejection_reason: null,
     follow_up_date: null,
     external_system: null,
     external_record_id: null,
     external_record_url: null,
     execution_idempotency_key: null,
     execution_error: null,
+    allowed_actions: [],
     audit_history: derivedAudit("derived_from_recommendation"),
+    notes: [],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }));
@@ -191,8 +243,10 @@ export function deriveWorkItems(world: World): WorkItem[] {
     dedupe_key: null,
     owner: null,
     priority: signal.confidence >= 0.9 ? "high" : "normal",
+    priority_status: "available",
     status: "detected",
     due_date: isoDate(3),
+    description: null,
     recommended_action: signalAccountId(signal)
       ? `${accountName(world, signal.subject_id)}: review ${signal.event_type.replace(/_/g, " ")} from ${sourceLabel(signal)}.`
       : `Portfolio: review market-level ${signal.event_type.replace(/_/g, " ")} from ${sourceLabel(signal)}.`,
@@ -200,13 +254,18 @@ export function deriveWorkItems(world: World): WorkItem[] {
     approval_state: signal.value || signal.confidence >= 0.9 ? "pending" : "not_required",
     execution_state: "not_started",
     outcome: null,
+    outcome_category: null,
+    dismissal_reason: null,
+    rejection_reason: null,
     follow_up_date: null,
     external_system: null,
     external_record_id: null,
     external_record_url: null,
     execution_idempotency_key: null,
     execution_error: null,
+    allowed_actions: [],
     audit_history: derivedAudit("derived_from_signal"),
+    notes: [],
     created_at: signal.detected_at,
     updated_at: signal.detected_at,
   }));
@@ -229,20 +288,27 @@ export function deriveWorkItems(world: World): WorkItem[] {
       dedupe_key: null,
       owner: null,
       priority: opp.stage === "proposal" ? "high" : "normal",
+      priority_status: "available",
       status: "approved",
       due_date: opp.close_date,
+      description: null,
       recommended_action: `${accountName(world, opp.company_id)}: prepare for ${opp.name}.`,
       generated_artifact_ref: opp.id,
       approval_state: "pending",
       execution_state: "not_started",
       outcome: null,
+      outcome_category: null,
+      dismissal_reason: null,
+      rejection_reason: null,
       follow_up_date: null,
       external_system: null,
       external_record_id: null,
       external_record_url: null,
       execution_idempotency_key: null,
       execution_error: null,
+      allowed_actions: [],
       audit_history: derivedAudit("derived_from_opportunity"),
+      notes: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }));
@@ -268,11 +334,38 @@ export function filterWorkItems(items: WorkItem[], view?: WorkItemView): WorkIte
   }
 }
 
-export async function loadWorkItems(world: World, view?: WorkItemView): Promise<WorkItemState> {
+function filterQuery(filters: WorkItemFilters = {}): string {
+  const query = new URLSearchParams();
+  if (filters.view) query.set("view", filters.view);
+  if (filters.status && filters.status !== "all") query.set("status", filters.status);
+  if (filters.type && filters.type !== "all") query.set("type", filters.type);
+  if (filters.owner) query.set("owner", filters.owner);
+  if (filters.account) query.set("account", filters.account);
+  if (filters.program) query.set("program", filters.program);
+  if (filters.priority && filters.priority !== "all") query.set("priority", filters.priority);
+  if (filters.approval && filters.approval !== "all") query.set("approval", filters.approval);
+  if (filters.execution && filters.execution !== "all") query.set("execution", filters.execution);
+  if (filters.overdue) query.set("overdue", "true");
+  if (filters.sort && filters.sort !== "updated") query.set("sort", filters.sort);
+  const text = query.toString();
+  return text ? `?${text}` : "";
+}
+
+function workItemsKey(filters: WorkItemFilters = {}): string {
+  return queryKey(["work-items", filters.view, filters.status, filters.type, filters.owner, filters.account, filters.program, filters.priority, filters.approval, filters.execution, filters.overdue, filters.sort]);
+}
+
+export function refreshWorkState(): void {
+  invalidateQueries("work-items");
+  invalidateQueries("work-item");
+  invalidateQueries("tenant:current:world-snapshot");
+}
+
+export async function loadWorkItems(_world?: World, filters: WorkItemFilters | WorkItemView = {}): Promise<WorkItemState> {
   if (!BACKEND_ENDPOINT) return { items: [], source: "unavailable", error: "VITE_BACKEND_ENDPOINT is not configured." };
+  const normalized = typeof filters === "string" ? { view: filters } : filters;
   try {
-    const query = view ? `?${VIEW_PARAMS[view]}` : "";
-    const response = await backendJson<{ records: WorkItem[] }>(`/work-items${query}`);
+    const response = await backendJson<{ records: WorkItem[] }>(`/work-items${filterQuery(normalized)}`);
     return { items: response.records, source: "backend", error: null };
   } catch (error) {
     return {
@@ -283,22 +376,15 @@ export async function loadWorkItems(world: World, view?: WorkItemView): Promise<
   }
 }
 
-export function useWorkItems(world: World, view?: WorkItemView): WorkItemState {
-  const empty = useMemo<WorkItemState>(() => ({ items: [], source: "unavailable", error: null }), []);
-  const [state, setState] = useState<WorkItemState>(empty);
-
-  useEffect(() => {
-    let alive = true;
-    setState(empty);
-    void loadWorkItems(world, view).then((next) => {
-      if (alive) setState(next);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [empty, view, world]);
-
-  return state;
+export function useWorkItems(world: World, filters?: WorkItemFilters | WorkItemView): WorkItemState {
+  const normalized = typeof filters === "string" ? { view: filters } : (filters ?? {});
+  const key = workItemsKey(normalized);
+  const query = useQuery<WorkItemState>(key, () => loadWorkItems(world, normalized), [world, key]);
+  return useMemo(() => query.data ?? {
+    items: [],
+    source: "unavailable",
+    error: query.error,
+  }, [query.data, query.error]);
 }
 
 export function draftToCreatePayload(draft: WorkItemDraft): WorkItemCreate {
@@ -317,10 +403,43 @@ export function draftToCreatePayload(draft: WorkItemDraft): WorkItemCreate {
 }
 
 export async function createWorkItem(draft: WorkItemDraft): Promise<WorkItem> {
-  return backendJson<WorkItem>("/work-items", {
+  const item = await backendJson<WorkItem>("/work-items", {
     method: "POST",
     body: JSON.stringify(draftToCreatePayload(draft)),
   });
+  refreshWorkState();
+  return item;
+}
+
+export async function loadWorkItem(itemId: string): Promise<WorkItem> {
+  return backendJson<WorkItem>(`/work-items/${encodeURIComponent(itemId)}`);
+}
+
+export async function updateWorkItemMetadata(item: WorkItem, patch: Partial<Pick<WorkItem, "owner" | "priority" | "due_date" | "follow_up_date" | "description" | "recommended_action" | "generated_artifact_ref">>): Promise<WorkItem> {
+  const updated = await backendJson<WorkItem>(`/work-items/${encodeURIComponent(item.id)}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+  refreshWorkState();
+  return updated;
+}
+
+export async function transitionWorkItem(item: WorkItem, action: WorkItemTransitionAction, body: { note?: string; reason?: string; outcome?: string; outcome_category?: string; follow_up_date?: string | null } = {}): Promise<WorkItem> {
+  const updated = await backendJson<WorkItem>(`/work-items/${encodeURIComponent(item.id)}/transition`, {
+    method: "POST",
+    body: JSON.stringify({ action, ...body }),
+  });
+  refreshWorkState();
+  return updated;
+}
+
+export async function addWorkItemNote(item: WorkItem, body: string, noteType: WorkItemNoteType = "general", evidenceIds: string[] = []): Promise<WorkItem> {
+  const updated = await backendJson<WorkItem>(`/work-items/${encodeURIComponent(item.id)}/notes`, {
+    method: "POST",
+    body: JSON.stringify({ body, note_type: noteType, evidence_ids: evidenceIds }),
+  });
+  refreshWorkState();
+  return updated;
 }
 
 export interface ExecuteHubSpotTaskInput {
@@ -345,12 +464,33 @@ export interface ExecuteHubSpotTaskResult {
   };
 }
 
+export interface HubSpotTaskPreview {
+  status: "preview";
+  integration_availability: string;
+  can_execute: boolean;
+  work_item: WorkItem;
+  hubspot_task: {
+    canonical_account_id: string | null;
+    company_id: string | null;
+    owner_id: string | null;
+    due_at: string;
+    task_type: string;
+    subject: string;
+    body: string;
+    supporting_evidence: Array<Record<string, unknown>>;
+    source_signal_ids: string[];
+    related_work_item_id: string;
+    idempotency_key: string;
+    associations: Array<Record<string, unknown>>;
+  };
+}
+
 export function hubSpotTaskIdempotencyKey(item: WorkItem): string {
   return item.execution_idempotency_key ?? `work-item:${item.id}:hubspot-task`;
 }
 
 export async function executeHubSpotTask(input: ExecuteHubSpotTaskInput): Promise<ExecuteHubSpotTaskResult> {
-  return backendJson<ExecuteHubSpotTaskResult>(`/work-items/${input.item.id}/execute/hubspot-task`, {
+  const result = await backendJson<ExecuteHubSpotTaskResult>(`/work-items/${input.item.id}/execute/hubspot-task`, {
     method: "POST",
     headers: { "x-idempotency-key": hubSpotTaskIdempotencyKey(input.item) },
     body: JSON.stringify({
@@ -363,6 +503,23 @@ export async function executeHubSpotTask(input: ExecuteHubSpotTaskInput): Promis
       ].filter(Boolean).join("\n"),
       evidence: input.item.generated_artifact_ref ?? input.item.source_signal_ids.join(", "),
       relationship_record: input.relationshipRecord ?? null,
+      company_id: input.companyId ?? input.item.canonical_account_id,
+      contact_id: input.contactId ?? null,
+      deal_id: input.dealId ?? null,
+      owner_id: input.item.owner,
+      due_at: input.item.due_date,
+    }),
+  });
+  refreshWorkState();
+  return result;
+}
+
+export async function previewHubSpotTask(input: ExecuteHubSpotTaskInput): Promise<HubSpotTaskPreview> {
+  return backendJson<HubSpotTaskPreview>(`/work-items/${input.item.id}/preview/hubspot-task`, {
+    method: "POST",
+    headers: { "x-idempotency-key": hubSpotTaskIdempotencyKey(input.item) },
+    body: JSON.stringify({
+      task_text: input.item.recommended_action,
       company_id: input.companyId ?? input.item.canonical_account_id,
       contact_id: input.contactId ?? null,
       deal_id: input.dealId ?? null,

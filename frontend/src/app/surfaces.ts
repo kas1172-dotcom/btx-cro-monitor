@@ -63,7 +63,7 @@ export function countForSurface(surface: TabId, world: World | null, memory: Mem
     case "brief":
       return world.analysis.valid.length;
     case "work_queue":
-      return world.analysis.recommendations.length;
+      return (world.worldSnapshot?.workItems ?? []).filter((item) => !["dismissed", "closed"].includes(item.status)).length;
     case "accounts":
       return world.companies.filter((company) => company.relationship === "customer").length;
     case "ask":
