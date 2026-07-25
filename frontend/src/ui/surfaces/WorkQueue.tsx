@@ -235,7 +235,7 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
       />
       <section className="work-notes" aria-labelledby="work-notes-title">
         <h3 id="work-notes-title">Notes and findings</h3>
-        <label>Add note<textarea value={note} onChange={(event) => setNote(event.target.value)} /></label>
+        <label>Add note<textarea aria-label="Add work note" placeholder="Add a note or finding" value={note} onChange={(event) => setNote(event.target.value)} /></label>
         <button type="button" onClick={() => void addWorkItemNote(item, note).then(() => { setNote(""); setMessage("Note added."); }).catch((err) => setError(err instanceof Error ? err.message : "Could not add note."))}>Add note</button>
         {item.notes.map((entry) => <p key={entry.id}><strong>{titleCase(entry.note_type)}</strong> {entry.body} <span>{new Date(entry.created_at).toLocaleString()}</span></p>)}
       </section>

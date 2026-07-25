@@ -152,6 +152,24 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
     assert {row["availability"] for row in body["sourceHealth"]} >= {"simulated", "stale", "not_configured"}
 
 
+def test_demo_world_snapshot_does_not_mutate_seeded_workspace(tmp_path: Path):
+    client, sf = _build(tmp_path)
+    reset_demo_tenant(sf, DEMO_TENANT_ID)
+    before = _fingerprint(sf)
+
+    body = client.get("/world-snapshot", headers=_headers(tenant_id=DEMO_TENANT_ID, role="cro")).json()
+
+    assert len(body["accounts"]) == 6
+    assert len(body["signals"]) == 7
+    assert len(body["workItems"]) == 6
+    assert all(
+        row["sourceDataVersion"].startswith(f"{DEMO_TENANT_ID}:demo-reset:")
+        for row in body["scoreHistory"]["records"]
+    )
+    reset_demo_tenant(sf, DEMO_TENANT_ID, verify_only=True)
+    assert _fingerprint(sf) == before
+
+
 def test_normal_tenant_has_no_demo_notice(tmp_path: Path):
     client, _sf = _build(tmp_path)
 

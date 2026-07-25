@@ -24,10 +24,16 @@ export interface QueryResult<T> {
 
 const STALE_AFTER_MS = 60_000;
 const queryStates = new Map<string, QueryState<unknown>>();
+const emptyQueryStates = new Map<string, QueryState<unknown>>();
 const listeners = new Map<string, Set<() => void>>();
 
 function emptyState<T>(key: string): QueryState<T> {
-  return { key, status: "idle", data: null, error: null, updatedAt: null, promise: null };
+  let state = emptyQueryStates.get(key);
+  if (!state) {
+    state = { key, status: "idle", data: null, error: null, updatedAt: null, promise: null };
+    emptyQueryStates.set(key, state);
+  }
+  return state as QueryState<T>;
 }
 
 function getState<T>(key: string): QueryState<T> {

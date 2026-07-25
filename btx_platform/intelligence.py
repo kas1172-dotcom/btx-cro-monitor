@@ -670,7 +670,8 @@ def _score_result(*, factors: list[dict], missing: list[str], hard_gates: list[s
 
 
 def _capability_alignment(account: models.CanonicalAccount) -> float | None:
-    needs = [normalize_identifier("legal_name", item) for item in (account.known_programs or []) + (account.known_customers or [])]
+    explicit_needs = getattr(account, "needs", None) or []
+    needs = [normalize_identifier("legal_name", item) for item in explicit_needs + (account.known_programs or []) + (account.known_customers or [])]
     aliases = [normalize_identifier("legal_name", item) for item in (account.aliases or [])]
     text = " ".join([account.legal_name, account.display_name, *(account.domains or []), *needs, *aliases]).lower()
     matches = [capability for capability in BTX_CAPABILITIES if capability in text]

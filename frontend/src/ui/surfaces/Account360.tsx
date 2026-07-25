@@ -12,7 +12,7 @@ import { EmptyState, SignalCard, SurfaceHeader } from "../primitives.tsx";
 import { AccountToken } from "../common/AccountToken.tsx";
 import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
 import { openDeliverableWizard } from "../../store/store.ts";
-import { SCORE_FAMILY_LABELS, scoreAvailability, scoreInterpretation } from "../../app/presentation.ts";
+import { plainWorkStatus, SCORE_FAMILY_LABELS, scoreAvailability, scoreInterpretation } from "../../app/presentation.ts";
 import { navigateTo, useAppRoute } from "../../app/router.ts";
 import { buildAccountEvidence, buildScoreEvidence, buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
@@ -58,7 +58,7 @@ function scoreStatus(score: ScoreSnapshot | null): string {
 }
 
 function relationshipBackedSignals(world: World, accountId: string) {
-  return world.analysis.valid
+  return (world.worldSnapshot?.signals ?? world.analysis.valid)
     .filter((signal) =>
       signal.scope === "specific_account" &&
       signal.subject_id === accountId &&
@@ -95,6 +95,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const deals = selected ? world.opportunities.filter((opp) => opp.company_id === selected.company.id) : [];
   const facilities = selected ? world.facilities.filter((facility) => facility.company_id === selected.company.id) : [];
   const workItems = selected ? (world.worldSnapshot?.workItems ?? []).filter((item) => item.canonical_account_id === selected.company.id).slice(0, 5) : [];
+  const primaryAccountWork = workItems[0] ?? null;
 
   if (!selected && accountId) {
     return (
@@ -130,6 +131,12 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const isFocus = viewMode === "focus";
   const isBriefing = viewMode === "briefing";
   const accountTimeline = buildAccountTimeline(world, company.id);
+  const evidenceWhy = selected.linkedSignals.length
+    ? `${selected.linkedSignals.length} confirmed account development`
+    : scoreInterpretation(strongestScore, SCORE_FAMILY_LABELS.accountAttractiveness);
+  const evidenceDetail = selected.linkedSignals[0]
+    ? signalHeadline(selected.linkedSignals[0])
+    : `${selected.linkedSignals.length} confirmed account development${selected.linkedSignals.length === 1 ? "" : "s"}`;
 
   function pathWithView(nextView: string | null): string {
     const params = new URLSearchParams(route.query);
@@ -186,13 +193,13 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
           <section className="account-decision-strip" aria-labelledby="account-decision-title">
             <div>
               <span>Recommended</span>
-              <h2 id="account-decision-title">{rec ? actionLabel(rec.action) : "Review account context"}</h2>
-              <p>{rec?.reason ?? "The current records do not include a specific recommendation yet."}</p>
+              <h2 id="account-decision-title">{primaryAccountWork?.recommended_action ?? (rec ? actionLabel(rec.action) : "Review account context")}</h2>
+              <p>{primaryAccountWork ? `${company.name} needs a decision because this work is ${plainWorkStatus(primaryAccountWork.status).toLowerCase()}.` : rec?.reason ?? "The current records do not include a specific recommendation yet."}</p>
             </div>
             <div>
               <span>Why</span>
-              <strong>{scoreInterpretation(strongestScore, SCORE_FAMILY_LABELS.accountAttractiveness)}</strong>
-              <em>{selected.linkedSignals.length} confirmed account development{selected.linkedSignals.length === 1 ? "" : "s"}</em>
+              <strong>{evidenceWhy}</strong>
+              <em>{evidenceDetail}</em>
             </div>
             <div>
               <span>Missing</span>
@@ -272,7 +279,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
             />
           </section>
 
-          {rec && (
+          {rec && !primaryAccountWork && (
             <section className="surface-panel">
               <div className="panel-head"><h2>Recommended action</h2></div>
               <p><strong>{actionLabel(rec.action)}</strong> - {rec.reason}</p>

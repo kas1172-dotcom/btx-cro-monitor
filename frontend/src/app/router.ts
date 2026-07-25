@@ -30,6 +30,7 @@ export interface AppRoute {
 
 const routeListeners = new Set<() => void>();
 let routeSnapshot: AppRoute | null = null;
+const SERVER_ROUTE_SNAPSHOT = parseAppRoute("/today");
 
 const ROUTE_TO_TAB: Record<Exclude<RouteId, "not_found">, TabId> = {
   today: "brief",
@@ -117,7 +118,7 @@ export function useAppRoute(): AppRoute {
     if (window.location.pathname === "/") navigateTo("/today", { replace: true });
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
-  return useSyncExternalStore(subscribeRoute, currentRoute, () => parseAppRoute("/today"));
+  return useSyncExternalStore(subscribeRoute, currentRoute, () => SERVER_ROUTE_SNAPSHOT);
 }
 
 export function pathForTab(tab: TabId): string {

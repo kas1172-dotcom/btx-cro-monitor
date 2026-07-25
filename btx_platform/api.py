@@ -1018,7 +1018,17 @@ def create_app(
         opportunities: list[dict] = []
         tenant_payload = {"id": tenant_id, "displayName": "BTX Precision", "isDemonstration": False, "demoReferenceDate": None, "demoNotice": None}
         demo_metadata: dict = {}
-        if settings.hubspot_access_token:
+        with session_factory() as preflight_session:
+            tenant_payload = _tenant_summary(preflight_session, tenant_id)
+            demo_metadata = _tenant_demo_metadata(preflight_session, tenant_id)
+
+        if demo_metadata:
+            source_health = [
+                _source_health_from_metadata(row, generated_at)
+                for row in demo_metadata.get("sourceHealth", [])
+                if isinstance(row, dict)
+            ]
+        elif settings.hubspot_access_token:
             try:
                 client = HubSpotClient(settings.hubspot_access_token)
                 account_payload = hubspot_payload(client, "accounts")
@@ -1058,30 +1068,28 @@ def create_app(
                 error_message="BTX_HUBSPOT_ACCESS_TOKEN is not configured.",
             ))
 
-        signals, monitor_health = _monitor_records(settings)
-        source_health.append(monitor_health)
-        source_health.append(_source_health(
-            source_key="operating",
-            display_name="ERP / MES operating data",
-            availability="not_configured",
-            record_count=0,
-            freshness_threshold_minutes=60,
-            error_code="not_configured",
-            error_message="Operating data ingestion is not connected.",
-        ))
+        if demo_metadata:
+            signals = []
+            if not source_health:
+                source_health = source_health_payload()
+        else:
+            signals, monitor_health = _monitor_records(settings)
+            source_health.append(monitor_health)
+            source_health.append(_source_health(
+                source_key="operating",
+                display_name="ERP / MES operating data",
+                availability="not_configured",
+                record_count=0,
+                freshness_threshold_minutes=60,
+                error_code="not_configured",
+                error_message="Operating data ingestion is not connected.",
+            ))
 
         session = session_factory()
         try:
-            tenant_payload = _tenant_summary(session, tenant_id)
-            demo_metadata = _tenant_demo_metadata(session, tenant_id)
             if demo_metadata:
                 contacts = [dict(row) for row in demo_metadata.get("contacts", []) if isinstance(row, dict)]
                 opportunities = [dict(row) for row in demo_metadata.get("opportunities", []) if isinstance(row, dict)]
-                source_health = [
-                    _source_health_from_metadata(row, generated_at)
-                    for row in demo_metadata.get("sourceHealth", [])
-                    if isinstance(row, dict)
-                ] or source_health
             ensure_default_scoring_config(session, tenant_id, _actor(request))
             source_data_version = f"{tenant_id}:{generated_at}"
             id_map = upsert_canonical_accounts(session, accounts, tenant_id)
@@ -1152,30 +1160,39 @@ def create_app(
                 .order_by(models.CanonicalAccount.display_name.asc(), models.CanonicalAccount.legal_name.asc())
                 .all()
             )
-            for account in account_rows:
-                account_scores = score_account(session, tenant_id, account, source_data_version)
-                for family, result in account_scores.items():
+            if demo_metadata:
+                for snapshot in (
+                    session.query(models.ScoreSnapshot)
+                    .filter(models.ScoreSnapshot.tenant_id == tenant_id)
+                    .order_by(models.ScoreSnapshot.calculated_at.desc())
+                    .all()
+                ):
+                    scores.setdefault(snapshot.score_family, []).append(score_snapshot_summary(snapshot))
+            else:
+                for account in account_rows:
+                    account_scores = score_account(session, tenant_id, account, source_data_version)
+                    for family, result in account_scores.items():
+                        snapshot = persist_score_snapshot(
+                            session,
+                            tenant_id,
+                            entity_type="account",
+                            entity_id=account.id,
+                            score_family=family,
+                            result=result,
+                        )
+                        scores[family].append(score_snapshot_summary(snapshot))
+                for signal_row in signal_rows:
+                    result = signal_confidence(signal_row, relationships_by_signal.get(signal_row.id, []), source_data_version)
                     snapshot = persist_score_snapshot(
                         session,
                         tenant_id,
-                        entity_type="account",
-                        entity_id=account.id,
-                        score_family=family,
+                        entity_type="signal",
+                        entity_id=signal_row.id,
+                        score_family="signalConfidence",
                         result=result,
                     )
-                    scores[family].append(score_snapshot_summary(snapshot))
-            for signal_row in signal_rows:
-                result = signal_confidence(signal_row, relationships_by_signal.get(signal_row.id, []), source_data_version)
-                snapshot = persist_score_snapshot(
-                    session,
-                    tenant_id,
-                    entity_type="signal",
-                    entity_id=signal_row.id,
-                    score_family="signalConfidence",
-                    result=result,
-                )
-                scores["signalConfidence"].append(score_snapshot_summary(snapshot))
-            session.commit()
+                    scores["signalConfidence"].append(score_snapshot_summary(snapshot))
+                session.commit()
 
             work_items = [
                 _work_item_response(row, role=_role(request))
