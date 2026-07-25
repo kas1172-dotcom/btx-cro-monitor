@@ -14,9 +14,9 @@ This ledger coordinates the executive-demo readiness work. It is a planning reco
 
 | Workstream | Process | Files expected to change | Shared dependencies | Status | Validation | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0 Audit and shared contracts | Main process | `docs/UX_AUDIT_AND_DEMO_READINESS.md`, `frontend/src/app/presentation.ts` | Backend world snapshot, work-item lifecycle | Complete in checkpoint 1 | `git diff --check`; frontend checks listed below | Pending commit |
-| 1 Cockpit foundation | Main process | `App.tsx`, `BrainSidebar.tsx`, `styles.css`, command palette | Shared presentation helpers | Complete in checkpoint 1 | frontend checks listed below | Pending commit |
-| 2 Executive surfaces | Main process | Today, Account 360, Work Queue, Map/Prospecting as scoped | Foundation components | Initial Today, Account 360, and Work Detail pass complete; evidence drawer, timeline, action dock, map/prospecting polish remain | frontend checks listed below | Pending commit |
+| 0 Audit and shared contracts | Main process | `docs/UX_AUDIT_AND_DEMO_READINESS.md`, `frontend/src/app/presentation.ts` | Backend world snapshot, work-item lifecycle | Complete in checkpoint 1 | `git diff --check`; frontend checks listed below | `5074d29` |
+| 1 Cockpit foundation | Main process | `App.tsx`, `BrainSidebar.tsx`, `styles.css`, command palette | Shared presentation helpers | Complete in checkpoint 1 | frontend checks listed below | `5074d29` |
+| 2 Executive surfaces | Main process | Today, Account 360, Work Queue, Map/Prospecting as scoped | Foundation components | Initial Today, Account 360, and Work Detail pass complete; evidence drawer, timeline, action dock, map/prospecting polish remain | frontend checks listed below | `5074d29` partial |
 | 3 Demo workspace | Main process | `tooling/reset_demo_tenant.py`, backend seed fixtures/tests/docs | Existing backend schemas | Pending | Pending | Pending |
 | 4 Assistant | Main process | Ask/assistant modules, backend conversation models/routes/tests | Backend authoritative retrieval | Pending | Pending | Pending |
 | 5 Briefing/focus/deliverable | Main process | Deliverable templates, modes, runbook | Shared shell and route state | Pending | Pending | Pending |
