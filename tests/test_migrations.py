@@ -99,6 +99,11 @@ def test_deliverables_migration_downgrade_steps_remove_expected_tables(tmp_path:
     assert "deliverables" in set(inspect(engine).get_table_names())
     columns = {column["name"] for column in inspect(engine).get_columns("deliverables")}
     assert "entity_ids" in columns
+    assert "needs" in {column["name"] for column in inspect(engine).get_columns("canonical_accounts")}
+
+    command.downgrade(config, "-1")
+    engine = make_engine(f"sqlite:///{db_path}")
+    assert "needs" not in {column["name"] for column in inspect(engine).get_columns("canonical_accounts")}
 
     command.downgrade(config, "-1")
     engine = make_engine(f"sqlite:///{db_path}")

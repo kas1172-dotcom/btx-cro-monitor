@@ -1,13 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// The app imports the engine (src/engine) and the frozen JSON fixtures (data/)
-// directly. No backend. The data/engine wall is preserved: engine code is
-// industry-free; everything BTX-specific is the imported data.
-// base: relative ("./") for production builds so assets resolve when the app is
-// served from a GitHub Pages project subpath (…/btx-cro-monitor/); "/" for local dev.
+// The cockpit reads all of its data from the backend through the WorldSnapshot
+// contract. The JSON files under data/ are test fixtures only and are never
+// imported by anything reachable from src/main.tsx.
+//
+// base must be an absolute path, not "./". A relative base breaks deep links:
+// loading /accounts/<id> would resolve assets against /accounts/ and 404. Pages
+// serves the cockpit from /btx-cro-monitor/cockpit/, so builds default to that
+// and VITE_BASE_PATH can override it for any other host, such as a domain root.
 export default defineConfig(({ command }) => ({
-  base: command === "build" ? "./" : "/",
+  base: command === "build" ? process.env.VITE_BASE_PATH || "/btx-cro-monitor/cockpit/" : "/",
   plugins: [react()],
   build: {
     modulePreload: false,

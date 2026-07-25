@@ -54,6 +54,11 @@ runs:
       run: |
         rm -rf _site && mkdir -p _site/cockpit _site/btx
         cp -r frontend/dist/. _site/cockpit/
+        # Pages has no SPA rewrite, so a deep link such as
+        # /btx-cro-monitor/cockpit/accounts/<id> would 404. Serving the app shell
+        # as 404.html lets the client router take over. This only works because
+        # the build uses an absolute base, so assets resolve from any depth.
+        cp _site/cockpit/index.html _site/cockpit/404.html
         for artifact in run_output.json archive.json map_targets.json; do
           test -f "clients/btx/artifacts/$artifact"
           cp "clients/btx/artifacts/$artifact" "_site/btx/$artifact"

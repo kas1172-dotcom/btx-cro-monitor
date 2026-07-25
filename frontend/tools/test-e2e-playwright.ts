@@ -174,6 +174,9 @@ async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
 
 await mkdir(SCREENSHOT_DIR, { recursive: true });
 const buildEnv = { ...process.env } as NodeJS.ProcessEnv;
+// This suite serves the build from "/" through vite preview, whereas a default
+// build targets the GitHub Pages subpath.
+buildEnv.VITE_BASE_PATH = "/";
 if (CLERK_LOGIN_ENABLED && CLERK_PUBLISHABLE_KEY) buildEnv.VITE_CLERK_PUBLISHABLE_KEY = CLERK_PUBLISHABLE_KEY;
 if (!CLERK_LOGIN_ENABLED) delete buildEnv.VITE_CLERK_PUBLISHABLE_KEY;
 if (HUBSPOT_LOOP_ENABLED) buildEnv.VITE_BACKEND_ENDPOINT = process.env.E2E_BACKEND_ENDPOINT;

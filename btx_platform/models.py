@@ -172,6 +172,9 @@ class CanonicalAccount(Base):
     public_recipient_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     known_programs: Mapped[list | None] = mapped_column(JSON, nullable=True)
     known_customers: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # What this account buys, in BTX capability terms. The attractiveness scorer
+    # reads this for capability alignment, the single heaviest factor.
+    needs: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
 

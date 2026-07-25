@@ -28,6 +28,28 @@ export interface AppRoute {
   query: URLSearchParams;
 }
 
+/**
+ * The cockpit is served from a subpath on GitHub Pages ("/btx-cro-monitor/cockpit/")
+ * and from the root in local dev. Routes are written root-relative everywhere in the
+ * app; these two helpers translate between an app path and a browser path so the
+ * same route table works under either base.
+ */
+// import.meta.env only exists under Vite. The tools/test-*.ts scripts run this
+// module directly through tsx, where it is undefined, so read it defensively.
+const BASE_PATH = (import.meta.env?.BASE_URL || "/").replace(/\/+$/, "");
+
+export function toBrowserPath(appPath: string): string {
+  if (!BASE_PATH) return appPath;
+  return `${BASE_PATH}${appPath.startsWith("/") ? appPath : `/${appPath}`}`;
+}
+
+export function stripBasePath(pathname: string): string {
+  if (BASE_PATH && (pathname === BASE_PATH || pathname.startsWith(`${BASE_PATH}/`))) {
+    return pathname.slice(BASE_PATH.length) || "/";
+  }
+  return pathname;
+}
+
 const routeListeners = new Set<() => void>();
 let routeSnapshot: AppRoute | null = null;
 const SERVER_ROUTE_SNAPSHOT = parseAppRoute("/today");
@@ -73,7 +95,7 @@ function decodeSegment(value: string | undefined): string | null {
 }
 
 export function parseAppRoute(pathname: string, search = ""): AppRoute {
-  const clean = pathname.replace(/\/+$/, "") || "/";
+  const clean = stripBasePath(pathname).replace(/\/+$/, "") || "/";
   const query = new URLSearchParams(search);
   const parts = clean.split("/").filter(Boolean);
   const [root, child] = parts;
@@ -115,7 +137,7 @@ export function useAppRoute(): AppRoute {
   useEffect(() => {
     const onPopState = () => emitRoute();
     window.addEventListener("popstate", onPopState);
-    if (window.location.pathname === "/") navigateTo("/today", { replace: true });
+    if (stripBasePath(window.location.pathname).replace(/\/+$/, "") === "") navigateTo("/today", { replace: true });
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
   return useSyncExternalStore(subscribeRoute, currentRoute, () => SERVER_ROUTE_SNAPSHOT);
@@ -138,7 +160,7 @@ export function tabForRoute(route: RouteId): TabId {
 }
 
 export function navigateTo(path: string, options: { replace?: boolean } = {}): void {
-  const next = new URL(path, window.location.origin);
+  const next = new URL(toBrowserPath(path), window.location.origin);
   const current = `${window.location.pathname}${window.location.search}`;
   const target = `${next.pathname}${next.search}`;
   if (current === target) return;

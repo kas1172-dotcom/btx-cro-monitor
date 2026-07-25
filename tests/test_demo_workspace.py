@@ -145,6 +145,17 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
     # The prospect journey must name what it is missing rather than fill the gaps in.
     nlight_research = next(item for item in body["workItems"] if item["id"] == "demo-wi-research-nlight")
     assert len(nlight_research["missing_information"]) == 4
+    # A scored customer next to an honestly unscored prospect is the demo's point.
+    attractiveness = {row["entityId"]: row for row in body["scores"]["accountAttractiveness"]}
+    lockheed = attractiveness["demo-acct-lockheed"]
+    assert lockheed["status"] == "available"
+    assert isinstance(lockheed["score"], (int, float))
+    assert lockheed["result"]["dataCompleteness"] >= 0.60
+    contributing = [f for f in lockheed["result"]["positiveFactors"] if f["contribution"] is not None]
+    assert len(contributing) >= 4
+    nlight = attractiveness["demo-acct-nlight"]
+    assert nlight["status"] == "insufficient_data"
+    assert nlight["score"] is None
     assert body["relationshipReview"]["records"][0]["id"] == "demo-rel-nlight-review"
     assert any(item["approval_state"] == "pending" for item in body["workItems"])
     assert any(item["execution_state"] == "verified" and item["external_system"] == "hubspot-demo" for item in body["workItems"])

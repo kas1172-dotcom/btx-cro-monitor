@@ -127,8 +127,9 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             subject_id="demo-acct-lockheed",
             scope="specific_account",
             relevance=86,
+            value=627_000_000,
             detected_at=detected_three_days_ago,
-            quote="Lockheed Martin and nLIGHT were selected for a Pentagon laser-defense project; the repository artifact flags potential precision housings, mounts, optical benches, and thermal-management hardware.",
+            quote="Lockheed Martin and nLIGHT were selected for a Pentagon laser-defense project valued at $627 million; the repository artifact flags potential precision housings, mounts, optical benches, and thermal-management hardware. The award value is the public program figure, not a BTX work-package value.",
         ),
         _signal(
             signal_id="demo-sig-nlight-laser",

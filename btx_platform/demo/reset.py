@@ -197,6 +197,7 @@ def _seed_accounts(session: Session, seed: dict[str, Any], tenant_id: str) -> No
             known_customers=record.get("known_customers", []),
             cage_code=record.get("cage_code"),
             uei=record.get("uei"),
+            needs=record.get("needs", []),
         )
         session.add(row)
         add_identifier(account_id=row.id, identifier_type="legal_name", value=record["name"], classification="crm", verified=True)
@@ -506,6 +507,25 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     _assert(len(nlight_research.missing_information or []) >= 4, "nLIGHT prospect research must name its missing evidence.")
     nlight_account = next((row for row in accounts if row.id == "demo-acct-nlight"), None)
     _assert(not (nlight_account.cage_code if nlight_account else None), "nLIGHT must not carry an invented CAGE code.")
+    # The demo's whole scoring claim is that a score is earned from evidence.
+    # Lockheed must score; the unqualified prospect must not.
+    attractiveness = {
+        row.entity_id: row
+        for row in snapshots
+        if row.score_family == "accountAttractiveness" and row.entity_type == "account"
+    }
+    lockheed_score = attractiveness.get("demo-acct-lockheed")
+    _assert(lockheed_score is not None, "Lockheed attractiveness snapshot is missing.")
+    _assert(lockheed_score.status == "available", "Lockheed must produce an engine-computed attractiveness score.")
+    _assert(isinstance(lockheed_score.result.get("score"), (int, float)), "Lockheed score value was not computed.")
+    _assert(
+        len([f for f in lockheed_score.result.get("positiveFactors", []) if f.get("contribution") is not None]) >= 4,
+        "Lockheed score must show a populated factor breakdown.",
+    )
+    nlight_score = attractiveness.get("demo-acct-nlight")
+    _assert(nlight_score is not None, "nLIGHT attractiveness snapshot is missing.")
+    _assert(nlight_score.status == "insufficient_data", "nLIGHT must stay honestly unscored.")
+    _assert(nlight_score.result.get("score") is None, "nLIGHT must not carry a score value.")
     _assert(by_status["demo-wi-approve-lockheed"].approval_state == "pending", "Awaiting-approval item was not restored.")
     _assert(by_status["demo-wi-approved-pulse"].approval_state == "approved", "Approved item was not restored.")
     _assert(by_status["demo-wi-verified-sim"].execution_state == "verified", "Verified simulated action was not restored.")

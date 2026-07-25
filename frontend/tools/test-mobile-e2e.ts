@@ -81,7 +81,9 @@ async function assertLazyBundles(): Promise<void> {
 }
 
 await mkdir(SCREENSHOT_DIR, { recursive: true });
-await run("npm", ["run", "build"]);
+// Build at the root base. This suite serves the app from "/" through vite
+// preview, whereas a default build targets the Pages subpath.
+await run("npm", ["run", "build"], { ...process.env, VITE_BASE_PATH: "/" });
 await assertLazyBundles();
 await run("npx", ["playwright", "install", "chromium"]);
 const preview = await waitForPreview();
