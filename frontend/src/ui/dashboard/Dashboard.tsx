@@ -11,7 +11,7 @@ import { actionDescription, actionLabel } from "../../app/actionLabels.ts";
 import { explainRankingPrompt, expandSignalPrompt, nextActionPrompt } from "../../app/copilotPrompts.ts";
 import { USER_PROMPT_RULES } from "../../app/promptContract.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
-import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { AskButton } from "../ask/AskButton.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 
 function RankList({ world, dimension, title }: { world: World; dimension: ScoreDimension; title: string }) {
@@ -34,7 +34,7 @@ function RankList({ world, dimension, title }: { world: World; dimension: ScoreD
             <span className="rank-bar"><span style={{ width: `${v}%`, background: color }} /></span>
             <span className="rank-val">{v}</span>
             {explanation && <RankingWhy explanation={explanation} />}
-            <AskChatpilButton
+            <AskButton
               label="Explain ranking"
               prompt={explainRankingPrompt(nameOf(s.subject_id), `${title}. ${explanation?.summary ?? `${dimension} score ${v}`}. ${explanation?.driverLine ?? ""} ${explanation?.signalLine ?? ""} ${explanation?.contextLine ?? ""}`)}
             />
@@ -72,7 +72,7 @@ export function Dashboard({ world }: { world: World }) {
               </span>
               <span className="rec-name">{nameOf(r.subject_id)}</span>
               <span className="muted">{r.reason}</span>
-              <AskChatpilButton
+              <AskButton
                 label="Explain"
                 prompt={nextActionPrompt(nameOf(r.subject_id), `Dashboard recommendation: ${actionLabel(r.action)}. Priority ${r.priority}. Reason: ${r.reason}.`)}
               />
@@ -92,7 +92,7 @@ export function Dashboard({ world }: { world: World }) {
             <span className={`sev sev-${a.severity}`}>{a.severity}</span>
             <span className="alert-main">{nameOf(a.subject_id)} - {a.dimension} {a.score}</span>
             <span className="muted">{a.reason}</span>
-            <AskChatpilButton
+            <AskButton
               label="Explain"
               prompt={`Explain this alert for a CRO. Account: ${nameOf(a.subject_id)}. Dimension: ${a.dimension}. Score: ${a.score}. Severity: ${a.severity}. Reason: ${a.reason}. Cover what happened, why it matters, recommended action, evidence, and missing data. ${USER_PROMPT_RULES}`}
             />
@@ -106,7 +106,7 @@ export function Dashboard({ world }: { world: World }) {
           <button key={s.id} className="feed-row" onClick={() => setState({ activeCompanyId: s.subject_id })}>
             <span className="feed-ev">{s.event_type}</span>
             <span className="feed-q">{nameOf(s.subject_id)}: {s.source_quote}</span>
-            <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(s, nameOf(s.subject_id))} />
+            <AskButton label="Expand signal" prompt={expandSignalPrompt(s, nameOf(s.subject_id))} />
           </button>
         ))}
       </div>

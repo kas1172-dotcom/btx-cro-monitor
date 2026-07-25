@@ -13,6 +13,7 @@ import { AccountToken } from "../common/AccountToken.tsx";
 import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
 import { openDeliverableWizard } from "../../store/store.ts";
 import { SCORE_FAMILY_LABELS, scoreAvailability, scoreInterpretation } from "../../app/presentation.ts";
+import { navigateTo } from "../../app/router.ts";
 
 function money(value: number | null): string {
   if (value === null) return "Value not provided";
@@ -207,6 +208,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               <p>Create a deliverable or confirm a HubSpot task from this account context.</p>
             </div>
             <div className="primary-action-row">
+              <button type="button" onClick={() => navigateTo(`/ask?account=${encodeURIComponent(company.id)}&prompt=${encodeURIComponent(`What should we do next with ${company.name}?`)}`)}>Ask about this account</button>
               <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create deliverable</button>
             </div>
             <CrmWriteActions

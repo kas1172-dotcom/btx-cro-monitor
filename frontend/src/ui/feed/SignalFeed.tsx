@@ -11,7 +11,7 @@ import { signalHeadline, signalSourceDate, signalSourceName } from "../../app/si
 import { qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
 import { accountPath, navigateTo, pathForTab } from "../../app/router.ts";
-import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { AskButton } from "../ask/AskButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState } from "../primitives.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
@@ -269,8 +269,8 @@ export function SignalFeed({ world }: { world: World }) {
               {!row.sourceUrl && !row.documentUrl && <em>{row.signal.artifact ? "No source link in monitor engine document" : "No source link in the current context"}</em>}
             </div>
                 <div className="signal-actions">
-              <AskChatpilButton label="Explain" prompt={expandSignalPrompt(row.signal, row.companyName)} />
-              <AskChatpilButton
+              <AskButton label="Explain" prompt={expandSignalPrompt(row.signal, row.companyName)} />
+              <AskButton
                 label="What should I do?"
                 prompt={nextActionPrompt(row.companyName, `Signal inbox item. Event ${row.signal.event_type}. Motion ${row.motion}. Score impact ${row.impact.text}. Recommended action: ${row.actionText}. Evidence: ${row.signal.source_quote}`)}
               />

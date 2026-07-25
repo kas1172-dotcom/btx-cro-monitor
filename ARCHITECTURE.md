@@ -69,7 +69,7 @@ The frontend is the decision interface. It is responsible for:
 - monitor signal presentation,
 - map/prospecting views,
 - deliverables,
-- Chatpil/assistant UX,
+- persistent Ask conversations,
 - provenance labels,
 - workflow buttons that call backend routes where live actions exist.
 
@@ -108,13 +108,17 @@ It is not responsible for rendering the product UI.
 
 ## Runtime Data Path
 
-The production cockpit has one adapter path: authenticated frontend calls to the backend `WorldSnapshot` API. The backend is responsible for CRM reads, monitor artifact reads, persisted work items, persisted work-item lifecycle commands, durable notes, persisted deliverables, and source-health disclosure.
+The production cockpit has one adapter path: authenticated frontend calls to backend APIs. The backend is responsible for CRM reads, monitor artifact reads, persisted work items, persisted work-item lifecycle commands, durable notes, persisted deliverables, persistent Ask conversations, and source-health disclosure.
+
+## Ask
+
+Ask is the single production assistant identity. It stores tenant-scoped conversations and messages in the backend, retrieves only internal records, returns citations for supported claims, and creates only preview drafts until the user confirms through the normal work-item or deliverable APIs. Details live in `docs/ASSISTANT_ARCHITECTURE.md`.
 
 Demo JSON under `frontend/data/demo/btx/` is test scaffolding only. It must not be selected by a production Vite flag or used as a runtime fallback when a backend source is missing.
 
 ## Demonstration Tenant
 
-The deterministic demo workspace is a backend tenant, not a frontend mode. The tenant row `btx-demo-command-cockpit` is marked by `tenants.is_demonstration = true`; reset tooling refuses all normal tenants. Seeded accounts, signals, relationships, score snapshots, work items, notes, and deliverables use the normal database tables and load through `/world-snapshot`.
+The deterministic demo workspace is a backend tenant, not a frontend mode. The tenant row `btx-demo-command-cockpit` is marked by `tenants.is_demonstration = true`; reset tooling refuses all normal tenants. Seeded accounts, signals, relationships, score snapshots, work items, notes, deliverables, and Ask conversations use the normal database tables. World records load through `/world-snapshot`; assistant records load through `/assistant/conversations`.
 
 Public intelligence in the seed retains source metadata. Internal BTX CRM/workflow context is illustrative and classified as simulated. Resetting the demo tenant does not call HubSpot or mutate external systems.
 

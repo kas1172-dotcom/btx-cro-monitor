@@ -6,7 +6,7 @@ Use this checklist for UI behaviors that are not covered by the deterministic Ty
 - Nav sweep at 1280px desktop: click Core (Today's Brief, Work Queue, Accounts, Ask), Analytical (Map, Analysis, Capacity, Programs), and Utility (Settings). Screenshot each and confirm every surface renders its distinct component.
 - Mobile sweep at 390px and 414px: verify the rail is a bottom touch tab bar, Core surfaces open as full-screen views, Ask reads like a chat surface, Account 360 scrolls without horizontal overflow, and the right context/dossier panels open as sheets.
 - Mobile map sweep at 390px and 414px: open Map, rotate or resize, and confirm tiles/markers redraw rather than appearing blank. The automated smoke writes reference screenshots to `/tmp/btx-mobile-smoke/cockpit-390.png`, `/tmp/btx-mobile-smoke/cockpit-414.png`, and `/tmp/btx-mobile-smoke/cockpit-1280.png`.
-- Ask chips: chips work from Home, responses, deliverables, and every workspace tab.
+- Ask entry points: Today, Account 360, and Work detail open `/ask` with the right prompt and context.
 - Parameter chips: Meeting brief shows account select; Plan a trip shows city and date range; Board deck shows quarter; Analysis view shows metric preset; Escape closes the popover.
 - Dossier: X closes the dossier, clicking the backdrop closes it, and Escape closes only the dossier without changing the active tab or response.
 - Deliverable actions: Send and Create task modals open, Confirm closes them, and Cancel closes them from every deliverable type.
@@ -17,7 +17,7 @@ Use this checklist for UI behaviors that are not covered by the deterministic Ty
 - Browser Back: verify the browser does not leave the app in a stale dossier or modal state.
 - Resize: verify 1512px wide, 1280px wide, and 1024x768 tablet landscape have no horizontal scroll, no overlapping panels, and readable tables. Open a dossier at each width and confirm it sits below the topbar with no content clipping.
 - Resize: verify below 900px shows the desktop-focused mobile companion message rather than a broken app layout.
-- FAB/Chatpil: open a dossier or context panel, confirm the Chatpil FAB shifts left so it does not cover the right panel; close the panel and confirm the FAB returns to the right edge.
+- Ask workspace: open an account conversation, confirm the sidebar, citations, persistent composer, archive/restore, and mobile stacked layout.
 - Param popup: open "Plan a trip", confirm skeleton loading bars from a prior request are not visible behind the popup; confirm the × close button is at least 32×32px and clearly visible.
 - Overflow auditor (DEV only): in the browser console run `window.__btxAudit?.()` after navigating to each tab. No red warnings should appear. If any appear, record the selector and report.
 - Width sweep: at 1512, 1280, and 1024px - verify no column is squished to zero, no button label is cut mid-word, no table overflows its container, and no rail badge overlaps the nav icon.
@@ -39,19 +39,19 @@ The cockpit uses the backend `WorldSnapshot` endpoint. Missing integrations must
 3. Open Settings → Engine tuning. Confirm the panel shows `Backend scoring_weights`, a version number, and editable scoring rows. Change one weight, save, and confirm the version/status updates.
 4. Open Settings → Sources. Toggle a source, save, reload, and confirm the saved enabled state returns from the backend.
 5. Click `Run collection now`. Confirm the button reports the run status, recent runs populate, and a second click inside the rate-limit window is refused with a visible message.
-6. Ask Chatpil a simple question while pointed at `/llm`. Confirm the LIVE badge recovers and no local `copilot-proxy.mjs` process is required.
+6. Ask a simple question from `/ask`. Confirm the answer cites internal records and no local proxy process is required.
 
-## Chatpil smoke tests (run in both proxy-on and proxy-off states)
+## Ask Smoke Tests
 
 **Proxy-off (no VITE_COPILOT_ENDPOINT set):**
-1. Open Chatpil. Badge shows "offline" (not "live" or "…"). Opening brief appears.
+1. Open Ask. Seeded conversations load from the backend.
 2. Ask a data question: "What's the top opportunity?" → grounded deterministic answer, no debug text, no raw JSON or "model:" string.
 3. Type "open top risk account" → dossier opens for the highest-risk account; thread shows "Opened dossier for …" confirmation.
 4. Ask an out-of-scope question: "What is the European churn rate?" → response mentions the data isn't available, offers what IS in context. No hallucinated numbers.
 5. Suggestion chips show entity names from world data (not "BTX Precision"). Clicking a chip fires the question.
 
 **Proxy-on (VITE_COPILOT_ENDPOINT set to running proxy):**
-1. Open Chatpil. Badge shows "…" briefly then "live" after health-check completes.
+1. Open Ask after sign-in. Backend conversations load without a local fixture.
 2. Ask "What needs my attention today?" → LLM answer grounded in account names, scores, and recommendations; no "model:", no raw JSON. "based on:" line present.
 3. Receive an OFFER button from the LLM response → clicking it either opens a dossier or drafts an outreach; a confirmation message follows in the thread.
 4. After proxy is stopped (kill the process mid-session): ask another question → falls back to deterministic answer + one offline note. Badge flips to "offline". The thread shows no debug text.

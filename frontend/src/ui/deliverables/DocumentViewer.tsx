@@ -467,7 +467,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         ))}
       </aside>
       <aside className="editor-assistant">
-        <h2>ChatPill Editor</h2>
+        <h2>Ask Editor</h2>
         <p>{copilotEndpoint ? "Ask for a focused rewrite of a section." : "Assistant needs the connection, manual editing still works."}</p>
         <div className="editor-quick-actions">
           {["Tighten", "More formal", "Shorten to 80 words", "Add evidence", "Soften claims", "Fix to sources"].map((action) => (

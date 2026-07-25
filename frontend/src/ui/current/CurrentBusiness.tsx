@@ -9,7 +9,7 @@ import { explainAccountPrompt, expandSignalPrompt, nextActionPrompt } from "../.
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { formatAddress } from "../../app/format.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
-import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { AskButton } from "../ask/AskButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
@@ -204,7 +204,7 @@ export function CurrentBusiness({ world }: { world: World }) {
                 {openValue > 0 ? ` · ${money(openValue)} open` : ""}
                 {rec ? ` · ${actionLabel(rec.action)}` : ""}
               </span>
-              <AskChatpilButton
+              <AskButton
                 label="Explain"
                 prompt={explainAccountPrompt(company, `Current Business attention row. Risk ${score?.dimensions.risk.score ?? 0}, capacity ${score?.dimensions.capacityRisk.score ?? 0}, open pipeline ${money(openValue)}. Recommendation ${rec ? actionLabel(rec.action) : "none"}.`)}
               />
@@ -247,7 +247,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               </span>
               <span className="rec-name">{nameOf(r.subject_id)}</span>
               <span className="muted">{r.reason}</span>
-              <AskChatpilButton
+              <AskButton
                 label="What next?"
                 prompt={nextActionPrompt(nameOf(r.subject_id), `Current Business recommendation: ${actionLabel(r.action)}. Priority ${r.priority}. Reason: ${r.reason}.`)}
               />
@@ -266,7 +266,7 @@ export function CurrentBusiness({ world }: { world: World }) {
               <ProvenanceBadge label={provenanceForRecord(company)} />
               {formatAddress(company.location) && <span>{formatAddress(company.location)}</span>}
               <em>Opportunity {opportunity}: {whyAccountMatters(world, company)}</em>
-              <AskChatpilButton
+              <AskButton
                 label="Explain"
                 prompt={explainAccountPrompt(company, `Expansion opportunity. Opportunity score ${opportunity}. ${whyAccountMatters(world, company)}`)}
               />
@@ -307,7 +307,7 @@ export function CurrentBusiness({ world }: { world: World }) {
                 <ExternalLink href={signal.source_url} label="Source" />
                 <ExternalLink href={signal.document_url} label="Document" />
               </span>
-              <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(signal, nameOf(signal.subject_id))} />
+              <AskButton label="Expand signal" prompt={expandSignalPrompt(signal, nameOf(signal.subject_id))} />
             </button>
           ))}
         </div>}

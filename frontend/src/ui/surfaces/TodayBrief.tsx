@@ -7,7 +7,6 @@ import type { Signal } from "../../engine/signals/contract.ts";
 import type { TabId } from "../../app/surfaces.ts";
 import { accountPath, navigateTo, pathForTab, useAppRoute } from "../../app/router.ts";
 import { plainActionLabel, plainWorkStatus, primaryWorkAction, workItemAlertLevel } from "../../app/presentation.ts";
-import { AskBrainBar } from "../brain/AskBrainBar.tsx";
 import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
 
@@ -311,7 +310,9 @@ export function TodayBrief({ world }: { world: World }) {
         </section>
       )}
 
-      <AskBrainBar world={world} seedPrompt={topSeed} />
+      <div className="today-ask-row">
+        <button type="button" onClick={() => navigateTo(`/ask?prompt=${encodeURIComponent(topSeed)}`)}>Ask about today</button>
+      </div>
     </section>
   );
 }

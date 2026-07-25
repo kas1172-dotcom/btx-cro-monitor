@@ -35,6 +35,8 @@ class DemoResetReport:
     work_items: int
     deliverables: int
     notes: int
+    assistant_conversations: int
+    assistant_messages: int
     message: str
 
     def as_dict(self) -> dict[str, Any]:
@@ -49,6 +51,8 @@ class DemoResetReport:
             "work_items": self.work_items,
             "deliverables": self.deliverables,
             "notes": self.notes,
+            "assistant_conversations": self.assistant_conversations,
+            "assistant_messages": self.assistant_messages,
             "message": self.message,
         }
 
@@ -84,6 +88,8 @@ def _make_report(seed: dict[str, Any], *, dry_run: bool, verify_only: bool, mess
         work_items=len(seed["work_items"]),
         deliverables=len(seed["deliverables"]),
         notes=len(seed["notes"]),
+        assistant_conversations=len(seed.get("assistant_conversations", [])),
+        assistant_messages=len(seed.get("assistant_messages", [])),
         message=message,
     )
 
@@ -119,6 +125,8 @@ def create_demo_tenant_marker(session: Session, tenant_id: str, *, display_name:
 
 def _delete_tenant_rows(session: Session, tenant_id: str) -> None:
     for model in (
+        models.AssistantMessage,
+        models.AssistantConversation,
         models.HubSpotTaskAudit,
         models.WorkItemNote,
         models.WorkItem,
@@ -338,6 +346,42 @@ def _seed_deliverables(session: Session, seed: dict[str, Any], tenant_id: str) -
         ))
 
 
+def _seed_assistant(session: Session, seed: dict[str, Any], tenant_id: str) -> None:
+    for item in seed.get("assistant_conversations", []):
+        session.add(models.AssistantConversation(
+            id=item["id"],
+            tenant_id=tenant_id,
+            title=item["title"],
+            status=item["status"],
+            created_by_user_id=item.get("created_by_user_id"),
+            context=item.get("context"),
+            related_account_id=item.get("related_account_id"),
+            related_program_id=item.get("related_program_id"),
+            related_work_item_id=item.get("related_work_item_id"),
+            related_signal_id=item.get("related_signal_id"),
+            related_deliverable_id=item.get("related_deliverable_id"),
+            archived_at=item.get("archived_at"),
+            created_at=item["created_at"],
+            updated_at=item["updated_at"],
+        ))
+    for item in seed.get("assistant_messages", []):
+        session.add(models.AssistantMessage(
+            id=item["id"],
+            tenant_id=tenant_id,
+            conversation_id=item["conversation_id"],
+            role=item["role"],
+            content=item["content"],
+            status=item["status"],
+            tool_activity=item.get("tool_activity", []),
+            citations=item.get("citations", []),
+            related_records=item.get("related_records", []),
+            action_draft=item.get("action_draft"),
+            deliverable_draft=item.get("deliverable_draft"),
+            metadata_=item.get("metadata", {}),
+            created_at=item["created_at"],
+        ))
+
+
 def _seed_scores(session: Session, seed: dict[str, Any], tenant_id: str) -> None:
     ensure_default_scoring_config(session, tenant_id, DEMO_ACTOR)
     source_data_version = f"{tenant_id}:demo-reset:{seed['tenant']['reference_date'].date().isoformat()}"
@@ -405,6 +449,7 @@ def reset_demo_tenant(
             _seed_scores(session, seed, tenant_id)
             _seed_work(session, seed, tenant_id)
             _seed_deliverables(session, seed, tenant_id)
+            _seed_assistant(session, seed, tenant_id)
             if fail_stage == "before_commit":
                 raise DemoResetError("Injected failure before commit.")
             verify_demo_tenant(session, tenant_id)
@@ -433,6 +478,8 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     work_items = session.query(models.WorkItem).filter(models.WorkItem.tenant_id == tenant_id).all()
     deliverables = session.query(models.Deliverable).filter(models.Deliverable.tenant_id == tenant_id).all()
     notes = session.query(models.WorkItemNote).filter(models.WorkItemNote.tenant_id == tenant_id).all()
+    assistant_conversations = session.query(models.AssistantConversation).filter(models.AssistantConversation.tenant_id == tenant_id).all()
+    assistant_messages = session.query(models.AssistantMessage).filter(models.AssistantMessage.tenant_id == tenant_id).all()
     snapshots = session.query(models.ScoreSnapshot).filter(models.ScoreSnapshot.tenant_id == tenant_id).all()
 
     _assert(len(accounts) == len(seed["accounts"]), "Expected demo account count was not restored.")
@@ -441,7 +488,9 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     _assert(len(work_items) == len(seed["work_items"]), "Expected work-item count was not restored.")
     _assert(len(deliverables) == len(seed["deliverables"]), "Expected deliverable count was not restored.")
     _assert(len(notes) == len(seed["notes"]), "Expected work-item note count was not restored.")
-    _assert({row.tenant_id for row in [*accounts, *signals, *relationships, *work_items, *deliverables, *notes, *snapshots]} == {tenant_id}, "Tenant isolation check failed.")
+    _assert(len(assistant_conversations) == len(seed["assistant_conversations"]), "Expected assistant conversation count was not restored.")
+    _assert(len(assistant_messages) == len(seed["assistant_messages"]), "Expected assistant message count was not restored.")
+    _assert({row.tenant_id for row in [*accounts, *signals, *relationships, *work_items, *deliverables, *notes, *assistant_conversations, *assistant_messages, *snapshots]} == {tenant_id}, "Tenant isolation check failed.")
 
     by_status = {row.id: row for row in work_items}
     _assert(any(row.review_status == "confirmed" for row in relationships), "No confirmed relationship exists.")
@@ -456,6 +505,10 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     _assert(all(row.raw_payload.get("dataClassification") == "public" for row in signals), "Public source records lost classification.")
     _assert(all(row.raw_payload.get("source_url") for row in signals), "Public source metadata is incomplete.")
     _assert(all(row.result["sourceDataVersion"].startswith(f"{tenant_id}:demo-reset:") for row in snapshots), "Score snapshots do not reference demo source data.")
+    _assert(any(row.status == "archived" for row in assistant_conversations), "No archived assistant conversation exists.")
+    _assert(any(row.related_account_id == "demo-acct-lockheed" for row in assistant_conversations), "No seeded account conversation exists.")
+    _assert(all("reasoning" not in (row.metadata_ or {}) for row in assistant_messages), "Assistant messages must not store hidden reasoning.")
+    _assert(any((row.citations or []) for row in assistant_messages if row.role == "assistant"), "Seeded assistant response has no citations.")
 
     active = [row for row in work_items if row.status not in {"closed", "dismissed"}]
     dedupe = [row.dedupe_key for row in active if row.dedupe_key]

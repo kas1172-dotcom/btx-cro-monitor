@@ -40,7 +40,9 @@ Fixture JSON under `frontend/data/demo/btx/` is retained for tests and local dev
 
 Canonical account identity, signal-account relationship review, and backend score families are documented in `docs/CANONICAL_IDENTITY_AND_SCORING.md`.
 
-Backend-enforced work-item lifecycle, roles, audit history, notes, duplicate prevention, and HubSpot task execution are documented in `docs/WORK_ITEMS_API.md` and `docs/WORK_ITEM_LIFECYCLE.md`.
+Backend-enforced work-item lifecycle, roles, audit history, notes, duplicate prevention, and HubSpot task execution are documented in `docs/WORK_ITEMS_API.md` and `docs/WORK_ITEM_LIFECYCLE.md`. Saved deliverables and Ask deliverable previews are documented in `docs/DELIVERABLES_API.md`.
+
+The persistent Ask workspace, conversation schema, internal retrieval flow, citations, draft previews, and permissions are documented in `docs/ASSISTANT_ARCHITECTURE.md`.
 
 Frontend URL routing, selected-account behavior, and shared server-state conventions are documented in `docs/ROUTING_AND_STATE.md`.
 

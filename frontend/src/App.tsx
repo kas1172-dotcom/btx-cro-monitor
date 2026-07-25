@@ -4,7 +4,6 @@ import { useWorld } from "./app/useWorld.ts";
 import { Dossier } from "./ui/company/Dossier.tsx";
 import { BrainSidebar } from "./ui/brain/BrainSidebar.tsx";
 import { BrainResponseWorkspace } from "./ui/brain/BrainResponseWorkspace.tsx";
-import { AskBrainBar } from "./ui/brain/AskBrainBar.tsx";
 import { RightContextPanel } from "./ui/brain/RightContextPanel.tsx";
 import { TourHud } from "./ui/brain/TourHud.tsx";
 import { useMemory } from "./memory/localMemory.ts";
@@ -374,7 +373,6 @@ export function App() {
     >
       <ContextRibbon world={world} />
       <section className="quiet-stage">{renderDefault()}</section>
-      {world && !homeActive && !settingsActive && routeTab !== "ask" && routeTab !== "deliverables" && <AskBrainBar world={viewWorld ?? world} />}
       <CommandPalette world={world} open={commandOpen} onClose={() => setCommandOpen(false)} />
     </AppShell>
   );

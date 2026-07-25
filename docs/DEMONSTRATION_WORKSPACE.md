@@ -47,6 +47,15 @@ The default reset does not call HubSpot and does not create or delete external r
   - Closed item with recorded outcome
 - 1 seeded deliverable:
   - `demo-deliv-lockheed-brief`
+- 2 Ask conversations:
+  - `demo-assist-lockheed`, active, linked to Lockheed
+  - `demo-assist-archive`, archived source-health check
+- 4 Ask messages:
+  - one contextual account question
+  - one grounded account answer with internal citations
+  - one archived source-health exchange
+
+Seeded Ask citations point to the Lockheed public signal, a persisted score snapshot, and the approval work item. Assistant seed messages do not contain hidden reasoning fields.
 
 ## Date Strategy
 
@@ -101,6 +110,8 @@ Today should show a clear priority stack led by the Lockheed directed-energy fol
 ## Integration Limitations
 
 HubSpot execution is previewable from approved work items, but real execution remains disabled unless a sandbox HubSpot token is configured and the user has the required role. ERP/MES operating data is not connected; capacity context is illustrative and marked through the demo notice and work-item context.
+
+Ask does not perform live internet search, send email, update calendars, or execute CRM mutations. It can preview work-item and deliverable drafts, then relies on the existing backend APIs for confirmed creation.
 
 ## Recovery
 

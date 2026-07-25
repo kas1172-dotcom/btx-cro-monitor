@@ -10,7 +10,7 @@ export const SETTINGS_SECTIONS: SettingsSectionSpec[] = [
   {
     id: "general",
     label: "General & history",
-    summary: "Clear local ChatPill threads, saved memory, and reset this workspace.",
+    summary: "Clear local Ask threads, saved memory, and reset this workspace.",
   },
   {
     id: "memory",

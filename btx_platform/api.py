@@ -21,6 +21,15 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from btx_platform import models
+from btx_platform.assistant import (
+    AssistantError,
+    conversation_response,
+    create_conversation,
+    get_conversation,
+    message_response,
+    persist_turn,
+    rename_or_archive_conversation,
+)
 from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_token
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
@@ -53,6 +62,11 @@ from btx_platform.queue import CeleryQueue, InMemoryQueue, JobQueue
 from btx_platform.ratelimit import RateLimiter
 from btx_platform.schemas import (
     CalendarEventRequest,
+    AssistantAskRequest,
+    AssistantAskResponse,
+    AssistantConversationCreate,
+    AssistantConversationPatch,
+    AssistantConversationResponse,
     CrmTaskRequest,
     DeliverableCreate,
     DeliverablePatch,
@@ -101,6 +115,10 @@ WORK_ITEM_TRANSITIONS: dict[str, dict[str, str]] = {
 LEGACY_STATUS_MAP = {"proposed": "detected", "done": "closed"}
 LEGACY_EXECUTION_STATE_MAP = {"queued": "pending", "running": "pending", "completed": "verified"}
 TERMINAL_WORK_ITEM_STATUSES = {"dismissed", "closed"}
+ASSISTANT_VIEWER_MUTATIONS = {
+    ("POST", "/assistant/conversations"),
+    ("POST", "/assistant/ask"),
+}
 
 
 def _three_business_days_from_now() -> str:
@@ -857,7 +875,11 @@ def create_app(
         request.state.auth = auth
 
         if request.method in MUTATING_METHODS:
-            if not auth.has_role(MUTATING_ROUTE_MIN_ROLE):
+            minimum_role = "viewer" if (
+                (request.method, path) in ASSISTANT_VIEWER_MUTATIONS
+                or (request.method == "POST" and path.startswith("/assistant/conversations/") and path.endswith("/messages"))
+            ) else MUTATING_ROUTE_MIN_ROLE
+            if not auth.has_role(minimum_role):
                 return JSONResponse(
                     {"code": "forbidden", "detail": f"Role '{auth.role}' cannot perform this action."},
                     status_code=403,
@@ -1253,6 +1275,129 @@ def create_app(
     @app.get("/world-snapshot")
     def world_snapshot(request: Request) -> Response:
         return JSONResponse(world_payload(request))
+
+    @app.get("/assistant/conversations")
+    def list_assistant_conversations(
+        request: Request,
+        status: str = "active",
+        q: str | None = None,
+    ) -> Response:
+        if status not in {"active", "archived", "all"}:
+            return JSONResponse({"code": "validation_error", "detail": f"Unknown conversation status {status}."}, status_code=422)
+        session = session_factory()
+        try:
+            query = session.query(models.AssistantConversation).filter(models.AssistantConversation.tenant_id == _tenant_id(request))
+            if status != "all":
+                query = query.filter(models.AssistantConversation.status == status)
+            if q:
+                query = query.filter(models.AssistantConversation.title.ilike(f"%{q.strip()}%"))
+            rows = query.order_by(models.AssistantConversation.updated_at.desc(), models.AssistantConversation.created_at.desc()).limit(100).all()
+            return JSONResponse({"records": [conversation_response(session, row) for row in rows]})
+        finally:
+            session.close()
+
+    @app.post("/assistant/conversations")
+    def create_assistant_conversation(payload: AssistantConversationCreate, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = create_conversation(
+                session,
+                tenant_id=_tenant_id(request),
+                actor_user_id=_actor_user_id(request),
+                title=payload.title,
+                context=payload.context,
+            )
+            session.commit()
+            session.refresh(row)
+            body = AssistantConversationResponse(**conversation_response(session, row, include_messages=True)).model_dump()
+            return JSONResponse(body, status_code=201)
+        finally:
+            session.close()
+
+    @app.get("/assistant/conversations/{conversation_id}")
+    def get_assistant_conversation(conversation_id: str, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = get_conversation(session, _tenant_id(request), conversation_id)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No conversation {conversation_id}."}, status_code=404)
+            return JSONResponse(AssistantConversationResponse(**conversation_response(session, row, include_messages=True)).model_dump())
+        finally:
+            session.close()
+
+    @app.patch("/assistant/conversations/{conversation_id}")
+    def patch_assistant_conversation(conversation_id: str, payload: AssistantConversationPatch, request: Request) -> Response:
+        session = session_factory()
+        try:
+            row = get_conversation(session, _tenant_id(request), conversation_id)
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No conversation {conversation_id}."}, status_code=404)
+            try:
+                rename_or_archive_conversation(row, title=payload.title, status=payload.status, context=payload.context)
+            except AssistantError as exc:
+                return JSONResponse({"code": exc.code, "detail": exc.detail}, status_code=exc.status_code)
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(AssistantConversationResponse(**conversation_response(session, row, include_messages=True)).model_dump())
+        finally:
+            session.close()
+
+    @app.post("/assistant/conversations/{conversation_id}/messages")
+    def add_assistant_message(conversation_id: str, payload: AssistantAskRequest, request: Request) -> Response:
+        session = session_factory()
+        try:
+            try:
+                conversation, user_message, assistant_message = persist_turn(
+                    session,
+                    tenant_id=_tenant_id(request),
+                    actor_user_id=_actor_user_id(request),
+                    conversation_id=conversation_id,
+                    message=(payload.message or payload.prompt or "").strip(),
+                    context=payload.context,
+                )
+            except AssistantError as exc:
+                session.rollback()
+                return JSONResponse({"code": exc.code, "detail": exc.detail}, status_code=exc.status_code)
+            if conversation.id != conversation_id:
+                session.rollback()
+                return JSONResponse({"code": "not_found", "detail": f"No conversation {conversation_id}."}, status_code=404)
+            session.commit()
+            session.refresh(conversation)
+            response = AssistantAskResponse(
+                conversation=AssistantConversationResponse(**conversation_response(session, conversation, include_messages=True)),
+                user_message=message_response(user_message),
+                assistant_message=message_response(assistant_message),
+            )
+            return JSONResponse(response.model_dump())
+        finally:
+            session.close()
+
+    @app.post("/assistant/ask")
+    def ask_assistant(payload: AssistantAskRequest, request: Request) -> Response:
+        session = session_factory()
+        try:
+            try:
+                conversation, user_message, assistant_message = persist_turn(
+                    session,
+                    tenant_id=_tenant_id(request),
+                    actor_user_id=_actor_user_id(request),
+                    conversation_id=payload.conversation_id,
+                    message=(payload.message or payload.prompt or "").strip(),
+                    context=payload.context,
+                )
+            except AssistantError as exc:
+                session.rollback()
+                return JSONResponse({"code": exc.code, "detail": exc.detail}, status_code=exc.status_code)
+            session.commit()
+            session.refresh(conversation)
+            response = AssistantAskResponse(
+                conversation=AssistantConversationResponse(**conversation_response(session, conversation, include_messages=True)),
+                user_message=message_response(user_message),
+                assistant_message=message_response(assistant_message),
+            )
+            return JSONResponse(response.model_dump())
+        finally:
+            session.close()
 
     @app.get("/signal-relationships/review")
     def relationship_review_queue(request: Request) -> Response:

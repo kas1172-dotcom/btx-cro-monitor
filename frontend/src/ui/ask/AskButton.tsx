@@ -1,18 +1,18 @@
 import type { KeyboardEvent, MouseEvent } from "react";
-import { openCopilotWithPrompt } from "../../store/store.ts";
+import { navigateTo } from "../../app/router.ts";
 
-export function AskChatpilButton({ prompt, label = "Ask ChatPill" }: { prompt: string; label?: string }) {
+export function AskButton({ prompt, label = "Ask" }: { prompt: string; label?: string }) {
   function open(event: MouseEvent | KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
-    openCopilotWithPrompt(prompt);
+    navigateTo(`/ask?prompt=${encodeURIComponent(prompt)}`);
   }
 
   return (
     <span
       role="button"
       tabIndex={0}
-      className="ask-chatpil"
+      className="ask-inline-button"
       onClick={open}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") open(event);

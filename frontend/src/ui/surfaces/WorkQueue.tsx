@@ -123,7 +123,10 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
           <h2 id="work-detail-title">{item.recommended_action}</h2>
           <span>{titleCase(item.type)} · {account}</span>
         </div>
-        <button type="button" onClick={() => navigateTo("/work")}>Back to queue</button>
+        <div className="panel-action-group">
+          <button type="button" onClick={() => navigateTo(`/ask?work=${encodeURIComponent(item.id)}${item.canonical_account_id ? `&account=${encodeURIComponent(item.canonical_account_id)}` : ""}&prompt=${encodeURIComponent("What is the next safe action for this work item?")}`)}>Ask about this work</button>
+          <button type="button" onClick={() => navigateTo("/work")}>Back to queue</button>
+        </div>
       </div>
       <div className="work-decision-summary">
         <div>

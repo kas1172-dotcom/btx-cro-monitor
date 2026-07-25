@@ -11,7 +11,7 @@ import "leaflet/dist/leaflet.css";
 import type { World } from "../../app/useWorld.ts";
 import { explainRankingPrompt, outreachPrompt } from "../../app/copilotPrompts.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
-import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { AskButton } from "../ask/AskButton.tsx";
 import { buildMapMarkers, mapCenter, mappableCompanies } from "./mapModel.ts";
 import { uiTokens } from "../../app/uiTokens.ts";
 import { AccountToken } from "../common/AccountToken.tsx";
@@ -122,11 +122,11 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
                 </em>
                 {p.topSignal && <small>{p.topSignal.event_type}: {p.topSignal.source_quote}</small>}
                 <span className="map-prospect-actions">
-                  <AskChatpilButton
+                  <AskButton
                     label="Explain"
                     prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Account attractiveness ${p.opportunity}, ${qualification.label}, missing ${qualification.gaps.join(", ") || "none"}, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
                   />
-                  <AskChatpilButton
+                  <AskButton
                     label="Draft outreach"
                     prompt={outreachPrompt(p.company, `Map prospect rank #${i + 1}. Account attractiveness ${p.opportunity}, ${qualification.label}, contact ${p.contact?.name ?? "not available"}.`)}
                   />

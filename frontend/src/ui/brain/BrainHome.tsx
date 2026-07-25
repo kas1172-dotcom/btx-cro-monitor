@@ -48,7 +48,7 @@ export function BrainHome({ world, askBar }: { world: World; askBar?: ReactNode 
 
   return (
     <div className="quiet-home">
-      <p className="home-welcome">Welcome to ChatPill, your personal assistant</p>
+      <p className="home-welcome">Welcome to Ask</p>
       <div className="today-strip">
         <button title={topSignalLabel} onClick={() => ask("What market signals should BTX care about this week?")}>
           <span>Top signal</span>

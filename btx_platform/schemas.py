@@ -50,6 +50,98 @@ class LlmProxyResponse(BaseModel):
     text: str
 
 
+AssistantRole = Literal["user", "assistant"]
+AssistantConversationStatus = Literal["active", "archived"]
+ClaimClassification = Literal["fact", "derived", "inference", "missing", "simulation"]
+
+
+class AssistantContext(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    account_id: str | None = None
+    program_id: str | None = None
+    work_item_id: str | None = None
+    signal_id: str | None = None
+    deliverable_id: str | None = None
+    route: str | None = None
+
+
+class AssistantCitation(BaseModel):
+    id: str
+    source_type: str
+    record_id: str
+    title: str
+    route: str
+    claim: str
+    claim_classification: ClaimClassification
+    data_classification: str
+    relationship_status: str | None = None
+
+
+class AssistantMessageResponse(BaseModel):
+    id: str
+    conversation_id: str
+    role: AssistantRole
+    content: str
+    status: str
+    tool_activity: list[str]
+    citations: list[AssistantCitation]
+    related_records: list[dict]
+    action_draft: dict | None = None
+    deliverable_draft: dict | None = None
+    created_at: str
+
+
+class AssistantConversationCreate(BaseModel):
+    title: str | None = Field(default=None, max_length=300)
+    context: AssistantContext | None = None
+
+
+class AssistantConversationPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str | None = Field(default=None, min_length=1, max_length=300)
+    status: AssistantConversationStatus | None = None
+    context: AssistantContext | None = None
+
+
+class AssistantConversationResponse(BaseModel):
+    id: str
+    title: str
+    status: str
+    context: dict | None = None
+    related_account_id: str | None = None
+    related_program_id: str | None = None
+    related_work_item_id: str | None = None
+    related_signal_id: str | None = None
+    related_deliverable_id: str | None = None
+    message_count: int
+    preview: str | None = None
+    created_at: str
+    updated_at: str
+    archived_at: str | None = None
+    messages: list[AssistantMessageResponse] = []
+
+
+class AssistantAskRequest(BaseModel):
+    conversation_id: str | None = None
+    message: str | None = Field(default=None, min_length=1)
+    prompt: str | None = Field(default=None, min_length=1)
+    context: AssistantContext | None = None
+
+    @model_validator(mode="after")
+    def has_message(self):
+        if not (self.message or self.prompt or "").strip():
+            raise ValueError("message is required")
+        return self
+
+
+class AssistantAskResponse(BaseModel):
+    conversation: AssistantConversationResponse
+    user_message: AssistantMessageResponse
+    assistant_message: AssistantMessageResponse
+
+
 class IntegrationError(BaseModel):
     code: str
     detail: str

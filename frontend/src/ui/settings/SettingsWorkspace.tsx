@@ -405,11 +405,11 @@ export function SettingsWorkspace() {
             <div className="settings-actions">
               <button onClick={() => clearCurrentThread(activeTab)}>
                 <strong>Clear this chat</strong>
-                <span>Remove the ChatPill thread stored for the current tab.</span>
+                <span>Remove the Ask thread stored for the current tab.</span>
               </button>
               <button onClick={clearAllThreads}>
                 <strong>Clear all chats</strong>
-                <span>Remove every local ChatPill thread from this browser.</span>
+                <span>Remove every local Ask thread from this browser.</span>
               </button>
               <button onClick={clearMemory}>
                 <strong>Clear notes + activity</strong>

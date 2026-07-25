@@ -15,7 +15,7 @@ import { explainAccountPrompt, expandSignalPrompt, nextActionPrompt } from "../.
 import { companyLinks, formatAddress, plural } from "../../app/format.ts";
 import { provenanceForRecord } from "../../app/provenance.ts";
 import { displayLabel } from "../../app/displayLabels.ts";
-import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { AskButton } from "../ask/AskButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
@@ -107,7 +107,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
             {actionLabel(rec.action)}
           </span>
           <span className="rec-reason">{rec.reason}</span>
-          <AskChatpilButton
+          <AskButton
             label="Explain"
             prompt={nextActionPrompt(company.name, `Dossier recommendation: ${actionLabel(rec.action)}. Reason: ${rec.reason}.`)}
           />
@@ -144,7 +144,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
         <h4>Why this is a target</h4>
         <p className="narrative">{narrative}</p>
         {oppGroups.length > 0 && <p className="audit">scoring: {summarizeGroups(oppGroups)}</p>}
-        <AskChatpilButton
+        <AskButton
           label="Why this account?"
           prompt={explainAccountPrompt(company, `Dossier narrative: ${narrative}. Opportunity ${opp?.score ?? 0}, ${fitLabel(fit.score)} capability fit, pipeline health ${healthValue}.`)}
         />
@@ -212,7 +212,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
                   <ExternalLink href={s.source_url} label="Source" />
                   <ExternalLink href={s.document_url} label="Document" />
                 </div>
-                <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(s, company.name)} />
+                <AskButton label="Expand signal" prompt={expandSignalPrompt(s, company.name)} />
               </li>
             );
           })}

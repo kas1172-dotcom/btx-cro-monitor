@@ -18,7 +18,7 @@ This ledger coordinates the executive-demo readiness work. It is a planning reco
 | 1 Cockpit foundation | Main process | `App.tsx`, `BrainSidebar.tsx`, `styles.css`, command palette | Shared presentation helpers | Complete in checkpoint 1 | frontend checks listed below | `5074d29` |
 | 2 Executive surfaces | Main process | Today, Account 360, Work Queue, Map/Prospecting as scoped | Foundation components | Initial Today, Account 360, and Work Detail pass complete; evidence drawer, timeline, action dock, map/prospecting polish remain | frontend checks listed below | `5074d29` partial |
 | 3 Demo workspace | Main process | `tooling/reset_demo_tenant.py`, `btx_platform/demo/*`, tenant metadata migration, demo tests/docs | Existing backend schemas | Complete | Demo and full validation listed below | Pending commit |
-| 4 Assistant | Main process | Ask/assistant modules, backend conversation models/routes/tests | Backend authoritative retrieval | Pending | Pending | Pending |
+| 4 Assistant | Main process | Ask/assistant modules, backend conversation models/routes/tests | Backend authoritative retrieval | Complete in assistant checkpoint | Validation listed below | Pending commit |
 | 5 Briefing/focus/deliverable | Main process | Deliverable templates, modes, runbook | Shared shell and route state | Pending | Pending | Pending |
 | 6 Final hardening | Main process | QA docs, visual/mobile fixes | All prior work | Pending | Pending | Pending |
 
@@ -76,3 +76,20 @@ No files are edited concurrently in this environment. Shared files are sequenced
 - `cd frontend && npm run check:voice` passed.
 - `cd frontend && npm run build` passed.
 - `cd frontend && npm audit --audit-level=moderate` passed with `0 vulnerabilities`.
+
+## Assistant Checkpoint Validation
+
+- `python3 -m pytest tests/test_assistant_workspace.py tests/test_migrations.py -q` passed.
+- `cd frontend && npm run test:assistant` passed.
+- `cd frontend && npm run test:routing` passed.
+- `cd frontend && npm run test:architecture` passed.
+- `cd frontend && npm run typecheck` passed.
+
+Implemented scope:
+
+- Persistent backend Ask conversations and messages.
+- Tenant-scoped internal retrieval across accounts, confirmed signals, scores, work items, deliverables, programs, and source health.
+- Citation and claim-classification payloads.
+- Work-item and deliverable draft previews with explicit confirmation.
+- Backend-seeded active and archived demo conversations.
+- Ask workspace with conversation sidebar, thread, citations, composer, contextual routes, archive/restore, rename, copy, retry, and mobile stacking.

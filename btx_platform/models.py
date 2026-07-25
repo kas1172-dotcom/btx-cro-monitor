@@ -390,3 +390,50 @@ class HubSpotTaskAudit(Base):
     record_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     idempotency_key: Mapped[str | None] = mapped_column(String(256), nullable=True, index=True)
     associations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+
+class AssistantConversation(Base):
+    """Tenant-scoped Ask conversation metadata.
+
+    Messages carry the durable transcript. This row stores only navigation,
+    context, and lifecycle state for the visible Ask workspace.
+    """
+    __tablename__ = "assistant_conversations"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(32), default="active", index=True)
+    created_by_user_id: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
+    context: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    related_account_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    related_program_id: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
+    related_work_item_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    related_signal_id: Mapped[str | None] = mapped_column(String(120), nullable=True, index=True)
+    related_deliverable_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, index=True)
+
+
+class AssistantMessage(Base):
+    """Durable Ask transcript row.
+
+    The application stores user-visible content, tool summaries, citations, and
+    draft previews. It intentionally has no hidden reasoning field.
+    """
+    __tablename__ = "assistant_messages"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    tenant_id: Mapped[str] = mapped_column(String(80), default=DEFAULT_TENANT_ID, index=True)
+    conversation_id: Mapped[str] = mapped_column(String(32), ForeignKey("assistant_conversations.id"), index=True)
+    role: Mapped[str] = mapped_column(String(20), index=True)
+    content: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(32), default="complete", index=True)
+    tool_activity: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    citations: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    related_records: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    action_draft: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    deliverable_draft: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    metadata_: Mapped[dict | None] = mapped_column("metadata", JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)

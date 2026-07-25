@@ -8,7 +8,7 @@ import { openDeliverableWizard, setState, useStore } from "../../store/store.ts"
 import { explainRankingPrompt, expandSignalPrompt, nextActionPrompt, outreachPrompt } from "../../app/copilotPrompts.ts";
 import { rankingExplanation } from "../../app/rankingExplain.ts";
 import { companyLinks, formatAddress } from "../../app/format.ts";
-import { AskChatpilButton } from "../copilot/AskChatpilButton.tsx";
+import { AskButton } from "../ask/AskButton.tsx";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { RankingWhy } from "../ranking/RankingWhy.tsx";
 import { DemoActionButton } from "../actions/DemoActionButton.tsx";
@@ -220,7 +220,7 @@ export function Prospecting({ world }: { world: World }) {
                       <small>{evidence}</small>
                       <div className="link-row">
                         {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Source" />}
-                        <AskChatpilButton
+                        <AskButton
                           label="Draft outreach"
                           prompt={outreachPrompt(row.company, `Visit plan stop in ${row.company.location.city}. Why visit: ${visitReason(row)} Evidence: ${evidence}. Contact: ${row.contact?.name ?? "not available"}.`)}
                         />
@@ -291,11 +291,11 @@ export function Prospecting({ world }: { world: World }) {
                       {companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}
                       {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Top signal source" />}
                     </span>
-                    <AskChatpilButton
+                    <AskButton
                       label="Explain ranking"
                       prompt={explainRankingPrompt(row.company.name, `Prospecting rank #${index + 1}. ${rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit }).summary} ${row.qualification.label}, missing ${row.qualification.gaps.join(", ") || "none"}, contact ${row.contact?.name ?? "not available"}.`)}
                     />
-                    <AskChatpilButton
+                    <AskButton
                       label="Draft outreach"
                       prompt={outreachPrompt(row.company, `Prospecting card. Why now: ${whyNow(row.signals)} Contact: ${row.contact?.name ?? "not available"}. ${row.qualification.label}, opportunity ${row.opportunity}, missing ${row.qualification.gaps.join(", ") || "none"}.`)}
                     />
@@ -337,7 +337,7 @@ export function Prospecting({ world }: { world: World }) {
               {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
               <em>{row.contact ? `Call ${row.contact.name}` : "Contact discovery needed"}</em>
               <span className="link-row">{companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}</span>
-              <AskChatpilButton
+              <AskButton
                 label="Why this account?"
                 prompt={explainRankingPrompt(row.company.name, `Market-based prospect. City ${row.company.location.city}, ${row.qualification.label}, opportunity ${row.opportunity}, contact ${row.contact?.name ?? "not available"}, missing ${row.qualification.gaps.join(", ") || "none"}.`)}
               />
@@ -356,7 +356,7 @@ export function Prospecting({ world }: { world: World }) {
               </span>
               <span className="rec-name">{nameOf(r.subject_id)}</span>
               <span className="muted">{r.reason}</span>
-              <AskChatpilButton
+              <AskButton
                 label="What next?"
                 prompt={nextActionPrompt(nameOf(r.subject_id), `Prospecting recommendation: ${actionLabel(r.action)}. Priority ${r.priority}. Reason: ${r.reason}.`)}
               />
@@ -377,7 +377,7 @@ export function Prospecting({ world }: { world: World }) {
                 <ExternalLink href={signal.source_url} label="Source" />
                 <ExternalLink href={signal.document_url} label="Document" />
               </span>
-              <AskChatpilButton label="Expand signal" prompt={expandSignalPrompt(signal, nameOf(signal.subject_id))} />
+              <AskButton label="Expand signal" prompt={expandSignalPrompt(signal, nameOf(signal.subject_id))} />
             </button>
           ))}
         </div>
@@ -391,7 +391,7 @@ export function Prospecting({ world }: { world: World }) {
               <strong>{row.contact?.name}</strong>
               <span>{row.contact?.title} · {row.company.name}</span>
               <em>{recommendedOutreach(row.company, row.contact?.name)}</em>
-              <AskChatpilButton
+              <AskButton
                 label="Draft outreach"
                 prompt={outreachPrompt(row.company, `Outreach queue contact ${row.contact?.name}, ${row.contact?.title}. Recommended next step: ${recommendedOutreach(row.company, row.contact?.name)}`)}
               />

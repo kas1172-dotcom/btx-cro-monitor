@@ -43,6 +43,8 @@ Legacy inbound statuses are normalized:
 
 Creates a durable item. If `dedupe_key` matches an active item for the tenant, the existing active item is returned instead of creating a duplicate.
 
+Ask work-item previews also create through this endpoint after explicit user confirmation. Ask does not maintain a separate task system and does not silently create work items from ordinary answers.
+
 `GET /work-items`
 
 Filters:
