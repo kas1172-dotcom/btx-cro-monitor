@@ -5166,3 +5166,23 @@ button.work-item-summary:focus-visible {
     transition: none;
   }
 }
+
+/* Honest degraded-state notice: records failed to load, or are stale. */
+.surface-notice {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(var(--card-rgb), .54);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.surface-notice button {
+  margin-left: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  padding: 3px 10px;
+  cursor: pointer;
+}

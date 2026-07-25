@@ -361,3 +361,55 @@ runs all three, so CI was already red.
 
 Net: frontend scripts went from 16 passing and 3 failing to 15 passing and 2 failing, with two
 passing tests removed alongside the code they covered. Backend `pytest` holds at 454 passed.
+
+## 13. Phase 4, live walkthrough findings
+
+Driven with Playwright against a real backend and frontend, using the demo tenant. The
+frontend reads its bearer token from `window.Clerk.session.getToken()`, which was stubbed
+with a test-issued token so the walk exercised the real auth path without live Clerk.
+
+### Defect found and fixed: the prospect journey had nowhere to render
+
+`Account360` filtered its rows to `relationship === "customer"`, so `/accounts/demo-acct-nlight`
+returned "Account not found". This was invisible until Fork B retired the separate Prospects
+surface, which left nLIGHT with no reachable surface at all. Retiring a surface without
+checking what depended on it is the mistake; the walkthrough is what caught it.
+
+Fixed by building rows from every account and resolving the routed account against all of
+them, while keeping the visible list customer-first with the selected prospect appended.
+
+### Defect found and fixed: silent degradation on Today
+
+`TodayBrief` had no error or stale handling. With the world snapshot failing it rendered
+partial data drawn from work records only, with raw account ids such as `demo-acct-nlight`
+in place of names, and no indication anything was wrong. Silent wrongness is the worst
+on-camera failure mode. Added an explicit notice with a retry, plus a stale-record notice,
+and `nameOf` now says the record is unavailable instead of printing an internal id.
+
+### Not a defect
+
+`missing_information` renders in the evidence drawer rather than inline on the work item.
+That is correct progressive disclosure per the product principles, not a gap.
+
+## 14. Scoring test diagnosis
+
+**Case B: important, not demo-blocking.**
+
+`test:phase0` and `test:identity` both fail inside signal-to-account resolution by domain,
+in `analyze()` and `resolveSignalRelationships()`. Their fixtures build a synthetic Boeing
+company and expect an `exact_domain` match to contribute to its score. The match never
+happens, so both scores stay at zero.
+
+Neither journey touches that path. Lockheed and nLIGHT are linked through backend
+relationship records seeded by the reset, `demo-rel-lockheed-laser` and
+`demo-rel-nlight-review`, not through frontend domain matching. The live walkthrough
+confirms the account page renders its recommendation and its confirmed-signal count
+correctly from those records.
+
+The account score families on screen come from the backend `scores` payload, which returns
+`status: insufficient_data` with `score: null` and a full factor breakdown. The UI shows
+`More information needed`. That is honest by design and is not what these tests cover.
+
+So the demo is safe, and no wrong number can reach the camera. CI is the real problem: it
+runs both scripts and has been red, which means a green check has not been meaningful.
+Fix them before trusting CI again, not before recording.

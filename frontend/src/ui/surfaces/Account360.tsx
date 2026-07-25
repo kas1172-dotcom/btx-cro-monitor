@@ -71,9 +71,12 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const route = useAppRoute();
   const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
+  // Rows cover every account, not just customers. The list below stays
+  // customer-first, but a prospect that is routed to directly must still
+  // render, otherwise prospect journeys have nowhere to live now that the
+  // separate Prospects surface is retired.
   const accountRows = useMemo(() => {
     return world.companies
-      .filter((company) => company.relationship === "customer")
       .map((company) => ({
         company,
         score: world.analysis.byId.get(company.id),
@@ -90,7 +93,14 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   }, [world]);
   const selected = accountId
     ? accountRows.find((row) => row.company.id === accountId || row.company.canonical_account_id === accountId) ?? null
-    : accountRows[0] ?? null;
+    : accountRows.find((row) => row.company.relationship === "customer") ?? accountRows[0] ?? null;
+  // Customers lead the list. A selected prospect is appended so the row the
+  // user is reading is always visible in the picker.
+  const listRows = useMemo(() => {
+    const customers = accountRows.filter((row) => row.company.relationship === "customer");
+    if (selected && !customers.includes(selected)) return [...customers, selected];
+    return customers;
+  }, [accountRows, selected]);
   const contacts = selected ? world.contacts.filter((contact) => contact.company_id === selected.company.id) : [];
   const deals = selected ? world.opportunities.filter((opp) => opp.company_id === selected.company.id) : [];
   const facilities = selected ? world.facilities.filter((facility) => facility.company_id === selected.company.id) : [];
@@ -177,7 +187,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
 
       <div className="account360-layout">
         <aside className="account360-list">
-          {accountRows.map((row) => (
+          {listRows.map((row) => (
             <button key={row.company.id} className={row.company.id === company.id ? "active account360-list-row" : "account360-list-row"} onClick={() => onSelectAccount?.(row.company.id)}>
               <AccountToken name={row.company.name} riskScore={row.score?.dimensions.risk.score} size="sm" />
               <span className="account360-list-row-main">

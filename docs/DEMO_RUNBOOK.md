@@ -98,24 +98,34 @@ The demo tenant is exactly two journeys plus one supporting prospect account.
 
 ## Go Or No-Go
 
-Status as of 2026-07-25: **NO-GO pending the on-camera surface audit.**
+Status as of 2026-07-25: **GO for a local recording**, with two known items below.
 
-Verified by this pass:
+Verified by a live browser walkthrough against a running backend and frontend:
 
-- Reset is deterministic and idempotent. Two consecutive resets produce identical
-  counts and fingerprints, and verify-only passes against the result.
-- Backend `pytest`: 454 passed.
-- Frontend typecheck clean, production build succeeds, `check:design` and `check:voice` pass.
-- Repo-wide em-dash grep is clean apart from one `.gitignore` comment.
-- No surface renders a fabricated percentage confidence.
+- Both journeys render end to end. Lockheed shows customer context, the confirmed
+  account link, the approval-gated work item, and the seeded brief. nLIGHT renders as
+  a prospect, and its evidence drawer names all four gaps: CAGE, contact, fit, capacity.
+- The rail shows the four primary surfaces. No retired surface appears.
+- No em dash, scaffolding copy, percentage confidence, or raw NaN on any surface.
+- Failure state: when the world snapshot fails, Today now says so and offers a retry.
+- Empty and stale states render without crashing.
+- Reset is deterministic and idempotent, and verify-only passes.
+- Backend `pytest` 454 passed, typecheck clean, build ok, `check:design` and `check:voice` pass.
 
-Not yet verified, and required before a GO:
+Known items, neither of which blocks a local recording:
 
-- The live click-through of both journeys in a running browser, including loading,
-  empty, stale, and failure states on each of the four primary surfaces.
-- Confirmation that AI status shows live when the LLM is configured.
-- `test:phase0` and `test:identity` are red. Both were already red on `main` before this
-  consolidation and both run in CI, so CI is currently red for a pre-existing reason.
+1. **Deep links do not work in the built app.** `vite.config.ts` sets `base: "./"` for
+   GitHub Pages subpath hosting, so loading `/accounts/<id>` directly requests
+   `/accounts/assets/...` and 404s. Navigate by clicking from the app root, or set
+   `base: "/"` before serving the cockpit from a domain root such as Fly. The comment
+   above that setting still claims the app has no backend, which is out of date.
+2. **AI status reads `offline`** because no LLM key was configured for the walkthrough.
+   Set the key and confirm it reads live before recording if the Ask narration depends on it.
+
+Scoring: every account score family renders `More information needed`. This is the
+backend returning `status: insufficient_data` with `dataCompleteness: 0` and a full
+factor breakdown, which is the honest designed behavior, not a defect. No fabricated
+number appears anywhere.
 
 ## Exact Ask Questions
 

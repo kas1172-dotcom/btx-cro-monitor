@@ -44,7 +44,11 @@ const HORIZONS = [
 
 function nameOf(world: World, id: string | null | undefined): string {
   if (!id) return "Portfolio";
-  return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
+  const match = world.companies.find((company) => company.id === id || company.canonical_account_id === id);
+  if (match) return match.name;
+  // The account record did not load. Say so rather than printing a raw
+  // internal id, which reads as broken and tells the user nothing.
+  return "Account record unavailable";
 }
 
 function eventLabel(value: string): string {
@@ -224,6 +228,16 @@ export function TodayBrief({ world }: { world: World }) {
         subline={summaryLine}
       />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
+      {world.loadErrors.length > 0 ? (
+        <p className="surface-notice" role="status">
+          Account and signal records did not load, so this briefing is incomplete. Anything below is
+          drawn from work records only. <button type="button" onClick={world.refresh}>Try again</button>
+        </p>
+      ) : world.isStale ? (
+        <p className="surface-notice" role="status">
+          These records are more than a minute old. <button type="button" onClick={world.refresh}>Refresh</button>
+        </p>
+      ) : null}
 
       <div className="horizon-control" aria-label="Time horizon">
         {HORIZONS.map((item) => (
