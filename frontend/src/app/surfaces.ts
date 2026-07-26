@@ -16,7 +16,7 @@ export interface SurfaceSpec {
 }
 
 export const CORE_SURFACES: SurfaceSpec[] = [
-  { id: "brief", label: "Today", group: "core", componentId: "surface-todays-brief", title: "What changed and what needs you today." },
+  { id: "brief", label: "Briefing", group: "core", componentId: "surface-todays-brief", title: "What changed and what needs you today." },
   { id: "work_queue", label: "Work", group: "core", componentId: "surface-work-queue", title: "Your open tasks, who owns them, and what is due." },
   { id: "accounts", label: "Accounts", group: "core", componentId: "surface-account-360", title: "Everything on a customer: health, signals, contacts, deals, and next steps." },
   { id: "ask", label: "Ask", group: "core", componentId: "surface-ask", title: "Primary conversational assistant." },
@@ -43,7 +43,7 @@ export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "pros
 export const PRIMARY_TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask"];
 
 export const TAB_LABELS: Record<TabId, string> = {
-  brief: "Today",
+  brief: "Briefing",
   work_queue: "Work",
   accounts: "Accounts",
   ask: "Ask",

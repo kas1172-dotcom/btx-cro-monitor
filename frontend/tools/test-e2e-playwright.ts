@@ -96,7 +96,7 @@ async function walkCoreSurfaces(page: Page): Promise<void> {
   await openSurface(page, /^Work/i, "surface-work-queue");
   await openSurface(page, /Accounts/i, "surface-account-360");
   await openSurface(page, /Ask/i, "surface-ask");
-  await openSurface(page, /^Today/i, "surface-todays-brief");
+  await openSurface(page, /^Briefing/i, "surface-todays-brief");
 }
 
 async function smokeViewport(browser: Browser, opts: { width: number; height: number; isMobile: boolean }): Promise<void> {

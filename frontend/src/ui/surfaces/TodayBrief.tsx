@@ -7,7 +7,7 @@ import type { Signal } from "../../engine/signals/contract.ts";
 import type { TabId } from "../../app/surfaces.ts";
 import { accountPath, navigateTo, pathForTab, useAppRoute } from "../../app/router.ts";
 import { plainActionLabel, plainWorkStatus, primaryWorkAction, workItemAlertLevel } from "../../app/presentation.ts";
-import { EmptyState, SurfaceHeader, UiIcon } from "../primitives.tsx";
+import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
 import { buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
@@ -207,6 +207,14 @@ export function TodayBrief({ world }: { world: World }) {
     .filter((item) => ["verified", "outcome_recorded", "closed"].includes(item.status))
     .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
     .slice(0, 3);
+  const openPipelineValues = world.opportunities
+    .filter((opportunity) => !["won", "lost"].includes(opportunity.stage))
+    .map((opportunity) => opportunity.value)
+    .filter((value): value is number => value !== null);
+  const openPipeline = openPipelineValues.length
+    ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 })
+      .format(openPipelineValues.reduce((total, value) => total + value, 0))
+    : "Unavailable";
   const attentionCards: AttentionCard[] = [
     {
       label: "Accounts needing attention",
@@ -262,10 +270,11 @@ export function TodayBrief({ world }: { world: World }) {
         ))}
       </div>
 
-      <section className="priority-stack" aria-labelledby="priority-stack-title">
+      <div className="briefing-grid">
+      <section className="priority-stack briefing-decisions" aria-labelledby="priority-stack-title">
         <div className="panel-head">
-          <h2 id="priority-stack-title">Top priorities</h2>
-          <span>{horizon.label}</span>
+          <h2 id="priority-stack-title">Decisions</h2>
+          <span>{rankedWork.length} require review</span>
         </div>
         {rankedWork.map((item, index) => {
           const primary = primaryWorkAction(item);
@@ -293,29 +302,19 @@ export function TodayBrief({ world }: { world: World }) {
         {!rankedWork.length && <EmptyState headline="No immediate work" body="No urgent, overdue, or high-priority work is due in this horizon." icon="work_queue" />}
       </section>
 
-      <section className="surface-panel today-mini-brief" aria-labelledby="today-mini-brief-title">
+      <section className="surface-panel briefing-pulse" aria-labelledby="briefing-pulse-title">
         <div className="panel-head">
-          <h2 id="today-mini-brief-title">Mini-brief</h2>
-          <span>{miniBrief.length} signals</span>
+          <h2 id="briefing-pulse-title">Business pulse</h2>
+          <span>Current workspace</span>
         </div>
-        <div className="today-brief-list">
-          {miniBrief.map((item, index) => (
-            <article key={item.id} className={index < attentionBriefs.length ? "today-brief-item pinned" : "today-brief-item"}>
-              <div>
-                <strong>{item.title}</strong>
-                <p>{item.reason}</p>
-                <span>{item.meta}</span>
-              </div>
-              <button type="button" className="accent-action" onClick={() => navigate(item.link)}>
-                {item.link.label}<UiIcon name="chevron" />
-              </button>
-            </article>
-          ))}
-          {miniBrief.length === 0 && (
-            <EmptyState headline="No briefing items" body="Validated signals and urgent work items will appear here after the monitor finds actionable evidence." icon="signal" />
-          )}
+        <div className="business-pulse-table">
+          <span>Open pipeline<strong>{openPipeline}</strong><small>CRM snapshot</small></span>
+          <span>Decisions<strong>{rankedWork.length}</strong><small>Canonical work state</small></span>
+          <span>At risk<strong>Unavailable</strong><small>Risk policy not configured</small></span>
+          <span>Capacity<strong>Unavailable</strong><small>ERP / MES not connected</small></span>
         </div>
       </section>
+      </div>
 
       {attentionCards.length > 0 && (
         <section className="today-attention-strip" aria-label="Attention counters">
@@ -328,10 +327,16 @@ export function TodayBrief({ world }: { world: World }) {
         </section>
       )}
 
-      <section className="today-development-grid" aria-label="Recent developments">
-        <DevelopmentColumn title="Confirmed account developments" signals={accountSignals} world={world} onEvidence={openEvidence} />
-        <DevelopmentColumn title="Program developments" signals={programSignals} world={world} onEvidence={openEvidence} />
-        <DevelopmentColumn title="Market developments" signals={marketSignals} world={world} onEvidence={openEvidence} />
+      <section className="surface-panel briefing-changes" aria-labelledby="briefing-changes-title">
+        <div className="panel-head">
+          <h2 id="briefing-changes-title">What changed</h2>
+          <span>{horizonSignals.length} signals screened</span>
+        </div>
+        <div className="today-development-grid" aria-label="Recent developments">
+          <DevelopmentColumn title="Confirmed account developments" signals={accountSignals} world={world} onEvidence={openEvidence} />
+          <DevelopmentColumn title="Program developments" signals={programSignals} world={world} onEvidence={openEvidence} />
+          <DevelopmentColumn title="Market developments" signals={marketSignals} world={world} onEvidence={openEvidence} />
+        </div>
       </section>
 
       {completed.length > 0 && (

@@ -13,12 +13,12 @@ import { Account360 } from "./ui/surfaces/Account360.tsx";
 import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
 import { createWorkItem } from "./app/workItems.ts";
-import { AppShell, StatusChip } from "./ui/primitives.tsx";
-import { CommandPalette, ContextRibbon } from "./ui/CommandPalette.tsx";
-import { CockpitAuthStatus } from "./app/clerkAuth.tsx";
+import { AppShell } from "./ui/primitives.tsx";
+import { CommandPalette } from "./ui/CommandPalette.tsx";
 import type { Deliverable } from "./deliverables/types.ts";
 import { checkAiStatus, getAiStatusSnapshot, subscribeAiStatus } from "./app/aiStatus.ts";
 import { accountPath, navigateTo, useAppRoute } from "./app/router.ts";
+import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "./app/sourceRegistry.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const AnalysisView = lazy(() => import("./ui/analysis/AnalysisView.tsx").then((module) => ({ default: module.AnalysisView })));
@@ -40,6 +40,7 @@ export function App() {
   const routeTab = route.tab;
   const [workItemStatus, setWorkItemStatus] = useState("");
   const [commandOpen, setCommandOpen] = useState(false);
+  const [systemOpen, setSystemOpen] = useState(false);
   const handledWizardSaveIds = useRef(new Set<number>());
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
@@ -249,11 +250,38 @@ export function App() {
             <button type="button" className="global-command-trigger" onClick={() => setCommandOpen(true)} aria-label="Open command palette">
               Command <kbd>{commandShortcut}</kbd>
             </button>
-            <StatusChip
-              tone={systemNeedsAttention ? "warning" : "success"}
-              label="System status"
-              value={systemNeedsAttention ? "Needs attention" : "Ready"}
-            />
+            <div className="system-status-wrap">
+              <button
+                type="button"
+                className="system-status-trigger"
+                onClick={() => setSystemOpen((value) => !value)}
+                aria-expanded={systemOpen}
+                aria-controls="system-status-panel"
+              >
+                System <span className={systemNeedsAttention ? "system-dot warning" : "system-dot"} />
+              </button>
+              {systemOpen && (
+                <section id="system-status-panel" className="system-status-panel" aria-label="System status">
+                  <div className="system-panel-head">
+                    <strong>System status</strong>
+                    <button type="button" onClick={() => setSystemOpen(false)} aria-label="Close system status">Close</button>
+                  </div>
+                  <div className="system-source-list">
+                    {(world?.sources ?? []).map((source) => (
+                      <div key={source.id}>
+                        <span><strong>{source.name}</strong><small>{sourceModeLabel(source)}</small></span>
+                        <span><strong>{sourceFreshness(source).relative}</strong><small>{sourcePermissionLabel(source)}</small></span>
+                      </div>
+                    ))}
+                    <div>
+                        <span><strong>Assistant</strong><small>{aiStatus.state === "live" ? "AI connected" : "Rules-based summary"}</small></span>
+                      <span><strong>{aiStatus.state === "live" ? "Available" : "Generative answers unavailable"}</strong></span>
+                    </div>
+                  </div>
+                  <button type="button" className="system-details-link" onClick={() => { setSystemOpen(false); navigateTo("/integrations"); }}>View integration details</button>
+                </section>
+              )}
+            </div>
             {marketScoped && <label className="cockpit-city-picker">
               <span>Market</span>
               <select
@@ -270,7 +298,6 @@ export function App() {
                 ))}
               </select>
             </label>}
-            <CockpitAuthStatus />
           </div>
         </header>
       )}
@@ -366,7 +393,6 @@ export function App() {
         </>
       )}
     >
-      <ContextRibbon world={world} />
       <section className="quiet-stage">{renderDefault()}</section>
       <CommandPalette world={world} open={commandOpen} onClose={() => setCommandOpen(false)} />
     </AppShell>

@@ -35,20 +35,38 @@ export function WorkItemSourceNote({ source, error }: { source: "backend" | "una
 
 export function WorkItemList({ items, empty = "No work items yet.", world }: { items: WorkItem[]; empty?: string; world?: World }) {
   return (
-    <div className="work-item-list">
+    <div className="work-item-list" role="table" aria-label="Controlled work queue">
+      {items.length > 0 && (
+        <div className="work-item-table-head" role="row">
+          <span role="columnheader">Decision / action</span>
+          <span role="columnheader">Account</span>
+          <span role="columnheader">Status</span>
+          <span role="columnheader">Owner</span>
+          <span role="columnheader">Due</span>
+          <span role="columnheader">Priority</span>
+          <span role="columnheader">External effect</span>
+        </div>
+      )}
       {items.map((item) => {
         const overdue = item.due_date ? new Date(item.due_date) < new Date() && !TERMINAL_STATUSES.has(item.status) : false;
         return (
-          <article key={item.id} className={overdue ? "work-item-row overdue" : "work-item-row"}>
-            <button type="button" className="work-item-summary" onClick={() => navigateTo(workItemPath(item.id))}>
-              <span className="work-item-kind">{titleCase(item.type)}</span>
-              <strong>{item.recommended_action}</strong>
-              <em>{accountName(world, item.canonical_account_id)} · {priorityLabel(item)} · {dateLabel(item.due_date)}</em>
-              <span className="work-item-confidence">{titleCase(item.status)} · {titleCase(item.approval_state)}</span>
-              {item.execution_state === "failed" && <span className="work-item-error">Execution failed</span>}
-              {item.external_record_url && <span className="work-item-success">Verified external action</span>}
-            </button>
-          </article>
+          <button key={item.id} type="button" role="row" className={overdue ? "work-item-row overdue" : "work-item-row"} onClick={() => navigateTo(workItemPath(item.id))}>
+            <span role="cell" className="work-action-cell"><small>{titleCase(item.type)}</small><strong>{item.recommended_action}</strong></span>
+            <span role="cell">{accountName(world, item.canonical_account_id)}</span>
+            <span role="cell">{titleCase(item.status)}</span>
+            <span role="cell">{item.owner ?? "Unassigned"}</span>
+            <span role="cell" className={overdue ? "overdue-label" : ""}>{dateLabel(item.due_date)}</span>
+            <span role="cell">{priorityLabel(item)}</span>
+            <span role="cell">
+              {item.execution_state === "failed"
+                ? "Failed"
+                : item.external_record_url
+                  ? "Executed; record linked"
+                  : item.approval_state === "pending"
+                    ? "Approval required"
+                    : "None recorded"}
+            </span>
+          </button>
         );
       })}
       {items.length === 0 && <EmptyState headline="No work items" body={empty} icon="work_queue" />}

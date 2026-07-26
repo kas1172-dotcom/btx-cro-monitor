@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
-  PRIMARY_TAB_IDS,
   UTILITY_SURFACES,
   type SurfaceSpec,
   type TabId,
@@ -13,6 +12,7 @@ import { CockpitRailIdentity } from "../../app/clerkAuth.tsx";
 
 const SECONDARY_IDS: TabId[] = ["programs", "prospecting", "capacity", "analysis", "map"];
 const UTILITY_IDS: TabId[] = ["deliverables", "hubspot", "settings"];
+const PRIMARY_IDS: TabId[] = ["brief", "work_queue", "accounts"];
 
 const surfaceById = new Map(
   [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES].map((surface) => [surface.id, surface]),
@@ -38,57 +38,76 @@ export function BrainSidebar({
   counts: Partial<Record<TabId, number>>;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const groups = [
-    { label: "Primary", items: surfacesFor(PRIMARY_TAB_IDS) },
-    { label: "Workspace", items: surfacesFor(SECONDARY_IDS) },
-    { label: "Utilities", items: surfacesFor(UTILITY_IDS) },
-  ];
+  const [intelligenceOpen, setIntelligenceOpen] = useState(SECONDARY_IDS.includes(activeTab));
   const primaryActiveTab = primaryTabFor(activeTab);
+  const primary = surfacesFor(PRIMARY_IDS);
+  const ask = surfaceById.get("ask");
+  const intelligence = surfacesFor(SECONDARY_IDS);
+  const utilities = surfacesFor(UTILITY_IDS);
+  const link = (surface: SurfaceSpec, compact = false) => (
+    <a
+      key={surface.id}
+      className={`${primaryActiveTab === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}${compact ? " intelligence-child" : ""}`}
+      href={toBrowserPath(pathForTab(surface.id))}
+      onClick={(event) => {
+        event.preventDefault();
+        setMoreOpen(false);
+        openSurface(surface.id);
+      }}
+      aria-current={primaryActiveTab === surface.id ? "page" : undefined}
+      aria-label={surface.label}
+      title={surface.title}
+    >
+      <span><UiIcon name={surface.id} /></span>
+      <strong>{surface.label}</strong>
+      {counts[surface.id] ? <CountBadge value={counts[surface.id] ?? 0} /> : null}
+    </a>
+  );
   return (
     <nav className="brain-rail" aria-label="Cockpit navigation">
       <div className="rail-brand" aria-label="BTX">
         <span>BTX</span>
         <strong>Steel & Signal</strong>
       </div>
-      {groups.filter((group) => group.items.length > 0).map((group) => (
-        <div key={group.label} className={group.label === "Utilities" ? "brain-rail-group brain-rail-utility" : `brain-rail-group brain-rail-${group.label.toLowerCase()}`}>
-          <div className="brain-rail-group-label">{group.label}</div>
-          {group.items.map((surface) => (
-            <a
-              key={surface.id}
-              className={primaryActiveTab === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
-              href={toBrowserPath(pathForTab(surface.id))}
-              onClick={(event) => {
-                event.preventDefault();
-                openSurface(surface.id);
-              }}
-              aria-current={primaryActiveTab === surface.id ? "page" : undefined}
-              title={surface.title}
-            >
-              <span><UiIcon name={surface.id} /></span>
-              <strong>{surface.label}</strong>
-              {counts[surface.id] ? <CountBadge value={counts[surface.id] ?? 0} /> : null}
-            </a>
-          ))}
-        </div>
-      ))}
+      <div className="brain-rail-group brain-rail-primary">
+        <div className="brain-rail-group-label">Operate</div>
+        {primary.map((surface) => link(surface))}
+        <button
+          type="button"
+          className={SECONDARY_IDS.includes(activeTab) ? "brain-rail-btn active" : "brain-rail-btn"}
+          onClick={() => setIntelligenceOpen((value) => !value)}
+          aria-expanded={intelligenceOpen}
+          aria-controls="intelligence-navigation"
+        >
+          <span><UiIcon name="signal" /></span>
+          <strong>Intelligence</strong>
+          <span className="nav-disclosure" aria-hidden="true">{intelligenceOpen ? "−" : "+"}</span>
+        </button>
+        {intelligenceOpen && <div id="intelligence-navigation" className="intelligence-navigation">{intelligence.map((surface) => link(surface, true))}</div>}
+        {ask ? link(ask) : null}
+      </div>
+      <div className="brain-rail-group brain-rail-utility">
+        <div className="brain-rail-group-label">Utilities</div>
+        {utilities.map((surface) => link(surface))}
+      </div>
       <button
         type="button"
         className={moreOpen ? "brain-rail-btn brain-rail-more active" : "brain-rail-btn brain-rail-more"}
         onClick={() => setMoreOpen((value) => !value)}
         aria-expanded={moreOpen}
         aria-controls="mobile-more-menu"
-        aria-label="More navigation"
+        aria-label="Open navigation"
       >
         <span><UiIcon name="chevron" /></span>
-        <strong>More</strong>
+        <strong>Navigation</strong>
       </button>
       {moreOpen && (
         <div id="mobile-more-menu" className="mobile-more-menu">
-          {[...surfacesFor(SECONDARY_IDS), ...surfacesFor(UTILITY_IDS)].map((surface) => (
+          {[...primary, ...(ask ? [ask] : []), ...intelligence, ...utilities].map((surface) => (
             <a
               key={surface.id}
               href={toBrowserPath(pathForTab(surface.id))}
+              aria-label={surface.label}
               aria-current={primaryActiveTab === surface.id ? "page" : undefined}
               onClick={(event) => {
                 event.preventDefault();

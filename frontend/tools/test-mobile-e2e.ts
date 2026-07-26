@@ -51,25 +51,25 @@ async function openSurface(page: Page, label: RegExp, componentId: string): Prom
   await page.locator(`[data-surface-component='${componentId}']`).waitFor({ timeout: 10000 });
 }
 
-async function smokeViewport(browser: Browser, width: number): Promise<void> {
-  const page = await browser.newPage({ viewport: { width, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+async function smokeViewport(browser: Browser, width: number, height: number): Promise<void> {
+  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 2, isMobile: width <= 414, hasTouch: width <= 414 });
   await unlock(page);
   const bodyText = await page.locator("body").innerText();
   assert(!bodyText.includes("mobile companion coming soon"), "Mobile blocker overlay is still present.");
-  await openSurface(page, /^Today/i, "surface-todays-brief");
+  await openSurface(page, /^Briefing/i, "surface-todays-brief");
   await openSurface(page, /^Work/i, "surface-work-queue");
   await openSurface(page, /Accounts/i, "surface-account-360");
   await openSurface(page, /Ask/i, "surface-ask");
   const railBox = await page.locator(".brain-rail").boundingBox();
   assert(railBox && railBox.height >= 56, "Mobile bottom navigation is not touch-sized.");
-  await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-${width}.png`, fullPage: true });
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-${width}x${height}.png`, fullPage: true });
   await page.close();
 }
 
-async function desktopSmoke(browser: Browser): Promise<void> {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+async function desktopSmoke(browser: Browser, width: number, height: number): Promise<void> {
+  const page = await browser.newPage({ viewport: { width, height } });
   await unlock(page);
-  await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-1280.png`, fullPage: true });
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-${width}x${height}.png`, fullPage: true });
   await page.close();
 }
 
@@ -90,9 +90,13 @@ const preview = await waitForPreview();
 let browser: Browser | null = null;
 try {
   browser = await chromium.launch();
-  await smokeViewport(browser, 390);
-  await smokeViewport(browser, 414);
-  await desktopSmoke(browser);
+  await smokeViewport(browser, 320, 700);
+  await smokeViewport(browser, 390, 844);
+  await smokeViewport(browser, 414, 844);
+  await smokeViewport(browser, 768, 900);
+  await smokeViewport(browser, 1024, 768);
+  await desktopSmoke(browser, 1280, 800);
+  await desktopSmoke(browser, 1440, 900);
 } finally {
   if (browser) await browser.close();
   preview.kill("SIGTERM");
