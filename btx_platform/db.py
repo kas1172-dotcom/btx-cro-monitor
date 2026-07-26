@@ -6,7 +6,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-from sqlalchemy import create_engine, inspect, text
+from sqlalchemy import event, create_engine, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -21,15 +21,27 @@ class SchemaNotMigrated(RuntimeError):
     revision - the deploy forgot to run `alembic upgrade head` first."""
 
 
+def _enable_sqlite_foreign_keys(engine: Engine) -> Engine:
+    """SQLite ignores foreign keys unless asked. Turning them on means tests
+    catch ordering bugs that would otherwise only appear against Postgres."""
+    @event.listens_for(engine, "connect")
+    def _set_pragma(dbapi_connection, _connection_record):  # pragma: no cover - trivial
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+    return engine
+
+
 def make_engine(url: str) -> Engine:
     """Create an engine. For in-memory SQLite (tests) use a StaticPool so every
     connection shares one database; otherwise standard settings."""
     if url.startswith("sqlite"):
         connect_args = {"check_same_thread": False}
         if ":memory:" in url or url in ("sqlite://", "sqlite:///:memory:"):
-            return create_engine(
+            return _enable_sqlite_foreign_keys(create_engine(
                 url, connect_args=connect_args, poolclass=StaticPool, future=True
-            )
+            ))
         return create_engine(url, connect_args=connect_args, future=True)
     if url.startswith("postgresql://"):
         url = url.replace("postgresql://", "postgresql+psycopg://", 1)

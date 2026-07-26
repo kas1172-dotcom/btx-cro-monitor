@@ -182,6 +182,7 @@ def _seed_accounts(session: Session, seed: dict[str, Any], tenant_id: str) -> No
             verified=verified,
         ))
 
+    accounts_by_id: dict[str, models.CanonicalAccount] = {}
     for record in seed["accounts"]:
         row = models.CanonicalAccount(
             id=record["id"],
@@ -200,6 +201,15 @@ def _seed_accounts(session: Session, seed: dict[str, Any], tenant_id: str) -> No
             needs=record.get("needs", []),
         )
         session.add(row)
+        accounts_by_id[row.id] = row
+    # Identifiers carry a foreign key to canonical_accounts. Postgres enforces it
+    # on flush, and there is no ORM relationship telling the unit of work to
+    # order the inserts, so the accounts are flushed first. SQLite does not
+    # enforce foreign keys by default, which is why this only failed on deploy.
+    session.flush()
+
+    for record in seed["accounts"]:
+        row = accounts_by_id[record["id"]]
         add_identifier(account_id=row.id, identifier_type="legal_name", value=record["name"], classification="crm", verified=True)
         add_identifier(account_id=row.id, identifier_type="hubspot_company_id", value=row.hubspot_company_id or row.id, classification="crm" if record.get("hubspot_company_id") else "simulated", verified=True)
         for domain in record.get("domains", []):
@@ -252,6 +262,9 @@ def _seed_relationships(session: Session, seed: dict[str, Any], tenant_id: str) 
             last_validated_at=item.get("confirmed_at") or _now(),
         )
         session.add(row)
+        # The audit event points at the relationship, so the relationship has to
+        # exist before it is written.
+        session.flush()
         session.add(models.RelationshipAuditEvent(
             id=f"aud{item['id']}"[:32],
             tenant_id=tenant_id,
@@ -444,13 +457,20 @@ def reset_demo_tenant(
             if fail_stage == "after_delete":
                 raise DemoResetError("Injected failure after delete.")
             _store_tenant_metadata(session, tenant, seed)
-            _seed_accounts(session, seed, tenant_id)
-            _seed_signals(session, seed, tenant_id)
-            _seed_relationships(session, seed, tenant_id)
-            _seed_scores(session, seed, tenant_id)
-            _seed_work(session, seed, tenant_id)
-            _seed_deliverables(session, seed, tenant_id)
-            _seed_assistant(session, seed, tenant_id)
+            # Each stage references rows written by the stage before it, and
+            # Postgres enforces those foreign keys on flush. Flushing between
+            # stages keeps the insert order correct.
+            for seed_stage in (
+                _seed_accounts,
+                _seed_signals,
+                _seed_relationships,
+                _seed_scores,
+                _seed_work,
+                _seed_deliverables,
+                _seed_assistant,
+            ):
+                seed_stage(session, seed, tenant_id)
+                session.flush()
             if fail_stage == "before_commit":
                 raise DemoResetError("Injected failure before commit.")
             verify_demo_tenant(session, tenant_id)
