@@ -160,11 +160,18 @@ export function TodayBrief({ world }: { world: World }) {
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const horizonId = route.query.get("horizon") ?? "week";
   const horizon = HORIZONS.find((item) => item.id === horizonId) ?? HORIZONS[1];
-  const attention = useWorkItems(world, "needs_attention");
-  const approval = useWorkItems(world, "needs_approval");
+  const work = useWorkItems(world);
+  const openWorkItems = work.items.filter((item) => !["dismissed", "closed"].includes(item.status));
+  const attentionItems = openWorkItems.filter((item) =>
+    item.priority === "urgent"
+    || item.priority === "high"
+    || item.approval_state === "pending"
+    || Boolean(item.due_date && new Date(item.due_date) < new Date())
+  );
+  const approvalItems = openWorkItems.filter((item) => item.approval_state === "pending");
   const signalById = new Map(world.analysis.valid.map((signal) => [signal.id, signal]));
   const selectedSignalIds = new Set(
-    attention.items
+    attentionItems
       .flatMap((item) => item.source_signal_ids)
       .filter((id) => Boolean(signalById.get(id))),
   );
@@ -174,7 +181,7 @@ export function TodayBrief({ world }: { world: World }) {
     .sort((a, b) => b.confidence - a.confidence || b.detected_at.localeCompare(a.detected_at) || a.id.localeCompare(b.id))
     .slice(0, 8);
   const signalBriefs = topSignals.map((signal) => signalToBriefItem(world, signal));
-  const attentionBriefs = attention.items.map((item) => workItemToBriefItem(world, item));
+  const attentionBriefs = attentionItems.map((item) => workItemToBriefItem(world, item));
   const seenBriefIds = new Set<string>();
   const miniBrief = [...attentionBriefs, ...signalBriefs]
     .filter((item) => {
@@ -183,11 +190,11 @@ export function TodayBrief({ world }: { world: World }) {
       return true;
     })
     .slice(0, MINI_BRIEF_LIMIT);
-  const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
+  const accountsNeedingAttention = new Set(attentionItems.map((item) => item.canonical_account_id).filter(Boolean)).size;
   const activeAccountCount = world.companies.filter((company) => company.relationship === "customer").length;
-  const summaryLine = `${activeAccountCount} customer account${activeAccountCount === 1 ? "" : "s"}, ${miniBrief.length} priority item${miniBrief.length === 1 ? "" : "s"}, and ${attention.items.length} open work item${attention.items.length === 1 ? "" : "s"} need review.`;
+  const summaryLine = `${activeAccountCount} customer account${activeAccountCount === 1 ? "" : "s"}, ${miniBrief.length} priority item${miniBrief.length === 1 ? "" : "s"}, and ${openWorkItems.length} open work item${openWorkItems.length === 1 ? "" : "s"} need review.`;
   const topSeed = miniBrief[0]?.seed;
-  const rankedWork = [...attention.items]
+  const rankedWork = [...attentionItems]
     .sort((a, b) => {
       const priorityRank = { urgent: 4, high: 3, normal: 2, low: 1 };
       return (priorityRank[b.priority] ?? 0) - (priorityRank[a.priority] ?? 0) || b.updated_at.localeCompare(a.updated_at);
@@ -208,12 +215,12 @@ export function TodayBrief({ world }: { world: World }) {
     },
     {
       label: "Work awaiting approval",
-      value: approval.items.length,
+      value: approvalItems.length,
       link: { label: "Open approvals", surface: "work_queue" as const, path: "/work?approval=pending" },
     },
     {
       label: "Overdue work",
-      value: attention.items.filter((item) => item.due_date && new Date(item.due_date) < new Date()).length,
+      value: openWorkItems.filter((item) => item.due_date && new Date(item.due_date) < new Date()).length,
       link: { label: "Open overdue", surface: "work_queue" as const, path: "/work?overdue=true" },
     },
   ].filter((card) => card.value > 0);
@@ -230,7 +237,7 @@ export function TodayBrief({ world }: { world: World }) {
         headline={briefingLabel(world, horizon.id)}
         subline={summaryLine}
       />
-      <WorkItemSourceNote source={attention.source} error={attention.error} />
+      <WorkItemSourceNote source={work.source} error={work.error} />
       {world.loadErrors.length > 0 ? (
         <p className="surface-notice" role="status">
           The data service could not load account and signal records: {world.loadErrors.join(" ")}
