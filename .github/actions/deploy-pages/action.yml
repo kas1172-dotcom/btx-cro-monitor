@@ -47,6 +47,7 @@ runs:
           exit 1
         fi
         npm ci
+        npm run validate:production-env
         npm run build
 
     - name: Assemble site

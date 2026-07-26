@@ -78,8 +78,18 @@ for (const [title, entityName, expectedMethod] of [
   assert(signal.subject_id === "hubspot-company-100", `${expectedMethod} linked to ${signal.subject_id}`);
   assert(signal.scope === "specific_account", `${expectedMethod} should be specific_account`);
   assert(signal.relationships?.[0]?.match_method === expectedMethod, `${expectedMethod} produced ${signal.relationships?.[0]?.match_method}`);
-  const score = analyze([boeing, acme], [signal]).byId.get("hubspot-company-100");
-  assert((score?.dimensions.opportunity.score ?? 0) > 0, `${expectedMethod} did not contribute to Boeing score`);
+  const resolverScore = analyze([boeing, acme], [signal]).byId.get("hubspot-company-100");
+  assert((resolverScore?.dimensions.opportunity.score ?? 0) === 0, `${expectedMethod} affected scoring before account confirmation`);
+  const confirmedSignal = {
+    ...signal,
+    relationships: signal.relationships?.map((relationship) => ({
+      ...relationship,
+      review_status: "confirmed" as const,
+      evidence_ids: [`identity-source-${expectedMethod}`],
+    })),
+  };
+  const confirmedScore = analyze([boeing, acme], [confirmedSignal]).byId.get("hubspot-company-100");
+  assert((confirmedScore?.dimensions.opportunity.score ?? 0) > 0, `${expectedMethod} did not contribute after evidence-backed confirmation`);
 }
 
 const unrelated = buildArtifactSignals(artifactRun({

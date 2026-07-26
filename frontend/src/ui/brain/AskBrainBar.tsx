@@ -90,12 +90,11 @@ export function AskBrainBar({ world, large = false, seedPrompt, initialMessages 
   async function submit(text: string) {
     const q = text.trim();
     if (!q) return;
-    let showTimer: number | undefined;
+    const showTimer = window.setTimeout(() => setShowWorking(true), 300);
     setWorkingQuestion(q);
     setMessages((current) => [...current, { role: "user", content: q }]);
     setShowWorking(false);
     setWorkingStages(INITIAL_STAGES.map((stage, index) => ({ ...stage, status: index === 0 ? "active" : "pending" })));
-    showTimer = window.setTimeout(() => setShowWorking(true), 300);
     try {
       const result = await dispatchBrainQuestion(q, world, {
         accountId,

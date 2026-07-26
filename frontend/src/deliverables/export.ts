@@ -53,11 +53,6 @@ function emailSubject(deliverable: Deliverable): string {
   return block?.kind === "text" ? block.text : deliverable.title;
 }
 
-function emailBody(deliverable: Deliverable): string {
-  const body = deliverable.sections.find((section) => section.id === "body");
-  return body?.blocks.map(blockText).join("\n\n") ?? "";
-}
-
 type DocxModule = typeof import("docx");
 type XlsxCell = import("write-excel-file/browser").Cell;
 type XlsxSheetData = import("write-excel-file/browser").SheetData;
@@ -144,12 +139,11 @@ export function buildDocxDocument(deliverable: Deliverable, docx: DocxModule) {
     Document,
     HeadingLevel,
     Paragraph,
-    Table,
     TextRun,
   } = docx;
   const sections = exportSections(deliverable);
   const title = deliverable.form === "email" ? emailSubject(deliverable) : deliverable.title;
-  const children: any[] = [
+  const children: Array<ReturnType<typeof docxBlock>[number]> = [
     new Paragraph({
       style: "BTXBrand",
       children: [new TextRun({ text: "BTX Revenue Brain", bold: true, color: DOCX_COLORS.teal, size: 20, font: "Arial" })],

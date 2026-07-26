@@ -666,6 +666,42 @@ def _approve_work_item_for_hubspot(client: TestClient, item_id: str) -> None:
     assert client.post(f"/work-items/{item_id}/transition", headers=_headers(role="cro"), json={"action": "approve"}).status_code == 200
 
 
+def test_work_item_hubspot_preview_is_complete_and_does_not_write(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+    created = _create_detected_work_item(client)
+    _approve_work_item_for_hubspot(client, created["id"])
+
+    class NoWriteHubSpotClient:
+        def __init__(self, _token: str):
+            raise AssertionError("Preview must not construct a HubSpot client.")
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", NoWriteHubSpotClient)
+    response = client.post(
+        f"/work-items/{created['id']}/preview/hubspot-task",
+        headers={**_headers(role="cro"), "X-Idempotency-Key": "preview-only-key"},
+        json={},
+    )
+
+    assert response.status_code == 200
+    preview = response.json()
+    assert preview["destination"] == {
+        "system": "hubspot",
+        "environment": "sandbox",
+        "object_type": "task",
+        "target_record": "hubspot-company-10",
+    }
+    assert preview["approval"]["state"] == "approved"
+    assert preview["idempotency"]["key"] == "preview-only-key"
+    assert "same key" in preview["idempotency"]["behavior"]
+    assert "Read the task after creation" in preview["verification"]["method"]
+    assert preview["proposed_payload"]["properties"]["hs_task_subject"] == "Call Acme about the verified contract signal"
+
+
 def test_work_item_hubspot_task_happy_path_verifies_and_audits(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)

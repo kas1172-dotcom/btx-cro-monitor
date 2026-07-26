@@ -35,11 +35,6 @@ function money(value: number): string {
   return `$${Math.round(value / 1_000)}k`;
 }
 
-function riskPhrase(value: unknown): string {
-  const score = Number(value);
-  return score > 0 ? `risk score is ${score}` : "there are no active risk signals";
-}
-
 function scoreSnapshot(world: World, accountId: string, family: keyof NonNullable<World["scoreResults"]>) {
   return world.scoreResults?.[family]
     .filter((score) => score.entityType === "account" && score.entityId === accountId)

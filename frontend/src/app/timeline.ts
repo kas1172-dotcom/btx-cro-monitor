@@ -86,7 +86,7 @@ function scoreEvents(world: World, accountId: string): MeaningfulTimelineEvent[]
   const scores = world.scoreResults;
   if (!scores) return [];
   return (Object.entries(SCORE_FAMILY_LABELS) as Array<[keyof typeof SCORE_FAMILY_LABELS, string]>)
-    .map(([family, label]) => scores[family]?.filter((score) => score.entityType === "account" && score.entityId === accountId).sort((a, b) => b.calculatedAt.localeCompare(a.calculatedAt))[0])
+    .map(([family]) => scores[family]?.filter((score) => score.entityType === "account" && score.entityId === accountId).sort((a, b) => b.calculatedAt.localeCompare(a.calculatedAt))[0])
     .filter((score): score is ScoreSnapshot => Boolean(score))
     .map((score) => ({
       id: `score-${score.scoreFamily}-${score.id}`,

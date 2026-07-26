@@ -274,7 +274,7 @@ export function HubSpotViewer({ world }: { world: World }) {
           <div className="hubspot-select-list">
             {selectableRecords.map((record) => (
               <label key={`${record.source}-${record.id}`}>
-                <input type="checkbox" checked={selectedIds.includes(record.id)} onChange={() => toggle(record.id)} />
+                <input aria-label={`Select ${record.label}`} type="checkbox" checked={selectedIds.includes(record.id)} onChange={() => toggle(record.id)} />
                 <span><strong>{record.label}</strong><em>{record.detail}</em></span>
               </label>
             ))}

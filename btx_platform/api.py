@@ -1897,10 +1897,40 @@ def create_app(
                 contact_id=values.get("contact_id") if isinstance(values.get("contact_id"), str) else None,
                 deal_id=values.get("deal_id") if isinstance(values.get("deal_id"), str) else None,
             )
+            proposed_payload = {
+                "properties": {
+                    "hs_task_subject": task_subject,
+                    "hs_task_body": body,
+                    "hs_timestamp": due_at,
+                    "hs_task_status": "NOT_STARTED",
+                    "hubspot_owner_id": values.get("owner_id") or row.owner,
+                },
+                "associations": [association.__dict__ for association in associations],
+            }
             return JSONResponse({
                 "status": "preview",
                 "integration_availability": "configured_unverified" if settings.hubspot_access_token else "not_configured",
                 "can_execute": bool(settings.hubspot_access_token) and row.approval_state == "approved" and _has_role(request, "cro"),
+                "destination": {
+                    "system": "hubspot",
+                    "environment": settings.hubspot_environment,
+                    "object_type": "task",
+                    "target_record": company_id,
+                },
+                "approval": {
+                    "required": True,
+                    "state": row.approval_state,
+                    "policy": "CRO or admin approval is required before execution.",
+                },
+                "idempotency": {
+                    "key": idempotency_key,
+                    "behavior": "Retries with the same key return the verified task without creating a duplicate.",
+                },
+                "verification": {
+                    "method": "Read the task after creation and compare subject and body.",
+                    "outcome_state": "Work remains unverified until the read-after-write comparison succeeds.",
+                },
+                "proposed_payload": proposed_payload,
                 "work_item": _work_item_response(row, role=_role(request), notes=_notes_for_work_item(session, row)),
                 "hubspot_task": {
                     "canonical_account_id": row.canonical_account_id,

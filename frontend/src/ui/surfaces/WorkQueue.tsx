@@ -213,10 +213,16 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
       {preview && (
         <div className="work-preview" role="dialog" aria-label="HubSpot task preview">
           <strong>{preview.hubspot_task.subject}</strong>
+          <span>Destination: {titleCase(preview.destination.system)} · {titleCase(preview.destination.environment)} · {titleCase(preview.destination.object_type)}</span>
+          <span>Target: {preview.destination.target_record ?? "No target record"}</span>
           <span>Availability: {titleCase(preview.integration_availability)}</span>
           <span>Owner: {preview.hubspot_task.owner_id ?? "Unassigned"}</span>
           <span>Due: {preview.hubspot_task.due_at}</span>
+          <span>Approval: {titleCase(preview.approval.state)} · {preview.approval.policy}</span>
+          <span>Idempotency: {preview.idempotency.key} · {preview.idempotency.behavior}</span>
+          <span>Verification: {preview.verification.method}</span>
           <pre>{preview.hubspot_task.body}</pre>
+          <details><summary>Full proposed payload</summary><pre>{JSON.stringify(preview.proposed_payload, null, 2)}</pre></details>
           <button type="button" onClick={() => setPreview(null)}>Close preview</button>
         </div>
       )}

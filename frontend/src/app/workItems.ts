@@ -156,14 +156,6 @@ export interface WorkItemFilters {
   sort?: "updated" | "priority" | "due_date" | "account";
 }
 
-const VIEW_PARAMS: Record<WorkItemView, string> = {
-  what_changed: "view=what_changed",
-  needs_attention: "view=needs_attention",
-  prepared: "view=prepared",
-  needs_approval: "view=needs_approval",
-  outcomes: "view=outcomes",
-};
-
 function isoDate(daysFromNow: number): string {
   const date = new Date();
   date.setDate(date.getDate() + daysFromNow);
@@ -482,6 +474,11 @@ export interface HubSpotTaskPreview {
   status: "preview";
   integration_availability: string;
   can_execute: boolean;
+  destination: { system: string; environment: string; object_type: string; target_record: string | null };
+  approval: { required: boolean; state: string; policy: string };
+  idempotency: { key: string; behavior: string };
+  verification: { method: string; outcome_state: string };
+  proposed_payload: Record<string, unknown>;
   work_item: WorkItem;
   hubspot_task: {
     canonical_account_id: string | null;

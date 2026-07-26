@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import { classifyQuestion } from "./classifyQuestion.ts";
 import type { Classification } from "./classifyQuestion.ts";
-import { TAB_IDS, type TabId } from "../app/surfaces.ts";
+import { TAB_IDS } from "../app/surfaces.ts";
 import type { QuestionIntent } from "./types.ts";
 import { LLM_MODELS, LLM_TIMEOUT_MS } from "../app/llmConfig.ts";
 import { backendHeaders } from "../app/backendApi.ts";

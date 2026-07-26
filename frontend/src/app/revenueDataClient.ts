@@ -212,7 +212,6 @@ export const revenueDataClient = new BackendRevenueDataClient();
 export function operatingSnapshotFromWorld(snapshot: WorldSnapshot): OperatingSnapshot {
   const latestSignalAt = snapshot.signals.map((signal) => signal.detected_at).filter(Boolean).sort().at(-1) ?? null;
   const monitor = snapshot.sourceHealth.find((source) => source.sourceKey === "monitor");
-  const hubspot = snapshot.sourceHealth.find((source) => source.sourceKey === "hubspot");
   const operating = snapshot.sourceHealth.find((source) => source.sourceKey === "operating");
   return {
     crm: [],

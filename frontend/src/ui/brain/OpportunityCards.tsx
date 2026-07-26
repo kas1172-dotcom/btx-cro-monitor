@@ -6,15 +6,26 @@ export function OpportunityCards({ cards }: { cards: OpportunityCard[] }) {
   return (
     <div className="brain-card-list">
       {cards.map((card) => (
-        <button key={card.companyId} className="brain-opportunity-row" onClick={() => setState({ activeCompanyId: card.companyId })}>
+        <div
+          key={card.companyId}
+          className="brain-opportunity-row"
+          role="button"
+          tabIndex={0}
+          onClick={() => setState({ activeCompanyId: card.companyId })}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setState({ activeCompanyId: card.companyId });
+            }
+          }}
+        >
           <strong>{card.companyName}</strong>
           <span>Opportunity {card.opportunityScore} · {card.qualificationLabel ?? card.confidence} · {card.city}</span>
           {card.qualificationGaps?.length ? <span>Missing: {card.qualificationGaps.join(", ")}</span> : null}
           <em>{card.whySurfaced}</em>
           <small>{card.recommendedAction}</small>
-          <span
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
             className="demo-action-btn"
             onClick={(event) => {
               event.preventDefault();
@@ -30,8 +41,8 @@ export function OpportunityCards({ cards }: { cards: OpportunityCard[] }) {
             }}
           >
             Create task
-          </span>
-        </button>
+          </button>
+        </div>
       ))}
     </div>
   );

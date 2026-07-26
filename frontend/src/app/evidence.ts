@@ -3,7 +3,7 @@ import { qualitativeSignalConfidence } from "./confidence.ts";
 import { SCORE_FAMILY_LABELS } from "./presentation.ts";
 import type { ScoreSnapshot } from "./revenueDataClient.ts";
 import { humanSourceLabel, humanSourceReason } from "./sourceLabels.ts";
-import { signalHeadline, signalSourceDate, signalSourceName } from "./signalProvenance.ts";
+import { signalHeadline, signalSourceName } from "./signalProvenance.ts";
 import type { World } from "./useWorld.ts";
 import type { WorkItem } from "./workItems.ts";
 import type { Deliverable, ProvenanceEntry } from "../deliverables/types.ts";

@@ -48,7 +48,12 @@ export function MeaningfulTimeline({
           return (
             <li key={event.id} className={`timeline-event ${event.category} ${event.importance}`}>
               <div className="timeline-marker" aria-hidden="true" />
-              <article tabIndex={0} title={new Date(event.occurredAt).toISOString()}>
+              <article
+                role="group"
+                tabIndex={0}
+                aria-label={`${event.title}, ${displayDate(event.occurredAt)}`}
+                title={new Date(event.occurredAt).toISOString()}
+              >
                 <div className="timeline-event-head">
                   <span>{categoryLabel(event.category)}</span>
                   <time dateTime={event.occurredAt}>{displayDate(event.occurredAt)}</time>

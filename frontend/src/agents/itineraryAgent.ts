@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { World } from "../app/useWorld.ts";
 import type { Prospect } from "../app/intelligence.ts";
-import type { Deliverable, DeliverableSection } from "../deliverables/types.ts";
+import type { Deliverable } from "../deliverables/types.ts";
 import type { Company, Location } from "../engine/brain/entities.ts";
 import { signalEvidenceForCompany } from "../app/signalProvenance.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";

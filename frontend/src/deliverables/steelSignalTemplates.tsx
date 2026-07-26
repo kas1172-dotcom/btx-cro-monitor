@@ -11,8 +11,6 @@ import {
   Figure,
   PROVENANCE_CONFIDENCE_FLOOR,
   ProvenanceCard,
-  ScopePill,
-  StatCallout,
   TellShowSoWhatBlock,
   type CapacityRow,
 } from "./steelSignalPrimitives.tsx";

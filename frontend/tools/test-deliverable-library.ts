@@ -60,7 +60,8 @@ const localBrief = deliverable("local-1", "Local brief", "acct-1", "weekly_memo"
 const unrelated = deliverable("local-2", "Other account deck", "acct-2", "board_deck");
 const items = buildLibraryItems({ backend: [backendDeliverable], local: [localBrief, unrelated], world });
 
-assert(items.length === 3, `Expected 3 library items, got ${items.length}`);
+assert(items.length === 2, `Expected 2 canonical-account library items, got ${items.length}`);
+assert(!items.some((item) => item.deliverable.id === unrelated.id), "Deliverables for accounts outside the canonical tenant world must be suppressed.");
 assert(items.some((item) => item.accountName === "Trinity Defense Components"), "Library item should resolve account name from world.");
 
 const accountFiltered = filterLibraryItems(items, { accountId: "acct-1", type: "all" });
@@ -72,4 +73,4 @@ assert(typeFiltered.length === 1 && typeFiltered[0]?.deliverable.id === "local-1
 const combined = filterLibraryItems(items, { accountId: "acct-1", type: "meeting_brief" });
 assert(combined.length === 1 && combined[0]?.deliverable.backendRecordId === "backend-1", "Combined filters should isolate backend meeting brief.");
 
-console.log(`deliverable library ok: ${items.length} items, ${accountFiltered.length} for Trinity`);
+console.log(`deliverable library ok: ${items.length} canonical items, ${accountFiltered.length} for Trinity; orphan suppressed`);

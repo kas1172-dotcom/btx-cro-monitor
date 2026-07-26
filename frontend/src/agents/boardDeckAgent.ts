@@ -47,7 +47,6 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
   contextRecipe(inputs: Inputs, world: World): AgentContext {
     const window = quarterWindow(inputs.quarter);
     const prior = priorQuarter(window);
-    const trendRange = sixMonthTrendRangeForQuarter(inputs.quarter);
     const metrics = {
       revenue: computeMetric("revenue", world, undefined, window),
       bookings: computeMetric("bookings", world, undefined, window),
