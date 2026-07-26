@@ -142,7 +142,7 @@ export function Prospecting({ world }: { world: World }) {
   const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
   const totalRevenue = prospectRows.reduce((sum, row) => sum + row.revenue, 0);
   const marketLabel = selectedMarket ?? "All Markets";
-  const visitPlanTitle = selectedMarket ? `${selectedMarket} Visit Plan` : "National Target List";
+  const visitPlanTitle = selectedMarket ? `${selectedMarket} prospecting shortlist` : "Prospecting shortlist";
 
   return (
     <div className="prospecting-workspace" data-surface-component="surface-prospecting">
@@ -246,6 +246,8 @@ export function Prospecting({ world }: { world: World }) {
                       <CrmWriteActions
                         company={row.company}
                         contact={row.contact}
+                        environment={world.sources.find((source) => source.id.includes("hubspot"))?.environment ?? "none"}
+                        writeConnected={world.sources.find((source) => source.id.includes("hubspot"))?.canWrite ?? false}
                         variant="prospect"
                         defaultTaskSubject={`Qualify ${row.company.name}`}
                         defaultTaskBody={`${whyNow(row.signals)} Missing evidence: ${row.qualification.gaps.join(", ") || "none"}.`}

@@ -273,11 +273,13 @@ export function TodayBrief({ world }: { world: World }) {
             <article key={item.id} className={index === 0 ? "priority-card lead" : "priority-card"}>
               <span className={`priority-alert ${workItemAlertLevel(item)}`}>{alertLabel(item)}</span>
               <strong>{index + 1}. {item.recommended_action}</strong>
-              <p>{nameOf(world, item.canonical_account_id)} needs a decision because this work is {plainWorkStatus(item.status).toLowerCase()}.</p>
+              <p>{item.status === "detected"
+                ? "A market signal may match this account. Confirm or reject the match before it affects account analysis."
+                : `${nameOf(world, item.canonical_account_id)} has work that is ${plainWorkStatus(item.status).toLowerCase()}. Review the evidence, uncertainty, and required decision.`}</p>
               <div className="priority-meta">
                 <span>Owner: {item.owner ?? "Unassigned"}</span>
                 <span>{item.due_date ? `Due ${new Date(item.due_date).toLocaleDateString()}` : "No due date"}</span>
-                <span>{item.source_signal_ids.length ? "Evidence attached" : "Evidence needed"}</span>
+                <span>{item.source_signal_ids.length ? `${item.source_signal_ids.length} public source${item.source_signal_ids.length === 1 ? "" : "s"} · account match unconfirmed` : "Evidence needed"}</span>
               </div>
               <button type="button" className="priority-primary" onClick={() => navigateTo(`/work/${encodeURIComponent(item.id)}`)}>
                 {primary ? plainActionLabel(primary) : "Open work item"}

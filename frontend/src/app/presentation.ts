@@ -8,7 +8,7 @@ export type AvailabilityLabel = "Available" | "More information needed" | "Not c
 export const SCORE_FAMILY_LABELS = {
   accountAttractiveness: "Strategic attractiveness",
   signalConfidence: "Evidence strength",
-  pursuitPwin: "Likelihood to win",
+  pursuitPwin: "Qualification confidence",
   deliveryFeasibility: "Ability to deliver",
   relationshipHealth: "Relationship strength",
   actionPriority: "Action priority",
@@ -29,7 +29,7 @@ const WORK_STATUS_LABELS: Record<string, string> = {
 };
 
 const ACTION_LABELS: Record<WorkItemTransitionAction, string> = {
-  triage: "Mark triaged",
+  triage: "Confirm review complete",
   prepare: "Prepare work",
   request_approval: "Request approval",
   approve: "Approve action",

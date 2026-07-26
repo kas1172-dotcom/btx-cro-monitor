@@ -11,6 +11,7 @@ import type { Company, Contact, Facility, Opportunity } from "../engine/brain/en
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 import { operatingSnapshotFromWorld, revenueDataClient, type ScoreFamilies, type WorldSnapshot } from "./revenueDataClient.ts";
 import { queryKey, useQuery } from "./serverState.ts";
+import { sourceRegistry, type SourceCapability } from "./sourceRegistry.ts";
 
 export interface World {
   city: string | null;
@@ -26,6 +27,7 @@ export interface World {
   scoreResults: ScoreFamilies | null;
   dataSource: string | null;
   loadErrors: string[];
+  sources: SourceCapability[];
   provenanceSources: Array<{ label: ProvenanceLabel; count: number; detail: string }>;
   provenanceSummary: string | null;
   queryStatus: "idle" | "loading" | "refreshing" | "success" | "error";
@@ -54,6 +56,7 @@ function emptyWorld(city: string | null, message: string): World {
     scoreResults: null,
     dataSource: "Backend world snapshot",
     loadErrors: [message],
+    sources: [],
     provenanceSources: [],
     provenanceSummary: null,
     queryStatus: "error",
@@ -113,6 +116,7 @@ export function useWorld(city: string | null): World | null {
           .map((source) => `${source.displayName}: ${source.errorMessage ?? source.availability}`),
         ...(worldQuery.error ? [worldQuery.error] : []),
       ],
+      sources: sourceRegistry(worldSnapshot),
       provenanceSources: [] as Array<{ label: ProvenanceLabel; count: number; detail: string }>,
       provenanceSummary: null as string | null,
       queryStatus: worldQuery.status,

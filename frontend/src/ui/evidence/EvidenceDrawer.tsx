@@ -128,6 +128,8 @@ export function EvidenceDrawer({
                 <div><dt>Updated</dt><dd>{dateText(record.updatedAt)}</dd></div>
               </dl>
               <p>{record.summary}</p>
+              <p><strong>What this supports:</strong> {record.supportedClaim}</p>
+              <p className="muted"><strong>Record limitation:</strong> {record.limitation}</p>
               <div className="evidence-record-actions">
                 {record.route && <button type="button" onClick={() => navigateTo(String(record.route))}>Open record</button>}
                 {record.externalUrl && <a href={record.externalUrl} target="_blank" rel="noreferrer">Full source</a>}

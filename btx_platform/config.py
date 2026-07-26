@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 45.0
     llm_max_body_bytes: int = 524_288
     hubspot_access_token: str | None = None
+    hubspot_environment: str = "none"
     gmail_allowlist: str = ""
     pipeline_mechanism: str = "subprocess"
     pipeline_output_dir: str = "clients/btx/artifacts"

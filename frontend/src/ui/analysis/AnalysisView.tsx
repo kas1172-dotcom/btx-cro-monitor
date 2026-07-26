@@ -40,7 +40,7 @@ function computeAnnotation(spec: ChartSpec, result: ChartResult): string {
     return [
       top ? `${top.name} is the top account in the latest complete quarter at ${fmtV(top.value)} (${Math.round(topShare)}% of period total).` : "",
       completeCols.length > 1 ? `Portfolio ${result.meta.label.toLowerCase()} is ${trend}: ${fmtV(firstSum)} in ${completeCols[0]} vs ${fmtV(lastSum)} in ${lastCol ?? ""}.` : "",
-      topShare > 30 ? "Concentration risk: the top account holds over 30% of revenue, warranting diversification attention." : "No single account dominates; concentration is within acceptable bounds.",
+      "Concentration assessment unavailable until an approved threshold is configured.",
     ].filter(Boolean).join(" ");
   }
 

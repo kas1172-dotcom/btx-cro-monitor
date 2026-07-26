@@ -94,13 +94,9 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const selected = accountId
     ? accountRows.find((row) => row.company.id === accountId || row.company.canonical_account_id === accountId) ?? null
     : accountRows.find((row) => row.company.relationship === "customer") ?? accountRows[0] ?? null;
-  // Customers lead the list. A selected prospect is appended so the row the
-  // user is reading is always visible in the picker.
   const listRows = useMemo(() => {
-    const customers = accountRows.filter((row) => row.company.relationship === "customer");
-    if (selected && !customers.includes(selected)) return [...customers, selected];
-    return customers;
-  }, [accountRows, selected]);
+    return accountRows;
+  }, [accountRows]);
   const contacts = selected ? world.contacts.filter((contact) => contact.company_id === selected.company.id) : [];
   const deals = selected ? world.opportunities.filter((opp) => opp.company_id === selected.company.id) : [];
   const facilities = selected ? world.facilities.filter((facility) => facility.company_id === selected.company.id) : [];
@@ -151,6 +147,15 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const evidenceDetail = selected.linkedSignals[0]
     ? signalHeadline(selected.linkedSignals[0])
     : `${selected.linkedSignals.length} confirmed account development${selected.linkedSignals.length === 1 ? "" : "s"}`;
+  const accountScores = SCORE_LABELS.map(([family, label]) => ({
+    family,
+    label,
+    score: latestAccountScore(world, company.id, family),
+  }));
+  const availableScores = accountScores.filter(({ score }) => score && score.score !== null && score.result.status !== "insufficient_data");
+  const qualificationGaps = accountScores.flatMap(({ family, label, score }) =>
+    (score?.result.missingInputs ?? [`${label} has not been calculated.`]).map((gap) => ({ family, label, gap }))
+  );
 
   function pathWithView(nextView: string | null): string {
     const params = new URLSearchParams(route.query);
@@ -233,8 +238,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
           </div>
 
           <div className="account360-kpis">
-            {SCORE_LABELS.map(([family, label]) => {
-              const scoreResult = latestAccountScore(world, company.id, family);
+            {availableScores.map(({ family, label, score: scoreResult }) => {
               return (
                 <div key={family}>
                   <span>{label}</span>
@@ -244,14 +248,29 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                 </div>
               );
             })}
-            <div><span>Capability fit</span><strong>{fitLabel(fit.score)}</strong><em>not capacity</em></div>
+            <div><span>Capability fit</span><strong>{fit.matched.length ? fitLabel(fit.score) : "Unqualified"}</strong><em>Capacity has not been assessed.</em></div>
           </div>
 
           <section className="surface-panel">
-            <div className="panel-head"><h2>Score explanations</h2></div>
+            <div className="panel-head"><h2>Qualification gaps</h2><span>{qualificationGaps.length}</span></div>
+            <p>Missing inputs are not zero values. Assign the evidence collection needed before these decision aids are calculated.</p>
             <div className="score-explain-list">
-              {SCORE_LABELS.map(([family, label]) => {
-                const scoreResult = latestAccountScore(world, company.id, family);
+              {qualificationGaps.map(({ family, label, gap }, index) => (
+                <div key={`${family}-${index}`}>
+                  <strong>{label}</strong>
+                  <p>{gap}</p>
+                  <span>Owner: Revenue Operations</span>
+                  <button type="button" onClick={() => navigateTo(`/ask?account=${encodeURIComponent(company.id)}&prompt=${encodeURIComponent(`Create qualification work for ${company.name}: ${gap}`)}`)}>Assign qualification action</button>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {availableScores.length > 0 && <section className="surface-panel">
+            <div className="panel-head"><h2>Calculated decision aids</h2></div>
+            <p>Rule-based decision aids; not statistical probabilities.</p>
+            <div className="score-explain-list">
+              {availableScores.map(({ family, label, score: scoreResult }) => {
                 const result = scoreResult?.result;
                 return (
                   <details key={family}>
@@ -273,7 +292,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                 );
               })}
             </div>
-          </section>
+          </section>}
 
           <section className="surface-panel primary-action-panel">
             <div>
@@ -287,6 +306,8 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
             <CrmWriteActions
               company={company}
               contact={contacts[0]}
+              environment={world.sources.find((source) => source.id.includes("hubspot"))?.environment ?? "none"}
+              writeConnected={world.sources.find((source) => source.id.includes("hubspot"))?.canWrite ?? false}
               variant="account"
               defaultTaskSubject={`Follow up with ${company.name}`}
               defaultTaskBody={rec?.reason ?? `Review next step for ${company.name}.`}
@@ -339,7 +360,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
             </section>
             <section className="surface-panel">
               <div className="panel-head"><h2>Capability fit</h2></div>
-              <p>{fit.matched.length ? fit.matched.join(", ") : "No direct capability overlap."}</p>
+              <p>{fit.matched.length ? fit.matched.join(", ") : "No capability overlap is documented in current records."}</p>
               <p className="muted">{facilities.length} facility record{facilities.length === 1 ? "" : "s"} in the current production view.</p>
             </section>
             <section className="surface-panel">

@@ -7,7 +7,7 @@ import {
   type SurfaceSpec,
   type TabId,
 } from "../../app/surfaces.ts";
-import { navigateTo, pathForTab } from "../../app/router.ts";
+import { navigateTo, pathForTab, toBrowserPath } from "../../app/router.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
 import { CockpitRailIdentity } from "../../app/clerkAuth.tsx";
 
@@ -45,7 +45,7 @@ export function BrainSidebar({
   ];
   const primaryActiveTab = primaryTabFor(activeTab);
   return (
-    <aside className="brain-rail">
+    <nav className="brain-rail" aria-label="Cockpit navigation">
       <div className="rail-brand" aria-label="BTX">
         <span>BTX</span>
         <strong>Steel & Signal</strong>
@@ -54,16 +54,21 @@ export function BrainSidebar({
         <div key={group.label} className={group.label === "Utilities" ? "brain-rail-group brain-rail-utility" : `brain-rail-group brain-rail-${group.label.toLowerCase()}`}>
           <div className="brain-rail-group-label">{group.label}</div>
           {group.items.map((surface) => (
-            <button
+            <a
               key={surface.id}
               className={primaryActiveTab === surface.id ? "brain-rail-btn active" : "brain-rail-btn"}
-              onClick={() => openSurface(surface.id)}
+              href={toBrowserPath(pathForTab(surface.id))}
+              onClick={(event) => {
+                event.preventDefault();
+                openSurface(surface.id);
+              }}
+              aria-current={primaryActiveTab === surface.id ? "page" : undefined}
               title={surface.title}
             >
               <span><UiIcon name={surface.id} /></span>
               <strong>{surface.label}</strong>
               {counts[surface.id] ? <CountBadge value={counts[surface.id] ?? 0} /> : null}
-            </button>
+            </a>
           ))}
         </div>
       ))}
@@ -73,6 +78,7 @@ export function BrainSidebar({
         onClick={() => setMoreOpen((value) => !value)}
         aria-expanded={moreOpen}
         aria-controls="mobile-more-menu"
+        aria-label="More navigation"
       >
         <span><UiIcon name="chevron" /></span>
         <strong>More</strong>
@@ -80,17 +86,19 @@ export function BrainSidebar({
       {moreOpen && (
         <div id="mobile-more-menu" className="mobile-more-menu">
           {[...surfacesFor(SECONDARY_IDS), ...surfacesFor(UTILITY_IDS)].map((surface) => (
-            <button
+            <a
               key={surface.id}
-              type="button"
-              onClick={() => {
+              href={toBrowserPath(pathForTab(surface.id))}
+              aria-current={primaryActiveTab === surface.id ? "page" : undefined}
+              onClick={(event) => {
+                event.preventDefault();
                 setMoreOpen(false);
                 openSurface(surface.id);
               }}
             >
               <UiIcon name={surface.id} />
               <span>{surface.label}</span>
-            </button>
+            </a>
           ))}
         </div>
       )}
@@ -98,6 +106,6 @@ export function BrainSidebar({
         <UiIcon name="user" />
         <CockpitRailIdentity />
       </div>
-    </aside>
+    </nav>
   );
 }

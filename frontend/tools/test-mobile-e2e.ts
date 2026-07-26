@@ -47,7 +47,7 @@ async function unlock(page: Page): Promise<void> {
 }
 
 async function openSurface(page: Page, label: RegExp, componentId: string): Promise<void> {
-  await page.getByRole("button", { name: label }).first().click();
+  await page.getByRole("link", { name: label }).first().click();
   await page.locator(`[data-surface-component='${componentId}']`).waitFor({ timeout: 10000 });
 }
 

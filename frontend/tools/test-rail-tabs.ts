@@ -8,7 +8,6 @@ import {
   PRIMARY_TAB_IDS,
   TAB_IDS,
   UTILITY_SURFACES,
-  RETIRED_SURFACES,
   countForSurface,
 } from "../src/app/surfaces.ts";
 import { deriveWorkItems, draftToCreatePayload, filterWorkItems } from "../src/app/workItems.ts";
@@ -46,6 +45,7 @@ async function loadWorld(): Promise<World> {
     snapshot,
     dataSource: null,
     loadErrors: [],
+    sources: [],
     provenanceSources: [],
     provenanceSummary: null,
   };
@@ -61,10 +61,9 @@ const world = await loadWorld();
 const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId));
 
 assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
-assert(ANALYTICAL_SURFACES.length === 0, "Analytical surfaces were retired on 2026-07-25 and must not appear in the rail.");
-assert(RETIRED_SURFACES.map((surface) => surface.id).join(",") === "prospecting,trip_planner,map,analysis,capacity,programs", "Retired surfaces must stay recorded so the decision is reversible.");
+assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "prospecting,trip_planner,map,analysis,capacity,programs", "Analytical routes must appear in the workspace navigation.");
 assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "deliverables,hubspot,settings", "Utility nav must expose Deliverable Editor, HubSpot, and Settings.");
-assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,deliverables,hubspot,settings", "Navigable tabs must be the four core surfaces plus utilities.");
+assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,prospecting,map,analysis,capacity,programs,deliverables,hubspot,settings", "Navigable tabs must include core, analytical, and utility routes.");
 assert(PRIMARY_TAB_IDS.join(",") === "brief,work_queue,accounts,ask", "Primary rail must be the four-surface cockpit.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
 assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
@@ -80,13 +79,12 @@ assert(componentByTab.work_queue === "surface-work-queue", "Work Queue tab must 
 assert(componentByTab.accounts === "surface-account-360", "Accounts tab must mount Account 360.");
 assert(componentByTab.ask === "surface-ask", "Ask tab must mount Ask.");
 assert(componentByTab.settings === "surface-settings", "Settings tab must mount Settings.");
-// The retired surfaces keep their component bindings so a deep link still resolves.
-const componentByRetiredTab = Object.fromEntries(RETIRED_SURFACES.map((surface) => [surface.id, surface.componentId]));
-assert(componentByRetiredTab.trip_planner === "surface-trip-planner", "Retired Trip Planner must keep its component binding.");
-assert(componentByRetiredTab.map === "surface-map", "Retired Map must keep its component binding.");
-assert(componentByRetiredTab.analysis === "surface-analysis-dashboard", "Retired Analysis must keep its component binding.");
-assert(componentByRetiredTab.capacity === "surface-capacity-assessment", "Retired Capacity must keep its component binding.");
-assert(componentByRetiredTab.programs === "surface-program-contract-tracker", "Retired Programs must keep its component binding.");
+const componentByAnalyticalTab = Object.fromEntries(ANALYTICAL_SURFACES.map((surface) => [surface.id, surface.componentId]));
+assert(componentByAnalyticalTab.trip_planner === "surface-trip-planner", "Trip Planner must keep its component binding.");
+assert(componentByAnalyticalTab.map === "surface-map", "Map must keep its component binding.");
+assert(componentByAnalyticalTab.analysis === "surface-analysis-dashboard", "Analysis must keep its component binding.");
+assert(componentByAnalyticalTab.capacity === "surface-capacity-assessment", "Capacity must keep its component binding.");
+assert(componentByAnalyticalTab.programs === "surface-program-contract-tracker", "Programs must keep its component binding.");
 
 const workItems = deriveWorkItems(world);
 assert(workItems.length > 0, "Core surfaces must be backed by work items.");

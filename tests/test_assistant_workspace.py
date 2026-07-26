@@ -159,3 +159,42 @@ def test_demo_reset_restores_seeded_assistant_records_idempotently(tmp_path: Pat
     seeded = second_reset_client.get("/assistant/conversations/demo-assist-lockheed", headers=analyst).json()
     assert seeded["messages"][1]["citations"]
     assert all("reasoning" not in message for message in seeded["messages"])
+
+
+def test_workspace_change_and_data_basis_intents_are_distinct_and_do_not_inherit_account(tmp_path: Path):
+    client = _build(tmp_path)
+    viewer = _headers(role="viewer", tenant_id=DEMO_TENANT_ID)
+
+    changes = client.post(
+        "/assistant/ask",
+        headers=viewer,
+        json={"message": "What changed today?", "context": {"account_id": "demo-acct-pulse-space"}},
+    ).json()["assistant_message"]
+    basis = client.post(
+        "/assistant/ask",
+        headers=viewer,
+        json={"message": "Is this information live or simulated?", "context": {"account_id": "demo-acct-pulse-space"}},
+    ).json()["assistant_message"]
+
+    assert changes["content"].startswith("Today has")
+    assert "Scope: workspace" in changes["content"]
+    assert basis["content"].startswith("This workspace contains a mix")
+    assert "simulated demonstration records" in basis["content"]
+    assert changes["content"] != basis["content"]
+    assert changes["metadata"]["scope"] == basis["metadata"]["scope"] == "workspace"
+    assert changes["metadata"]["engine_mode"] == basis["metadata"]["engine_mode"] == "rules_based_fallback"
+
+
+def test_assistant_citations_are_unique_by_source_type_and_record_id(tmp_path: Path):
+    client = _build(tmp_path)
+    viewer = _headers(role="viewer", tenant_id=DEMO_TENANT_ID)
+
+    response = client.post(
+        "/assistant/ask",
+        headers=viewer,
+        json={"message": "What changed today?"},
+    )
+
+    citations = response.json()["assistant_message"]["citations"]
+    stable_ids = [(item["source_type"], item["record_id"]) for item in citations]
+    assert len(stable_ids) == len(set(stable_ids))

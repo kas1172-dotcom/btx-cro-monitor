@@ -32,4 +32,9 @@ export const SETTINGS_SECTIONS: SettingsSectionSpec[] = [
     label: "Source admin",
     summary: "Monitor source registry, collection runs, and source requests.",
   },
+  {
+    id: "integrations",
+    label: "Integrations",
+    summary: "Review integration capabilities, environments, and guarded external actions.",
+  },
 ];

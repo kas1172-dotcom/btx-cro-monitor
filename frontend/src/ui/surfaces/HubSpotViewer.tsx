@@ -8,6 +8,7 @@ import {
 import type { World } from "../../app/useWorld.ts";
 import type { Company, Contact, Opportunity } from "../../engine/brain/entities.ts";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
+import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "../../app/sourceRegistry.ts";
 
 type ListType = "company" | "contact";
 
@@ -183,6 +184,25 @@ export function HubSpotViewer({ world }: { world: World }) {
         headline="CRM workspace"
         subline="Review the CRM records already loaded in the cockpit, search HubSpot, and create client lists."
       />
+
+      <section className="surface-panel" aria-labelledby="source-registry-title">
+        <div className="panel-head">
+          <h2 id="source-registry-title">Source capabilities</h2>
+          <span>{world.sources.length} registered</span>
+        </div>
+        <div className="hubspot-mini-list">
+          {world.sources.map((source) => {
+            const freshness = sourceFreshness(source);
+            return (
+              <article key={source.id}>
+                <span>{source.environment} · {source.verification}</span>
+                <strong>{source.name}: {sourceModeLabel(source)}</strong>
+                <em>{sourcePermissionLabel(source)} · {freshness.relative} · {freshness.exact}</em>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="hubspot-viewer-grid">
         <section className="surface-panel">

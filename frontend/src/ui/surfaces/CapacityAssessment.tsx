@@ -3,6 +3,7 @@ import { computeMetric } from "../../metrics/catalog.ts";
 import { formatMetricValue } from "../../metrics/chartSpec.ts";
 import { OperatingSnapshot } from "../operating/OperatingSnapshot.tsx";
 import { SurfaceHeader } from "../primitives.tsx";
+import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "../../app/sourceRegistry.ts";
 
 export function CapacityAssessment({ world }: { world: World }) {
   const utilization = computeMetric("capacity_utilization", world);
@@ -23,6 +24,21 @@ export function CapacityAssessment({ world }: { world: World }) {
         <div><span>Backlog</span><strong>{formatMetricValue(backlog.value, backlog.unit)}</strong></div>
         <div><span>Open demand</span><strong>{formatMetricValue(openDemand, "$")}</strong></div>
       </div>
+      <section className="surface-panel">
+        <div className="panel-head"><h2>Current data sources</h2><span>{world.sources.length} registered</span></div>
+        <div className="hubspot-mini-list">
+          {world.sources.map((source) => {
+            const freshness = sourceFreshness(source);
+            return (
+              <article key={source.id}>
+                <span>{source.environment}</span>
+                <strong>{source.name}: {sourceModeLabel(source)}</strong>
+                <em>{sourcePermissionLabel(source)} · {freshness.relative} · {freshness.exact}</em>
+              </article>
+            );
+          })}
+        </div>
+      </section>
       <OperatingSnapshot />
     </section>
   );

@@ -53,7 +53,7 @@ function CockpitAuthStatusInner() {
     : user?.primaryEmailAddress?.emailAddress ?? user?.fullName ?? "Signed in";
   return (
     <div className="clerk-auth-status" role="status" aria-label="Clerk sign-in status">
-      <span>Clerk</span>
+      <span>Signed in</span>
       <strong>{identity}</strong>
       <UserButton />
     </div>

@@ -60,7 +60,7 @@ export interface DemoActionNotice {
 }
 
 let state: UiState = {
-  city: "Austin",
+  city: null,
   view: "home",
   activeCompanyId: null,
   copilotPrompt: null,
@@ -175,7 +175,7 @@ export function closeDeliverable(): void {
 
 export function resetUiState(): void {
   state = {
-    city: "Austin",
+    city: null,
     view: "home",
     activeCompanyId: null,
     copilotPrompt: null,

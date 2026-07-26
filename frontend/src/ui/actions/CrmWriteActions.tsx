@@ -10,6 +10,8 @@ interface CrmWriteActionsProps {
   variant?: "account" | "prospect" | "queue";
   defaultTaskSubject?: string;
   defaultTaskBody?: string;
+  environment?: "sandbox" | "developer" | "production" | "none";
+  writeConnected?: boolean;
 }
 
 function keyPart(value: string): string {
@@ -27,6 +29,8 @@ export function CrmWriteActions({
   variant = "account",
   defaultTaskSubject,
   defaultTaskBody,
+  environment = "none",
+  writeConnected = false,
 }: CrmWriteActionsProps) {
   const [mode, setMode] = useState<Mode>("closed");
   const [companyName, setCompanyName] = useState(company.name);
@@ -47,6 +51,7 @@ export function CrmWriteActions({
 
   const companyKey = useMemo(() => `crm-company:${keyPart(companyName || company.id)}:${keyPart(domain || "no-domain")}`, [company.id, companyName, domain]);
   const taskKey = useMemo(() => `crm-task:${company.id}:${keyPart(taskSubject)}`, [company.id, taskSubject]);
+  const writesAllowed = writeConnected && (environment === "sandbox" || environment === "developer");
 
   async function confirmCompany() {
     setBusy(true);
@@ -127,10 +132,14 @@ export function CrmWriteActions({
       {mode === "company_preview" && (
         <div className="crm-write-preview">
           <strong>Confirm HubSpot company write</strong>
+          <p>Portal environment: {environment}. Object: company. Approval: explicit confirmation required.</p>
           <p>{companyName || "Unnamed company"} · {domain || "no domain"} · {city}{state ? `, ${state}` : ""} · {relationship}</p>
           {program && <p>Program: {program}</p>}
           {notes && <p>Notes: {notes}</p>}
-          <div><button type="button" disabled={busy} onClick={() => void confirmCompany()}>{busy ? "Creating..." : "Confirm create"}</button><button type="button" onClick={() => setMode("company_form")}>Back</button></div>
+          <p>Idempotency key: {companyKey}</p>
+          <p>Verification plan: retrieve the company by returned HubSpot ID and confirm its association fields.</p>
+          {!writesAllowed && <p role="alert">Execution is disabled until the source registry confirms a sandbox or developer portal.</p>}
+          <div><button type="button" disabled={busy || !writesAllowed} onClick={() => void confirmCompany()}>{busy ? "Creating..." : "Confirm create"}</button><button type="button" onClick={() => setMode("company_form")}>Back</button></div>
         </div>
       )}
 
@@ -147,11 +156,15 @@ export function CrmWriteActions({
       {mode === "task_preview" && (
         <div className="crm-write-preview">
           <strong>Confirm HubSpot task write</strong>
+          <p>Portal environment: {environment}. Object: task. Approval: explicit confirmation required.</p>
           <p>{taskSubject}</p>
           <p>{company.name}{contact ? ` · ${contact.name}` : ""}{dueDate ? ` · due ${dueDate}` : ""} · {priority}</p>
           <p>{hubspotCompanyId || company.hubspot_company_id ? "Associated to HubSpot company." : "No HubSpot company association yet. Add company first if this should attach to a company record."}</p>
           <p>{taskBody}</p>
-          <div><button type="button" disabled={busy} onClick={() => void confirmTask()}>{busy ? "Creating..." : "Confirm create"}</button><button type="button" onClick={() => setMode("task_form")}>Back</button></div>
+          <p>Idempotency key: {taskKey}</p>
+          <p>Verification plan: retrieve the task by returned HubSpot ID and confirm the target company association.</p>
+          {!writesAllowed && <p role="alert">Execution is disabled until the source registry confirms a sandbox or developer portal.</p>}
+          <div><button type="button" disabled={busy || !writesAllowed} onClick={() => void confirmTask()}>{busy ? "Creating..." : "Confirm create"}</button><button type="button" onClick={() => setMode("task_form")}>Back</button></div>
         </div>
       )}
     </div>

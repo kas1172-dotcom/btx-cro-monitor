@@ -89,6 +89,7 @@ class AssistantMessageResponse(BaseModel):
     related_records: list[dict]
     action_draft: dict | None = None
     deliverable_draft: dict | None = None
+    metadata: dict = {}
     created_at: str
 
 

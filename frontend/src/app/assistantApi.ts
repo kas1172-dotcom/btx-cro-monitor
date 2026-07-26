@@ -33,6 +33,11 @@ export interface AssistantMessage {
   related_records: Array<{ type?: string; id?: string; title?: string; route?: string }>;
   action_draft: { requires_confirmation: boolean; create_via: string; payload: Record<string, unknown> } | null;
   deliverable_draft: { requires_confirmation: boolean; create_via: string; payload: Record<string, unknown> } | null;
+  metadata: {
+    orchestration?: string;
+    engine_mode?: "llm_connected" | "rules_based_fallback" | "cached_answer" | "unavailable";
+    scope?: "workspace" | "account" | "program" | "work_item" | "deliverable";
+  };
   created_at: string;
 }
 

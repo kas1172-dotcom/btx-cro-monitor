@@ -389,9 +389,9 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
                     {"id": "demo-facility-austin-cell", "company_id": "demo-acct-lockheed", "city": "Austin", "state": "TX", "address": "Illustrative BTX partner cell", "lat": 30.2672, "lon": -97.7431, "kind": "plant", "dataClassification": "simulated"}
                 ],
                 "sourceHealth": [
-                    {"sourceKey": "hubspot-demo", "displayName": "Illustrative CRM seed", "availability": "simulated", "recordCount": 4, "errorCode": None, "errorMessage": "CRM records are illustrative for this demonstration workspace."},
-                    {"sourceKey": "monitor", "displayName": "Monitor pipeline", "availability": "stale", "recordCount": 3, "lastSuccessfulSyncAt": _iso(detected_yesterday), "errorCode": None, "errorMessage": None},
-                    {"sourceKey": "operating", "displayName": "ERP / MES operating data", "availability": "not_configured", "recordCount": 0, "errorCode": "not_configured", "errorMessage": "Operating data is not connected; capacity findings are illustrative manual checks."},
+                    {"sourceKey": "hubspot-demo", "displayName": "Illustrative CRM seed", "availability": "simulated", "connectionMode": "snapshot_loaded", "environment": "developer", "dataMode": "simulated_internal", "canRead": True, "canWrite": False, "recordCount": 4, "lastSuccessfulSyncAt": _iso(reset_at), "errorCode": None, "errorMessage": "CRM records are illustrative for this demonstration workspace."},
+                    {"sourceKey": "monitor", "displayName": "Monitor pipeline", "availability": "stale", "connectionMode": "snapshot_loaded", "environment": "none", "dataMode": "stored_snapshot", "canRead": True, "canWrite": False, "recordCount": 3, "lastSuccessfulSyncAt": _iso(detected_yesterday), "errorCode": None, "errorMessage": None},
+                    {"sourceKey": "operating", "displayName": "ERP / MES operating data", "availability": "not_configured", "connectionMode": "not_configured", "environment": "none", "dataMode": "missing", "canRead": False, "canWrite": False, "recordCount": 0, "errorCode": "not_configured", "errorMessage": "Operating data is not connected; capacity findings are illustrative manual checks."},
                 ],
                 "notice": "Public intelligence is sourced. Internal BTX records are illustrative.",
             },

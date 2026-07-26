@@ -6,6 +6,7 @@ import type { Company, Contact, Facility, Opportunity } from "../engine/brain/en
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 import type { Signal } from "../engine/signals/contract.ts";
 import type { SignalRelationship } from "../engine/signals/contract.ts";
+import type { ConnectionMode, DataMode, SourceEnvironment } from "./sourceRegistry.ts";
 
 export type SourceAvailability = "available" | "stale" | "unavailable" | "not_configured" | "error" | "simulated";
 
@@ -19,6 +20,11 @@ export interface SourceHealth {
   recordCount: number | null;
   errorCode: string | null;
   errorMessage: string | null;
+  connectionMode?: ConnectionMode;
+  environment?: SourceEnvironment;
+  dataMode?: DataMode;
+  canRead?: boolean;
+  canWrite?: boolean;
 }
 
 export interface TenantSummary {

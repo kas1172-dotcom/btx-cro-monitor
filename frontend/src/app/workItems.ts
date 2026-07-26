@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { BACKEND_ENDPOINT, backendJson } from "./backendApi.ts";
-import { invalidateQueries, queryKey, useQuery } from "./serverState.ts";
+import { invalidateQueries } from "./serverState.ts";
 import type { World } from "./useWorld.ts";
 import { signalSourceDate, signalSourceName } from "./signalProvenance.ts";
 import type { Signal } from "../engine/signals/contract.ts";
@@ -351,10 +351,6 @@ function filterQuery(filters: WorkItemFilters = {}): string {
   return text ? `?${text}` : "";
 }
 
-function workItemsKey(filters: WorkItemFilters = {}): string {
-  return queryKey(["work-items", filters.view, filters.status, filters.type, filters.owner, filters.account, filters.program, filters.priority, filters.approval, filters.execution, filters.overdue, filters.sort]);
-}
-
 export function refreshWorkState(): void {
   invalidateQueries("work-items");
   invalidateQueries("work-item");
@@ -378,13 +374,31 @@ export async function loadWorkItems(_world?: World, filters: WorkItemFilters | W
 
 export function useWorkItems(world: World, filters?: WorkItemFilters | WorkItemView): WorkItemState {
   const normalized = typeof filters === "string" ? { view: filters } : (filters ?? {});
-  const key = workItemsKey(normalized);
-  const query = useQuery<WorkItemState>(key, () => loadWorkItems(world, normalized), [world, key]);
-  return useMemo(() => query.data ?? {
-    items: [],
-    source: "unavailable",
-    error: query.error,
-  }, [query.data, query.error]);
+  return useMemo(() => {
+    if (!world.worldSnapshot) {
+      return {
+        items: [],
+        source: "unavailable",
+        error: world.loadErrors[0] ?? "Work items could not be loaded.",
+      };
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    let items = filterWorkItems(world.worldSnapshot.workItems, normalized.view);
+    if (normalized.status && normalized.status !== "all") items = items.filter((item) => item.status === normalized.status);
+    if (normalized.type && normalized.type !== "all") items = items.filter((item) => item.type === normalized.type);
+    if (normalized.owner) items = items.filter((item) => normalized.owner === "unassigned" ? !item.owner : item.owner === normalized.owner);
+    if (normalized.account) items = items.filter((item) => item.canonical_account_id === normalized.account);
+    if (normalized.program) items = items.filter((item) => item.program_id === normalized.program);
+    if (normalized.priority && normalized.priority !== "all") items = items.filter((item) => item.priority === normalized.priority);
+    if (normalized.approval && normalized.approval !== "all") items = items.filter((item) => item.approval_state === normalized.approval);
+    if (normalized.execution && normalized.execution !== "all") items = items.filter((item) => item.execution_state === normalized.execution);
+    if (normalized.overdue) items = items.filter((item) => Boolean(item.due_date && item.due_date < today));
+    return { items, source: "backend", error: null };
+  }, [normalized.account, normalized.approval, normalized.execution, normalized.overdue, normalized.owner, normalized.priority, normalized.program, normalized.status, normalized.type, normalized.view, world]);
+}
+
+export function openWorkItems(world: World): WorkItem[] {
+  return (world.worldSnapshot?.workItems ?? []).filter((item) => !TERMINAL_STATUSES.has(item.status));
 }
 
 export function draftToCreatePayload(draft: WorkItemDraft): WorkItemCreate {

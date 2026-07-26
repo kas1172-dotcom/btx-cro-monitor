@@ -264,11 +264,13 @@ export function WorkQueue({ world, workItemId }: { world: World; workItemId?: st
     <section className="surface-page" data-surface-component="surface-work-queue">
       <SurfaceHeader
         eyebrow="Work queue"
-        headline={`${state.items.length} work items`}
+        headline={state.error ? "Work queue unavailable" : `${state.items.length} work item${state.items.length === 1 ? "" : "s"}`}
         subline="Assigned actions move through approval, execution, verification, outcome, and closure."
       />
       <WorkItemSourceNote source={state.source} error={state.error} />
-      {workItemId ? (
+      {state.error ? (
+        <EmptyState headline="Work items could not be loaded" body="Retry after the data service recovers." icon="work_queue" />
+      ) : workItemId ? (
         selected ? <WorkItemDetail item={selected} world={world} /> : <EmptyState headline="Work item not found" body="This work item is not in the current tenant or no longer exists." icon="work_queue" />
       ) : (
         <>

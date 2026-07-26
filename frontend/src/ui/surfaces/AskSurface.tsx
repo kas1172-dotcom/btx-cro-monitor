@@ -132,6 +132,18 @@ function MessageBubble({
         <span>{isUser ? "You" : "Ask"}</span>
         <em>{displayTime(message.created_at)}</em>
       </div>
+      {!isUser && (
+        <div className="ask-engine-mode">
+          {message.metadata?.engine_mode === "llm_connected"
+            ? "AI connected"
+            : message.metadata?.engine_mode === "cached_answer"
+              ? "Cached answer"
+              : message.metadata?.engine_mode === "rules_based_fallback" || message.metadata?.orchestration === "internal_retrieval_v1"
+                ? "AI unavailable · showing rules-based summary"
+                : "Engine unavailable"}
+          {message.metadata?.scope ? ` · ${message.metadata.scope} scope` : ""}
+        </div>
+      )}
       {editing ? (
         <form
           className="ask-edit-form"

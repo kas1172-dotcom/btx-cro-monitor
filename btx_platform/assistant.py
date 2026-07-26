@@ -59,7 +59,7 @@ def citation(
     relationship_status: str | None = None,
     route: str | None = None,
 ) -> dict[str, Any]:
-    digest = hashlib.sha256(f"{source_type}:{record_id}:{title}:{claim}".encode("utf-8")).hexdigest()[:8]
+    digest = hashlib.sha256(f"{source_type}:{record_id}".encode("utf-8")).hexdigest()[:8]
     return {
         "id": f"{source_type}:{record_id}:{digest}",
         "source_type": source_type,
@@ -135,6 +135,7 @@ def message_response(row: models.AssistantMessage) -> dict[str, Any]:
         "related_records": row.related_records or [],
         "action_draft": row.action_draft,
         "deliverable_draft": row.deliverable_draft,
+        "metadata": row.metadata_ or {},
         "created_at": row.created_at.isoformat(),
     }
 
@@ -221,7 +222,14 @@ def _account_by_id(session: Session, tenant_id: str, account_id: str | None) -> 
     return row if row is not None and row.tenant_id == tenant_id else None
 
 
-def _match_account(session: Session, tenant_id: str, message: str, context: dict[str, Any]) -> models.CanonicalAccount | None:
+def _match_account(
+    session: Session,
+    tenant_id: str,
+    message: str,
+    context: dict[str, Any],
+    *,
+    allow_fallback: bool = True,
+) -> models.CanonicalAccount | None:
     account = _account_by_id(session, tenant_id, context.get("account_id"))
     if account is not None:
         return account
@@ -237,6 +245,8 @@ def _match_account(session: Session, tenant_id: str, message: str, context: dict
         candidates = [row.display_name, row.legal_name, row.domain, *(row.aliases or [])]
         if any(candidate and str(candidate).lower() in lowered for candidate in candidates):
             return row
+    if not allow_fallback:
+        return None
     urgent = (
         session.query(models.WorkItem)
         .filter(models.WorkItem.tenant_id == tenant_id, models.WorkItem.status.notin_(["closed", "dismissed"]))
@@ -246,6 +256,87 @@ def _match_account(session: Session, tenant_id: str, message: str, context: dict
     if urgent and urgent.canonical_account_id:
         return _account_by_id(session, tenant_id, urgent.canonical_account_id)
     return rows[0] if rows else None
+
+
+def _intent(message: str) -> str:
+    lowered = message.lower()
+    if any(phrase in lowered for phrase in ["live or simulated", "live, stored", "data basis", "information live", "source status"]):
+        return "data_basis"
+    if any(phrase in lowered for phrase in ["what changed today", "what changed", "today's changes", "today changes"]):
+        return "workspace_changes"
+    return "account_summary"
+
+
+def _deduplicate_citations(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    unique: dict[tuple[str, str], dict[str, Any]] = {}
+    for record in records:
+        key = (str(record.get("source_type") or ""), str(record.get("record_id") or ""))
+        if key not in unique:
+            unique[key] = record
+    return list(unique.values())
+
+
+def _data_basis_content(source_health: list[dict[str, Any]]) -> str:
+    lines: list[str] = []
+    for source in source_health:
+        name = str(source.get("displayName") or source.get("sourceKey") or "Source")
+        availability = str(source.get("availability") or "unavailable")
+        if availability == "simulated":
+            basis = "simulated internal demonstration data"
+        elif availability == "stale":
+            basis = "stored snapshot"
+        elif availability == "available":
+            basis = "connected source"
+        elif availability == "not_configured":
+            basis = "missing"
+        else:
+            basis = "unavailable"
+        checked = source.get("lastSuccessfulSyncAt") or source.get("lastAttemptAt") or "time unavailable"
+        lines.append(f"- {name}: {basis}; last checked {checked}.")
+    return "\n".join([
+        "This workspace contains a mix of stored snapshots, simulated demonstration records, derived scores, and missing operating data.",
+        "",
+        "Data classification:",
+        *lines,
+        "",
+        "Derived scores are rule-based decision aids, not statistical probabilities. Missing data is not treated as zero.",
+        "",
+        "Engine mode: rules-based retrieval. No LLM generated this answer.",
+    ])
+
+
+def _workspace_changes_content(
+    signals: list[models.IntelligenceSignal],
+    work_items: list[models.WorkItem],
+) -> str:
+    today = _now().date()
+    dated_signals = sorted(
+        [
+            row
+            for row in signals
+            if (row.published_at or row.retrieved_at or row.created_at).date() == today
+        ],
+        key=lambda row: row.retrieved_at or row.created_at,
+        reverse=True,
+    )
+    change_lines = [
+        f"- {row.title} ({(row.published_at or row.retrieved_at or row.created_at).date().isoformat()})."
+        for row in dated_signals[:4]
+    ]
+    work_lines = [f"- {row.recommended_action} ({row.status.replace('_', ' ')})." for row in work_items[:4]]
+    return "\n".join([
+        f"Today has {len(dated_signals)} recorded signal change(s) and {len(work_items)} open work item(s) in the current workspace.",
+        "",
+        "Dated changes:",
+        *(change_lines or ["- No dated signal changes are available."]),
+        "",
+        "Open work:",
+        *(work_lines or ["- No open work items are available."]),
+        "",
+        "Scope: workspace. Account context was not inherited.",
+        "",
+        "Engine mode: rules-based retrieval. No LLM generated this answer.",
+    ])
 
 
 def _programs(session: Session, tenant_id: str, context: dict[str, Any]) -> list[dict[str, Any]]:
@@ -445,13 +536,14 @@ def answer(
     context: Any | None = None,
 ) -> AssistantResult:
     ctx = _context_dict(context)
+    intent = _intent(message)
+    workspace_scope = intent in {"data_basis", "workspace_changes"}
     tool_activity = [
-        "Reviewing account records",
-        "Reading score explanation",
+        "Resolving question intent and scope",
         "Checking open work",
-        "Reviewing confirmed signals",
+        "Reviewing source classifications",
     ]
-    account = _match_account(session, tenant_id, message, ctx)
+    account = _match_account(session, tenant_id, message, ctx, allow_fallback=not workspace_scope)
     signal = _signal_by_context(session, tenant_id, ctx.get("signal_id"))
     contextual_work = _work_by_context(session, tenant_id, ctx.get("work_item_id"))
     contextual_deliverable = _deliverable_by_context(session, tenant_id, ctx.get("deliverable_id"))
@@ -462,6 +554,15 @@ def answer(
     work_items = _work_items(session, tenant_id, account.id if account else None)
     deliverables = _deliverables(session, tenant_id, account.id if account else None)
     health = _source_health(session, tenant_id)
+    workspace_signals = (
+        session.query(models.IntelligenceSignal)
+        .filter(models.IntelligenceSignal.tenant_id == tenant_id)
+        .order_by(models.IntelligenceSignal.retrieved_at.desc(), models.IntelligenceSignal.created_at.desc())
+        .limit(RESULT_LIMIT)
+        .all()
+        if intent == "workspace_changes"
+        else []
+    )
 
     citations: list[dict[str, Any]] = []
     related_records: list[dict[str, Any]] = []
@@ -541,6 +642,18 @@ def answer(
             claim_classification="fact",
             data_classification=str(program.get("dataClassification") or "internal"),
         ))
+    for item in workspace_signals:
+        citations.append(citation(
+            source_type="signal",
+            record_id=item.id,
+            title=item.title,
+            claim="Dated workspace change from the signal registry.",
+            claim_classification="fact" if item.scope in {"market", "program"} else "inference",
+            data_classification=_source_classification(item.raw_payload, "public"),
+            route="/programs",
+        ))
+
+    citations = _deduplicate_citations(citations)
 
     name = account.display_name or account.legal_name if account else "the current workspace"
     confirmed_lines = [f"- {item.title}" for _, item in relationships[:4]]
@@ -576,6 +689,13 @@ def answer(
         "- Use the highest priority open work item or ask me to prepare a draft for confirmation.",
     ])
 
+    if intent == "data_basis":
+        content = _data_basis_content(health)
+    elif intent == "workspace_changes":
+        content = _workspace_changes_content(workspace_signals, work_items)
+    else:
+        content = "\n".join(content_parts)
+
     lowered = message.lower()
     action_draft = None
     deliverable_draft = None
@@ -587,7 +707,7 @@ def answer(
         deliverable_draft = _draft_deliverable(account, relationships, scores, work_items, citations, health)
 
     return AssistantResult(
-        content="\n".join(content_parts),
+        content=content,
         tool_activity=tool_activity,
         citations=citations[:RESULT_LIMIT],
         related_records=related_records[:RESULT_LIMIT],
@@ -608,13 +728,20 @@ def persist_turn(
     ctx = _context_dict(context)
     conversation = get_conversation(session, tenant_id, conversation_id) if conversation_id else None
     if conversation is None:
-        account = _match_account(session, tenant_id, message, ctx)
+        intent = _intent(message)
+        account = _match_account(
+            session,
+            tenant_id,
+            message,
+            ctx,
+            allow_fallback=intent == "account_summary",
+        )
         conversation = create_conversation(
             session,
             tenant_id=tenant_id,
             actor_user_id=actor_user_id,
             title=_conversation_title(message, account),
-            context={**ctx, **({"account_id": account.id} if account and not ctx.get("account_id") else {})},
+            context={**ctx, **({"account_id": account.id} if account and not ctx.get("account_id") and intent == "account_summary" else {})},
         )
     elif conversation.status == "archived":
         raise AssistantError("archived_conversation", "Restore this conversation before adding a message.", status_code=409)
@@ -647,7 +774,11 @@ def persist_turn(
         related_records=result.related_records,
         action_draft=result.action_draft,
         deliverable_draft=result.deliverable_draft,
-        metadata_={"orchestration": "internal_retrieval_v1"},
+        metadata_={
+            "orchestration": "internal_retrieval_v1",
+            "engine_mode": "rules_based_fallback",
+            "scope": "workspace" if _intent(message) in {"data_basis", "workspace_changes"} else "account",
+        },
     )
     session.add(assistant_message)
     conversation.updated_at = _now()

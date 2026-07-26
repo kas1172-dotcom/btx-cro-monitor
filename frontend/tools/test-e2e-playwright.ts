@@ -87,16 +87,16 @@ async function signInWithClerkIfConfigured(page: Page): Promise<void> {
 }
 
 async function openSurface(page: Page, label: RegExp, componentId: string): Promise<void> {
-  await page.getByRole("button", { name: label }).first().click();
+  await page.getByRole("link", { name: label }).first().click();
   await page.locator(`[data-surface-component='${componentId}']`).waitFor({ timeout: 10000 });
 }
 
 async function walkCoreSurfaces(page: Page): Promise<void> {
   await page.locator("[data-surface-component='surface-todays-brief']").waitFor({ timeout: 15000 });
-  await openSurface(page, /Work Queue/i, "surface-work-queue");
+  await openSurface(page, /^Work/i, "surface-work-queue");
   await openSurface(page, /Accounts/i, "surface-account-360");
   await openSurface(page, /Ask/i, "surface-ask");
-  await openSurface(page, /Today'?s Brief|Home/i, "surface-todays-brief");
+  await openSurface(page, /^Today/i, "surface-todays-brief");
 }
 
 async function smokeViewport(browser: Browser, opts: { width: number; height: number; isMobile: boolean }): Promise<void> {

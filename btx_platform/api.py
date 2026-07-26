@@ -631,6 +631,11 @@ def _source_health(
     freshness_threshold_minutes: int | None = None,
     error_code: str | None = None,
     error_message: str | None = None,
+    connection_mode: str | None = None,
+    environment: str = "none",
+    data_mode: str | None = None,
+    can_read: bool = False,
+    can_write: bool = False,
 ) -> dict:
     now = datetime.now(UTC).isoformat()
     return {
@@ -643,6 +648,11 @@ def _source_health(
         "recordCount": record_count,
         "errorCode": error_code,
         "errorMessage": error_message,
+        "connectionMode": connection_mode,
+        "environment": environment,
+        "dataMode": data_mode,
+        "canRead": can_read,
+        "canWrite": can_write,
     }
 
 
@@ -657,6 +667,11 @@ def _source_health_from_metadata(record: dict, generated_at: str) -> dict:
         freshness_threshold_minutes=record.get("freshnessThresholdMinutes") if isinstance(record.get("freshnessThresholdMinutes"), int) else None,
         error_code=record.get("errorCode") if isinstance(record.get("errorCode"), str) else None,
         error_message=record.get("errorMessage") if isinstance(record.get("errorMessage"), str) else None,
+        connection_mode=record.get("connectionMode") if isinstance(record.get("connectionMode"), str) else None,
+        environment=str(record.get("environment") or "none"),
+        data_mode=record.get("dataMode") if isinstance(record.get("dataMode"), str) else None,
+        can_read=bool(record.get("canRead")),
+        can_write=bool(record.get("canWrite")),
     )
 
 
@@ -757,6 +772,8 @@ def _monitor_records(settings: Settings) -> tuple[list[dict], dict]:
             freshness_threshold_minutes=threshold,
             error_code="artifact_not_found",
             error_message=f"Missing monitor artifact: {run_output_path}",
+            connection_mode="configured_unverified",
+            data_mode="unavailable",
         )
     try:
         run_output = json.loads(run_output_path.read_text(encoding="utf-8"))
@@ -768,6 +785,8 @@ def _monitor_records(settings: Settings) -> tuple[list[dict], dict]:
             freshness_threshold_minutes=threshold,
             error_code="artifact_invalid",
             error_message=str(exc),
+            connection_mode="configured_unverified",
+            data_mode="unavailable",
         )
     run_at = str(run_output.get("meta", {}).get("run_at") or datetime.now(UTC).isoformat())
     items = run_output.get("items") if isinstance(run_output.get("items"), list) else []
@@ -788,6 +807,9 @@ def _monitor_records(settings: Settings) -> tuple[list[dict], dict]:
         freshness_threshold_minutes=threshold,
         error_code=None if availability != "error" else "invalid_run_timestamp",
         error_message=None if availability != "error" else f"Invalid monitor run timestamp: {run_at}",
+        connection_mode="snapshot_loaded" if availability in {"available", "stale"} else "configured_unverified",
+        data_mode="recently_ingested" if availability == "available" else "stored_snapshot" if availability == "stale" else "unavailable",
+        can_read=availability in {"available", "stale"},
     )
 
 
@@ -982,8 +1004,11 @@ def create_app(
             hubspot_health = _source_health(
                 source_key="hubspot",
                 display_name="HubSpot CRM",
-                availability="available",
+                availability="unavailable",
                 freshness_threshold_minutes=15,
+                connection_mode="configured_unverified",
+                environment=settings.hubspot_environment,
+                data_mode="unavailable",
             )
         else:
             hubspot_health = _source_health(
@@ -994,6 +1019,9 @@ def create_app(
                 freshness_threshold_minutes=15,
                 error_code="not_configured",
                 error_message="BTX_HUBSPOT_ACCESS_TOKEN is not configured.",
+                connection_mode="not_configured",
+                environment="none",
+                data_mode="missing",
             )
         _signals, monitor_health = _monitor_records(settings)
         return [
@@ -1007,6 +1035,9 @@ def create_app(
                 freshness_threshold_minutes=60,
                 error_code="not_configured",
                 error_message="Operating data ingestion is not connected.",
+                connection_mode="not_configured",
+                environment="none",
+                data_mode="missing",
             ),
         ]
 
@@ -1046,6 +1077,10 @@ def create_app(
                     record_count=len(accounts) + len(contacts) + len(opportunities),
                     last_successful_sync_at=generated_at,
                     freshness_threshold_minutes=15,
+                    connection_mode="read_connected",
+                    environment=settings.hubspot_environment,
+                    data_mode="live_external",
+                    can_read=True,
                 ))
             except HubSpotError as exc:
                 logger.warning("hubspot.world_snapshot_failed", extra={"status_code": exc.status_code})
@@ -1057,6 +1092,9 @@ def create_app(
                     freshness_threshold_minutes=15,
                     error_code="hubspot_error",
                     error_message=str(exc),
+                    connection_mode="authentication_failed" if exc.status_code in {401, 403} else "configured_unverified",
+                    environment=settings.hubspot_environment,
+                    data_mode="unavailable",
                 ))
         else:
             source_health.append(_source_health(
@@ -1067,6 +1105,9 @@ def create_app(
                 freshness_threshold_minutes=15,
                 error_code="not_configured",
                 error_message="BTX_HUBSPOT_ACCESS_TOKEN is not configured.",
+                connection_mode="not_configured",
+                environment="none",
+                data_mode="missing",
             ))
 
         if demo_metadata:
@@ -1084,6 +1125,9 @@ def create_app(
                 freshness_threshold_minutes=60,
                 error_code="not_configured",
                 error_message="Operating data ingestion is not connected.",
+                connection_mode="not_configured",
+                environment="none",
+                data_mode="missing",
             ))
 
         session = session_factory()

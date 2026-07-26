@@ -21,6 +21,8 @@ export interface EvidenceRecord {
   eventDate: string | null;
   updatedAt: string | null;
   summary: string;
+  supportedClaim: string;
+  limitation: string;
   classification: string;
   route: string | null;
   externalUrl?: string | null;
@@ -89,6 +91,8 @@ function relationForSignal(signal: Signal): SignalRelationship | null {
 }
 
 function recordFromSignal(signal: Signal): EvidenceRecord {
+  const relationship = relationForSignal(signal);
+  const reviewed = relationship && plainStatus(relationshipReviewStatus(relationship)) === "Confirmed";
   return {
     id: signal.id,
     title: signalHeadline(signal),
@@ -97,6 +101,12 @@ function recordFromSignal(signal: Signal): EvidenceRecord {
     eventDate: signal.detected_at,
     updatedAt: signal.artifact?.run_at ?? signal.detected_at,
     summary: sentence(signal.source_quote, "No source excerpt is available."),
+    supportedClaim: reviewed
+      ? "Supports the reviewed account relationship and the dated development shown here."
+      : "Supports the dated development only; it does not confirm an account relationship.",
+    limitation: signal.scope === "specific_account" && !reviewed
+      ? "Account matching is awaiting review."
+      : "The source does not establish commercial intent, timing, or value unless those facts are stated separately.",
     classification: signal.artifact ? "Public monitor record" : "Internal evidence record",
     route: routeForSignal(signal),
     externalUrl: signal.source_url ?? signal.document_url ?? signal.artifact?.source_url ?? null,
@@ -183,6 +193,8 @@ export function buildScoreEvidence(world: World, score: ScoreSnapshot | null, fa
           eventDate: null,
           updatedAt: score?.calculatedAt ?? null,
           summary: contribution?.limitation ?? "No linked evidence records are available.",
+          supportedClaim: score ? "Supports the existence of this persisted score snapshot." : "No scored conclusion is supported.",
+          limitation: contribution?.limitation ?? "No backend score snapshot is available.",
           classification: score ? "Derived score snapshot" : "Missing score snapshot",
           route: `/accounts/${encodeURIComponent(accountId)}`,
         }],
@@ -216,6 +228,8 @@ export function buildWorkItemEvidence(world: World, item: WorkItem): EvidencePac
         eventDate: null,
         updatedAt: item.updated_at,
         summary: String(record.summary ?? record.reason ?? record.id ?? "Supporting evidence attached to the work item."),
+        supportedClaim: String(record.supportedClaim ?? record.supported_claim ?? "Supports the work item's stated rationale."),
+        limitation: String(record.limitation ?? "Does not prove execution or outcome."),
         classification: String(record.dataClassification ?? record.classification ?? "Internal record"),
         route: `/work/${encodeURIComponent(item.id)}`,
       })),
@@ -275,6 +289,10 @@ export function evidenceFromCitation(citation: AssistantCitation): EvidencePacka
       eventDate: null,
       updatedAt: null,
       summary: citation.claim,
+      supportedClaim: citation.claim,
+      limitation: citation.relationship_status
+        ? `Relationship status: ${plainStatus(citation.relationship_status)}.`
+        : "The citation supports only the claim shown here.",
       classification: citation.data_classification,
       route: citation.route,
     }],
@@ -304,6 +322,10 @@ export function evidenceFromDeliverableSource(deliverable: Deliverable, source: 
       eventDate: null,
       updatedAt: deliverable.createdAt,
       summary: humanSourceReason(source.reason),
+      supportedClaim: "Supports the source attribution recorded for this deliverable.",
+      limitation: source.records.length
+        ? "The linked record must be reviewed for the exact underlying claim."
+        : "No linked record id is available.",
       classification: source.source.toLowerCase().includes("simulated") ? "Demonstration data" : "Internal citation",
       route: deliverable.backendRecordId ? `/deliverables/${encodeURIComponent(deliverable.backendRecordId)}` : null,
     })),

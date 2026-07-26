@@ -34,17 +34,6 @@ const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) 
 const DocumentViewer = lazy(() => import("./ui/deliverables/DocumentViewer.tsx").then((module) => ({ default: module.DocumentViewer })));
 const DeliverableWizard = lazy(() => import("./ui/deliverables/DeliverableWizard.tsx").then((module) => ({ default: module.DeliverableWizard })));
 
-function formatRunDate(value: string | null | undefined): string {
-  if (!value) return "not available";
-  return new Date(value).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-}
-
-function liveDataStatus(world: ReturnType<typeof useWorld>): { tone: "success" | "warning"; label: string; value: string } | null {
-  if (!world) return null;
-  if (world.loadErrors.length) return { tone: "warning", label: "Data", value: "Bundled data" };
-  return { tone: "success", label: "Data", value: "Live data" };
-}
-
 export function App() {
   const { city, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested, deliverableWizardRequest } = useStore();
   const route = useAppRoute();
@@ -72,6 +61,13 @@ export function App() {
   useEffect(() => {
     void checkAiStatus();
   }, []);
+
+  useEffect(() => {
+    const routeLabel = route.id === "not_found"
+      ? "Page not found"
+      : ALL_SURFACES.find((surface) => surface.id === routeTab)?.label ?? "Cockpit";
+    document.title = `${routeLabel} | BTX Precision`;
+  }, [route.id, routeTab]);
 
   useEffect(() => {
     setState({
@@ -189,10 +185,8 @@ export function App() {
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
   const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : routeTab))?.label ?? "Cockpit";
-  const backendStatus = liveDataStatus(world);
-  const aiChip = aiStatus.state === "live"
-    ? { tone: "success" as const, value: "live" }
-    : { tone: "warning" as const, value: "offline" };
+  const sourceFailures = world?.sources.filter((source) => source.verification === "failed") ?? [];
+  const systemNeedsAttention = Boolean(world?.loadErrors.length || sourceFailures.length || aiStatus.state === "offline");
   const commandShortcut = typeof navigator !== "undefined" && navigator.platform.toLowerCase().includes("mac") ? "⌘K" : "Ctrl K";
   const globalViewMode = route.query.get("view");
   const shellClassName = [
@@ -255,17 +249,11 @@ export function App() {
             <button type="button" className="global-command-trigger" onClick={() => setCommandOpen(true)} aria-label="Open command palette">
               Command <kbd>{commandShortcut}</kbd>
             </button>
-            {world?.provenanceSummary && (
-              <StatusChip label="Sources" value={`${world.provenanceSources.length} connected`} />
-            )}
-            {backendStatus ? <StatusChip tone={backendStatus.tone} label={backendStatus.label} value={backendStatus.value} /> : null}
-            <StatusChip tone={aiChip.tone} label="AI" value={aiChip.value} />
-            {world?.snapshot?.publicSignals.run_at && (
-              <StatusChip tone={world.snapshot.publicSignals.stale ? "warning" : "info"} label="Monitor run" value={formatRunDate(world.snapshot.publicSignals.run_at)} />
-            )}
-            {world?.snapshot?.publicSignals.notice && (
-              <StatusChip tone="warning" label="Monitor status" value={world.snapshot.publicSignals.notice} />
-            )}
+            <StatusChip
+              tone={systemNeedsAttention ? "warning" : "success"}
+              label="System status"
+              value={systemNeedsAttention ? "Needs attention" : "Ready"}
+            />
             {marketScoped && <label className="cockpit-city-picker">
               <span>Market</span>
               <select
