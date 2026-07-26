@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -10,11 +11,13 @@ pytest.importorskip("sqlalchemy")
 from fastapi.testclient import TestClient  # noqa: E402
 
 from btx_platform.api import create_app  # noqa: E402
+from btx_platform import models  # noqa: E402
 from btx_platform.config import Settings  # noqa: E402
 from btx_platform.db import init_db, make_engine, make_session_factory  # noqa: E402
 from btx_platform.demo.definitions import DEMO_DISPLAY_NAME, DEMO_TENANT_ID  # noqa: E402
 from btx_platform.demo.reset import create_demo_tenant_marker, reset_demo_tenant  # noqa: E402
 from tests.auth_helpers import make_clerk_fixture  # noqa: E402
+from btx_platform.assistant_online import OnlineAnswer  # noqa: E402
 
 CLERK = make_clerk_fixture()
 
@@ -23,7 +26,7 @@ def _headers(**kwargs) -> dict[str, str]:
     return CLERK.headers(**kwargs)
 
 
-def _build(tmp_path: Path):
+def _build(tmp_path: Path, *, ask_online: bool = False):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
@@ -34,6 +37,8 @@ def _build(tmp_path: Path):
     settings = Settings(
         env="test",
         anthropic_api_key="anthropic-test-key",
+        ask_online_enabled=ask_online,
+        ask_web_search_enabled=ask_online,
         pipeline_generated_dir=str(tmp_path / "generated"),
         pipeline_output_dir=str(tmp_path / "artifacts"),
         pipeline_min_interval_seconds=0,
@@ -198,3 +203,110 @@ def test_assistant_citations_are_unique_by_source_type_and_record_id(tmp_path: P
     citations = response.json()["assistant_message"]["citations"]
     stable_ids = [(item["source_type"], item["record_id"]) for item in citations]
     assert len(stable_ids) == len(set(stable_ids))
+
+
+def test_online_ask_persists_mode_run_evidence_and_remains_read_only(tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    with sf() as session:
+        create_demo_tenant_marker(session, DEMO_TENANT_ID, display_name=DEMO_DISPLAY_NAME)
+        session.commit()
+    reset_demo_tenant(sf, DEMO_TENANT_ID)
+    with sf() as session:
+        score_count_before = session.query(models.ScoreSnapshot).count()
+    settings = Settings(
+        env="test",
+        anthropic_api_key="test-key",
+        ask_online_enabled=True,
+        ask_web_search_enabled=True,
+        pipeline_generated_dir=str(tmp_path / "generated"),
+        pipeline_output_dir=str(tmp_path / "artifacts"),
+    )
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+    result = OnlineAnswer(
+        content="Direct answer.\n\nEvidence: official source.",
+        actual_mode="workspace_web",
+        citations=[{
+            "id": "web:one", "source_type": "public_web", "record_id": "one",
+            "title": "Official source", "route": "https://example.com/news",
+            "url": "https://example.com/news", "publisher": "example.com",
+            "claim": "Official source.", "claim_classification": "public_fact",
+            "data_classification": "public", "relationship_status": None,
+            "published_at": None, "retrieved_at": "2026-07-26T12:00:00+00:00",
+            "freshness": "retrieved_live",
+        }],
+        tool_activity=["Checking BTX evidence", "Searching public sources", "Validating citations"],
+        metadata={
+            "orchestration": "anthropic_messages_web_search_v1",
+            "engine_mode": "llm_connected",
+            "requested_source_mode": "automatic",
+            "actual_source_mode": "workspace_web",
+            "as_of": "2026-07-26T12:00:00+00:00",
+            "model": "claude-haiku-4-5-20251001",
+            "search_count": 1,
+            "sources_reviewed": 1,
+            "warnings": [],
+            "partial_failure": False,
+        },
+    )
+    with patch("btx_platform.assistant.run_online_answer", return_value=result):
+        response = client.post(
+            "/assistant/ask",
+            headers=_headers(role="viewer", tenant_id=DEMO_TENANT_ID),
+            json={"message": "What changed this week?", "source_mode": "automatic"},
+        )
+    assert response.status_code == 200
+    assistant = response.json()["assistant_message"]
+    assert assistant["metadata"]["actual_source_mode"] == "workspace_web"
+    assert assistant["metadata"]["search_count"] == 1
+    assert assistant["citations"][0]["claim_classification"] == "public_fact"
+    with sf() as session:
+        assert session.query(models.HubSpotTaskAudit).count() == 0
+        assert session.query(models.ScoreSnapshot).count() == score_count_before
+
+
+def test_online_provider_failure_falls_back_without_exposing_error_detail(tmp_path: Path):
+    client = _build(tmp_path, ask_online=True)
+    with patch("btx_platform.assistant.run_online_answer", side_effect=RuntimeError("secret upstream detail")):
+        response = client.post(
+            "/assistant/ask",
+            headers=_headers(role="viewer", tenant_id=DEMO_TENANT_ID),
+            json={"message": "Research current Lockheed news", "source_mode": "workspace_web"},
+        )
+    assistant = response.json()["assistant_message"]
+    assert assistant["metadata"]["engine_mode"] == "rules_based_fallback"
+    assert assistant["metadata"]["partial_failure"] is True
+    assert "secret upstream detail" not in str(assistant)
+
+
+def test_daily_web_search_budget_fails_safe_without_provider_call(tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    with sf() as session:
+        create_demo_tenant_marker(session, DEMO_TENANT_ID, display_name=DEMO_DISPLAY_NAME)
+        session.commit()
+    reset_demo_tenant(sf, DEMO_TENANT_ID)
+    settings = Settings(
+        env="test",
+        anthropic_api_key="test-key",
+        ask_online_enabled=True,
+        ask_web_search_enabled=True,
+        ask_daily_search_budget=0,
+        pipeline_generated_dir=str(tmp_path / "generated"),
+        pipeline_output_dir=str(tmp_path / "artifacts"),
+    )
+    client = TestClient(create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier))
+    with patch("btx_platform.assistant.run_online_answer") as provider:
+        response = client.post(
+            "/assistant/ask",
+            headers=_headers(role="viewer", tenant_id=DEMO_TENANT_ID),
+            json={"message": "Research latest space funding", "source_mode": "web"},
+        )
+    provider.assert_not_called()
+    assistant = response.json()["assistant_message"]
+    assert assistant["metadata"]["actual_source_mode"] == "workspace"
+    assert assistant["metadata"]["partial_failure"] is True
+    assert "budget" not in assistant["content"].lower()

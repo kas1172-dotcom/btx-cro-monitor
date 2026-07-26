@@ -41,6 +41,15 @@ class Settings(BaseSettings):
     anthropic_version: str = "2023-06-01"
     llm_timeout_seconds: float = 45.0
     llm_max_body_bytes: int = 524_288
+    ask_online_enabled: bool = False
+    ask_web_search_enabled: bool = False
+    ask_default_source_mode: str = "automatic"
+    ask_model: str = "claude-haiku-4-5-20251001"
+    ask_web_max_uses: int = 3
+    ask_max_tool_turns: int = 2
+    ask_timeout_ms: int = 60_000
+    ask_max_output_tokens: int = 2_048
+    ask_daily_search_budget: int = 100
     hubspot_access_token: str | None = None
     hubspot_environment: str = "none"
     gmail_allowlist: str = ""

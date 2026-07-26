@@ -52,7 +52,12 @@ class LlmProxyResponse(BaseModel):
 
 AssistantRole = Literal["user", "assistant"]
 AssistantConversationStatus = Literal["active", "archived"]
-ClaimClassification = Literal["fact", "derived", "inference", "missing", "simulation"]
+ClaimClassification = Literal[
+    "fact", "derived", "inference", "missing", "simulation",
+    "workspace_fact", "public_fact", "derived_analysis",
+    "market_level_hypothesis", "unconfirmed_account_match", "missing_information",
+]
+AssistantSourceMode = Literal["automatic", "workspace", "workspace_web", "web"]
 
 
 class AssistantContext(BaseModel):
@@ -76,6 +81,11 @@ class AssistantCitation(BaseModel):
     claim_classification: ClaimClassification
     data_classification: str
     relationship_status: str | None = None
+    url: str | None = None
+    publisher: str | None = None
+    published_at: str | None = None
+    retrieved_at: str | None = None
+    freshness: str | None = None
 
 
 class AssistantMessageResponse(BaseModel):
@@ -129,6 +139,7 @@ class AssistantAskRequest(BaseModel):
     message: str | None = Field(default=None, min_length=1)
     prompt: str | None = Field(default=None, min_length=1)
     context: AssistantContext | None = None
+    source_mode: AssistantSourceMode = "automatic"
 
     @model_validator(mode="after")
     def has_message(self):

@@ -10,6 +10,7 @@ import {
   type AssistantContext,
   type AssistantConversation,
   type AssistantMessage,
+  type AssistantSourceMode,
 } from "../../app/assistantApi.ts";
 import { navigateTo, useAppRoute } from "../../app/router.ts";
 import type { World } from "../../app/useWorld.ts";
@@ -142,6 +143,14 @@ function MessageBubble({
                 ? "AI unavailable · showing rules-based summary"
                 : "Engine unavailable"}
           {message.metadata?.scope ? ` · ${message.metadata.scope} scope` : ""}
+          {message.metadata?.actual_source_mode ? ` · ${message.metadata.actual_source_mode.replace("_", " + ")}` : ""}
+          {message.metadata?.as_of ? ` · as of ${displayTime(message.metadata.as_of)}` : ""}
+          {typeof message.metadata?.sources_reviewed === "number" ? ` · ${message.metadata.sources_reviewed} sources reviewed` : ""}
+        </div>
+      )}
+      {!isUser && message.metadata?.partial_failure && (
+        <div className="live-inline-status warning" role="status">
+          {(message.metadata.warnings ?? ["Research completed with limitations."]).join(" ")}
         </div>
       )}
       {editing ? (
@@ -195,11 +204,13 @@ export function AskSurface({ world }: { world: World }) {
   const [context, setContext] = useState<AssistantContext>(routeCtx);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [sourceMode, setSourceMode] = useState<AssistantSourceMode>("automatic");
   const [error, setError] = useState<string | null>(null);
   const [createdRoute, setCreatedRoute] = useState<string | null>(null);
   const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const appliedPrompt = useRef<string | null>(null);
+  const requestController = useRef<AbortController | null>(null);
   const attention = useWorkItems(world, "needs_attention");
   const isFocus = route.query.get("view") === "focus";
 
@@ -247,8 +258,10 @@ export function AskSurface({ world }: { world: World }) {
     setError(null);
     setCreatedRoute(null);
     const currentId = selected?.status === "active" ? selected.id : null;
+    const controller = new AbortController();
+    requestController.current = controller;
     try {
-      const response = await askAssistant({ message, conversation_id: currentId, context });
+      const response = await askAssistant({ message, conversation_id: currentId, context, source_mode: sourceMode }, controller.signal);
       setSelected(response.conversation);
       setDraft("");
       navigateTo(`/ask/${encodeURIComponent(response.conversation.id)}`, { replace: true });
@@ -256,6 +269,7 @@ export function AskSurface({ world }: { world: World }) {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send message.");
     } finally {
+      requestController.current = null;
       setSending(false);
     }
   }
@@ -371,7 +385,12 @@ export function AskSurface({ world }: { world: World }) {
                 {sending && (
                   <article className="ask-workspace-message assistant pending">
                     <div className="ask-message-topline"><span>Ask</span><em>Working</em></div>
-                    <div className="ask-activity-row"><span>Reviewing account records</span><span>Checking open work</span></div>
+                    <div className="ask-activity-row" role="status" aria-live="polite">
+                      {sourceMode !== "web" && <span>Checking BTX evidence</span>}
+                      {(sourceMode === "web" || sourceMode === "workspace_web") && <span>Web search active</span>}
+                      <span>Preparing brief</span>
+                    </div>
+                    <button type="button" onClick={() => requestController.current?.abort()}>Cancel research</button>
                   </article>
                 )}
               </div>
@@ -391,6 +410,27 @@ export function AskSurface({ world }: { world: World }) {
               <strong>{contextLabel}</strong>
               {Object.values(context).some(Boolean) && <button type="button" onClick={() => setContext({})}>Remove</button>}
             </div>
+            <fieldset className="ask-source-mode">
+              <legend>Sources</legend>
+              {([
+                ["automatic", "Automatic"],
+                ["workspace", "Workspace"],
+                ["workspace_web", "Workspace + web"],
+                ["web", "Web"],
+              ] as Array<[AssistantSourceMode, string]>).map(([value, label]) => (
+                <label key={value}>
+                  <input
+                    type="radio"
+                    name="ask-source-mode"
+                    value={value}
+                    checked={sourceMode === value}
+                    onChange={() => setSourceMode(value)}
+                    disabled={sending}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </fieldset>
             <div className="ask-context-actions" aria-label="Contextual Ask actions">
               {[
                 "Explain this evidence",

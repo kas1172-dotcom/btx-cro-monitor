@@ -17,6 +17,12 @@ for (const token of [
   "ask-workspace-composer",
   "action_draft",
   "deliverable_draft",
+  "AssistantSourceMode",
+  "workspace_web",
+  "Web search active",
+  "Cancel research",
+  "actual_source_mode",
+  "sources_reviewed",
 ]) {
   assert(askSurface.includes(token), `Ask workspace missing ${token}`);
 }

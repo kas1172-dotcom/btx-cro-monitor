@@ -1454,6 +1454,8 @@ def create_app(
                     conversation_id=conversation_id,
                     message=(payload.message or payload.prompt or "").strip(),
                     context=payload.context,
+                    source_mode=payload.source_mode,
+                    settings=settings,
                 )
             except AssistantError as exc:
                 session.rollback()
@@ -1484,6 +1486,8 @@ def create_app(
                     conversation_id=payload.conversation_id,
                     message=(payload.message or payload.prompt or "").strip(),
                     context=payload.context,
+                    source_mode=payload.source_mode,
+                    settings=settings,
                 )
             except AssistantError as exc:
                 session.rollback()

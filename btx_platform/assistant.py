@@ -8,6 +8,8 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from btx_platform import models
+from btx_platform.assistant_online import SourceMode, choose_source_mode, run_online_answer
+from btx_platform.config import Settings
 
 RESULT_LIMIT = 8
 
@@ -32,6 +34,24 @@ class AssistantResult:
 
 def _now() -> datetime:
     return datetime.now(UTC)
+
+
+def _daily_search_uses(session: Session, tenant_id: str) -> int:
+    start = _now().replace(hour=0, minute=0, second=0, microsecond=0)
+    rows = (
+        session.query(models.AssistantMessage.metadata_)
+        .filter(
+            models.AssistantMessage.tenant_id == tenant_id,
+            models.AssistantMessage.role == "assistant",
+            models.AssistantMessage.created_at >= start,
+        )
+        .all()
+    )
+    return sum(
+        max(0, int((metadata or {}).get("search_count") or 0))
+        for (metadata,) in rows
+        if isinstance(metadata, dict)
+    )
 
 
 def _route(source_type: str, record_id: str) -> str:
@@ -724,6 +744,8 @@ def persist_turn(
     message: str,
     conversation_id: str | None = None,
     context: Any | None = None,
+    source_mode: SourceMode = "automatic",
+    settings: Settings | None = None,
 ) -> tuple[models.AssistantConversation, models.AssistantMessage, models.AssistantMessage]:
     ctx = _context_dict(context)
     conversation = get_conversation(session, tenant_id, conversation_id) if conversation_id else None
@@ -763,6 +785,46 @@ def persist_turn(
     session.flush()
 
     result = answer(session, tenant_id=tenant_id, message=message, context=conversation.context or ctx)
+    online_metadata: dict[str, Any] = {
+        "orchestration": "internal_retrieval_v1",
+        "engine_mode": "rules_based_fallback",
+        "requested_source_mode": source_mode,
+        "actual_source_mode": "workspace",
+        "as_of": _now().isoformat(),
+        "sources_reviewed": len(result.citations),
+        "warnings": [],
+        "partial_failure": False,
+    }
+    if settings is not None and settings.ask_online_enabled:
+        try:
+            online_settings = settings
+            routed_mode = choose_source_mode(
+                message,
+                source_mode,
+                web_enabled=settings.ask_web_search_enabled,
+            )
+            if routed_mode in {"web", "workspace_web"}:
+                remaining = settings.ask_daily_search_budget - _daily_search_uses(session, tenant_id)
+                if remaining <= 0:
+                    raise RuntimeError("daily public-search budget reached")
+                online_settings = settings.model_copy(
+                    update={"ask_web_max_uses": min(settings.ask_web_max_uses, remaining)}
+                )
+            online = run_online_answer(
+                message=message,
+                requested_mode=source_mode,
+                workspace_summary=result.content,
+                workspace_citations=result.citations,
+                settings=online_settings,
+            )
+            result.content = online.content
+            result.citations = online.citations
+            result.tool_activity = online.tool_activity
+            online_metadata = online.metadata
+        except Exception as exc:  # provider errors must preserve the supported workspace answer
+            online_metadata["warnings"] = ["Online synthesis was unavailable; showing the workspace-supported fallback."]
+            online_metadata["partial_failure"] = True
+            online_metadata["failure_class"] = type(exc).__name__
     assistant_message = models.AssistantMessage(
         tenant_id=tenant_id,
         conversation_id=conversation.id,
@@ -775,8 +837,7 @@ def persist_turn(
         action_draft=result.action_draft,
         deliverable_draft=result.deliverable_draft,
         metadata_={
-            "orchestration": "internal_retrieval_v1",
-            "engine_mode": "rules_based_fallback",
+            **online_metadata,
             "scope": "workspace" if _intent(message) in {"data_basis", "workspace_changes"} else "account",
         },
     )

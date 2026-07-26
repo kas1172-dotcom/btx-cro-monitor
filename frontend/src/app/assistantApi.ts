@@ -17,9 +17,14 @@ export interface AssistantCitation {
   title: string;
   route: string;
   claim: string;
-  claim_classification: "fact" | "derived" | "inference" | "missing" | "simulation";
+  claim_classification: "fact" | "derived" | "inference" | "missing" | "simulation" | "workspace_fact" | "public_fact" | "derived_analysis" | "market_level_hypothesis" | "unconfirmed_account_match" | "missing_information";
   data_classification: string;
   relationship_status: string | null;
+  url?: string | null;
+  publisher?: string | null;
+  published_at?: string | null;
+  retrieved_at?: string | null;
+  freshness?: string | null;
 }
 
 export interface AssistantMessage {
@@ -37,6 +42,14 @@ export interface AssistantMessage {
     orchestration?: string;
     engine_mode?: "llm_connected" | "rules_based_fallback" | "cached_answer" | "unavailable";
     scope?: "workspace" | "account" | "program" | "work_item" | "deliverable";
+    requested_source_mode?: AssistantSourceMode;
+    actual_source_mode?: Exclude<AssistantSourceMode, "automatic">;
+    as_of?: string;
+    model?: string;
+    sources_reviewed?: number;
+    search_count?: number;
+    warnings?: string[];
+    partial_failure?: boolean;
   };
   created_at: string;
 }
@@ -64,6 +77,8 @@ export interface AssistantAskResponse {
   user_message: AssistantMessage;
   assistant_message: AssistantMessage;
 }
+
+export type AssistantSourceMode = "automatic" | "workspace" | "workspace_web" | "web";
 
 export interface StoredAssistantDeliverable {
   id: string;
@@ -100,10 +115,11 @@ export function updateAssistantConversation(id: string, patch: { title?: string;
   });
 }
 
-export function askAssistant(input: { message: string; conversation_id?: string | null; context?: AssistantContext }): Promise<AssistantAskResponse> {
+export function askAssistant(input: { message: string; conversation_id?: string | null; context?: AssistantContext; source_mode?: AssistantSourceMode }, signal?: AbortSignal): Promise<AssistantAskResponse> {
   return backendJson<AssistantAskResponse>("/assistant/ask", {
     method: "POST",
     body: JSON.stringify(input),
+    signal,
   });
 }
 

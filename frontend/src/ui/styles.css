@@ -1742,6 +1742,53 @@ button.work-item-summary:focus-visible {
   padding: 8px;
   background: var(--panel-2);
 }
+
+.ask-source-mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ask-source-mode legend {
+  width: 100%;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.ask-source-mode label {
+  cursor: pointer;
+}
+
+.ask-source-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ask-source-mode span {
+  display: block;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ask-source-mode input:checked + span {
+  border-color: var(--accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.ask-source-mode input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .ask-context-chip span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
 .ask-context-chip strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
 .ask-context-chip button {
