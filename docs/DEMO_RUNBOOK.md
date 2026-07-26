@@ -155,38 +155,48 @@ companies, not the per-take task.
 
 ## Go Or No-Go
 
-Status: **NO-GO, pending deploy and the deployed walkthrough.**
+Status: **NO-GO, pending the signed-in walkthrough on the deployed site.**
+Everything that can be verified without an operator login is verified and green.
 
-Verified on `main` and against the live portal and the deployed backend:
+### Verified on the deployed stack
 
-- The demo portal holds exactly three companies in the expected shape. Lockheed
-  `336059557613` with one contact and one deal, nLIGHT `336368378559` and Pulse
-  Space `336368378560` with no contact, no deal, and no CAGE code.
-- The three ids are bound into the demo tenant and enforced by the reset verifier
-  and `tests/test_demo_workspace.py`.
-- Lockheed produces an engine-computed score at data completeness 0.70 with four
-  contributing factors. nLIGHT stays at insufficient data. No score is hand-set.
-- Local reset is deterministic and idempotent, and verify-only passes.
-- The deployed backend reports `llm: true`, `auth: true`, `db: true`, and HubSpot
-  configured and ok. CORS allows the Pages origin. Unauthenticated calls return 401.
-- Backend `pytest` 454 passed. Typecheck, `check:design`, and `check:voice` pass.
-  The em-dash grep is clean apart from one `.gitignore` comment.
+- Backend Fly release **v22**, built from `main`. Health reports `status: ok`,
+  `env: prod`, `db: true`, `llm: true`, `auth: true`. HubSpot configured and ok.
+- Schema is at alembic head `8c1d4a7e3b52`, confirmed on the production database.
+- The deployed demo tenant resets and passes verify-only: 3 accounts, 3 signals,
+  2 relationships, 6 work items, 1 deliverable, 2 programs.
+- Frontend deployed to Pages from `main`. The site boots with zero asset errors
+  and zero page errors, and shows no em dash and no scaffolding copy.
+- Deep links resolve. `/btx-cro-monitor/cockpit/accounts/demo-acct-nlight` serves
+  the app shell and preserves the full path through the Clerk sign-in redirect.
+- CORS allows the Pages origin. Unauthenticated API calls return 401.
+- The demo HubSpot portal holds exactly three companies in the expected shape.
 
-Known red, carried deliberately:
+### Still required for GO, and it needs an operator login
 
-- `test:phase0` and `test:identity` fail inside signal-to-account resolution by
-  domain. Both were already red on `main` before this work and both run in CI, so
-  CI has been red for a pre-existing reason. Neither journey touches that path:
-  Lockheed and nLIGHT are linked through backend relationship records, not domain
-  matching. The demo is unaffected; CI should not be trusted until they are fixed.
+The signed-in walkthrough cannot be run without Clerk credentials, so these
+remain unverified rather than assumed:
 
-Still required before GO:
+1. Top bar reads AI live.
+2. Lockheed shows its engine-computed score and factor breakdown on the deployed
+   site, and the evidence drawer shows sources.
+3. A work item creates a real HubSpot task with preview, confirm, real id, and
+   verification, landing on company `336059557613`.
+4. nLIGHT shows insufficient data with all four named gaps.
+5. Pulse Space reads as surfaced but deliberately not actioned.
+6. Ask returns a live grounded answer with citations across both accounts.
+7. The four surfaces audited for loading, empty, stale, and failure states.
 
-- Deploy the backend to Fly and run the Pages workflow, then confirm the release
-  commit matches `main`. The last release predates this work.
-- Reset the demo tenant against the deployed database and run verify-only.
-- Walk both journeys on the deployed URL, signed in, including a real HubSpot task
-  write, live Ask with citations, the four-surface state audit, and a deep link.
+### Known issues to weigh before recording
+
+- The Clerk instance is a **development** instance (`unbiased-gecko-3.accounts.dev`).
+  Its sign-in screen renders a "Development mode" badge, which will appear on
+  camera if the sign-in is filmed. Sign in before recording, or move to a
+  production Clerk instance.
+- `test:phase0` and `test:identity` are red and run in CI, so CI is red. Both were
+  already red before this work. They fail inside signal-to-account resolution by
+  domain, which neither journey touches: Lockheed and nLIGHT link through backend
+  relationship records. The demo is unaffected; CI is not trustworthy until fixed.
 
 ## Exact Ask Questions
 
