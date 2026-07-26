@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import sys
+import tempfile
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,7 +19,6 @@ from monitor_engine.archive import (
     compute_diff,
     dedup_items,
     load_archive,
-    save_archive,
     update_archive,
 )
 from monitor_engine.collectors.base import collect_all
@@ -42,6 +42,54 @@ from monitor_engine.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _write_staged_json(directory: Path, name: str, payload: str) -> Path:
+    """Write and fsync a same-filesystem staging file for an atomic replace."""
+    fd, raw_path = tempfile.mkstemp(prefix=f".{name}.", suffix=".tmp", dir=directory)
+    path = Path(raw_path)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except Exception:
+        path.unlink(missing_ok=True)
+        raise
+    return path
+
+
+def _persist_completed_run(
+    output_dir: Path,
+    archive_path: Path,
+    run_output: RunOutput,
+    archive: Any,
+) -> None:
+    """Commit the validated feed and archive together, restoring the last good pair on failure."""
+    output_path = output_dir / "run_output.json"
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+    output_payload = run_output.model_dump_json(indent=2)
+    archive_payload = archive.model_dump_json(indent=2)
+    staged_output = _write_staged_json(output_dir, "run_output.json", output_payload)
+    staged_archive = _write_staged_json(archive_path.parent, archive_path.name, archive_payload)
+    previous_output = output_path.read_bytes() if output_path.exists() else None
+    previous_archive = archive_path.read_bytes() if archive_path.exists() else None
+    try:
+        RunOutput.model_validate_json(staged_output.read_text(encoding="utf-8"))
+        type(archive).model_validate_json(staged_archive.read_text(encoding="utf-8"))
+        os.replace(staged_archive, archive_path)
+        os.replace(staged_output, output_path)
+    except Exception:
+        for path, previous in ((archive_path, previous_archive), (output_path, previous_output)):
+            if previous is None:
+                path.unlink(missing_ok=True)
+            else:
+                staged_restore = _write_staged_json(path.parent, path.name, previous.decode("utf-8"))
+                os.replace(staged_restore, path)
+        raise
+    finally:
+        staged_output.unlink(missing_ok=True)
+        staged_archive.unlink(missing_ok=True)
 
 
 def apply_prefilter(items: list[RawItem], include: list[str], exclude: list[str]) -> list[RawItem]:
@@ -161,6 +209,16 @@ def run_pipeline(
     raw_items = collection.items
     logger.info("Collected %d raw items", len(raw_items))
 
+    enabled_health = list(collection.health.values())
+    if enabled_health and all(health.error for health in enabled_health):
+        logger.error("Every configured source failed; preserving the last successful artifacts.")
+        print(
+            "\n[COLLECTION FAILURE] Every configured source failed. "
+            "Not overwriting previous artifacts.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     # Drop items from any source the client muted via feedback.
     if feedback.mute_sources:
         before = len(raw_items)
@@ -202,7 +260,7 @@ def run_pipeline(
         analyzed, editorial, cost_usd = scorer.analyze(filtered)
         logger.info("Analysis done: %d items, $%.4f", len(analyzed), cost_usd)
     elif skip_analysis:
-        logger.info("Analysis skipped (--skip-analysis flag set)")
+        logger.info("Analysis skipped (--skip-analysis); retrieval probe will not replace analyzed artifacts")
     else:
         logger.info("No items passed prefilter; skipping analysis")
 
@@ -299,18 +357,18 @@ def run_pipeline(
         site_config=_site_config(config),
     )
 
-    # ── Write JSON artifact ──────────────────────────────────────────────
-    (output_dir / "run_output.json").write_text(
-        run_output.model_dump_json(indent=2), encoding="utf-8"
-    )
-    logger.info("Artifact written to %s", output_dir / "run_output.json")
-
-    # ── Validate (before persisting archive - bad output must not poison history) ──
-    _validate_artifact(output_dir / "run_output.json")
-
-    # ── Persist archive ───────────────────────────────────────────────────
     updated = update_archive(archive, new_run)
-    save_archive(updated, arch_path)
+    if skip_analysis:
+        logger.info(
+            "Retrieval probe complete: %d item(s), %d source(s); analyzed artifacts unchanged",
+            len(raw_items),
+            len(collection.health),
+        )
+        return run_output
+
+    # Validate staged JSON and replace the feed/archive pair transactionally.
+    _persist_completed_run(output_dir, arch_path, run_output, updated)
+    logger.info("Completed run artifacts committed to %s", output_dir)
     logger.info(
         "Archive: %d run(s), %d pinned item(s)", len(updated.runs), len(updated.pinned)
     )

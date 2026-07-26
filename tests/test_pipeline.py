@@ -127,17 +127,66 @@ class TestAnalysisFailureGuard:
         for name, content in sentinels.items():
             assert (output_dir / name).read_text() == content, name
 
-    def test_guard_does_not_fire_on_skip_analysis(self, config_path, tmp_path):
+    def test_skip_analysis_is_a_probe_and_preserves_analyzed_artifacts(self, config_path, tmp_path):
         output_dir = tmp_path / "out"
+        sentinels = self._seed_artifacts(output_dir)
 
         with patch("monitor_engine.pipeline.collect_all", return_value=_collection([_raw("a")])):
             result = run_pipeline(config_path, output_dir, skip_analysis=True)
 
         assert result.meta.items_after_prefilter == 1
         assert result.meta.items_analyzed == 0
-        assert (output_dir / "run_output.json").exists()
-        assert (output_dir / "archive.json").exists()
+        for name, content in sentinels.items():
+            assert (output_dir / name).read_text() == content, name
         assert not (output_dir / "index.html").exists()
+
+    def test_all_source_failure_preserves_previous_artifacts(self, config_path, tmp_path, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        output_dir = tmp_path / "out"
+        sentinels = self._seed_artifacts(output_dir)
+        failed = _collection([])
+        failed.health["s1"].error = "timeout"
+
+        with patch("monitor_engine.pipeline.collect_all", return_value=failed):
+            with pytest.raises(SystemExit) as excinfo:
+                run_pipeline(config_path, output_dir)
+
+        assert excinfo.value.code == 1
+        for name, content in sentinels.items():
+            assert (output_dir / name).read_text() == content, name
+
+    def test_archive_persistence_failure_restores_last_good_pair(self, config_path, tmp_path, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        output_dir = tmp_path / "out"
+        sentinels = self._seed_artifacts(output_dir)
+        from monitor_engine.models import AnalyzedItem, EditionAnalysis
+
+        analyzed = AnalyzedItem(
+            item_id="a", title="Budget news item", url="https://example.com/a",
+            source_id="Feed", published_at=_NOW, collected_at=_NOW, tier=1,
+            per_edition={"exec": EditionAnalysis(
+                relevance_score=90, so_what="x", now_what="y", categories=["Finance"])},
+        )
+        scorer = MagicMock()
+        scorer.analyze.return_value = ([analyzed], None, 0.01)
+        real_replace = __import__("os").replace
+        failed_once = False
+
+        def fail_output_replace(source, destination):
+            nonlocal failed_once
+            if not failed_once and str(destination).endswith("run_output.json"):
+                failed_once = True
+                raise OSError("simulated output replace failure")
+            return real_replace(source, destination)
+
+        with patch("monitor_engine.pipeline.collect_all", return_value=_collection([_raw("a")])), \
+             patch("monitor_engine.analysis.scorer.Scorer", return_value=scorer), \
+             patch("monitor_engine.pipeline.os.replace", side_effect=fail_output_replace):
+            with pytest.raises(OSError, match="simulated"):
+                run_pipeline(config_path, output_dir)
+
+        for name, content in sentinels.items():
+            assert (output_dir / name).read_text() == content, name
 
     def test_guard_does_not_fire_on_quiet_news_week(self, config_path, tmp_path, monkeypatch):
         # Prefilter legitimately produces zero items; no analysis, no error.
