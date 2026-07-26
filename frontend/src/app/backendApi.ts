@@ -37,6 +37,100 @@ export async function backendJson<T>(path: string, init: RequestInit = {}): Prom
   return response.json() as Promise<T>;
 }
 
+export interface IndustryMonitorSource {
+  id: string;
+  name: string;
+  publisher: string;
+  domain: string;
+  publicUrl: string;
+  sourceType: "official_api" | "rss" | "government_feed" | "press_room" | "public_web";
+  collectionMode: "live" | "snapshot" | "disabled";
+  schedule: string;
+  lastAttemptAt?: string | null;
+  lastSuccessAt?: string | null;
+  lastFailureAt?: string | null;
+  freshnessSlaHours: number;
+  health: "healthy" | "degraded" | "failed" | "disabled";
+  safeResultStatus: string;
+  recordsDiscovered: number;
+  recordsAccepted: number;
+  duplicatesRejected: number;
+  recordsRejectedIrrelevant: number;
+  parsingFailures: number;
+  sanitizedError?: string | null;
+}
+
+export interface IndustryUpdateRecord {
+  id: string;
+  canonicalUrl: string;
+  sourceId: string;
+  publisher: string;
+  headline: string;
+  normalizedSummary: string;
+  eventDate?: string | null;
+  publicationDate?: string | null;
+  retrievedAt: string;
+  contentFingerprint: string;
+  entities: Array<{ name: string; type: string }>;
+  programs: Array<{ name: string; type: string }>;
+  markets: string[];
+  capabilityTags: string[];
+  relationshipState: "market_only" | "candidate_account_match" | "confirmed_account_development" | "rejected_match";
+  evidenceClass: "public_source";
+  relevanceScore: number;
+  relevanceReasons: string[];
+  reviewStatus: "new" | "reviewed" | "needs_account_match" | "promoted" | "dismissed";
+  runId: string;
+  sourceVariants: Array<{ publisher: string; headline: string; url: string }>;
+  relationship?: { id: string; review_status: string; source_entity_name: string; canonical_account_id: string };
+}
+
+export interface IndustryMonitorResponse {
+  state: "never_run" | "running" | "delayed" | "complete" | "partial_failure" | "failed" | "stale";
+  ingestionMode: "live" | "stored_snapshot" | "seeded_demonstration" | "stale" | "failed";
+  status: string;
+  run: null | {
+    id: string;
+    startedAt: string | null;
+    completedAt: string | null;
+    durationMs: number | null;
+    version: string;
+    lastAttemptAt: string | null;
+    lastSuccessfulAt: string | null;
+    expectedNextRun: string | null;
+    latestRetrievedAt: string | null;
+    counts: {
+      sourcesChecked: number;
+      newRecords: number;
+      unchangedRecords: number;
+      duplicatesRejected: number;
+      irrelevantRecordsRejected: number;
+      failedSources: number;
+    };
+  };
+  sources: IndustryMonitorSource[];
+  updates: IndustryUpdateRecord[];
+}
+
+export function getIndustryMonitor(): Promise<IndustryMonitorResponse> {
+  return backendJson<IndustryMonitorResponse>("/industry-monitor");
+}
+
+export function reviewIndustryUpdate(
+  id: string,
+  action: "mark_reviewed" | "dismiss" | "needs_account_match",
+  reason?: string,
+): Promise<{ id: string; reviewStatus: IndustryUpdateRecord["reviewStatus"] }> {
+  return backendJson(`/industry-monitor/updates/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ action, reason }),
+  });
+}
+
+export function createIndustryWorkItem(id: string): Promise<{ id: string; recommended_action: string }> {
+  return backendJson(`/industry-monitor/updates/${encodeURIComponent(id)}/work-item`, { method: "POST" });
+}
+
 export interface HubSpotLookupCompany {
   id: string;
   hubspot_id?: string;

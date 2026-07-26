@@ -53,6 +53,11 @@ async function openSurface(page: Page, label: RegExp, componentId: string): Prom
 
 async function smokeViewport(browser: Browser, width: number, height: number): Promise<void> {
   const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 2, isMobile: width <= 414, hasTouch: width <= 414 });
+  const browserErrors: string[] = [];
+  page.on("pageerror", (error) => browserErrors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error" && !message.text().includes("net::ERR_CONNECTION_REFUSED")) browserErrors.push(message.text());
+  });
   await unlock(page);
   const bodyText = await page.locator("body").innerText();
   assert(!bodyText.includes("mobile companion coming soon"), "Mobile blocker overlay is still present.");
@@ -60,8 +65,12 @@ async function smokeViewport(browser: Browser, width: number, height: number): P
   await openSurface(page, /^Work/i, "surface-work-queue");
   await openSurface(page, /Accounts/i, "surface-account-360");
   await openSurface(page, /Ask/i, "surface-ask");
+  await page.goto(`${BASE_URL}/intelligence/industry-updates`, { waitUntil: "networkidle" });
+  await page.locator("[data-surface-component='surface-industry-updates']").waitFor({ timeout: 10000 });
+  await page.getByText(/stored snapshot|monitor has not run/i).first().waitFor();
   const railBox = await page.locator(".brain-rail").boundingBox();
   assert(railBox && railBox.height >= 56, "Mobile bottom navigation is not touch-sized.");
+  assert(browserErrors.length === 0, `Browser errors at ${width}x${height}: ${browserErrors.join(" | ")}`);
   await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-${width}x${height}.png`, fullPage: true });
   await page.close();
 }
@@ -69,13 +78,15 @@ async function smokeViewport(browser: Browser, width: number, height: number): P
 async function desktopSmoke(browser: Browser, width: number, height: number): Promise<void> {
   const page = await browser.newPage({ viewport: { width, height } });
   await unlock(page);
+  await page.goto(`${BASE_URL}/intelligence/industry-updates`, { waitUntil: "networkidle" });
+  await page.locator("[data-surface-component='surface-industry-updates']").waitFor({ timeout: 10000 });
   await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-${width}x${height}.png`, fullPage: true });
   await page.close();
 }
 
 async function assertLazyBundles(): Promise<void> {
   const html = await readFile("dist/index.html", "utf8");
-  for (const forbidden of ["leaflet", "write-excel-file", "xlsx", "pptx", "docx", "DocumentViewer", "ProspectMap"]) {
+  for (const forbidden of ["leaflet", "write-excel-file", "xlsx", "pptx", "docx", "DocumentViewer", "ProspectMap", "IndustryUpdates"]) {
     assert(!html.includes(forbidden), `Initial HTML eagerly references lazy chunk: ${forbidden}`);
   }
 }

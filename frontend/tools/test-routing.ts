@@ -25,6 +25,9 @@ assert(map.query.get("region") === "Austin", "map region query");
 const conversation = parseAppRoute("/ask/convo-9");
 assert(conversation.id === "ask" && conversation.conversationId === "convo-9", "ask conversation route");
 
+const industryUpdates = parseAppRoute("/intelligence/industry-updates");
+assert(industryUpdates.id === "industry_updates" && industryUpdates.tab === "industry_updates", "industry updates route");
+
 const deliverable = parseAppRoute("/deliverables/del-1", "?account=acct-1");
 assert(deliverable.id === "deliverables" && deliverable.deliverableId === "del-1", "deliverable route");
 assert(deliverable.accountId === "acct-1", "deliverable account query");
@@ -37,6 +40,7 @@ assert(workItemPath("work 1") === "/work/work%201", "work path encodes ids");
 assert(pathForTab("brief") === "/today", "brief tab path");
 assert(pathForTab("work_queue") === "/work", "work tab path");
 assert(pathForTab("hubspot") === "/integrations", "integrations path replaces HubSpot top-level");
+assert(pathForTab("industry_updates") === "/intelligence/industry-updates", "industry updates nested route");
 
 const expectedPrimary = ["/today", "/work", "/accounts", "/ask"];
 assert(expectedPrimary.every((path) => Object.values(TAB_TO_ROUTE).includes(path)), "primary routes should be registered");

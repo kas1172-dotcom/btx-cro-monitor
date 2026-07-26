@@ -34,7 +34,7 @@ from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_toke
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
 from btx_platform.demo.definitions import DEMO_TENANT_ID
-from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
+from btx_platform.engine_config import CLIENT_CONFIG_PATH, config_history, latest_config, put_config, seed_engine_configs
 from btx_platform.health import platform_health
 from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
 from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload, map_companies
@@ -57,6 +57,7 @@ from btx_platform.intelligence import (
     validate_weight_config,
 )
 from btx_platform.ingest import IngestError, ingest
+from btx_platform.industry_monitor import load_artifact, monitor_snapshot, sanitize_external_text
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
 from btx_platform.queue import CeleryQueue, InMemoryQueue, JobQueue
@@ -2518,6 +2519,210 @@ def create_app(
             detail=row.detail,
             config_path=row.config_path,
         ).model_dump()
+
+    def industry_monitor_response(session, tenant_id: str) -> dict:
+        source_config = latest_config(session, "source_registry", tenant_id)
+        registry = dict(source_config.document) if source_config else {"sources": []}
+        try:
+            registry["cadence"] = json.loads(CLIENT_CONFIG_PATH.read_text(encoding="utf-8")).get("cadence", {})
+        except (OSError, ValueError):
+            registry["cadence"] = {}
+        artifact = load_artifact(Path(settings.pipeline_output_dir) / "run_output.json")
+        result = monitor_snapshot(
+            artifact,
+            registry,
+            stale_after_hours=settings.monitor_stale_after_days * 24,
+        )
+        latest_pipeline_run = (
+            session.query(models.PipelineRun)
+            .filter(models.PipelineRun.tenant_id == tenant_id)
+            .order_by(models.PipelineRun.triggered_at.desc())
+            .first()
+        )
+        if latest_pipeline_run and latest_pipeline_run.status in {"queued", "running"}:
+            result["state"] = "running"
+            result["status"] = "Monitor is running"
+            result["ingestionMode"] = "stored_snapshot" if result["updates"] else "failed"
+            if result["run"]:
+                result["run"]["lastAttemptAt"] = latest_pipeline_run.triggered_at.isoformat()
+            else:
+                result["run"] = {
+                    "id": latest_pipeline_run.id,
+                    "startedAt": latest_pipeline_run.triggered_at.isoformat(),
+                    "completedAt": None,
+                    "durationMs": None,
+                    "version": "pending",
+                    "lastAttemptAt": latest_pipeline_run.triggered_at.isoformat(),
+                    "lastSuccessfulAt": None,
+                    "expectedNextRun": None,
+                    "latestRetrievedAt": None,
+                    "counts": {
+                        "sourcesChecked": 0,
+                        "newRecords": 0,
+                        "unchangedRecords": 0,
+                        "duplicatesRejected": 0,
+                        "irrelevantRecordsRejected": 0,
+                        "failedSources": 0,
+                    },
+                }
+        elif latest_pipeline_run and latest_pipeline_run.status == "failed" and result["state"] == "never_run":
+            result["state"] = "failed"
+            result["status"] = "All sources failed"
+            result["ingestionMode"] = "failed"
+        reviews = {
+            row.id: (row.raw_payload or {}).get("industry_review")
+            for row in session.query(models.IntelligenceSignal)
+            .filter(models.IntelligenceSignal.tenant_id == tenant_id)
+            .all()
+            if isinstance(row.raw_payload, dict) and isinstance((row.raw_payload or {}).get("industry_review"), dict)
+        }
+        relationships = {
+            row.signal_id: relationship_to_dict(row)
+            for row in session.query(models.SignalAccountRelationship)
+            .filter(models.SignalAccountRelationship.tenant_id == tenant_id)
+            .order_by(models.SignalAccountRelationship.updated_at.asc())
+            .all()
+        }
+        for update in result["updates"]:
+            review = reviews.get(update["id"])
+            if review:
+                update["reviewStatus"] = review.get("status", update["reviewStatus"])
+                update["review"] = review
+            relationship = relationships.get(update["id"])
+            if relationship:
+                update["relationship"] = relationship
+                if relationship["review_status"] == "confirmed":
+                    update["relationshipState"] = "confirmed_account_development"
+                elif relationship["review_status"] == "rejected":
+                    update["relationshipState"] = "rejected_match"
+                else:
+                    update["relationshipState"] = "candidate_account_match"
+        return result
+
+    @app.get("/industry-monitor")
+    def get_industry_monitor(request: Request) -> Response:
+        session = session_factory()
+        try:
+            return JSONResponse(industry_monitor_response(session, _tenant_id(request)))
+        finally:
+            session.close()
+
+    @app.get("/industry-monitor/runs/{run_id}")
+    def get_industry_monitor_run(run_id: str, request: Request) -> Response:
+        session = session_factory()
+        try:
+            result = industry_monitor_response(session, _tenant_id(request))
+            run = result.get("run")
+            if not run or run.get("id") != run_id:
+                return JSONResponse({"code": "not_found", "detail": f"No safe monitor run detail for {run_id}."}, status_code=404)
+            return JSONResponse({
+                "run": run,
+                "status": result["status"],
+                "ingestionMode": result["ingestionMode"],
+                "sources": result["sources"],
+            })
+        finally:
+            session.close()
+
+    @app.patch("/industry-monitor/updates/{signal_id}")
+    def patch_industry_update(signal_id: str, payload: dict, request: Request) -> Response:
+        action = str(payload.get("action") or "").strip()
+        reason = sanitize_external_text(payload.get("reason"), limit=500)
+        if action not in {"mark_reviewed", "dismiss", "needs_account_match"}:
+            return JSONResponse({"code": "validation_error", "detail": "Unsupported industry-update action."}, status_code=422)
+        if action == "dismiss" and not reason:
+            return JSONResponse({"code": "validation_error", "detail": "A dismissal reason is required."}, status_code=422)
+        session = session_factory()
+        try:
+            tenant_id = _tenant_id(request)
+            row = (
+                session.query(models.IntelligenceSignal)
+                .filter(models.IntelligenceSignal.tenant_id == tenant_id, models.IntelligenceSignal.id == signal_id)
+                .one_or_none()
+            )
+            if row is None:
+                return JSONResponse({"code": "not_found", "detail": f"No industry update {signal_id}."}, status_code=404)
+            raw = dict(row.raw_payload or {})
+            before = raw.get("industry_review")
+            status = {"mark_reviewed": "reviewed", "dismiss": "dismissed", "needs_account_match": "needs_account_match"}[action]
+            event = {
+                "reviewer": _actor(request),
+                "timestamp": datetime.now(UTC).isoformat(),
+                "action": action,
+                "priorState": before.get("status") if isinstance(before, dict) else "new",
+                "newState": status,
+                "reason": reason or None,
+                "evidenceIds": row.evidence_ids or [row.id],
+            }
+            history = list(before.get("history") or []) if isinstance(before, dict) else []
+            raw["industry_review"] = {**event, "status": status, "history": [*history, event]}
+            row.raw_payload = raw
+            row.updated_at = datetime.now(UTC)
+            session.commit()
+            return JSONResponse({"id": row.id, "reviewStatus": status, "review": raw["industry_review"]})
+        finally:
+            session.close()
+
+    @app.post("/industry-monitor/updates/{signal_id}/work-item")
+    def create_industry_update_work_item(signal_id: str, request: Request) -> Response:
+        session = session_factory()
+        try:
+            tenant_id = _tenant_id(request)
+            signal = (
+                session.query(models.IntelligenceSignal)
+                .filter(models.IntelligenceSignal.tenant_id == tenant_id, models.IntelligenceSignal.id == signal_id)
+                .one_or_none()
+            )
+            if signal is None:
+                return JSONResponse({"code": "not_found", "detail": f"No industry update {signal_id}."}, status_code=404)
+            dedupe_key = f"industry-update:{signal_id}"
+            existing = (
+                session.query(models.WorkItem)
+                .filter(models.WorkItem.tenant_id == tenant_id, models.WorkItem.dedupe_key == dedupe_key)
+                .order_by(models.WorkItem.updated_at.desc())
+                .first()
+            )
+            if existing:
+                return JSONResponse(_work_item_response(existing, role=_role(request), notes=_notes_for_work_item(session, existing)))
+            relationship = (
+                session.query(models.SignalAccountRelationship)
+                .filter(models.SignalAccountRelationship.tenant_id == tenant_id, models.SignalAccountRelationship.signal_id == signal_id)
+                .order_by(models.SignalAccountRelationship.updated_at.desc())
+                .first()
+            )
+            row = models.WorkItem(
+                tenant_id=tenant_id,
+                type="industry_update_review",
+                canonical_account_id=relationship.canonical_account_id if relationship and relationship.review_status == "confirmed" else None,
+                related_signal_id=signal.id,
+                related_relationship_id=relationship.id if relationship else None,
+                source_signal_ids=[signal.id],
+                supporting_evidence=[
+                    {
+                        "evidence_id": evidence_id,
+                        "classification": "public_source",
+                        "source_signal_id": signal.id,
+                        "summary": sanitize_external_text(signal.summary, limit=400),
+                    }
+                    for evidence_id in (signal.evidence_ids or [signal.id])
+                ],
+                missing_information=["Confirm account or program relevance before changing commercial assumptions."],
+                dedupe_key=dedupe_key,
+                priority="normal",
+                status="detected",
+                recommended_action=f"Assess BTX relevance: {sanitize_external_text(signal.title, limit=240)}",
+                approval_state="not_required",
+                execution_state="not_started",
+                audit_history=[],
+            )
+            session.add(row)
+            session.flush()
+            _append_work_item_audit(row, action="create_from_industry_update", actor=_actor(request), before=None, after=_work_item_snapshot(row))
+            session.commit()
+            session.refresh(row)
+            return JSONResponse(_work_item_response(row, role=_role(request), notes=[]), status_code=201)
+        finally:
+            session.close()
 
     @app.get("/engine-config/{name}")
     def get_engine_config(name: str, request: Request) -> Response:

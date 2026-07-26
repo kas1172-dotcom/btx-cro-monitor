@@ -10,7 +10,7 @@ import { navigateTo, pathForTab, toBrowserPath } from "../../app/router.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
 import { CockpitRailIdentity } from "../../app/clerkAuth.tsx";
 
-const SECONDARY_IDS: TabId[] = ["programs", "prospecting", "capacity", "analysis", "map"];
+const SECONDARY_IDS: TabId[] = ["industry_updates", "programs", "prospecting", "capacity", "analysis", "map"];
 const UTILITY_IDS: TabId[] = ["deliverables", "hubspot", "settings"];
 const PRIMARY_IDS: TabId[] = ["brief", "work_queue", "accounts"];
 

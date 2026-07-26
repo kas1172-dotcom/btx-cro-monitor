@@ -6,6 +6,7 @@ export type RouteId =
   | "work"
   | "accounts"
   | "programs"
+  | "industry_updates"
   | "prospecting"
   | "capacity"
   | "analysis"
@@ -59,6 +60,7 @@ const ROUTE_TO_TAB: Record<Exclude<RouteId, "not_found">, TabId> = {
   work: "work_queue",
   accounts: "accounts",
   programs: "programs",
+  industry_updates: "industry_updates",
   prospecting: "prospecting",
   capacity: "capacity",
   analysis: "analysis",
@@ -80,6 +82,7 @@ export const TAB_TO_ROUTE: Record<TabId, string> = {
   analysis: "/analysis",
   capacity: "/capacity",
   programs: "/programs",
+  industry_updates: "/intelligence/industry-updates",
   deliverables: "/deliverables",
   hubspot: "/integrations",
   settings: "/settings",
@@ -107,6 +110,7 @@ export function parseAppRoute(pathname: string, search = ""): AppRoute {
   if (root === "work") return { id: "work", tab: "work_queue", path: clean, accountId: null, workItemId: decodeSegment(child), programId: null, conversationId: null, deliverableId: null, query };
   if (root === "accounts") return { id: "accounts", tab: "accounts", path: clean, accountId: decodeSegment(child), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "programs") return { id: "programs", tab: "programs", path: clean, accountId: null, workItemId: null, programId: decodeSegment(child), conversationId: null, deliverableId: null, query };
+  if (root === "intelligence" && child === "industry-updates") return { id: "industry_updates", tab: "industry_updates", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "prospecting") return { id: "prospecting", tab: "prospecting", path: clean, accountId: query.get("account"), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "capacity") return { id: "capacity", tab: "capacity", path: clean, accountId: query.get("account"), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "analysis") return { id: "analysis", tab: "analysis", path: clean, accountId: query.get("account"), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };

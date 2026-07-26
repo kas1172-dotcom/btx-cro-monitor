@@ -3,7 +3,7 @@ import type { MemoryState } from "../memory/types.ts";
 import { openWorkItems } from "./workItems.ts";
 
 export type CoreTab = "brief" | "work_queue" | "accounts" | "ask";
-export type AnalyticalTab = "prospecting" | "trip_planner" | "map" | "analysis" | "capacity" | "programs";
+export type AnalyticalTab = "industry_updates" | "prospecting" | "trip_planner" | "map" | "analysis" | "capacity" | "programs";
 export type UtilityTab = "deliverables" | "hubspot" | "settings";
 export type TabId = CoreTab | AnalyticalTab | UtilityTab;
 
@@ -23,6 +23,7 @@ export const CORE_SURFACES: SurfaceSpec[] = [
 ];
 
 export const ANALYTICAL_SURFACES: SurfaceSpec[] = [
+  { id: "industry_updates", label: "Industry updates", group: "analytical", componentId: "surface-industry-updates", title: "Current public developments, collection evidence, and BTX relevance." },
   { id: "prospecting", label: "Prospects", group: "analytical", componentId: "surface-prospecting", title: "New companies worth pursuing and why." },
   { id: "trip_planner", label: "Trip Planner", group: "analytical", componentId: "surface-trip-planner", title: "Field itinerary planning with map context, account fit, and calendar-ready deliverables." },
   { id: "map", label: "Map", group: "analytical", componentId: "surface-map", title: "Geographic account and prospect map." },
@@ -39,7 +40,7 @@ export const UTILITY_SURFACES: SurfaceSpec[] = [
 
 export const ALL_SURFACES = [...CORE_SURFACES, ...ANALYTICAL_SURFACES, ...UTILITY_SURFACES];
 
-export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "prospecting", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"];
+export const TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask", "industry_updates", "prospecting", "map", "analysis", "capacity", "programs", "deliverables", "hubspot", "settings"];
 export const PRIMARY_TAB_IDS: TabId[] = ["brief", "work_queue", "accounts", "ask"];
 
 export const TAB_LABELS: Record<TabId, string> = {
@@ -47,6 +48,7 @@ export const TAB_LABELS: Record<TabId, string> = {
   work_queue: "Work",
   accounts: "Accounts",
   ask: "Ask",
+  industry_updates: "Industry updates",
   prospecting: "Prospects",
   trip_planner: "Trip Planner",
   map: "Map",
@@ -69,6 +71,8 @@ export function countForSurface(surface: TabId, world: World | null, memory: Mem
       return world.companies.length;
     case "ask":
       return undefined;
+    case "industry_updates":
+      return world.analysis.valid.filter((signal) => signal.artifact).length;
     case "prospecting":
       return world.companies.filter((company) => company.business_motion === "prospect_new_business" || company.account_status === "target_prospect" || company.account_status === "new_logo").length;
     case "trip_planner":

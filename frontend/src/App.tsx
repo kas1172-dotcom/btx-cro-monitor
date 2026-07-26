@@ -32,6 +32,7 @@ const Prospecting = lazy(() => import("./ui/surfaces/Prospecting.tsx").then((mod
 const TripPlanner = lazy(() => import("./ui/surfaces/TripPlanner.tsx").then((module) => ({ default: module.TripPlanner })));
 const ProspectMap = lazy(() => import("./ui/map/ProspectMap.tsx").then((module) => ({ default: module.ProspectMap })));
 const DocumentViewer = lazy(() => import("./ui/deliverables/DocumentViewer.tsx").then((module) => ({ default: module.DocumentViewer })));
+const IndustryUpdates = lazy(() => import("./ui/intelligence/IndustryUpdates.tsx").then((module) => ({ default: module.IndustryUpdates })));
 const DeliverableWizard = lazy(() => import("./ui/deliverables/DeliverableWizard.tsx").then((module) => ({ default: module.DeliverableWizard })));
 
 export function App() {
@@ -160,6 +161,11 @@ export function App() {
       case "programs": return (
         <Suspense fallback={<div className="loading">loading programs...</div>}>
           <ProgramContractTracker world={world} />
+        </Suspense>
+      );
+      case "industry_updates": return (
+        <Suspense fallback={<div className="loading">loading industry updates...</div>}>
+          <IndustryUpdates world={world} />
         </Suspense>
       );
       case "deliverables": return (

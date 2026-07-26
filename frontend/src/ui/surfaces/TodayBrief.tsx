@@ -200,9 +200,12 @@ export function TodayBrief({ world }: { world: World }) {
       return (priorityRank[b.priority] ?? 0) - (priorityRank[a.priority] ?? 0) || b.updated_at.localeCompare(a.updated_at);
     })
     .slice(0, 3);
-  const accountSignals = topSignals.filter((signal) => signal.scope === "specific_account").slice(0, 3);
-  const programSignals = topSignals.filter((signal) => signal.scope === "program").slice(0, 3);
-  const marketSignals = topSignals.filter((signal) => signal.scope !== "specific_account" && signal.scope !== "program").slice(0, 3);
+  // Briefing is an executive decision surface, not the full monitor feed.
+  // Keep What Changed to three ranked developments total; Intelligence owns the archive.
+  const briefingSignals = topSignals.slice(0, 3);
+  const accountSignals = briefingSignals.filter((signal) => signal.scope === "specific_account");
+  const programSignals = briefingSignals.filter((signal) => signal.scope === "program");
+  const marketSignals = briefingSignals.filter((signal) => signal.scope !== "specific_account" && signal.scope !== "program");
   const completed = (world.worldSnapshot?.workItems ?? [])
     .filter((item) => ["verified", "outcome_recorded", "closed"].includes(item.status))
     .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
