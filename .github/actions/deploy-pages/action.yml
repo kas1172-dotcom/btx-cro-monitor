@@ -58,7 +58,12 @@ runs:
         # /btx-cro-monitor/cockpit/accounts/<id> would 404. Serving the app shell
         # as 404.html lets the client router take over. This only works because
         # the build uses an absolute base, so assets resolve from any depth.
+        #
+        # Pages only honours a 404.html at the root of the published site, not
+        # one inside a subdirectory, so the site-root copy is the one that does
+        # the work. The cockpit copy is kept for local previews of this layout.
         cp _site/cockpit/index.html _site/cockpit/404.html
+        cp _site/cockpit/index.html _site/404.html
         for artifact in run_output.json archive.json map_targets.json; do
           test -f "clients/btx/artifacts/$artifact"
           cp "clients/btx/artifacts/$artifact" "_site/btx/$artifact"
