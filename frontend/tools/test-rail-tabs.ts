@@ -61,9 +61,9 @@ const world = await loadWorld();
 const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId));
 
 assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
-assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "prospecting,trip_planner,map,analysis,capacity,programs", "Analytical routes must appear in the workspace navigation.");
+assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "industry_updates,prospecting,trip_planner,map,analysis,capacity,programs", "Analytical routes must appear in the workspace navigation.");
 assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "deliverables,hubspot,settings", "Utility nav must expose Deliverable Editor, HubSpot, and Settings.");
-assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,prospecting,map,analysis,capacity,programs,deliverables,hubspot,settings", "Navigable tabs must include core, analytical, and utility routes.");
+assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,industry_updates,prospecting,map,analysis,capacity,programs,deliverables,hubspot,settings", "Navigable tabs must include core, analytical, and utility routes.");
 assert(PRIMARY_TAB_IDS.join(",") === "brief,work_queue,accounts,ask", "Primary rail must be the four-surface cockpit.");
 assert(componentIds.size === ALL_SURFACES.length, "Each surface must mount a distinct component id.");
 assert(!ALL_SURFACES.some((surface) => ["market", "customer", "capability", "revenue", "geographic", "decision", "workflow"].includes(surface.id)), "Old nine-peer rail ids must not be visible surfaces.");
@@ -80,6 +80,7 @@ assert(componentByTab.accounts === "surface-account-360", "Accounts tab must mou
 assert(componentByTab.ask === "surface-ask", "Ask tab must mount Ask.");
 assert(componentByTab.settings === "surface-settings", "Settings tab must mount Settings.");
 const componentByAnalyticalTab = Object.fromEntries(ANALYTICAL_SURFACES.map((surface) => [surface.id, surface.componentId]));
+assert(componentByAnalyticalTab.industry_updates === "surface-industry-updates", "Industry updates must keep its component binding.");
 assert(componentByAnalyticalTab.trip_planner === "surface-trip-planner", "Trip Planner must keep its component binding.");
 assert(componentByAnalyticalTab.map === "surface-map", "Map must keep its component binding.");
 assert(componentByAnalyticalTab.analysis === "surface-analysis-dashboard", "Analysis must keep its component binding.");
