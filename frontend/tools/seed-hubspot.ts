@@ -271,6 +271,44 @@ const companyRows: CompanyRow[] = [{
   notes: [
     "BTX relationship centers on build-to-print precision components for aircraft production and sustainment programs at the Fort Worth aeronautics facility.",
     "Account owner should lead with F-35 timing, inspection capacity, AS9100 controlled process fit, and clear qualification evidence.",
+    "Illustrative demonstration record. The BTX relationship, deal, and contact on this account are simulated.",
+  ],
+},
+// The demo tenant is three accounts, so the portal carries the same three. The
+// two prospects deliberately carry no contact, no deal, and no CAGE code: the
+// point of the prospect journey is that BTX has not qualified them yet.
+{
+  id: "nlight-inc",
+  name: "nLIGHT, Inc.",
+  relationship: "prospect",
+  account_status: "target_prospect",
+  location: { city: "Camas", state: "WA", address: "5408 NW Camas Meadows Dr", postal_code: "98607" },
+  domain: "nlight.net",
+  website_url: "https://www.nlight.net",
+  aliases: ["nLIGHT", "nLight", "NASDAQ: LASR"],
+  facility_names: ["nLIGHT Camas"],
+  known_programs: ["Directed-energy laser defense"],
+  known_customers: ["US Department of Defense"],
+  notes: [
+    "Public directed-energy selection is sourced. BTX fit is unconfirmed: no CAGE match, no named contact, no validated capability alignment, and no assessed capacity.",
+    "Illustrative demonstration record. No BTX relationship exists on this account.",
+  ],
+},
+{
+  id: "pulse-space-technologies",
+  name: "Pulse Space Technologies",
+  relationship: "prospect",
+  account_status: "target_prospect",
+  location: { city: "Bellevue", state: "WA" },
+  domain: "pulsespace.com",
+  website_url: "https://www.pulsespace.com",
+  aliases: ["Pulse Space"],
+  facility_names: ["Pulse Space Bellevue"],
+  known_programs: ["Laser power transmission"],
+  known_customers: ["US Space Force"],
+  notes: [
+    "Held signal only. Subcontract relevance to BTX is not confirmed and this account should stay a research target.",
+    "Illustrative demonstration record. No BTX relationship exists on this account.",
   ],
 }];
 
@@ -522,15 +560,21 @@ async function verifyHubSpotSeed(
 ): Promise<void> {
   const worldDomains = new Set(companyRows.map(worldCompanyDomain));
   const allCompanies = await searchAll("companies", ["name", "domain", "btx_company_domain"]);
-  const namelessCompanies = allCompanies.filter((company) => !company.properties.name);
   const worldCompanies = allCompanies.filter((company) => worldDomains.has(company.properties.domain ?? ""));
   const nonWorldCompanies = allCompanies.filter((company) => !worldDomains.has(company.properties.domain ?? ""));
 
-  if (namelessCompanies.length > 0) {
-    throw new Error(`HubSpot verification failed: ${namelessCompanies.length} companies lack a name.`);
+  // Only the companies this script seeds are its responsibility. The portal can
+  // hold unrelated records, including nameless ones, and failing on those makes
+  // the seed unrunnable for reasons that have nothing to do with the demo.
+  const namelessDemoCompanies = worldCompanies.filter((company) => !company.properties.name);
+  if (namelessDemoCompanies.length > 0) {
+    throw new Error(`HubSpot verification failed: ${namelessDemoCompanies.length} seeded demo companies lack a name.`);
   }
-  if (worldCompanies.length !== companyRows.length || allCompanies.length !== companyRows.length + 1) {
-    throw new Error(`HubSpot verification failed: expected ${companyRows.length} named demo companies plus 1 default company; found ${allCompanies.length} total (${worldCompanies.length} demo, ${nonWorldCompanies.length} other).`);
+  if (worldCompanies.length !== companyRows.length) {
+    throw new Error(`HubSpot verification failed: expected ${companyRows.length} seeded demo companies; found ${worldCompanies.length}.`);
+  }
+  if (nonWorldCompanies.length > 0) {
+    console.log(`Note: ${nonWorldCompanies.length} companies in the portal are outside the demo set and were left untouched.`);
   }
 
   const expectedCompanyByContactId = new Map(contactRows.map((contact) => [

@@ -184,8 +184,18 @@ async function batchReadByIdProperty(objectType: CrmObjectType, idProperty: stri
       properties,
       inputs: chunk.map((id) => ({ id })),
     });
-    if ((response?.numErrors ?? 0) > 0 || (response?.errors?.length ?? 0) > 0) {
-      throw new Error(`HubSpot ${objectType} batch read returned errors: ${JSON.stringify(response?.errors ?? [])}`);
+    // Cleanup is expected to run more than once, and on any run after the first
+    // the records it wants to archive are already gone. HubSpot reports that as
+    // OBJECT_NOT_FOUND on the whole batch, which is not a failure for us: there
+    // is nothing left to archive. Anything else is still a real error.
+    const errors = response?.errors ?? [];
+    const fatal = errors.filter((error) => (error as { category?: string }).category !== "OBJECT_NOT_FOUND");
+    if (fatal.length > 0) {
+      throw new Error(`HubSpot ${objectType} batch read returned errors: ${JSON.stringify(fatal)}`);
+    }
+    if (errors.length > 0) {
+      const missing = errors.reduce((count, error) => count + (((error as { context?: { ids?: string[] } }).context?.ids ?? []).length), 0);
+      console.log(`  ${objectType}: ${missing} of ${chunk.length} already absent, nothing to archive for those.`);
     }
     for (const object of response?.results ?? []) {
       const key = object.properties[idProperty];
