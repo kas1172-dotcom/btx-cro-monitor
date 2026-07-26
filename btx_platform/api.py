@@ -1000,6 +1000,23 @@ def create_app(
             status_code=501,
         )
 
+    def hubspot_write_blocked() -> JSONResponse | None:
+        environment = (settings.hubspot_environment or "none").strip().lower()
+        if environment in {"developer", "sandbox"}:
+            return None
+        return JSONResponse(
+            {
+                "code": "hubspot_write_disabled",
+                "detail": (
+                    "HubSpot writes are disabled. BTX_HUBSPOT_ENVIRONMENT must be "
+                    "classified as developer or sandbox; production and unclassified "
+                    "portals remain preview/read-only."
+                ),
+                "environment": environment if environment in {"production"} else "unclassified",
+            },
+            status_code=403,
+        )
+
     def source_health_payload() -> list[dict]:
         if settings.hubspot_access_token:
             hubspot_health = _source_health(
@@ -1662,6 +1679,8 @@ def create_app(
     def create_hubspot_list(payload: HubSpotListCreateRequest, request: Request) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot list creation")
+        if blocked := hubspot_write_blocked():
+            return blocked
         idempotency_key = request.headers.get(settings.idempotency_header)
         if idempotency_key:
             cached = app.state.crm_list_idempotency.get(("create", idempotency_key))
@@ -1696,6 +1715,8 @@ def create_app(
     def add_hubspot_list_records(list_id: str, payload: HubSpotListAddRecordsRequest, request: Request) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot list membership")
+        if blocked := hubspot_write_blocked():
+            return blocked
         idempotency_key = request.headers.get(settings.idempotency_header)
         normalized_ids = [_hubspot_record_id(item, payload.list_type) for item in payload.record_ids]
         try:
@@ -1725,6 +1746,8 @@ def create_app(
     def import_prospects_to_hubspot(payload: HubSpotImportRequest, request: Request) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot prospect import")
+        if blocked := hubspot_write_blocked():
+            return blocked
         idempotency_key = request.headers.get(settings.idempotency_header)
         if idempotency_key:
             cached = app.state.crm_list_idempotency.get(("import_prospects", idempotency_key))
@@ -1821,6 +1844,8 @@ def create_app(
     def create_crm_task(payload: CrmTaskRequest, request: Request) -> Response:
         if not settings.hubspot_access_token:
             return not_configured("HubSpot task creation")
+        if blocked := hubspot_write_blocked():
+            return blocked
         body = payload.body or payload.evidence or ""
         associations = _task_associations(payload)
         idempotency_key = request.headers.get(settings.idempotency_header)
@@ -1957,6 +1982,8 @@ def create_app(
             return JSONResponse({"code": "confirmation_required", "detail": "Explicit confirmation is required before writing to HubSpot."}, status_code=422)
         if not settings.hubspot_access_token:
             return not_configured("HubSpot task creation")
+        if blocked := hubspot_write_blocked():
+            return blocked
         if not _has_role(request, "cro"):
             return _forbidden("Only CRO or admin users can execute approved HubSpot tasks.")
 

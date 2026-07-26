@@ -339,7 +339,7 @@ def test_crm_task_route_creates_hubspot_task_with_associations(monkeypatch, tmp_
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     captured: dict = {}
@@ -417,7 +417,7 @@ def test_crm_task_route_maps_hubspot_errors_to_502(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
 
@@ -476,7 +476,7 @@ def test_crm_list_routes_create_add_verify_and_dedupe(monkeypatch, tmp_path: Pat
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     calls: list[tuple[str, dict]] = []
@@ -524,7 +524,7 @@ def test_crm_list_add_requires_readback_membership(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
 
@@ -555,7 +555,7 @@ def test_crm_import_prospects_batches_rows_and_reports_partial_failures(monkeypa
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     captured: dict[str, list[dict]] = {}
@@ -702,11 +702,50 @@ def test_work_item_hubspot_preview_is_complete_and_does_not_write(monkeypatch, t
     assert preview["proposed_payload"]["properties"]["hs_task_subject"] == "Call Acme about the verified contract signal"
 
 
+@pytest.mark.parametrize(
+    ("environment", "reported_environment"),
+    [("none", "unclassified"), ("invalid-value", "unclassified"), ("production", "production")],
+)
+def test_hubspot_write_routes_are_server_blocked_outside_sandbox(
+    monkeypatch,
+    tmp_path: Path,
+    environment: str,
+    reported_environment: str,
+):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(
+        env="test",
+        hubspot_access_token="hubspot-token",
+        hubspot_environment=environment,
+    )
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+
+    class NoWriteHubSpotClient:
+        def __init__(self, _token: str):
+            raise AssertionError("A blocked write must not construct a HubSpot client.")
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", NoWriteHubSpotClient)
+    requests = [
+        client.post("/crm/lists", headers=_headers(), json={"name": "Blocked", "list_type": "company"}),
+        client.put("/crm/lists/list-1/records", headers=_headers(), json={"list_type": "company", "record_ids": ["1"]}),
+        client.post("/crm/import/prospects", headers=_headers(), json={"rows": [{"row_id": "1", "company": {"companyName": "Blocked"}}]}),
+        client.post("/crm/task", headers=_headers(), json={"title": "Blocked"}),
+        client.post("/work-items/missing/execute/hubspot-task", headers=_headers(role="cro"), json={"confirmed": True}),
+    ]
+
+    assert {response.status_code for response in requests} == {403}
+    assert {response.json()["code"] for response in requests} == {"hubspot_write_disabled"}
+    assert {response.json()["environment"] for response in requests} == {reported_environment}
+
+
 def test_work_item_hubspot_task_happy_path_verifies_and_audits(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_detected_work_item(client)
@@ -778,7 +817,7 @@ def test_work_item_hubspot_task_retry_is_idempotent(monkeypatch, tmp_path: Path)
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_detected_work_item(client)
@@ -822,7 +861,7 @@ def test_work_item_hubspot_task_failure_leaves_unverified_with_error(monkeypatch
     engine = make_engine("sqlite://")
     init_db(engine)
     sf = make_session_factory(engine)
-    settings = Settings(env="test", hubspot_access_token="hubspot-token")
+    settings = Settings(env="test", hubspot_access_token="hubspot-token", hubspot_environment="sandbox")
     app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
     client = TestClient(app)
     created = _create_detected_work_item(client)
