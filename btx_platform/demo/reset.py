@@ -190,7 +190,7 @@ def _seed_accounts(session: Session, seed: dict[str, Any], tenant_id: str) -> No
             display_name=record["name"],
             domain=record["domains"][0] if record.get("domains") else None,
             account_type="customer" if record["relationship"] == "customer" else "prospect",
-            hubspot_company_id=f"demo-hubspot-{record['id']}",
+            hubspot_company_id=record.get("hubspot_company_id") or f"demo-hubspot-{record['id']}",
             domains=record.get("domains", []),
             aliases=record.get("aliases", []),
             known_programs=record.get("known_programs", []),
@@ -201,7 +201,7 @@ def _seed_accounts(session: Session, seed: dict[str, Any], tenant_id: str) -> No
         )
         session.add(row)
         add_identifier(account_id=row.id, identifier_type="legal_name", value=record["name"], classification="crm", verified=True)
-        add_identifier(account_id=row.id, identifier_type="hubspot_company_id", value=row.hubspot_company_id or row.id, classification="simulated", verified=True)
+        add_identifier(account_id=row.id, identifier_type="hubspot_company_id", value=row.hubspot_company_id or row.id, classification="crm" if record.get("hubspot_company_id") else "simulated", verified=True)
         for domain in record.get("domains", []):
             add_identifier(account_id=row.id, identifier_type="domain", value=domain, classification="public", verified=True)
         for alias in record.get("aliases", []):
@@ -522,6 +522,50 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
         len([f for f in lockheed_score.result.get("positiveFactors", []) if f.get("contribution") is not None]) >= 4,
         "Lockheed score must show a populated factor breakdown.",
     )
+    # Each demo account must resolve to its real HubSpot company. A numeric id is
+    # a real portal record; the "demo-hubspot-" prefix is the simulated fallback.
+    expected_hubspot_ids = {
+        "demo-acct-lockheed": "336059557613",
+        "demo-acct-nlight": "336368378559",
+        "demo-acct-pulse-space": "336368378560",
+    }
+    for account in accounts:
+        expected = expected_hubspot_ids.get(account.id)
+        if expected is None:
+            continue
+        _assert(
+            account.hubspot_company_id == expected,
+            f"{account.id} must bind to real HubSpot company {expected}, found {account.hubspot_company_id!r}.",
+        )
+    # The prospects are deliberately bare. That absence is the demo's argument,
+    # so it is asserted rather than left to drift.
+    for prospect_id in ("demo-acct-nlight", "demo-acct-pulse-space"):
+        prospect = next((row for row in accounts if row.id == prospect_id), None)
+        _assert(prospect is not None, f"{prospect_id} is missing.")
+        _assert(not prospect.cage_code, f"{prospect_id} must carry no CAGE code.")
+        _assert(prospect.account_type == "prospect", f"{prospect_id} must stay classified as a prospect.")
+    contacts = (tenant.demo_metadata or {}).get("contacts", [])
+    opportunities = (tenant.demo_metadata or {}).get("opportunities", [])
+    _assert(
+        not any(item.get("company_id") == "demo-acct-pulse-space" for item in contacts),
+        "demo-acct-pulse-space must carry no contact.",
+    )
+    # nLIGHT carries a placeholder row whose whole job is to name the gap. It must
+    # never become a person, because an invented contact would erase the argument
+    # the prospect journey exists to make.
+    for item in contacts:
+        if item.get("company_id") != "demo-acct-nlight":
+            continue
+        _assert(
+            item.get("name") == "Contact not provided",
+            "nLIGHT must not carry a named contact; only the not-provided placeholder.",
+        )
+    for prospect_id in ("demo-acct-nlight", "demo-acct-pulse-space"):
+        _assert(
+            not any(item.get("company_id") == prospect_id for item in opportunities),
+            f"{prospect_id} must carry no deal.",
+        )
+
     nlight_score = attractiveness.get("demo-acct-nlight")
     _assert(nlight_score is not None, "nLIGHT attractiveness snapshot is missing.")
     _assert(nlight_score.status == "insufficient_data", "nLIGHT must stay honestly unscored.")

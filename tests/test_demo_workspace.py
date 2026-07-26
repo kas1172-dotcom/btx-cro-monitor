@@ -156,6 +156,19 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
     nlight = attractiveness["demo-acct-nlight"]
     assert nlight["status"] == "insufficient_data"
     assert nlight["score"] is None
+    # Each demo account resolves to its real HubSpot company in the demo portal.
+    hubspot_ids = {account["id"]: account.get("hubspot_company_id") for account in body["accounts"]}
+    assert hubspot_ids["demo-acct-lockheed"] == "336059557613"
+    assert hubspot_ids["demo-acct-nlight"] == "336368378559"
+    assert hubspot_ids["demo-acct-pulse-space"] == "336368378560"
+    # The prospects stay deliberately bare: no CAGE, no deal, no named contact.
+    accounts_by_id = {account["id"]: account for account in body["accounts"]}
+    for prospect_id in ("demo-acct-nlight", "demo-acct-pulse-space"):
+        assert not accounts_by_id[prospect_id].get("cage_code")
+        assert not [opp for opp in body["opportunities"] if opp["company_id"] == prospect_id]
+    assert not [contact for contact in body["contacts"] if contact["company_id"] == "demo-acct-pulse-space"]
+    nlight_contacts = [contact for contact in body["contacts"] if contact["company_id"] == "demo-acct-nlight"]
+    assert all(contact["name"] == "Contact not provided" for contact in nlight_contacts)
     assert body["relationshipReview"]["records"][0]["id"] == "demo-rel-nlight-review"
     assert any(item["approval_state"] == "pending" for item in body["workItems"])
     assert any(item["execution_state"] == "verified" and item["external_system"] == "hubspot-demo" for item in body["workItems"])

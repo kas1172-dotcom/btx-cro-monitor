@@ -79,6 +79,9 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
         {
             "id": "demo-acct-lockheed",
             "name": "Lockheed Martin Corporation",
+            # Real HubSpot company in the demo portal. The company record is real;
+            # the BTX relationship, contact, and deal on it are illustrative.
+            "hubspot_company_id": "336059557613",
             "relationship": "customer",
             "domains": ["lockheedmartin.com"],
             "aliases": ["Lockheed Martin", "Lockheed", "Lockheed Martin Aeronautics"],
@@ -93,6 +96,7 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
         {
             "id": "demo-acct-nlight",
             "name": "nLIGHT, Inc.",
+            "hubspot_company_id": "336368378559",
             "relationship": "prospect",
             "domains": ["nlight.net"],
             "aliases": ["nLIGHT", "nLight"],
@@ -105,6 +109,7 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
         {
             "id": "demo-acct-pulse-space",
             "name": "Pulse Space Technologies",
+            "hubspot_company_id": "336368378560",
             "relationship": "prospect",
             "domains": ["pulsespace.com"],
             "aliases": ["Pulse Space", "Pulse Space Technologies"],

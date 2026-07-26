@@ -291,12 +291,13 @@ function printCleanupDryRun(companyRows: CompanyRow[], contactRows: ContactRow[]
 const companyRows = OLD_FAKE_COMPANIES;
 const opportunityRows = OLD_FAKE_DEAL_EXTERNAL_IDS.map((id) => ({ id, company_id: "", name: id }));
 
-if (!confirmed) {
-  printCleanupDryRun(companyRows, [], opportunityRows);
-} else if (!token) {
-  console.log("HubSpot cleanup skipped: set HUBSPOT_ACCESS_TOKEN or BTX_HUBSPOT_ACCESS_TOKEN.");
-} else {
-  console.log(`HubSpot token source: ${tokenSource?.name}`);
+// HubSpot auto-creates a company from a contact's email domain. The seeded
+// Lockheed contact is simulated and deliberately uses an .example.com address,
+// so the portal grows a nameless company for that domain on every seed. It is
+// an artifact of our own seeding, so cleanup owns removing it.
+const ARTIFACT_COMPANY_DOMAINS = new Set(["lockheedmartin.example.com"]);
+
+async function resolveCleanupTargets() {
   const fakeDomains = new Set(companyRows.flatMap((company) => {
     const domain = worldCompanyDomain(company);
     return [domain, `${domain}.com`];
@@ -310,21 +311,51 @@ if (!confirmed) {
     const domain = record.properties.domain ?? "";
     const btxDomain = record.properties.btx_company_domain ?? "";
     const name = record.properties.name ?? "";
-    return fakeDomains.has(domain) || fakeDomains.has(btxDomain) || fakeCompanyNames.has(name);
+    return fakeDomains.has(domain) || fakeDomains.has(btxDomain) || fakeCompanyNames.has(name)
+      || ARTIFACT_COMPANY_DOMAINS.has(domain) || ARTIFACT_COMPANY_DOMAINS.has(btxDomain);
   });
   const contactsToArchive = allContacts.filter((record) => {
     const email = record.properties.email ?? "";
     return [...fakeDomains].some((domain) => email.endsWith(`@${domain}`) || email.endsWith(`@${domain}.com`));
   });
   const dealsToArchive = [...(await batchReadByIdProperty("deals", "btx_external_id", fakeDealExternalIds, ["btx_external_id", "dealname"])).values()];
+  return { allCompanies, companiesToArchive, contactsToArchive, dealsToArchive };
+}
 
-  await archiveObjects("deals", dealsToArchive.map((record) => record.id));
-  await archiveObjects("contacts", contactsToArchive.map((record) => record.id));
-  await archiveObjects("companies", companiesToArchive.map((record) => record.id));
+function describeTargets(targets: Awaited<ReturnType<typeof resolveCleanupTargets>>): void {
+  const { allCompanies, companiesToArchive, contactsToArchive, dealsToArchive } = targets;
+  const total = companiesToArchive.length + contactsToArchive.length + dealsToArchive.length;
+  if (total === 0) {
+    console.log("Nothing left to remove. The portal holds no records from the old fake seed set.");
+  } else {
+    console.log(`Companies to archive (${companiesToArchive.length}): ${companiesToArchive.map((r) => r.properties.name || `unnamed ${r.id}`).join(", ") || "none"}`);
+    console.log(`Contacts to archive (${contactsToArchive.length}): ${contactsToArchive.map((r) => r.properties.email).join(", ") || "none"}`);
+    console.log(`Deals to archive (${dealsToArchive.length}): ${dealsToArchive.map((r) => r.properties.dealname).join(", ") || "none"}`);
+  }
+  console.log(`Companies left untouched: ${allCompanies.length - companiesToArchive.length}`);
+}
 
-  console.log("HubSpot cleanup complete.");
-  console.log(`Fake seeded companies archived: ${companiesToArchive.length}`);
-  console.log(`Fake seeded contacts archived: ${contactsToArchive.length}`);
-  console.log(`Fake seeded deals archived: ${dealsToArchive.length}`);
-  console.log(`Other companies left untouched: ${allCompanies.length - companiesToArchive.length}`);
+if (!token) {
+  if (!confirmed) printCleanupDryRun(companyRows, [], opportunityRows);
+  else console.log("HubSpot cleanup skipped: set HUBSPOT_ACCESS_TOKEN or BTX_HUBSPOT_ACCESS_TOKEN.");
+} else {
+  console.log(`HubSpot token source: ${tokenSource?.name}`);
+  // The dry run queries the portal too. Printing a fixed wish list instead of
+  // real state made it impossible to tell whether cleanup had already run.
+  const targets = await resolveCleanupTargets();
+  if (!confirmed) {
+    console.log("HubSpot cleanup dry-run against live portal state. Pass --confirm to write.");
+    describeTargets(targets);
+  } else {
+    const { allCompanies, companiesToArchive, contactsToArchive, dealsToArchive } = targets;
+    await archiveObjects("deals", dealsToArchive.map((record) => record.id));
+    await archiveObjects("contacts", contactsToArchive.map((record) => record.id));
+    await archiveObjects("companies", companiesToArchive.map((record) => record.id));
+
+    console.log("HubSpot cleanup complete.");
+    console.log(`Fake seeded companies archived: ${companiesToArchive.length}`);
+    console.log(`Fake seeded contacts archived: ${contactsToArchive.length}`);
+    console.log(`Fake seeded deals archived: ${dealsToArchive.length}`);
+    console.log(`Other companies left untouched: ${allCompanies.length - companiesToArchive.length}`);
+  }
 }
