@@ -96,36 +96,97 @@ The demo tenant is exactly two journeys plus one supporting prospect account.
     nLIGHT is treated as an account fact.
 13. `/ask/demo-assist-lockheed`. Ask answers from stored records and states its limits.
 
+## Deployed Demo Route
+
+Deployed cockpit: `https://kas1172-dotcom.github.io/btx-cro-monitor/cockpit/`
+Deployed backend: `https://btx-platform.fly.dev`
+Demo tenant: `btx-demo-command-cockpit`
+
+Sign in through Clerk as an operator whose session token carries a role claim of
+`cro`. Anything less cannot use Ask, which needs analyst or higher, and cannot
+execute a HubSpot task, which needs `cro`.
+
+### Journey 1: Lockheed Martin, current customer
+
+1. Open the cockpit root. It lands on Today.
+2. The sourced directed-energy development is the item needing attention. Open it.
+3. Follow it to the Lockheed account. It is classified a current customer.
+4. Read the score. Lockheed carries an engine-computed attractiveness score with a
+   factor breakdown: capability alignment, addressable work package, award
+   momentum, and strategic relevance all contribute. Nothing is hand-set.
+5. Open `View evidence` to show the sources behind the score and the account link.
+6. Open the approval-gated work item.
+7. `Preview HubSpot task`, confirm, and show the real task id and its verification.
+   The task lands on Lockheed Martin Aeronautics, HubSpot company `336059557613`.
+8. Open the seeded meeting brief from Deliverables.
+
+### Journey 2: nLIGHT, prospect
+
+9. Open the nLIGHT account. It is classified a prospect, not a customer.
+10. The score reads insufficient data, honestly, because the evidence is not there.
+11. Open `View evidence` on the prospect-research work item. It names all four
+    gaps: no CAGE code, no named contact, unconfirmed supplier fit, and no
+    assessed capacity.
+12. Show the relationship-review item. The nLIGHT account link is unconfirmed, which
+    is why nLIGHT is not treated as an account fact.
+
+### Pulse Space, surfaced but not actioned
+
+13. Pulse Space appears as a held signal. Its subcontract relevance to BTX is not
+    confirmed, so it stays a research target rather than being escalated.
+
+### Ask
+
+14. Ask a question spanning both accounts. The answer is grounded in stored records,
+    carries internal citations, and states its limits rather than inventing.
+
+## Between Takes
+
+The demo tenant never issues an external mutation on reset, but Journey 1 step 7
+creates a real HubSpot task. Before re-recording:
+
+1. Delete the demo task created on Lockheed Martin Aeronautics in the HubSpot portal.
+2. Re-run the tenant reset against the deployed database to restore workflow state:
+   `python3 tooling/reset_demo_tenant.py --tenant btx-demo-command-cockpit`
+   then the same command with `--verify-only`.
+
+Do not run the HubSpot cleanup or seed between takes. Those manage the three demo
+companies, not the per-take task.
+
 ## Go Or No-Go
 
-Status as of 2026-07-25: **GO for a local recording**, with two known items below.
+Status: **NO-GO, pending deploy and the deployed walkthrough.**
 
-Verified by a live browser walkthrough against a running backend and frontend:
+Verified on `main` and against the live portal and the deployed backend:
 
-- Both journeys render end to end. Lockheed shows customer context, the confirmed
-  account link, the approval-gated work item, and the seeded brief. nLIGHT renders as
-  a prospect, and its evidence drawer names all four gaps: CAGE, contact, fit, capacity.
-- The rail shows the four primary surfaces. No retired surface appears.
-- No em dash, scaffolding copy, percentage confidence, or raw NaN on any surface.
-- Failure state: when the world snapshot fails, Today now says so and offers a retry.
-- Empty and stale states render without crashing.
-- Reset is deterministic and idempotent, and verify-only passes.
-- Backend `pytest` 454 passed, typecheck clean, build ok, `check:design` and `check:voice` pass.
+- The demo portal holds exactly three companies in the expected shape. Lockheed
+  `336059557613` with one contact and one deal, nLIGHT `336368378559` and Pulse
+  Space `336368378560` with no contact, no deal, and no CAGE code.
+- The three ids are bound into the demo tenant and enforced by the reset verifier
+  and `tests/test_demo_workspace.py`.
+- Lockheed produces an engine-computed score at data completeness 0.70 with four
+  contributing factors. nLIGHT stays at insufficient data. No score is hand-set.
+- Local reset is deterministic and idempotent, and verify-only passes.
+- The deployed backend reports `llm: true`, `auth: true`, `db: true`, and HubSpot
+  configured and ok. CORS allows the Pages origin. Unauthenticated calls return 401.
+- Backend `pytest` 454 passed. Typecheck, `check:design`, and `check:voice` pass.
+  The em-dash grep is clean apart from one `.gitignore` comment.
 
-Known items, neither of which blocks a local recording:
+Known red, carried deliberately:
 
-1. **Deep links do not work in the built app.** `vite.config.ts` sets `base: "./"` for
-   GitHub Pages subpath hosting, so loading `/accounts/<id>` directly requests
-   `/accounts/assets/...` and 404s. Navigate by clicking from the app root, or set
-   `base: "/"` before serving the cockpit from a domain root such as Fly. The comment
-   above that setting still claims the app has no backend, which is out of date.
-2. **AI status reads `offline`** because no LLM key was configured for the walkthrough.
-   Set the key and confirm it reads live before recording if the Ask narration depends on it.
+- `test:phase0` and `test:identity` fail inside signal-to-account resolution by
+  domain. Both were already red on `main` before this work and both run in CI, so
+  CI has been red for a pre-existing reason. Neither journey touches that path:
+  Lockheed and nLIGHT are linked through backend relationship records, not domain
+  matching. The demo is unaffected; CI should not be trusted until they are fixed.
 
-Scoring: every account score family renders `More information needed`. This is the
-backend returning `status: insufficient_data` with `dataCompleteness: 0` and a full
-factor breakdown, which is the honest designed behavior, not a defect. No fabricated
-number appears anywhere.
+Still required before GO:
+
+- Deploy the backend to Fly and run the Pages workflow, then confirm the release
+  commit matches `main`. The last release predates this work.
+- Reset the demo tenant against the deployed database and run verify-only.
+- Walk both journeys on the deployed URL, signed in, including a real HubSpot task
+  write, live Ask with citations, the four-surface state audit, and a deep link.
 
 ## Exact Ask Questions
 
