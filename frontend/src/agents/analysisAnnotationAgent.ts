@@ -92,8 +92,8 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
       : `No prior-quarter data available for comparison.`;
     const topShare = Number(f.topSharePct);
     const concentrationNote = topShare > 30
-      ? `${f.topAccountName} holds ${topShare}% of the quarter \u2014 concentration warrants monitoring.`
-      : topShare > 0 ? `Top account is ${f.topAccountName} at ${topShare}% \u2014 no single-account concentration risk.` : "";
+      ? `${f.topAccountName} holds ${topShare}% of the quarter; concentration warrants monitoring.`
+      : topShare > 0 ? `Top account is ${f.topAccountName} at ${topShare}%; no single-account concentration risk.` : "";
 
     const annotation = [
       `${f.label} for ${f.quarter}: ${fmt(value)}${Number(f.activeAccountCount) > 0 ? ` across ${f.activeAccountCount} active accounts` : ""}.`,
