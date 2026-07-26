@@ -25,7 +25,7 @@ function displayTime(value: string): string {
 
 function accountName(world: World, accountId?: string | null): string | null {
   if (!accountId) return null;
-  return world.companies.find((company) => company.id === accountId || company.canonical_account_id === accountId)?.name ?? accountId;
+  return world.companies.find((company) => company.id === accountId || company.canonical_account_id === accountId)?.name ?? "Account record unavailable";
 }
 
 function routeContext(route: ReturnType<typeof useAppRoute>): AssistantContext {

@@ -55,7 +55,10 @@ function eventLabel(value: string): string {
   return value.replace(/_/g, " ");
 }
 
-function weekdayBriefingLabel(world: World): string {
+function briefingLabel(world: World, horizonId: string): string {
+  if (horizonId === "week") return "This week";
+  if (horizonId === "30") return "Next 30 days";
+  if (horizonId === "quarter") return "This quarter";
   const anchor = world.snapshot?.publicSignals.run_at ? new Date(world.snapshot.publicSignals.run_at) : new Date();
   const weekday = Number.isNaN(anchor.getTime())
     ? "Daily"
@@ -182,7 +185,7 @@ export function TodayBrief({ world }: { world: World }) {
     .slice(0, MINI_BRIEF_LIMIT);
   const accountsNeedingAttention = new Set(attention.items.map((item) => item.canonical_account_id).filter(Boolean)).size;
   const activeAccountCount = world.companies.filter((company) => company.relationship === "customer").length;
-  const summaryLine = `${activeAccountCount} customer account, ${miniBrief.length} priority item${miniBrief.length === 1 ? "" : "s"}, and ${attention.items.length} open work items need review.`;
+  const summaryLine = `${activeAccountCount} customer account${activeAccountCount === 1 ? "" : "s"}, ${miniBrief.length} priority item${miniBrief.length === 1 ? "" : "s"}, and ${attention.items.length} open work item${attention.items.length === 1 ? "" : "s"} need review.`;
   const topSeed = miniBrief[0]?.seed;
   const rankedWork = [...attention.items]
     .sort((a, b) => {
@@ -224,14 +227,14 @@ export function TodayBrief({ world }: { world: World }) {
     <section className="surface-page today-brief-page" data-surface-component="surface-todays-brief">
       <SurfaceHeader
         eyebrow="Daily briefing"
-        headline={weekdayBriefingLabel(world)}
+        headline={briefingLabel(world, horizon.id)}
         subline={summaryLine}
       />
       <WorkItemSourceNote source={attention.source} error={attention.error} />
       {world.loadErrors.length > 0 ? (
         <p className="surface-notice" role="status">
-          Account and signal records did not load, so this briefing is incomplete. Anything below is
-          drawn from work records only. <button type="button" onClick={world.refresh}>Try again</button>
+          The data service could not load account and signal records: {world.loadErrors.join(" ")}
+          {" "}Work records may still appear below. <button type="button" onClick={world.refresh}>Try again</button>
         </p>
       ) : world.isStale ? (
         <p className="surface-notice" role="status">

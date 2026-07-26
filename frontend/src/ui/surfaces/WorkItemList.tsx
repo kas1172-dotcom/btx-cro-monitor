@@ -16,7 +16,7 @@ function dateLabel(value: string | null): string {
 
 function accountName(world: World | undefined, id: string | null): string {
   if (!id) return "Portfolio";
-  return world?.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
+  return world?.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? "Account record unavailable";
 }
 
 function priorityLabel(item: WorkItem): string {

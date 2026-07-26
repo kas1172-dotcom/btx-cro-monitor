@@ -67,7 +67,7 @@ function dateOrNull(value: string | null | undefined): string | null {
 
 function accountName(world: World, accountId: string | null | undefined): string {
   if (!accountId) return "Portfolio";
-  return world.companies.find((company) => company.id === accountId || company.canonical_account_id === accountId)?.name ?? accountId;
+  return world.companies.find((company) => company.id === accountId || company.canonical_account_id === accountId)?.name ?? "Account record unavailable";
 }
 
 function routeForSignal(signal: Signal): string | null {

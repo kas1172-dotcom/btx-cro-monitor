@@ -172,7 +172,7 @@ function isoDate(daysFromNow: number): string {
 
 function accountName(world: World, id: string | null): string {
   if (!id) return "Portfolio";
-  return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
+  return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? "Account record unavailable";
 }
 
 function signalAccountId(signal: Signal): string | null {

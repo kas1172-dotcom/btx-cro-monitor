@@ -33,6 +33,7 @@ from btx_platform.assistant import (
 from btx_platform.auth import AuthContext, AuthError, ClerkVerifier, bearer_token
 from btx_platform.config import Settings, get_settings
 from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
+from btx_platform.demo.definitions import DEMO_TENANT_ID
 from btx_platform.engine_config import config_history, latest_config, put_config, seed_engine_configs
 from btx_platform.health import platform_health
 from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
@@ -1291,6 +1292,26 @@ def create_app(
 
     @app.get("/world-snapshot")
     def world_snapshot(request: Request) -> Response:
+        tenant_id = _tenant_id(request)
+        if tenant_id == DEMO_TENANT_ID:
+            with session_factory() as session:
+                tenant = session.get(models.Tenant, tenant_id)
+            has_demo_dataset = bool(
+                tenant
+                and tenant.is_demonstration
+                and isinstance(tenant.demo_metadata, dict)
+                and tenant.demo_metadata.get("sourceHealth")
+            )
+            if not has_demo_dataset:
+                return JSONResponse(
+                    {
+                        "code": "tenant_dataset_missing",
+                        "detail": f"Tenant {tenant_id} is missing the demonstration world dataset.",
+                        "tenant_id": tenant_id,
+                        "dataset": "demonstration_world",
+                    },
+                    status_code=404,
+                )
         return JSONResponse(world_payload(request))
 
     @app.get("/assistant/conversations")

@@ -1205,9 +1205,8 @@ button.work-item-summary:focus-visible {
 .work-item-summary strong,
 .work-item-summary em {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 .work-item-kind,
 .work-item-confidence {

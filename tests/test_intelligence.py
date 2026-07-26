@@ -169,6 +169,30 @@ def test_missing_data_scores_remain_null_and_explain_missing_inputs():
         session.close()
 
 
+def test_partial_crm_account_with_missing_legal_name_can_be_scored():
+    session = _session()
+    try:
+        account = models.CanonicalAccount(
+            id="partial-account",
+            tenant_id="tenant-a",
+            legal_name=None,
+            display_name="Partial CRM account",
+            domains=[],
+            aliases=[],
+            known_programs=[],
+            known_customers=[],
+        )
+        session.add(account)
+        session.commit()
+
+        result = account_attractiveness(session, "tenant-a", account, "test-data-version")
+
+        assert result["status"] == "insufficient_data"
+        assert result["score"] is None
+    finally:
+        session.close()
+
+
 def test_default_scoring_config_weights_sum_to_one():
     session = _session()
     try:

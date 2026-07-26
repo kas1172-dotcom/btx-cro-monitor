@@ -117,10 +117,14 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   }
 
   if (!selected) {
+    const failed = world.queryStatus === "error" || world.loadErrors.length > 0;
     return (
       <section className="surface-page" data-surface-component="surface-account-360">
-        <SurfaceHeader eyebrow="Accounts" headline="No accounts are available." />
-        <EmptyState headline="No accounts" body="Connect a CRM source to populate customer records." />
+        <SurfaceHeader eyebrow="Accounts" headline={failed ? "Account records could not be loaded." : "No accounts are available."} />
+        <EmptyState
+          headline={failed ? "Account data unavailable" : "No accounts"}
+          body={failed ? `${world.loadErrors.join(" ")} Try again after the data service recovers.` : "The connected CRM returned no customer account records."}
+        />
       </section>
     );
   }

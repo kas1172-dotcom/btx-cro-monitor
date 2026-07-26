@@ -52,7 +52,7 @@ function dateValue(value: string | null): string {
 
 function accountName(world: World, id: string | null): string {
   if (!id) return "Portfolio";
-  return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? id;
+  return world.companies.find((company) => company.id === id || company.canonical_account_id === id)?.name ?? "Account record unavailable";
 }
 
 function filtersFromQuery(query: URLSearchParams): WorkItemFilters {
@@ -264,8 +264,8 @@ export function WorkQueue({ world, workItemId }: { world: World; workItemId?: st
     <section className="surface-page" data-surface-component="surface-work-queue">
       <SurfaceHeader
         eyebrow="Work queue"
-        headline={`${state.items.length} backend work items`}
-        subline="Assigned actions move through approval, execution, verification, outcome, and closure from the backend lifecycle."
+        headline={`${state.items.length} work items`}
+        subline="Assigned actions move through approval, execution, verification, outcome, and closure."
       />
       <WorkItemSourceNote source={state.source} error={state.error} />
       {workItemId ? (

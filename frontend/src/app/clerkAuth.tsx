@@ -59,3 +59,22 @@ function CockpitAuthStatusInner() {
     </div>
   );
 }
+
+export function CockpitRailIdentity() {
+  if (!CLERK_PUBLISHABLE_KEY) {
+    return <span><strong>Local workspace</strong><em>Not signed in</em></span>;
+  }
+  return (
+    <SignedIn>
+      <CockpitRailIdentityInner />
+    </SignedIn>
+  );
+}
+
+function CockpitRailIdentityInner() {
+  const { isLoaded, user } = useUser();
+  const identity = !isLoaded
+    ? "Checking session"
+    : user?.primaryEmailAddress?.emailAddress ?? user?.fullName ?? "Signed in";
+  return <span><strong>{identity}</strong><em>Signed in</em></span>;
+}

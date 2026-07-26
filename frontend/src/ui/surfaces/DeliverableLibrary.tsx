@@ -56,9 +56,11 @@ export function buildLibraryItems(input: {
   const byId = new Map<string, LibraryItem>();
   const add = (deliverable: Deliverable, source: LibraryItem["source"]) => {
     const accountId = deliverableAccountId(deliverable);
-    const accountName = accountId
-      ? input.world.companies.find((company) => company.id === accountId)?.name ?? accountId
-      : "Portfolio";
+    const account = accountId
+      ? input.world.companies.find((company) => company.id === accountId || company.canonical_account_id === accountId)
+      : null;
+    if (accountId && !account) return;
+    const accountName = account?.name ?? "Portfolio";
     const updatedAt = deliverable.createdAt;
     byId.set(deliverable.backendRecordId ?? deliverable.id, { deliverable, accountId, accountName, updatedAt, source });
   };
@@ -85,7 +87,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
 
   async function refresh() {
     if (!hasDeliverablesBackend()) {
-      setStatus("Backend program memory is not configured; showing local library entries.");
+      setStatus("Saved deliverables are not configured; showing local drafts.");
       return;
     }
     setLoading(true);
@@ -94,7 +96,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
       setBackendDeliverables(records.map(recordToDeliverable));
       setStatus("");
     } catch (error) {
-      setStatus(error ? "Program memory is using local drafts for this browser session." : "Could not load backend deliverables.");
+      setStatus(error ? "Saved deliverables are unavailable; showing local drafts for this browser session." : "Could not load saved deliverables.");
     } finally {
       setLoading(false);
     }
@@ -121,8 +123,8 @@ export function DeliverableLibrary({ world }: { world: World }) {
   return (
     <section className="surface-page deliverable-library" data-surface-component="surface-deliverable-library">
       <SurfaceHeader
-        eyebrow="Program memory"
-        headline="Deliverable editor"
+        eyebrow="Deliverables"
+        headline="Deliverables"
         subline="Browse saved briefs, decks, memos, and analysis views; open one to edit, download, or create CRM follow-up."
       />
 
@@ -184,7 +186,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
           >
             <ListRow
               name={item.deliverable.title}
-              subtitle={`${labelType(item.deliverable.type)} · ${item.accountName} · ${formatDate(item.updatedAt)} · ${item.source === "backend" ? "Program memory" : "Local draft"}`}
+              subtitle={`${labelType(item.deliverable.type)} · ${item.accountName} · ${formatDate(item.updatedAt)} · ${item.source === "backend" ? "Saved deliverable" : "Local draft"}`}
               action="Open"
             />
           </button>

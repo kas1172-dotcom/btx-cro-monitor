@@ -182,6 +182,20 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
     assert {row["availability"] for row in body["sourceHealth"]} >= {"simulated", "stale", "not_configured"}
 
 
+def test_demo_world_snapshot_names_missing_tenant_and_dataset(tmp_path: Path):
+    client, _sf = _build(tmp_path)
+
+    response = client.get("/world-snapshot", headers=_headers(tenant_id=DEMO_TENANT_ID, role="cro"))
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "code": "tenant_dataset_missing",
+        "detail": f"Tenant {DEMO_TENANT_ID} is missing the demonstration world dataset.",
+        "tenant_id": DEMO_TENANT_ID,
+        "dataset": "demonstration_world",
+    }
+
+
 def test_demo_world_snapshot_does_not_mutate_seeded_workspace(tmp_path: Path):
     client, sf = _build(tmp_path)
     reset_demo_tenant(sf, DEMO_TENANT_ID)

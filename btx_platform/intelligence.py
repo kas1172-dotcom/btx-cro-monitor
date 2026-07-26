@@ -673,7 +673,8 @@ def _capability_alignment(account: models.CanonicalAccount) -> float | None:
     explicit_needs = getattr(account, "needs", None) or []
     needs = [normalize_identifier("legal_name", item) for item in explicit_needs + (account.known_programs or []) + (account.known_customers or [])]
     aliases = [normalize_identifier("legal_name", item) for item in (account.aliases or [])]
-    text = " ".join([account.legal_name, account.display_name, *(account.domains or []), *needs, *aliases]).lower()
+    values = [account.legal_name, account.display_name, *(account.domains or []), *needs, *aliases]
+    text = " ".join(str(value) for value in values if value).lower()
     matches = [capability for capability in BTX_CAPABILITIES if capability in text]
     if not matches:
         return None

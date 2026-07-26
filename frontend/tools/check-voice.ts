@@ -7,7 +7,16 @@ import { join, relative } from "node:path";
 import { findVoiceViolations } from "../src/app/voiceRules.ts";
 
 const SRC = join(import.meta.dirname, "..", "src");
-const ROOTS = [join(SRC, "ui"), join(SRC, "deliverables"), join(SRC, "agents"), join(SRC, "brain")];
+const ROOTS = [
+  join(SRC, "ui"),
+  join(SRC, "deliverables"),
+  join(SRC, "agents"),
+  join(SRC, "brain"),
+  join(import.meta.dirname, "..", "..", "btx_platform", "demo"),
+];
+const STORED_CONTENT_FILES = [
+  join(import.meta.dirname, "..", "data", "demo", "btx", "sample_library.json"),
+];
 const ALLOWLIST_FILE = join(import.meta.dirname, "voice-allowlist.txt");
 
 // voiceRules.ts holds the banned lists themselves, so it is not scanned.
@@ -22,7 +31,7 @@ function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) walk(full, out);
-    else if (/\.tsx?$/.test(entry)) out.push(full);
+    else if (/\.(tsx?|py|json)$/.test(entry)) out.push(full);
   }
   return out;
 }
@@ -42,6 +51,14 @@ for (const root of ROOTS) {
       if (found.length) violations.push(`${relative(process.cwd(), file)}:${index + 1}: ${found.join(", ")}`);
     });
   }
+}
+for (const file of STORED_CONTENT_FILES) {
+  const lines = readFileSync(file, "utf8").split("\n");
+  lines.forEach((line, index) => {
+    if (isAllowlisted(line)) return;
+    const found = findVoiceViolations(line);
+    if (found.length) violations.push(`${relative(process.cwd(), file)}:${index + 1}: ${found.join(", ")}`);
+  });
 }
 
 if (violations.length > 0) {

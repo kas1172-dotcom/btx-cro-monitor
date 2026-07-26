@@ -417,7 +417,7 @@ export function SettingsWorkspace() {
               </button>
               <button onClick={resetDemo}>
                 <strong>Reset workspace</strong>
-                <span>Clear local state and reload from the approved baseline.</span>
+                <span>Remove local chats, notes, drafts, and activity, then reload this workspace.</span>
               </button>
             </div>
           ) : active.id === "memory" ? (

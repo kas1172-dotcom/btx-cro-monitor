@@ -9,6 +9,7 @@ import {
 } from "../../app/surfaces.ts";
 import { navigateTo, pathForTab } from "../../app/router.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
+import { CockpitRailIdentity } from "../../app/clerkAuth.tsx";
 
 const SECONDARY_IDS: TabId[] = ["programs", "prospecting", "capacity", "analysis", "map"];
 const UTILITY_IDS: TabId[] = ["deliverables", "hubspot", "settings"];
@@ -49,7 +50,7 @@ export function BrainSidebar({
         <span>BTX</span>
         <strong>Steel & Signal</strong>
       </div>
-      {groups.map((group) => (
+      {groups.filter((group) => group.items.length > 0).map((group) => (
         <div key={group.label} className={group.label === "Utilities" ? "brain-rail-group brain-rail-utility" : `brain-rail-group brain-rail-${group.label.toLowerCase()}`}>
           <div className="brain-rail-group-label">{group.label}</div>
           {group.items.map((surface) => (
@@ -95,7 +96,7 @@ export function BrainSidebar({
       )}
       <div className="rail-user-chip">
         <UiIcon name="user" />
-        <span><strong>BTX operator</strong><em>Signed in</em></span>
+        <CockpitRailIdentity />
       </div>
     </aside>
   );

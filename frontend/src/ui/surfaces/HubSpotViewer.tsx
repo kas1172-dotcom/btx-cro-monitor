@@ -180,8 +180,8 @@ export function HubSpotViewer({ world }: { world: World }) {
     <section className="surface-page hubspot-viewer" data-surface-component="surface-hubspot-viewer">
       <SurfaceHeader
         eyebrow="HubSpot"
-        headline="Live CRM viewer"
-        subline="Curated CRM reads use the already-loaded world; lookup and list creation call the backend with the server-side HubSpot token."
+        headline="CRM workspace"
+        subline="Review the CRM records already loaded in the cockpit, search HubSpot, and create client lists."
       />
 
       <div className="hubspot-viewer-grid">

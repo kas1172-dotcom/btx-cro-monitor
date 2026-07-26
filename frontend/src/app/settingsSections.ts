@@ -32,9 +32,4 @@ export const SETTINGS_SECTIONS: SettingsSectionSpec[] = [
     label: "Source admin",
     summary: "Monitor source registry, collection runs, and source requests.",
   },
-  {
-    id: "integrations",
-    label: "Integrations",
-    summary: "Connector status and pilot connection flows for CRM, ERP, work management, calendar, and market data.",
-  },
 ];
