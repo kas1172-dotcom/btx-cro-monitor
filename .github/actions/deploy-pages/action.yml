@@ -8,6 +8,10 @@ inputs:
   vite_clerk_publishable_key:
     description: Browser-safe Clerk publishable key.
     required: true
+  clerk_environment:
+    description: Clerk instance type expected by this deployment (development or production).
+    required: false
+    default: production
 
 outputs:
   page_url:
@@ -41,6 +45,7 @@ runs:
         VITE_BACKEND_ENDPOINT: ${{ inputs.vite_backend_endpoint }}
         VITE_COPILOT_ENDPOINT: ${{ inputs.vite_backend_endpoint }}/llm
         VITE_CLERK_PUBLISHABLE_KEY: ${{ inputs.vite_clerk_publishable_key }}
+        CLERK_DEPLOYMENT_ENVIRONMENT: ${{ inputs.clerk_environment }}
       run: |
         if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ]; then
           echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_CLERK_PUBLISHABLE_KEY"

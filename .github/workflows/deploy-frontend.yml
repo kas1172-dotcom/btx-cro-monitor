@@ -28,3 +28,4 @@ jobs:
         with:
           vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
           vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          clerk_environment: development
