@@ -70,7 +70,7 @@ jobs:
           node-version: "20"
 
       - name: Install engine
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,platform]"
 
       - name: Run test suite (frontend smoke tests enforced)
         run: pytest -q
@@ -102,7 +102,7 @@ jobs:
           cache: pip
 
       - name: Install engine
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,platform]"
 
       # Run pipeline
       # The pipeline exits with code 1 on any failure (missing env vars,
