@@ -3890,6 +3890,995 @@
           "importance_score": 71
         }
       ]
+    },
+    {
+      "run_id": "20260731T213035-a65d",
+      "run_at": "2026-07-31T21:30:35.480510Z",
+      "items": [
+        {
+          "item_id": "pinned-lockheed-f35-lot-18-19",
+          "title": "Lockheed, Pentagon finalize deal for 296 F-35s",
+          "raw_title": "Lockheed, Pentagon finalize deal for 296 F-35s",
+          "url": "https://breakingdefense.com/2025/09/lockheed-pentagon-finalize-deal-for-296-f-35s/",
+          "source_id": "Breaking Defense",
+          "published_at": "2026-07-24T09:00:00Z",
+          "collected_at": "2026-07-24T12:00:00Z",
+          "tier": 1,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 95,
+              "so_what": "Lockheed Martin and the F-35 Joint Program Office finalized the Lots 18 and 19 airframe deal, covering 296 aircraft. For BTX, this is a production and sustainment planning signal tied to a verified Lockheed Martin account, CAGE 81755, and the F-35 Lightning II program.",
+              "now_what": "Prepare the Lockheed call around F-35 timing, build-to-print capacity, inspection load, and where BTX can support precision components without overpromising.",
+              "categories": [
+                "Contract Award",
+                "Subcontracting Opportunity"
+              ]
+            },
+            "exec": {
+              "relevance_score": 88,
+              "so_what": "The F-35 Lots 18 and 19 agreement keeps Lockheed production demand visible and gives BTX a timely reason to review account coverage, capacity, and open follow-up.",
+              "now_what": "Assign the account owner to prepare a call brief and confirm whether current BTX capacity can support near-term F-35 related work.",
+              "categories": [
+                "Contract Award"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$24.3 billion",
+            "value": 24300000000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Pinned for demo presence with real source attribution. Account resolution still depends on canonical CAGE and program matching.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Lockheed Martin Corporation",
+              "type": "company"
+            },
+            {
+              "name": "F-35 Lightning II",
+              "type": "program"
+            },
+            {
+              "name": "81755",
+              "type": "identifier"
+            },
+            {
+              "name": "CQWLW9XRQTH5",
+              "type": "identifier"
+            }
+          ],
+          "enrichment": {
+            "facts": [
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "F-35 Lightning II",
+                "label": "Latest Federal Register doc",
+                "value": "Arms Sales Notification",
+                "kind": "text",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/01/14/2026-00531/arms-sales-notification"
+              },
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "F-35 Lightning II",
+                "label": "Published",
+                "value": "2026-01-14",
+                "kind": "date",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/01/14/2026-00531/arms-sales-notification"
+              }
+            ],
+            "queried_entities": [
+              "F-35 Lightning II"
+            ]
+          },
+          "related": [],
+          "importance_score": 95
+        },
+        {
+          "item_id": "8346ce89c1fa8d71",
+          "title": "Contracts for July 27, 2026",
+          "raw_title": null,
+          "url": "https://www.war.gov/News/Contracts/Contract/Article/4556787/contracts-for-july-27-2026/",
+          "source_id": "Department of War Contract Announcements",
+          "published_at": "2026-07-27T21:00:08Z",
+          "collected_at": "2026-07-31T21:28:12.441167Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 45,
+              "so_what": "DoD announced contracts valued at $7.5 million or more on July 27, 2026, posted to War.gov; the summary does not identify any specific contract, award recipient, program, or relevance to BTX's primes or core programs.",
+              "now_what": "Retrieve full contract list from War.gov for July 27, 2026. Filter for awards to or subcontracting opportunities from Lockheed Martin, RTX, Northrop Grumman, and Boeing Defense related to F-35, B-21, hypersonics, or flight-critical machining. Flag sole-source and set-aside awards.",
+              "categories": [
+                "Contract Award"
+              ]
+            },
+            "exec": {
+              "relevance_score": 25,
+              "so_what": "DoD contract announcements for July 27, 2026 are available; without identification of specific awards, programs, or strategic relevance, the signal is low.",
+              "now_what": "If routine BD monitoring finds a major prime award (Lockheed, RTX, NG) to a new program, escalate to leadership; otherwise, no action at this stage.",
+              "categories": [
+                "Contract Award"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$7.5 million or more",
+            "value": 7500000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Notice is a pointer to a contract list, not the contract data itself. Relevance to BTX depends on contents of War.gov that are not quoted here.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "On July 27, 2026, the Department of War released daily contract announcements for awards valued at $7.5 million or more on War.gov. This represents the start of a four-day high-volume contract-posting window at the end of July, likely coinciding with mid-fiscal or quarterly budget obligation cycles.",
+              "key_stakeholders": [
+                "Department of War",
+                "Defense primes (Lockheed Martin, RTX, Northrop Grumman, Boeing Defense)",
+                "DCMA",
+                "Tier 2 suppliers"
+              ],
+              "scenarios": [
+                "July 27 awards may include multi-year production or sustainment contracts for active defense programs, signaling stable subcontracting demand for precision-machining suppliers over the next 12–24 months.",
+                "If IRIS² (European satellite constellation) or space-defense programs appear in postings, non-traditional and allied-nation subcontractors may compete for work, potentially displacing some traditional U.S.-based supply chains.",
+                "If July 27 postings are heavily weighted toward foreign military sales (FMS) or allied-nation support, BTX's ITAR registration and export-control compliance will become a competitive advantage."
+              ],
+              "recommended_actions": [
+                "Immediately scan July 27 postings for any prime awards related to satellite, communications, or space-segment work; cross-check ITAR classification and export-control implications with BTX's compliance team.",
+                "For any production or sustainment awards, engage prime procurement teams to confirm whether BTX's 5-axis CNC, AS9100, and NADCAP certifications meet the subcontracting scope.",
+                "Flag any opportunities labeled 'international' or 'allied-nation' for State Department DDTC review before pursuing, to confirm export eligibility of BTX's manufacturing or technical data."
+              ]
+            }
+          },
+          "also_covered_by": [
+            {
+              "item_id": "f12e5afdeaf3c2f8",
+              "source_id": "Department of War Contract Announcements",
+              "title": "Contracts for July 30, 2026",
+              "url": "https://www.war.gov/News/Contracts/Contract/Article/4560267/contracts-for-july-30-2026/"
+            },
+            {
+              "item_id": "0528f3095c4e0d2c",
+              "source_id": "Department of War Contract Announcements",
+              "title": "Contracts for July 29, 2026",
+              "url": "https://www.war.gov/News/Contracts/Contract/Article/4559059/contracts-for-july-29-2026/"
+            },
+            {
+              "item_id": "94e4294951733e72",
+              "source_id": "Department of War Contract Announcements",
+              "title": "Contracts for July 28, 2026",
+              "url": "https://www.war.gov/News/Contracts/Contract/Article/4557600/contracts-for-july-28-2026/"
+            }
+          ],
+          "entities": [
+            {
+              "name": "Department of War",
+              "type": "agency"
+            }
+          ],
+          "enrichment": null,
+          "related": [],
+          "importance_score": 45
+        },
+        {
+          "item_id": "505096150ffbe929",
+          "title": "Spain commits up to $2.3 billion for national military communications for IRIS²",
+          "raw_title": null,
+          "url": "https://spacenews.com/spain-commits-up-to-2-3-billion-for-national-military-communications-for-iris%c2%b2/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T15:57:52Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 18,
+              "so_what": "Spain is committing €1.6–2 billion to develop a national military satellite communications constellation under the EU's IRIS² program; international space-defense spending outside BTX's current customer base (Lockheed, RTX, Northrop, Boeing Defense) and ITAR-controlled domain.",
+              "now_what": "Monitor for any U.S. prime-contractor involvement or subcontracting openings if Lockheed Martin, RTX, or Northrop Grumman win work on IRIS² components or ground stations; flag if ITAR/EAR applies to any U.S.-origin content BTX could machine.",
+              "categories": [
+                "Industry News"
+              ]
+            },
+            "exec": {
+              "relevance_score": 22,
+              "so_what": "EU's IRIS² constellation ($1.6–2 billion Spanish investment) is strategic defense infrastructure outside U.S. control; limited direct impact on BTX unless a named U.S. prime wins subcontract work or ITAR content applies.",
+              "now_what": "Compliance team should note: if any U.S. prime partners with European vendors on IRIS² and seeks to use BTX-machined ITAR-controlled components, export licensing (potentially via ITAR Technical Assistance Agreement or Strategic Trade Authorization) will be required. Wait for U.S. contractor involvement to materialize before deep dive.",
+              "categories": [
+                "Program Decision",
+                "Export Controls / Compliance"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "1.6 billion and 2 billion euros ($1.8 to $2.3 billion)",
+            "value": 1600000000.0,
+            "currency": null
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Item is Spanish government announcement; no U.S. prime involvement confirmed yet. ITAR applicability depends on whether U.S. contractors and BTX content are part of design or production.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "Spain announced on July 31, 2026, a commitment of €1.6–2 billion ($1.8–$2.3 billion USD) to develop a national military satellite communications constellation as part of the EU's IRIS² program. IRIS² is a European space-segment initiative aimed at reducing dependence on NATO/U.S. satellite infrastructure and building sovereign EU military communications capability. This represents a significant expansion of European defense space spending outside traditional U.S. defense supply chains.",
+              "key_stakeholders": [
+                "Spanish Ministry of Defence",
+                "European Defence Agency (EDA)",
+                "EU member states",
+                "ESA (European Space Agency)",
+                "Prime contractors (likely Airbus Defence & Space, Thales Alenia Space, OHB)",
+                "U.S. Defense primes (Lockheed Martin, RTX, Northrop Grumman, Boeing) monitoring allied competition",
+                "DDTC / State Department (export-control implications)"
+              ],
+              "scenarios": [
+                "If IRIS² satellites or ground-segment hardware require precision-machined components, Tier 1 European primes may establish or expand subcontracting networks in Spain and EU, potentially reducing U.S. subcontractor participation in the supply chain.",
+                "If U.S. defense primes partner with European primes on IRIS² manufacturing or integration, BTX could gain secondary work (components, assemblies) if U.S. technology or ITAR-controlled content is involved.",
+                "If IRIS² development accelerates to meet NATO interoperability deadlines, allied nations may request U.S. subsystem or component exports, triggering DDTC licensing and potential business for BTX if its components are ITAR-controlled and approved for allied supply."
+              ],
+              "recommended_actions": [
+                "Monitor IRIS² program announcements (ESA, Spanish MoD websites) for prime-contractor awards; identify whether any Tier 1 U.S. primes (Lockheed, RTX, Northrop, Boeing) are named as subcontractors or systems integrators.",
+                "Assess BTX's internal ITAR and export-control readiness: confirm whether 5-axis CNC aerospace components are classified under DDTC/EAR regulations and whether allied-nation content flows are permissible without licensing.",
+                "If a U.S. prime is engaged with IRIS², approach that prime's BD team to explore whether BTX's build-to-print capabilities can support U.S. subcontracting roles in IRIS² (e.g., component manufacturing, assembly, integration support)."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Spain",
+              "type": "place"
+            },
+            {
+              "name": "IRIS²",
+              "type": "program"
+            },
+            {
+              "name": "European Union",
+              "type": "organization"
+            }
+          ],
+          "enrichment": {
+            "facts": [
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "IRIS²",
+                "label": "Latest Federal Register doc",
+                "value": "National Emission Standards for Hazardous Air Pollutants: Plywood and Composite Wood Products",
+                "kind": "text",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/07/06/2026-13550/national-emission-standards-for-hazardous-air-pollutants-plywood-and-composite-wood-products"
+              },
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "IRIS²",
+                "label": "Published",
+                "value": "2026-07-06",
+                "kind": "date",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/07/06/2026-13550/national-emission-standards-for-hazardous-air-pollutants-plywood-and-composite-wood-products"
+              }
+            ],
+            "queried_entities": [
+              "European Union",
+              "IRIS²"
+            ]
+          },
+          "related": [],
+          "importance_score": 22
+        },
+        {
+          "item_id": "161c5c611de2e9b2",
+          "title": "Inside the effort to show Congress what war in space looks like",
+          "raw_title": null,
+          "url": "https://spacenews.com/inside-the-effort-to-show-congress-what-war-in-space-looks-like/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T13:30:00Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 12,
+              "so_what": "Space Force Association is building an unclassified satellite-threat simulation for congressional briefing; no solicitation, contract award, or BTX subcontracting opportunity identified.",
+              "now_what": "No action. This is an advocacy/education initiative, not a procurement. Monitor Space Force's actual threat-simulation contracts separately.",
+              "categories": []
+            },
+            "exec": {
+              "relevance_score": 28,
+              "so_what": "Space Force is working to communicate space-combat scenarios to Congress; signals growing focus on satellite resilience and space-defense policy, which could drive future Space Force procurement and F-35/B-21 integration work.",
+              "now_what": "Monitor Space Force's follow-up policy decisions and budget requests on satellite resilience, especially if they translate into new production or integration requirements for precision components BTX could machine (e.g., composite housings, sensor mounts, flight-critical brackets).",
+              "categories": [
+                "Program Decision",
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Source is about congressional education, not a procurement. Relevance is indirect (strategic signaling only).",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "On July 31, 2026, SpaceNews reported that the Space Force Association's National Spacepower Center is constructing an unclassified demonstration environment to simulate threats to satellites and their consequences for terrestrial military operations. This effort is designed to educate Congress on space-conflict scenarios and the dependencies of U.S. defense systems on space infrastructure. The initiative reflects growing DoD/USSF concern about space-domain threats and the need to harden critical defense systems against anti-satellite (ASAT) warfare.",
+              "key_stakeholders": [
+                "Space Force Association",
+                "National Spacepower Center",
+                "U.S. Space Force (USSF)",
+                "Congress (funding and policy decision-making)",
+                "Defense primes with space and satellite programs (Lockheed Martin, RTX, Northrop Grumman, Boeing Defense)",
+                "DARPA (potential funder/collaborator)",
+                "Allied nations (NATO, Japan, Australia)"
+              ],
+              "scenarios": [
+                "Congressional demonstration of space-conflict consequences may accelerate funding for space-resilience programs (satellites, communications, GPS-denied operations), creating new production and sustainment contracts for precision-machined components in satellite buses, ground stations, or hardened systems.",
+                "If the demonstration highlights vulnerabilities in legacy satellite or ground-segment hardware, primes may fund retrofits, upgrades, or next-generation builds, creating build-to-print opportunities for Tier 2 suppliers like BTX.",
+                "If the National Spacepower Center identifies supply-chain fragility or vendor-concentration risks as a barrier to rapid space-resilience deployment, Congress may fund domestic manufacturing capacity expansion, preferentially supporting AS9100-certified, ITAR-compliant suppliers such as BTX."
+              ],
+              "recommended_actions": [
+                "Alert BTX leadership to monitor USSF and congressional budget hearings (autumn 2026, early 2027) for space-resilience appropriations; these often cascade into prime-contractor RFQs for subcontractor capacity within 3–6 months of authorization.",
+                "Prepare a capability brief for Lockheed Martin, RTX, and Northrop Grumman highlighting BTX's readiness to support space-segment manufacturing: 5-axis CNC, AS9100, NADCAP, ITAR compliance, and capacity for low-rate-initial-production (LRIP) or full-rate production (FRP) of satellite or ground-station components.",
+                "Engage USSF and Space Command (via prime customers or BD consultants) to participate in supply-chain resilience assessments or industrial-base workshops, positioning BTX as a certified, geographically diverse, ITAR-registered supplier capable of supporting urgent space-defense manufacturing needs."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Space Force Association",
+              "type": "organization"
+            },
+            {
+              "name": "Space Force",
+              "type": "agency"
+            }
+          ],
+          "enrichment": {
+            "facts": [],
+            "queried_entities": [
+              "Space Force Association"
+            ]
+          },
+          "related": [
+            {
+              "item_id": "03a76f507072c9e5",
+              "title": "Space Force picks 15 companies for $981 million training range contract",
+              "url": "https://spacenews.com/space-force-picks-15-companies-for-981-million-training-range-contract/",
+              "via": [
+                "Space Force"
+              ]
+            },
+            {
+              "item_id": "5f36e674b3a2acca",
+              "title": "The new space wars: lessons from Ukraine and the Middle East",
+              "url": "https://spacenews.com/the-new-space-wars-lessons-from-ukraine-and-the-middle-east/",
+              "via": [
+                "Space Force"
+              ]
+            }
+          ],
+          "importance_score": 28
+        },
+        {
+          "item_id": "03a76f507072c9e5",
+          "title": "Space Force picks 15 companies for $981 million training range contract",
+          "raw_title": null,
+          "url": "https://spacenews.com/space-force-picks-15-companies-for-981-million-training-range-contract/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T13:18:20Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 2,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 72,
+              "so_what": "Space Force has selected 15 vendors for a $981 million training-range contract to build satellites, sensors, and support systems for military space exercises; significant opportunity if any of the 15 primes are Lockheed Martin, RTX, or Northrop Grumman, or if subcontracting work involves flight-critical machined components.",
+              "now_what": "BD team should immediately identify which of the 15 vendors are BTX's current or target primes (Lockheed, RTX, Northrop, Boeing Defense). Request RFQ/subcontracting details from each prime's capture team; prioritize if work involves satellite bus hardware, sensor housings, or structural components requiring 5-axis CNC precision machining and AS9100 certification.",
+              "categories": [
+                "Contract Award",
+                "Subcontracting Opportunity"
+              ]
+            },
+            "exec": {
+              "relevance_score": 68,
+              "so_what": "Space Force awarded $981 million to 15 vendors for a training-range system that builds satellites and sensors; a major Space Force procurement that may create subcontracting work for precision-machined components BTX can produce.",
+              "now_what": "Capture team should immediately determine if any of the 15 prime vendors are BTX customers or prospects. If yes, initiate formal capture: request SOW details, identify which components are flight-critical or are subject to AS9100/NADCAP, and assess whether BTX's 5-axis CNC and assembly capabilities are called for. If any vendor is new to BTX, evaluate partnership potential.",
+              "categories": [
+                "Contract Award",
+                "Subcontracting Opportunity"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$981 million",
+            "value": 981000000.0,
+            "currency": "USD"
+          },
+          "affected_population": {
+            "raw_text": "15 companies",
+            "value": 15,
+            "unit": "companies"
+          },
+          "action_deadline": null,
+          "confidence_note": "Source names $981 million and states ' 15 companies' were selected but does not list vendor names. BD team must source vendor list from Space Force announcement or SAM.gov to identify prime involvement and subcontracting pathways.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "The Space Force has awarded a competitive contract vehicle worth $981 million to 15 vendors to develop satellites, sensors, and systems for a military space training range. This follows U.S. Space Force strategy to increase realism and complexity of space-domain exercises, reflecting heightened concern over peer competition and the need to train forces for contested space environments.",
+              "key_stakeholders": [
+                "U.S. Space Force",
+                "15 selected vendors (names not stated in source)",
+                "Defense primes potentially using subcontractors"
+              ],
+              "scenarios": [
+                "If BTX is not already on a prime's subcontractor roster for this training range program, primes may seek precision-machined components (sensor mounts, structural housings, satellite brackets) and BTX could bid for build-to-print work within 6–12 months as primes begin detailed design and production planning.",
+                "If this training range contract triggers follow-on satellite or sensor production beyond the initial $981M, BTX's AS9100/ITAR certifications position it to win machined-component subcontract work, but only if primes are already aware of BTX's capabilities; lack of visibility may limit opportunity capture.",
+                "The training range program may create sustained demand for precision-machined satellite and sensor components over 18+ months, but competitive pressure from established aerospace suppliers and potential consolidation among the 15 awardees could reduce the number of actual production primes BTX must engage."
+              ],
+              "recommended_actions": [
+                "Immediately contact capture/capture managers at Lockheed Martin, RTX, Northrop Grumman, and Boeing Defense to determine which (if any) were selected as one of the 15 awardees and which build-to-print machining opportunities exist within their training range proposals.",
+                "Request a preliminary bill-of-materials (BOM) summary from winning primes to identify satellite, sensor, and system components that require precision 5-axis CNC machining, titanium or aluminum fabrication, and AS9100 quality pedigree—focus on structural assemblies, fastener blocks, and sensor housings.",
+                "Prepare a one-page capability brief highlighting BTX's AS9100/ITAR compliance, NADCAP certifications, and experience with satellite/spacecraft flight-critical components to circulate to the 15 awardees' supply-chain organizations within two weeks, positioning BTX for RFQ issuance as design phases mature."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Space Force",
+              "type": "agency"
+            }
+          ],
+          "enrichment": null,
+          "related": [
+            {
+              "item_id": "161c5c611de2e9b2",
+              "title": "Inside the effort to show Congress what war in space looks like",
+              "url": "https://spacenews.com/inside-the-effort-to-show-congress-what-war-in-space-looks-like/",
+              "via": [
+                "Space Force"
+              ]
+            },
+            {
+              "item_id": "5f36e674b3a2acca",
+              "title": "The new space wars: lessons from Ukraine and the Middle East",
+              "url": "https://spacenews.com/the-new-space-wars-lessons-from-ukraine-and-the-middle-east/",
+              "via": [
+                "Space Force"
+              ]
+            }
+          ],
+          "importance_score": 72
+        },
+        {
+          "item_id": "5f36e674b3a2acca",
+          "title": "The new space wars: lessons from Ukraine and the Middle East",
+          "raw_title": null,
+          "url": "https://spacenews.com/the-new-space-wars-lessons-from-ukraine-and-the-middle-east/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T12:00:00Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 14,
+              "so_what": "Brookings/Space Force Association discussion on space threats from Ukraine and Middle East conflicts; strategic context for space-defense spending but no specific solicitation, contract, or subcontracting opportunity named.",
+              "now_what": "No immediate action. Monitor follow-up Space Force strategy documents and budget requests for new programs or requirements that may drive demand for BTX's precision machining (e.g., hardened satellite components, resilient ground terminals).",
+              "categories": [
+                "Industry News"
+              ]
+            },
+            "exec": {
+              "relevance_score": 42,
+              "so_what": "Space Force Chief of Space Operations is engaging on lessons from Ukraine/Middle East space conflict, signaling elevated policy priority on satellite resilience and contested-environment operations—likely to drive new program funding and integration requirements.",
+              "now_what": "Strategy/BD teams should monitor upcoming Space Force budget cycles (FY2027+) and F-35/B-21 modernization roadmaps for new resilience or hardening requirements. Assess whether BTX's 5-axis CNC and AS9100 capabilities position it to win subcontracts on hardened electronics boxes, antenna mounts, or flight-control structural components if primes respond to new RFPs.",
+              "categories": [
+                "Program Decision",
+                "Budget & Appropriations"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Item is a discussion summary, not a policy announcement or procurement. Inference that it will drive future program requirements is reasonable but not yet confirmed.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "This article discusses strategic lessons for U.S. military space operations drawn from the Ukraine and Middle East conflicts, with Chief of Space Operations General Chance Saltzman offering insights into contested space environments. The piece reflects growing Pentagon focus on defending and operating satellites and ground systems in wartime scenarios where adversaries may attempt to degrade or deny U.S. space capabilities.",
+              "key_stakeholders": [
+                "U.S. Space Force (Chief of Space Operations Saltzman)",
+                "Brookings Institution",
+                "Defense primes (RTX, Lockheed Martin, Northrop Grumman)",
+                "Allied nations relying on U.S. space infrastructure"
+              ],
+              "scenarios": [
+                "If Ukraine/Middle East lessons drive Pentagon adoption of more resilient, redundant satellite constellations and ground stations, demand for precision-machined components in rapid-replacement or modular satellite bus designs could increase; BTX's build-to-print capability would be relevant if primes adopt plug-and-play architectures requiring tight-tolerance machined interfaces.",
+                "If contested-space doctrine leads to accelerated procurement of satellite hardening (radiation shielding, vibration isolation, structural reinforcement), BTX could see higher volumes of aluminum and titanium machined parts for satellite frames and thermal-management housings—but only if design specs are clarified and communicated to suppliers through prime RFQs.",
+                "If the lessons lead to distributed production and supply-chain resilience measures (e.g., multiple qualified suppliers per component), BTX's U.S. presence and AS9100/ITAR certification could strengthen its competitive position versus overseas machining firms, but this remains contingent on prime procurement decisions not yet announced."
+              ],
+              "recommended_actions": [
+                "Monitor DCMA, Space Force Rapid Capabilities Office (RCO), and prime RFI activity for emerging satellite resilience or rapid-replacement initiatives that may flow down machining requirements; contact a relationship owner at Lockheed Martin or RTX Space Systems to understand whether contested-space lessons are driving near-term design or supply-chain changes.",
+                "Assess BTX's current capacity and lead-time flexibility for satellite structural components (e.g., aluminum alloy frames, titanium heat shields, interface brackets) and document capability in a one-page brief to be issued if primes begin scouting for secondary or backup suppliers as part of supply-chain de-risking.",
+                "Flag internally any ITAR or export-control implications if these space systems or components are intended for joint allied operations; coordinate with BTX's compliance officer to ensure export-control posture aligns with potential NATO or allied-nation involvement in space infrastructure."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Brookings Institution",
+              "type": "organization"
+            },
+            {
+              "name": "General Chance Saltzman",
+              "type": "person"
+            },
+            {
+              "name": "Space Force",
+              "type": "agency"
+            }
+          ],
+          "enrichment": {
+            "facts": [],
+            "queried_entities": [
+              "Brookings Institution"
+            ]
+          },
+          "related": [
+            {
+              "item_id": "03a76f507072c9e5",
+              "title": "Space Force picks 15 companies for $981 million training range contract",
+              "url": "https://spacenews.com/space-force-picks-15-companies-for-981-million-training-range-contract/",
+              "via": [
+                "Space Force"
+              ]
+            },
+            {
+              "item_id": "161c5c611de2e9b2",
+              "title": "Inside the effort to show Congress what war in space looks like",
+              "url": "https://spacenews.com/inside-the-effort-to-show-congress-what-war-in-space-looks-like/",
+              "via": [
+                "Space Force"
+              ]
+            }
+          ],
+          "importance_score": 42
+        },
+        {
+          "item_id": "46bf8f3d72d67b02",
+          "title": "Proposed rule would exempt commercial launch licensing from environmental…",
+          "raw_title": "Proposed rule would exempt commercial launch licensing from environmental regulations",
+          "url": "https://spacenews.com/proposed-rule-would-exempt-commercial-launch-licensing-from-environmental-regulations/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-29T23:12:56Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 22,
+              "so_what": "A proposed DOT environmental-exemption rule for commercial space launch licensing is regulatory tail-wind for launch operators but does not directly open subcontracting or machining work for BTX unless a BTX prime wins new launch-service contracts.",
+              "now_what": "Monitor the final rule and track whether RTX, Lockheed Martin, or Northrop Grumman increase investment in commercial launch or satellite production as a result.",
+              "categories": [
+                "Industry News"
+              ]
+            },
+            "exec": {
+              "relevance_score": 28,
+              "so_what": "Proposed DOT rule to exempt commercial launch licensing from environmental review may lower barriers for space-industry expansion, potentially increasing demand for precision components if BTX primes scale satellite or launch-vehicle production.",
+              "now_what": "Assign regulatory monitor to track rule finalization (expected deadline not stated); brief operations on any capex or supply-chain implications if a BTX prime announces commercial-space initiatives in response.",
+              "categories": [
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Proposed rule status only; no final rule date stated in source.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "The Department of Transportation has proposed a rule to exempt commercial space launch licensing from many environmental regulations, a move supported by industry but opposed by environmental groups. This deregulatory shift is intended to accelerate commercial launch licensing and reduce compliance burdens on commercial space operators.",
+              "key_stakeholders": [
+                "Department of Transportation (FAA)",
+                "Commercial space industry (SpaceX, Blue Origin, Axiom Space, etc.)",
+                "Environmental advocacy groups",
+                "State-level environmental agencies"
+              ],
+              "scenarios": [
+                "If the exemption is finalized as proposed, BTX may see indirect demand as commercial launch operators accelerate investment in satellite and launch-vehicle production, potentially increasing build-to-print machining work from commercial primes (e.g., SpaceX, Blue Origin) if they use U.S. subcontractors; however, these firms may prefer in-house manufacturing or overseas suppliers, reducing upside for BTX.",
+                "If environmental groups succeed in narrowing or delaying the exemption through litigation or regulatory feedback, commercial launch timelines may extend and demand for satellite/component production may flatten, reducing secondary effects on BTX's subcontract pipeline.",
+                "The exemption may attract new commercial launch entrants or accelerate small-satellite constellation production (e.g., Starlink competitors), but most commercial operators rely on high-volume, low-margin production; BTX's high-precision, build-to-print, and ITAR-compliant focus is misaligned with commercial space volumes and pricing, so net impact on BTX is likely minimal unless a commercial customer specifically requires U.S.-made, ITAR-compliant machined components."
+              ],
+              "recommended_actions": [
+                "Monitor the final rule (expected within 6–12 months) and assess whether any commercial primes BTX currently serves or targets (e.g., via RTX or Northrop Grumman commercial divisions) signal accelerated satellite or component procurement; do not prioritize resource allocation to this rule pending clearer demand signals from known customers.",
+                "Internally note that commercial space acceleration, if it occurs, is unlikely to drive near-term defense build-to-print work for BTX; instead, confirm that BTX's strategic focus remains on defense-prime build-to-print programs (F-35, B-21, hypersonics) where regulatory/export-control compliance is foundational to winning.",
+                "Flag to leadership that environmental litigation risk around this rule may delay or complicate commercial launch timelines; if BTX has any supply-chain dependencies on commercial launch for non-defense components, stress-test those relationships and identify alternative suppliers or timelines."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Department of Transportation",
+              "type": "agency"
+            }
+          ],
+          "enrichment": null,
+          "related": [],
+          "importance_score": 28
+        },
+        {
+          "item_id": "3944a5aa46500641",
+          "title": "L3Harris delays missile business IPO to 2027 despite surging defense demand",
+          "raw_title": null,
+          "url": "https://spacenews.com/l3harris-delays-missile-business-ipo-to-2027-despite-surging-defense-demand/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-29T22:57:06Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 35,
+              "so_what": "L3Harris delays IPO of its missile business to 2027 despite Pentagon demand surge; this signals continued consolidation of missile-technology suppliers and may indicate capacity tightening that benefits smaller, agile subcontractors like BTX if a BTX prime wins missile-related awards.",
+              "now_what": "BD team should track L3Harris missile-business wins and any build-to-print or precision-component solicitations from its parent or primes; assess whether BTX can compete for subcontracts on missile-guidance, airframe, or fin hardware.",
+              "categories": [
+                "Industry News"
+              ]
+            },
+            "exec": {
+              "relevance_score": 42,
+              "so_what": "L3Harris missile-business surge and IPO deferral signal strong Pentagon demand for advanced missile systems; if a BTX prime (Lockheed Martin, RTX) captures a share, subcontracting opportunities for precision-machined missile components (guidance sections, control fins, motor cases) will open.",
+              "now_what": "Track RTX and Lockheed Martin's missile-program wins over next 6 months; if either lands new hypersonic or air-launched cruise-missile contracts, flag for supply-chain planning and assess BTX's capacity to support 5-axis CNC work on flight-critical hardware.",
+              "categories": [
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "IPO delay to 2027 is stated; CEO claim of 'surging defense demand' is not quantified and may reflect market positioning.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "L3Harris Technologies",
+              "type": "organization"
+            },
+            {
+              "name": "Department of Defense",
+              "type": "agency"
+            }
+          ],
+          "enrichment": {
+            "facts": [
+              {
+                "enricher_id": "usaspending-awards",
+                "entity": "L3Harris Technologies",
+                "label": "Top recent award",
+                "value": "2226709932.96",
+                "kind": "money",
+                "number": 2226709932.96,
+                "url": null
+              },
+              {
+                "enricher_id": "usaspending-awards",
+                "entity": "L3Harris Technologies",
+                "label": "Awarding agency",
+                "value": "Department of Defense",
+                "kind": "text",
+                "number": null,
+                "url": null
+              },
+              {
+                "enricher_id": "usaspending-awards",
+                "entity": "L3Harris Technologies",
+                "label": "Top recent award",
+                "value": "1826088581.86",
+                "kind": "money",
+                "number": 1826088581.86,
+                "url": null
+              }
+            ],
+            "queried_entities": [
+              "L3Harris Technologies"
+            ]
+          },
+          "related": [
+            {
+              "item_id": "078ee54271eca5d6",
+              "title": "Information Collection Requirement; Defense Federal Acquisition Regulation…",
+              "url": "https://www.federalregister.gov/documents/2026/07/31/2026-15546/information-collection-requirement-defense-federal-acquisition-regulation-supplement-subcontracting",
+              "via": [
+                "Department of Defense"
+              ]
+            },
+            {
+              "item_id": "303c3502c6316e59",
+              "title": "SpaceX wins $1.6 billion in launch orders for military satellite networks",
+              "url": "https://spacenews.com/spacex-wins-1-6-billion-in-launch-orders-for-military-satellite-networks/",
+              "via": [
+                "Department of Defense"
+              ]
+            }
+          ],
+          "importance_score": 42
+        },
+        {
+          "item_id": "303c3502c6316e59",
+          "title": "SpaceX wins $1.6 billion in launch orders for military satellite networks",
+          "raw_title": null,
+          "url": "https://spacenews.com/spacex-wins-1-6-billion-in-launch-orders-for-military-satellite-networks/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-29T20:43:51Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 2,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 72,
+              "so_what": "SpaceX wins $1.6 billion in launch orders for military satellite networks (missile tracking, targeting, military comms); if SpaceX subcontracts to a BTX prime or an aerospace Tier-1 for satellite bus, payload adapters, or structural components, BTX's precision-machining and assembly capabilities map directly to flight-critical hardware.",
+              "now_what": "Immediate: BD team should contact RTX, Lockheed Martin, and Northrop Grumman capture managers to determine if any are suppliers or major subcontractors to SpaceX on these military satellite programs; if yes, begin pursuit of build-to-print opportunities for structural, thermal-management, or guidance components. Escalate to capture lead if a BTX prime is involved.",
+              "categories": [
+                "Subcontracting Opportunity",
+                "Contract Award"
+              ]
+            },
+            "exec": {
+              "relevance_score": 68,
+              "so_what": "$1.6 billion Pentagon satellite-launch contract to SpaceX creates subcontracting pipeline risk and upside: if a BTX prime is awarded as integrator or major subcontractor, BTX will have clear path to precision-machined, flight-critical components; if not, BTX loses a high-value opportunity.",
+              "now_what": "Executive sponsor should direct BD to immediately confirm whether RTX, Lockheed Martin, or Northrop Grumman has been named or is bidding as a subcontractor to SpaceX on these military satellite networks. If confirmed, brief operations on supply-chain assumptions (labor, materials, tooling lead times) for scaled production of 5-axis CNC aerospace hardware over 18-36 month performance period. If not confirmed, assess whether BTX should approach a prime proactively to offer subcontracting support.",
+              "categories": [
+                "Subcontracting Opportunity",
+                "Contract Award"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$1.6 billion",
+            "value": 1600000000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "SpaceX is not named as recipient in summary title; inferred from 'wins' phrasing. Contract scope (missile tracking, targeting, military comms) is stated; specific satellites, platforms, and prime subcontractors are not named and require follow-up.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "SpaceX",
+              "type": "organization"
+            },
+            {
+              "name": "Department of Defense",
+              "type": "agency"
+            }
+          ],
+          "enrichment": {
+            "facts": [],
+            "queried_entities": [
+              "SpaceX"
+            ]
+          },
+          "related": [
+            {
+              "item_id": "078ee54271eca5d6",
+              "title": "Information Collection Requirement; Defense Federal Acquisition Regulation…",
+              "url": "https://www.federalregister.gov/documents/2026/07/31/2026-15546/information-collection-requirement-defense-federal-acquisition-regulation-supplement-subcontracting",
+              "via": [
+                "Department of Defense"
+              ]
+            },
+            {
+              "item_id": "3944a5aa46500641",
+              "title": "L3Harris delays missile business IPO to 2027 despite surging defense demand",
+              "url": "https://spacenews.com/l3harris-delays-missile-business-ipo-to-2027-despite-surging-defense-demand/",
+              "via": [
+                "Department of Defense"
+              ]
+            }
+          ],
+          "importance_score": 72
+        },
+        {
+          "item_id": "44d92cbd6460b704",
+          "title": "Fortastra and Hadrian join forces to streamline satellite production",
+          "raw_title": null,
+          "url": "https://spacenews.com/fortastra-and-hadrian-join-forces-to-streamline-satellite-production/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-29T13:00:00Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 2,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 72,
+              "so_what": "Hadrian, a manufacturing specialist, is partnering with Fortastra to apply precision machining and additive manufacturing to satellite production—a direct alignment with BTX's 5-axis CNC and build-to-print capabilities for flight-critical hardware.",
+              "now_what": "BD should research Hadrian's customer base and Fortastra's defense connections; if either works with BTX's primes or on BTX programs, assess whether this partnership signals a satellite subcontracting opportunity or competitive threat to BTX's precision-machining channel.",
+              "categories": [
+                "Industry News",
+                "Subcontracting Opportunity"
+              ]
+            },
+            "exec": {
+              "relevance_score": 48,
+              "so_what": "Hadrian's expansion into satellite production via precision machining may signal demand for BTX-type capabilities in defense satellite programs, but Fortastra's defense footprint is unclear from the source.",
+              "now_what": "Exec should flag to BD/capture for deeper reconnaissance on Hadrian and Fortastra's defense customer relationships and whether this represents a new channel to defend satellite work on F-35/B-21 industrial base programs.",
+              "categories": [
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Partnership specifics and Fortastra's defense affiliation not detailed in summary; further investigation required.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Hadrian",
+              "type": "organization"
+            },
+            {
+              "name": "Fortastra",
+              "type": "organization"
+            }
+          ],
+          "enrichment": {
+            "facts": [],
+            "queried_entities": [
+              "Hadrian"
+            ]
+          },
+          "related": [],
+          "importance_score": 72
+        },
+        {
+          "item_id": "dff0990b3231fe86",
+          "title": "Chinese startup raises funds for space situational awareness constellation…",
+          "raw_title": "Chinese startup raises funds for space situational awareness constellation, joining commercial SSA rush",
+          "url": "https://spacenews.com/chinese-startup-raises-funds-for-space-situational-awareness-constellation-joining-commercial-ssa-rush/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-29T01:18:28Z",
+          "collected_at": "2026-07-31T21:28:12.529814Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 12,
+              "so_what": "A Chinese startup raised $14M for a space situational awareness (SSA) satellite constellation—foreign commercial activity outside BTX's defense-prime customer base and U.S. geographic focus.",
+              "now_what": "Skip unless Chinese SSA capabilities trigger U.S. export-control restrictions on BTX's ITAR-registered precision-machining inputs or customer relationships.",
+              "categories": []
+            },
+            "exec": {
+              "relevance_score": 22,
+              "so_what": "Chinese commercial SSA constellation development may eventually prompt U.S. export-control or ITAR policy shifts to limit sensitive U.S. satellite technology, but no specific compliance action is evident from this item.",
+              "now_what": "Compliance should monitor for any DDTC or State Department guidance on SSA technology controls; no immediate action indicated.",
+              "categories": [
+                "Export Controls / Compliance"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$14 million",
+            "value": 14000000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Chinese SSA development is noted as trend but no direct U.S. policy response is named; speculative connection to BTX's export-control exposure.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "A Beijing-based startup (Xingchen Daohe) has raised approximately $14 million to develop a satellite constellation for space situational awareness (SSA)—tracking orbital debris and objects in space. This reflects accelerating competition in the commercial SSA sector, which has grown as both government and commercial actors seek to monitor and manage the increasingly congested orbital environment.",
+              "key_stakeholders": [
+                "Xingchen Daohe (Beijing-based startup)",
+                "Chinese government (national security interest)",
+                "U.S. Department of Defense (monitoring foreign SSA capabilities)",
+                "U.S. commercial space operators (potential competitive pressure)"
+              ],
+              "scenarios": [
+                "Chinese SSA constellation achieves operational capability within 18 months, enabling Beijing to market orbital-tracking data to non-aligned nations and commercial actors, potentially creating export-control and national-security review friction for U.S. defense primes sourcing supply-chain intelligence.",
+                "U.S. DoD or State Department designates Chinese SSA data or services as strategically sensitive, triggering ITAR/export-control restrictions on U.S. contractors sharing orbital-object information with foreign partners—constraining BTX's visibility into supply-chain and inventory risks on overseas defense programs.",
+                "Commercial SSA data becomes a competitive intelligence tool; Chinese constellation data is used to monitor or predict U.S. satellite deployments, creating secondary pressure on DoD to tighten information-sharing protocols with industrial base, including build-to-print suppliers."
+              ],
+              "recommended_actions": [
+                "Monitor DoD and State Department guidance on Chinese SSA capabilities and any resulting restrictions on contractor data-sharing or foreign technology engagement; flag to compliance/legal team any implications for BTX's current or prospective work with Lockheed Martin, RTX, or Northrop Grumman on programs involving space or orbital components (e.g., F-35 ground/satellite-link hardware, if any).",
+                "Track whether SSA developments trigger new or enhanced ITAR export-control requirements for BTX's machined components destined for space or satellite systems; coordinate with DCMA/DDTC on classification of BTX's build-to-print work for aerospace primes.",
+                "No immediate capture action indicated unless BTX is positioned as a supplier of precision hardware for U.S. government or commercial SSA systems; confirm with BD team whether any of BTX's existing customers are investing in domestic SSA constellation programs."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Xingchen Daohe",
+              "type": "organization"
+            },
+            {
+              "name": "China",
+              "type": "place"
+            }
+          ],
+          "enrichment": null,
+          "related": [],
+          "importance_score": 22
+        },
+        {
+          "item_id": "078ee54271eca5d6",
+          "title": "Information Collection Requirement; Defense Federal Acquisition Regulation…",
+          "raw_title": "Information Collection Requirement; Defense Federal Acquisition Regulation Supplement; Subcontracting Policies and Procedures",
+          "url": "https://www.federalregister.gov/documents/2026/07/31/2026-15546/information-collection-requirement-defense-federal-acquisition-regulation-supplement-subcontracting",
+          "source_id": "Federal Register - Dept. of Defense",
+          "published_at": "2026-07-31T00:00:00Z",
+          "collected_at": "2026-07-31T21:28:12.532906Z",
+          "tier": 3,
+          "per_edition": {
+            "exec": {
+              "relevance_score": 16,
+              "so_what": "DoD updating DFARS subcontracting-policy rules; routine notice with no stated changes to small-business setasides, DBE, or compliance exposure for BTX as a Tier-1 machining supplier.",
+              "now_what": "No action required unless final rule changes BTX's subcontracting-plan obligations or prime customer flowdown requirements.",
+              "categories": []
+            },
+            "bd": {
+              "relevance_score": 24,
+              "so_what": "DoD is revisiting DFARS subcontracting procedures; if final rule changes how primes structure subcontracting plans or reporting, it could affect BTX's visibility into and qualification for subcontracting opportunities under Lockheed, RTX, and Northrop.",
+              "now_what": "Once OMB clearance is final, legal/compliance should review whether new subcontracting rules require BTX to adjust its proposal or compliance processes.",
+              "categories": [
+                "Budget & Appropriations"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Regulatory notice only; no specifics on proposed subcontracting-policy changes.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Department of Defense",
+              "type": "agency"
+            },
+            {
+              "name": "Defense Acquisition Regulations System",
+              "type": "agency"
+            },
+            {
+              "name": "Office of Management and Budget",
+              "type": "agency"
+            }
+          ],
+          "enrichment": null,
+          "related": [
+            {
+              "item_id": "303c3502c6316e59",
+              "title": "SpaceX wins $1.6 billion in launch orders for military satellite networks",
+              "url": "https://spacenews.com/spacex-wins-1-6-billion-in-launch-orders-for-military-satellite-networks/",
+              "via": [
+                "Department of Defense"
+              ]
+            },
+            {
+              "item_id": "3944a5aa46500641",
+              "title": "L3Harris delays missile business IPO to 2027 despite surging defense demand",
+              "url": "https://spacenews.com/l3harris-delays-missile-business-ipo-to-2027-despite-surging-defense-demand/",
+              "via": [
+                "Department of Defense"
+              ]
+            }
+          ],
+          "importance_score": 24
+        }
+      ]
     }
   ],
   "pinned": []
