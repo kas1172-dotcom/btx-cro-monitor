@@ -133,16 +133,23 @@ async function waitForPreview(): Promise<ReturnType<typeof spawn>> {
 async function signInWithClerkIfConfigured(page: Page): Promise<void> {
   if (!CLERK_LOGIN_ENABLED) return;
   assert(CLERK_EMAIL && CLERK_PASSWORD, "E2E_CLERK_LOGIN=1 requires E2E_CLERK_EMAIL and E2E_CLERK_PASSWORD.");
-  await page.goto(BASE_URL, { waitUntil: "networkidle" });
-  const emailField = page.locator('input[name="identifier"], input[type="email"]').first();
-  await emailField.waitFor({ timeout: 20000 });
-  await emailField.fill(CLERK_EMAIL);
-  await page.getByRole("button", { name: /continue/i }).click();
-  const passwordField = page.locator('input[name="password"], input[type="password"]').first();
-  await passwordField.waitFor({ timeout: 20000 });
-  await passwordField.fill(CLERK_PASSWORD);
-  await page.getByRole("button", { name: /continue|sign in/i }).click();
-  await page.locator("[data-surface-component], .route-data-card").first().waitFor({ timeout: 30000 });
+  try {
+    await page.goto(BASE_URL, { waitUntil: "networkidle" });
+    const emailField = page.locator('input[name="identifier"], input[type="email"]').first();
+    await emailField.waitFor({ timeout: 20000 });
+    await emailField.fill(CLERK_EMAIL);
+    await page.getByRole("button", { name: /continue/i }).click();
+    const passwordField = page.locator('input[name="password"], input[type="password"]').first();
+    await passwordField.waitFor({ timeout: 20000 });
+    await passwordField.fill(CLERK_PASSWORD);
+    await page.getByRole("button", { name: /continue|sign in/i }).click();
+    await page.locator("[data-surface-component], .route-data-card").first().waitFor({ timeout: 30000 });
+  } catch (error) {
+    await mkdir(OUT_DIR, { recursive: true });
+    await page.screenshot({ path: `${OUT_DIR}/clerk-login-failure.png`, fullPage: true }).catch(() => undefined);
+    const text = (await page.locator("body").innerText({ timeout: 2000 }).catch(() => "")).replace(/\s+/g, " ").slice(0, 500);
+    throw new Error(`Clerk login did not reach the cockpit surface. Visible page text: ${text || "unavailable"}. ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 function slug(value: string): string {
