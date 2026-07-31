@@ -4,6 +4,7 @@ import { latestCompletedQuarter, sixMonthTrendRangeForQuarter } from "../app/dat
 import type { Deliverable } from "../deliverables/types.ts";
 import { computeMetric } from "../metrics/catalog.ts";
 import { priorQuarter, quarterWindow } from "../metrics/time.ts";
+import type { MetricResult } from "../metrics/types.ts";
 import type { AgentContext, DeliverableAgent } from "./contract.ts";
 import { validateRequiredSections } from "./contract.ts";
 import { AGENT_RUBRICS } from "./rubrics.ts";
@@ -37,6 +38,23 @@ function pct(value: number): string {
   return `${Math.round(value)}%`;
 }
 
+function available(metric: MetricResult): metric is MetricResult & { value: number } {
+  return (metric.state === "available" || metric.state === "stale") && typeof metric.value === "number";
+}
+
+function unavailableLine(metric: MetricResult): string {
+  return `${metric.label}: ${metric.reason}`;
+}
+
+function metricNumber(facts: Record<string, unknown>, key: string): number | null {
+  const value = facts[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function textSection(id: string, heading: string, text: string) {
+  return { id, heading, blocks: [{ kind: "text" as const, text }] };
+}
+
 export const boardDeckAgent: DeliverableAgent<Inputs> = {
   id: "board_deck",
   audience: "board",
@@ -60,6 +78,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
       pipelineCoverage: computeMetric("pipeline_coverage", world, undefined, window),
       priorBacklog: computeMetric("backlog", world, undefined, prior),
     };
+    const unavailableMetrics = Object.values(metrics).filter((metric) => !available(metric));
     const topRisk = [...world.analysis.scores].sort((a, b) => b.dimensions.risk.score - a.dimensions.risk.score).slice(0, 5);
     const nameOf = (id: string) => world.companies.find((c) => c.id === id)?.name ?? id;
     return {
@@ -89,6 +108,8 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
             driver: score.contributions[0]?.event_type?.replace(/_/g, " ") ?? "validated signal",
           };
         })),
+        unavailableMetrics: JSON.stringify(unavailableMetrics.map(unavailableLine)),
+        metricCoverage: Object.values(metrics).filter(available).length,
       },
       entityIds: topRisk.map((r) => r.subject_id),
       sources: mergeSources([
@@ -103,6 +124,115 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
   async compose(ctx): Promise<Deliverable> {
     const f = ctx.facts;
     const trendRange = sixMonthTrendRangeForQuarter(String(f.quarter));
+    const revenue = metricNumber(f, "revenue");
+    const bookings = metricNumber(f, "bookings");
+    const backlog = metricNumber(f, "backlog");
+    const priorBacklog = metricNumber(f, "priorBacklog");
+    const bookToBill = metricNumber(f, "bookToBill");
+    const winRate = metricNumber(f, "winRate");
+    const capacity = metricNumber(f, "capacity");
+    const concentration = metricNumber(f, "concentration");
+    const margin = metricNumber(f, "margin");
+    const aov = metricNumber(f, "aov");
+    const pipelineCoverage = metricNumber(f, "pipelineCoverage");
+    const unavailableMetrics = JSON.parse(String(f.unavailableMetrics || "[]")) as string[];
+    const availableCount = Number(f.metricCoverage ?? 0);
+    const confidence: Deliverable["confidence"] = availableCount >= 7 && ctx.sources.some((source) => source.records.length > 0) ? "high" : availableCount >= 3 ? "medium" : "low";
+    const confidenceReason = availableCount
+      ? `${availableCount} approved metric inputs were available; unavailable sections are suppressed.`
+      : "No approved operating metric inputs were available; the preview only lists missing inputs.";
+    const sections: Deliverable["sections"] = [];
+    sections.push(textSection(
+      "quarter-verdict",
+      "Quarter in One Slide",
+      availableCount
+        ? `This ${f.quarter} review includes only evidence-backed metrics. Sections without approved source data are omitted.`
+        : `The ${f.quarter} revenue review cannot state revenue, bookings, backlog, margin, pipeline, concentration, or capacity findings because approved source datasets are unavailable.`,
+    ));
+    sections.push(textSection(
+      "executive-summary",
+      "Executive Summary",
+      unavailableMetrics.length
+        ? `Missing required inputs: ${unavailableMetrics.join("; ")}.`
+        : `All required operating inputs were available for ${f.quarter}.`,
+    ));
+    if ([revenue, bookings, backlog, bookToBill, winRate].some((value) => value !== null)) {
+      sections.push({
+        id: "kpi-strip",
+        heading: "KPI Strip",
+        blocks: [{
+          kind: "table",
+          columns: ["Metric", "Value", "So what"],
+          rows: [
+            revenue !== null ? ["Revenue", money(revenue), "Recognized current-business revenue"] : null,
+            bookings !== null ? ["Bookings", money(bookings), "New order intake"] : null,
+            backlog !== null ? ["Backlog", money(backlog), "End-of-quarter backlog"] : null,
+            bookToBill !== null ? ["Bookings vs shipped revenue", bookToBill.toFixed(2), "Demand vs shipments"] : null,
+            winRate !== null ? ["Win rate", pct(winRate), "Commercial conversion"] : null,
+          ].filter((row): row is string[] => Boolean(row)),
+        }],
+      });
+    }
+    if (bookings !== null || backlog !== null || bookToBill !== null) {
+      sections.push({
+        id: "growth",
+        heading: "Growth",
+        blocks: [
+          ...(bookings !== null ? [{ kind: "chart-spec" as const, title: "Bookings trend", spec: { viz: "trend", metric: "bookings", timeRange: trendRange } }] : []),
+          ...(backlog !== null ? [{ kind: "chart-spec" as const, title: "Backlog trend", spec: { viz: "trend", metric: "backlog", timeRange: trendRange } }] : []),
+          ...(bookToBill !== null ? [{ kind: "chart-spec" as const, title: "Bookings versus shipped revenue trend", spec: { viz: "trend", metric: "book_to_bill", timeRange: trendRange } }] : []),
+        ],
+      });
+    }
+    if (pipelineCoverage !== null) {
+      sections.push({
+        id: "predictability",
+        heading: `Predictability: pipeline coverage is ${pipelineCoverage.toFixed(1)}x versus a 3.0x planning target`,
+        blocks: [
+          { kind: "chart-spec", title: "Pipeline coverage trend", spec: { viz: "trend", metric: "pipeline_coverage", timeRange: trendRange } },
+          { kind: "text", text: "Coverage is calculated as weighted pipeline divided by average monthly revenue in the quarter." },
+        ],
+      });
+    }
+    if (capacity !== null || margin !== null || aov !== null) {
+      sections.push({
+        id: "efficiency",
+        heading: capacity !== null && margin !== null ? `Efficiency: work-center load averages ${pct(capacity)}, margin ${pct(margin)}` : "Efficiency",
+        blocks: [
+          ...(capacity !== null ? [{ kind: "chart-spec" as const, title: "Work-center load trend", spec: { viz: "trend", metric: "capacity_utilization", timeRange: trendRange } }] : []),
+          ...(aov !== null ? [{ kind: "chart-spec" as const, title: "Average order value trend", spec: { viz: "trend", metric: "avg_order_value", timeRange: trendRange } }] : []),
+          ...(margin !== null ? [{ kind: "text" as const, text: `Margin is ${pct(margin)} for the available approved records.` }] : []),
+        ],
+      });
+    }
+    if (concentration !== null && revenue !== null) {
+      sections.push({
+        id: "concentration-risks",
+        heading: `Concentration is ${pct(concentration)}; top risks need account action`,
+        blocks: [
+          { kind: "chart-spec", title: "Revenue concentration by account", spec: { viz: "ranked_bar", metric: "revenue", rows: "account", timeRange: { from: String(f.windowFrom), to: String(f.windowTo) } } },
+        ],
+      });
+    }
+    const riskRows = JSON.parse(String(f.riskRows)) as Array<{ name: string; score: number; driver: string }>;
+    if (riskRows.length) {
+      sections.push({
+        id: "risk-register",
+        heading: "Risk Register",
+        blocks: [{
+          kind: "table",
+          columns: ["Account", "Risk score", "Top driver", "Action"],
+          rows: riskRows.map((row) => [row.name, String(row.score), row.driver, "Create account follow-up"]),
+        }],
+      });
+    }
+    sections.push(textSection(
+      "priorities",
+      "Priorities and Asks",
+      capacity !== null
+        ? `Use ${pct(capacity)} average work-center load to keep sales focus aligned with production reality.`
+        : "Before setting revenue or capacity priorities, connect approved operating datasets for revenue, bookings, backlog, pipeline, margin, concentration, and work-center load.",
+    ));
     return {
       id: `deliv-${Date.now()}-board-deck`,
       type: "board_deck",
@@ -110,92 +240,9 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
       createdAt: new Date().toISOString(),
       brainArea: "analysis",
       entityIds: ctx.entityIds,
-      confidence: "high",
-      sections: [
-        {
-          id: "quarter-verdict",
-          heading: "Quarter in One Slide",
-          blocks: [
-            { kind: "text", text: `Demand is steady but capacity discipline matters: bookings were ${Number(f.bookToBill).toFixed(2)}x shipped revenue on ${money(Number(f.revenue))} ${f.quarter} revenue.` },
-            { kind: "text", text: `Backlog ended at ${money(Number(f.backlog))}, ${Number(f.backlog) >= Number(f.priorBacklog) ? "up" : "down"} from the prior quarter, while win rate was ${pct(Number(f.winRate))}.` },
-            { kind: "text", text: `Priority: protect the riskiest accounts while using capacity selectively on high-fit growth.` },
-          ],
-        },
-        {
-          id: "executive-summary",
-          heading: "Executive Summary",
-          blocks: [
-            { kind: "text", text: `Verdict: ${f.quarter} is a capacity-sensitive quarter, with demand slightly ahead of shipments and account risk requiring follow-up.` },
-            { kind: "text", text: `Evidence: revenue was ${money(Number(f.revenue))}, bookings were ${money(Number(f.bookings))}, bookings were ${Number(f.bookToBill).toFixed(2)}x shipped revenue, and backlog ended at ${money(Number(f.backlog))}.` },
-            { kind: "text", text: `Implication: leadership should protect ${f.topRiskName}, prioritize high-fit work, and avoid filling constrained capacity with low-fit demand.` },
-          ],
-        },
-        {
-          id: "kpi-strip",
-          heading: "KPI Strip",
-          blocks: [{
-            kind: "table",
-            columns: ["Metric", "Value", "So what"],
-            rows: [
-              ["Revenue", money(Number(f.revenue)), "Recognized current-business revenue"],
-              ["Bookings", money(Number(f.bookings)), "New order intake"],
-              ["Backlog", money(Number(f.backlog)), "End-of-quarter backlog"],
-              ["Bookings vs shipped revenue", Number(f.bookToBill).toFixed(2), "Demand vs shipments"],
-              ["Win rate", pct(Number(f.winRate)), "Commercial conversion"],
-            ],
-          }],
-        },
-        {
-          id: "growth",
-          heading: `Growth: demand ${Number(f.bookToBill) >= 1 ? "outruns" : "trails"} shipments at ${Number(f.bookToBill).toFixed(2)}x`,
-          blocks: [
-            { kind: "chart-spec", title: "Bookings trend", spec: { viz: "trend", metric: "bookings", timeRange: trendRange } },
-            { kind: "chart-spec", title: "Backlog trend", spec: { viz: "trend", metric: "backlog", timeRange: trendRange } },
-            { kind: "chart-spec", title: "Bookings versus shipped revenue trend", spec: { viz: "trend", metric: "book_to_bill", timeRange: trendRange } },
-          ],
-        },
-        {
-          id: "predictability",
-          heading: `Predictability: pipeline coverage is ${Number(f.pipelineCoverage).toFixed(1)}x versus a 3.0x planning target`,
-          blocks: [
-            { kind: "chart-spec", title: "Pipeline coverage trend", spec: { viz: "trend", metric: "pipeline_coverage", timeRange: trendRange } },
-            { kind: "text", text: `Coverage is calculated as weighted pipeline divided by average monthly revenue in the quarter.` },
-          ],
-        },
-        {
-          id: "efficiency",
-          heading: `Efficiency: work-center load averages ${pct(Number(f.capacity))}, margin ${pct(Number(f.margin))}`,
-          blocks: [
-            { kind: "chart-spec", title: "Work-center load trend", spec: { viz: "trend", metric: "capacity_utilization", timeRange: trendRange } },
-            { kind: "chart-spec", title: "Average order value trend", spec: { viz: "trend", metric: "avg_order_value", timeRange: trendRange } },
-          ],
-        },
-        {
-          id: "concentration-risks",
-          heading: `Concentration is ${pct(Number(f.concentration))}; top risks need account action`,
-          blocks: [
-            { kind: "chart-spec", title: "Revenue concentration by account", spec: { viz: "ranked_bar", metric: "revenue", rows: "account", timeRange: { from: String(f.windowFrom), to: String(f.windowTo) } } },
-          ],
-        },
-        {
-          id: "risk-register",
-          heading: "Risk Register",
-          blocks: [{
-            kind: "table",
-            columns: ["Account", "Risk score", "Top driver", "Action"],
-            rows: JSON.parse(String(f.riskRows)).map((row: { name: string; score: number; driver: string }) => [row.name, String(row.score), row.driver, "Create account follow-up"]),
-          }],
-        },
-        {
-          id: "priorities",
-          heading: "Priorities and Asks",
-          blocks: [
-            { kind: "text", text: `Protect accounts at high risk before they become delivery or revenue slippage.` },
-            { kind: "text", text: `Use ${pct(Number(f.capacity))} average work-center load to keep sales focus aligned with production reality.` },
-            { kind: "text", text: `Watch customer concentration at ${pct(Number(f.concentration))} and keep prospecting active in priority markets.` },
-          ],
-        },
-      ],
+      confidence,
+      confidenceReason,
+      sections,
       sources: ctx.sources,
       actions: [
         { id: "download-pptx", label: "Download PPTX", kind: "download_markdown" },
@@ -204,7 +251,16 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
     };
   },
   validate(deliverable, ctx) {
-    return validateRequiredSections(deliverable, sectionSpec.map((s) => ({ id: s.id, heading: s.heading, blocks: [] })), ctx);
+    const required = sectionSpec
+      .filter((section) => deliverable.sections.some((actual) => actual.id === section.id))
+      .map((s) => ({ id: s.id, heading: s.heading, blocks: [] }));
+    const base = validateRequiredSections(deliverable, required, ctx);
+    const unavailable = String(ctx.facts.unavailableMetrics ?? "[]");
+    const mentionsMissingInputs = deliverable.sections.some((section) => section.blocks.some((block) => block.kind === "text" && /Missing required inputs/i.test(block.text)));
+    if (unavailable !== "[]" && !mentionsMissingInputs) {
+      return { valid: false, errors: [...base.errors, "Unavailable metrics must be stated as missing inputs."] };
+    }
+    return base;
   },
 };
 

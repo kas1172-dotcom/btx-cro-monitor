@@ -108,7 +108,7 @@ export function parseAppRoute(pathname: string, search = ""): AppRoute {
   if (clean === "/") {
     return { id: "today", tab: "brief", path: "/today", accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   }
-  if (root === "today") return { id: "today", tab: "brief", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
+  if (root === "today" || root === "briefing") return { id: "today", tab: "brief", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "work") return { id: "work", tab: "work_queue", path: clean, accountId: null, workItemId: decodeSegment(child), programId: null, conversationId: null, deliverableId: null, query };
   if (root === "accounts") return { id: "accounts", tab: "accounts", path: clean, accountId: decodeSegment(child), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "programs") return { id: "programs", tab: "programs", path: clean, accountId: null, workItemId: null, programId: decodeSegment(child), conversationId: null, deliverableId: null, query };

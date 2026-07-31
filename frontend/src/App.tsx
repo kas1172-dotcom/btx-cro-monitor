@@ -538,7 +538,7 @@ function RouteNotFound({ path }: { path: string }) {
       <div className="surface-panel">
         <p className="eyebrow">Not found</p>
         <h1>That page is not available.</h1>
-        <p>The route <code>{path}</code> does not match a cockpit workspace.</p>
+        <p>That address does not match a cockpit workspace. Use the navigation rail to choose a supported page.</p>
         <button type="button" onClick={() => navigateTo("/today", { replace: true })}>Open Today</button>
       </div>
     </section>

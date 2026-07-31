@@ -6,6 +6,8 @@ function assert(condition: unknown, message: string): void {
 
 const today = parseAppRoute("/");
 assert(today.id === "today" && today.tab === "brief" && today.path === "/today", "root should normalize to Today");
+const briefing = parseAppRoute("/briefing");
+assert(briefing.id === "today" && briefing.tab === "brief", "labelled briefing URL should resolve");
 
 const account = parseAppRoute("/accounts/acct-123");
 assert(account.id === "accounts", "account route id");
