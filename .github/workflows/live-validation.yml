@@ -21,10 +21,10 @@ jobs:
       - name: Install backend test dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
+          python -m pip install -e ".[dev,platform]"
 
       - name: Run live Ask current-news web-search proof
-        run: pytest tests/test_assistant_online.py::test_live_current_news_web_search_opt_in -q -rs
+        run: pytest tests/test_assistant_online.py -k test_live_current_news_web_search_opt_in -q -rs
         env:
           BTX_LIVE_ASK_EVAL: "1"
           BTX_ASK_ONLINE_ENABLED: "1"

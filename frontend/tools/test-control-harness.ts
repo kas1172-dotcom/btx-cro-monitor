@@ -62,6 +62,9 @@ const VIEWPORTS = {
   desktop: { width: 1280, height: 900 },
   mobile: { width: 390, height: 844 },
 } as const;
+const CLERK_LOGIN_ENABLED = process.env.E2E_CLERK_LOGIN === "1";
+const CLERK_EMAIL = process.env.E2E_CLERK_EMAIL;
+const CLERK_PASSWORD = process.env.E2E_CLERK_PASSWORD;
 const REQUIRED_SCENARIOS = [
   "browser_back",
   "browser_forward",
@@ -125,6 +128,21 @@ async function waitForPreview(): Promise<ReturnType<typeof spawn>> {
   }
   child.kill("SIGTERM");
   throw new Error("Timed out waiting for Vite preview.");
+}
+
+async function signInWithClerkIfConfigured(page: Page): Promise<void> {
+  if (!CLERK_LOGIN_ENABLED) return;
+  assert(CLERK_EMAIL && CLERK_PASSWORD, "E2E_CLERK_LOGIN=1 requires E2E_CLERK_EMAIL and E2E_CLERK_PASSWORD.");
+  await page.goto(BASE_URL, { waitUntil: "networkidle" });
+  const emailField = page.locator('input[name="identifier"], input[type="email"]').first();
+  await emailField.waitFor({ timeout: 20000 });
+  await emailField.fill(CLERK_EMAIL);
+  await page.getByRole("button", { name: /continue/i }).click();
+  const passwordField = page.locator('input[name="password"], input[type="password"]').first();
+  await passwordField.waitFor({ timeout: 20000 });
+  await passwordField.fill(CLERK_PASSWORD);
+  await page.getByRole("button", { name: /continue|sign in/i }).click();
+  await page.locator("[data-surface-component], .route-data-card").first().waitFor({ timeout: 30000 });
 }
 
 function slug(value: string): string {
@@ -400,6 +418,7 @@ try {
   const seen = new Map<string, ManifestControl>();
   for (const [viewportName, viewport] of Object.entries(VIEWPORTS) as Array<["desktop" | "mobile", { width: number; height: number }]>) {
     const page = await browser.newPage({ viewport, isMobile: viewportName === "mobile", hasTouch: viewportName === "mobile", deviceScaleFactor: viewportName === "mobile" ? 2 : 1 });
+    await signInWithClerkIfConfigured(page);
     for (const route of ROUTES) {
       const controls = await renderedControls(page, route, viewportName);
       for (const control of controls) {
