@@ -16,11 +16,13 @@
 //    the same "manual credential required" boundary as deploy-staging.yml.
 import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
+import { createServer, type Server, type ServerResponse } from "node:http";
 import { chromium, type Browser, type Page } from "playwright";
 
 // This suite exercises the real Clerk auth gate. The retired shared password
 // gate is intentionally absent from the build.
 const BASE_URL = "http://127.0.0.1:4175";
+const LOCAL_API_URL = "http://127.0.0.1:4185";
 const SCREENSHOT_DIR = "/tmp/btx-e2e-smoke";
 
 const CLERK_PUBLISHABLE_KEY = process.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -28,6 +30,8 @@ const CLERK_EMAIL = process.env.E2E_CLERK_EMAIL;
 const CLERK_PASSWORD = process.env.E2E_CLERK_PASSWORD;
 const CLERK_LOGIN_ENABLED = process.env.E2E_CLERK_LOGIN === "1";
 const HUBSPOT_LOOP_ENABLED = process.env.E2E_HUBSPOT_TEST_PORTAL === "1" && !!process.env.E2E_BACKEND_ENDPOINT;
+const HUBSPOT_LOOP_REQUIRED = process.env.E2E_REQUIRE_HUBSPOT_LOOP === "1";
+const BACKEND_ENDPOINT = process.env.E2E_BACKEND_ENDPOINT ?? LOCAL_API_URL;
 
 function assert(condition: unknown, message: string): void {
   if (!condition) throw new Error(message);
@@ -59,6 +63,156 @@ async function waitForPreview(): Promise<ReturnType<typeof spawn>> {
   }
   child.kill("SIGTERM");
   throw new Error("Timed out waiting for Vite preview.");
+}
+
+function json(response: ServerResponse, status: number, body: unknown): void {
+  response.writeHead(status, {
+    "access-control-allow-origin": BASE_URL,
+    "access-control-allow-headers": "authorization,content-type",
+    "access-control-allow-methods": "GET,POST,PATCH,OPTIONS",
+    "content-type": "application/json",
+  });
+  response.end(JSON.stringify(body));
+}
+
+function smokeScore(entityId: string, score: number) {
+  return {
+    id: `score-${entityId}`,
+    entityType: "account",
+    entityId,
+    scoreFamily: "accountAttractiveness",
+    status: "available",
+    score,
+    result: {
+      score,
+      status: "available",
+      dataCompleteness: 1,
+      positiveFactors: [],
+      negativeFactors: [],
+      neutralFactors: [],
+      missingInputs: [],
+      hardGateFailures: [],
+      evidenceIds: [],
+      configurationVersion: "e2e-smoke",
+      sourceDataVersion: "e2e-smoke",
+      calculatedAt: "2026-07-31T12:00:00Z",
+    },
+    configurationVersion: "e2e-smoke",
+    sourceDataVersion: "e2e-smoke",
+    calculatedAt: "2026-07-31T12:00:00Z",
+  };
+}
+
+function localWorldSnapshot() {
+  const accounts = [
+    {
+      id: "lockheed-smoke",
+      canonical_account_id: "lockheed-smoke",
+      hubspot_company_id: "1001",
+      name: "Lockheed Smoke Fixture",
+      relationship: "customer",
+      account_status: "current_customer",
+      business_motion: "grow_existing_business",
+      location: { city: "Bethesda", state: "MD", country: "US", lat: 39.0, lon: -77.0 },
+      needs: ["5-axis machining", "AS9100"],
+    },
+    {
+      id: "pulse-space-smoke",
+      canonical_account_id: "pulse-space-smoke",
+      hubspot_company_id: "1002",
+      name: "Pulse Space Smoke Fixture",
+      relationship: "target",
+      account_status: "target_prospect",
+      business_motion: "prospect_new_business",
+      location: { city: "Denver", state: "CO", country: "US", lat: 39.7, lon: -104.9 },
+      needs: ["precision turning", "rapid quote"],
+    },
+  ];
+  const contacts = [
+    { id: "contact-lockheed", company_id: "lockheed-smoke", name: "Lane Park", title: "Supplier Quality" },
+    { id: "contact-pulse", company_id: "pulse-space-smoke", name: "Mira Chen", title: "Operations Lead" },
+  ];
+  const opportunities = [
+    { id: "opp-lockheed", company_id: "lockheed-smoke", name: "Smoke machining package", value: 1200000, stage: "qualified", close_date: "2026-09-30" },
+    { id: "opp-pulse", company_id: "pulse-space-smoke", name: "Smoke prototype lot", value: 800000, stage: "proposal", close_date: "2026-10-15" },
+  ];
+  const scores = {
+    accountAttractiveness: [smokeScore("lockheed-smoke", 84), smokeScore("pulse-space-smoke", 78)],
+    signalConfidence: [],
+    pursuitPwin: [],
+    deliveryFeasibility: [],
+    relationshipHealth: [],
+    actionPriority: [],
+  };
+  return {
+    tenant: { id: "e2e-smoke", displayName: "E2E smoke", isDemonstration: true, demoNotice: "Demonstration — internal records are illustrative" },
+    accounts,
+    contacts,
+    opportunities,
+    programs: [],
+    signals: [],
+    signalRelationships: [],
+    facilities: [],
+    operatingFacts: [],
+    capacity: null,
+    scores,
+    workItems: [],
+    deliverables: [],
+    sourceHealth: [
+      { sourceKey: "hubspot-smoke", displayName: "E2E HubSpot smoke fixture", availability: "simulated", lastSuccessfulSyncAt: "2026-07-31T12:00:00Z", lastAttemptAt: "2026-07-31T12:00:00Z", freshnessThresholdMinutes: 15, recordCount: accounts.length, errorCode: null, errorMessage: "Local smoke fixture; writes remain frozen.", connectionMode: "snapshot_loaded", environment: "developer", dataMode: "simulated_internal", canRead: true, canWrite: false },
+      { sourceKey: "monitor", displayName: "E2E monitor smoke fixture", availability: "stale", lastSuccessfulSyncAt: "2026-07-31T12:00:00Z", lastAttemptAt: "2026-07-31T12:00:00Z", freshnessThresholdMinutes: 60, recordCount: 0, errorCode: null, errorMessage: null, connectionMode: "snapshot_loaded", environment: "none", dataMode: "stored_snapshot", canRead: true, canWrite: false },
+    ],
+    generatedAt: "2026-07-31T12:00:00Z",
+    dataVersion: "e2e-smoke",
+  };
+}
+
+async function startLocalSmokeApi(): Promise<Server | null> {
+  if (process.env.E2E_BACKEND_ENDPOINT) return null;
+  const world = localWorldSnapshot();
+  const server = createServer((request, response) => {
+    if (request.method === "OPTIONS") {
+      json(response, 204, {});
+      return;
+    }
+    const path = new URL(request.url ?? "/", LOCAL_API_URL).pathname;
+    if (path === "/health") {
+      json(response, 200, { status: "ok" });
+      return;
+    }
+    if (path === "/environment") {
+      json(response, 200, {
+        deploymentMode: "demo",
+        isDemonstration: true,
+        displayLabel: "Demonstration",
+        demoNotice: "Demonstration — internal records are illustrative",
+        tenant: { id: "e2e-smoke" },
+        auth: { provider: "clerk", keyClass: "unconfigured", configured: false },
+        source: { type: "local_smoke_fixture", dataProvenance: "E2E smoke fixture; internal records are illustrative" },
+        externalWrites: { capable: false },
+        revision: { deployed: "779198f", expected: "779198f", seed: "779198f", matchesExpected: true },
+      });
+      return;
+    }
+    if (path === "/world-snapshot") {
+      json(response, 200, world);
+      return;
+    }
+    if (path === "/source-health") {
+      json(response, 200, { records: world.sourceHealth });
+      return;
+    }
+    json(response, 404, { error: "not_found" });
+  });
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(4185, "127.0.0.1", () => {
+      server.off("error", reject);
+      resolve();
+    });
+  });
+  console.log("e2e: local smoke API provides two account fixtures for account-switch regression.");
+  return server;
 }
 
 async function signInWithClerkIfConfigured(page: Page): Promise<void> {
@@ -95,19 +249,6 @@ async function walkCoreSurfaces(page: Page): Promise<void> {
   const demoBanner = page.getByRole("status", { name: "Demonstration environment" });
   await page.locator("[data-surface-component='surface-todays-brief'], [data-surface-component='surface-route-today']").waitFor({ timeout: 15000 });
   assert(await demoBanner.isVisible(), "Demo banner is missing from the initial route.");
-  if (!process.env.E2E_BACKEND_ENDPOINT) {
-    assert(await page.getByRole("button", { name: "Retry" }).isVisible(), "No-backend route state should expose retry.");
-    await page.getByRole("link", { name: /^Work/i }).first().click();
-    await page.locator("[data-surface-component='surface-route-work']").waitFor({ timeout: 10000 });
-    assert(await demoBanner.isVisible(), "Demo banner disappeared on Work route-data state.");
-    await page.getByRole("link", { name: /Accounts/i }).first().click();
-    await page.locator("[data-surface-component='surface-route-accounts']").waitFor({ timeout: 10000 });
-    assert(await demoBanner.isVisible(), "Demo banner disappeared on Accounts route-data state.");
-    await page.getByRole("link", { name: /Ask/i }).first().click();
-    await page.locator("[data-surface-component='surface-route-ask']").waitFor({ timeout: 10000 });
-    assert(await demoBanner.isVisible(), "Demo banner disappeared on Ask route-data state.");
-    return;
-  }
   await openSurface(page, /^Work/i, "surface-work-queue");
   assert(await demoBanner.isVisible(), "Demo banner disappeared on Work.");
   await openSurface(page, /Accounts/i, "surface-account-360");
@@ -132,20 +273,15 @@ async function smokeViewport(browser: Browser, opts: { width: number; height: nu
 }
 
 async function crmAccountSwitchRegression(browser: Browser): Promise<void> {
-  if (!process.env.E2E_BACKEND_ENDPOINT) {
-    console.log("e2e: account-switch tier skipped because no backend endpoint is configured.");
-    return;
-  }
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await signInWithClerkIfConfigured(page);
   await page.goto(`${BASE_URL}/accounts`, { waitUntil: "networkidle" });
   await page.locator("[data-surface-component='surface-account-360']").waitFor();
   const accountRows = page.locator(".account360-list-row");
   await accountRows.nth(1).waitFor({ timeout: 15000 }).catch(() => undefined);
-  if (await accountRows.count() === 0) {
-    console.log("e2e: account-switch tier skipped because the active smoke adapter returned no account fixtures.");
+  if (await accountRows.count() < 2) {
     await page.close();
-    return;
+    throw new Error("CRM account-switch regression requires at least two account fixtures.");
   }
   const firstName = (await accountRows.nth(0).locator("strong").first().textContent())?.trim() ?? "";
   const hasSecondAccount = await accountRows.count() >= 2;
@@ -254,9 +390,10 @@ buildEnv.VITE_TENANT_ID = "btx-demo-command-cockpit";
 buildEnv.VITE_DEPLOYED_REVISION = "779198f";
 if (CLERK_LOGIN_ENABLED && CLERK_PUBLISHABLE_KEY) buildEnv.VITE_CLERK_PUBLISHABLE_KEY = CLERK_PUBLISHABLE_KEY;
 if (!CLERK_LOGIN_ENABLED) delete buildEnv.VITE_CLERK_PUBLISHABLE_KEY;
-if (HUBSPOT_LOOP_ENABLED) buildEnv.VITE_BACKEND_ENDPOINT = process.env.E2E_BACKEND_ENDPOINT;
+buildEnv.VITE_BACKEND_ENDPOINT = BACKEND_ENDPOINT;
 await run("npm", ["run", "build"], buildEnv);
 await run("npx", ["playwright", "install", "chromium"]);
+const localApi = await startLocalSmokeApi();
 const preview = await waitForPreview();
 let browser: Browser | null = null;
 try {
@@ -267,11 +404,14 @@ try {
 
   if (HUBSPOT_LOOP_ENABLED) {
     await runHubSpotTaskLoop(browser);
+  } else if (HUBSPOT_LOOP_REQUIRED) {
+    throw new Error("E2E_REQUIRE_HUBSPOT_LOOP=1 requires E2E_HUBSPOT_TEST_PORTAL=1, E2E_BACKEND_ENDPOINT, and E2E_CLERK_SESSION_TOKEN.");
   } else {
     console.log("e2e: E2E_HUBSPOT_TEST_PORTAL / E2E_BACKEND_ENDPOINT not set - skipping the HubSpot task loop tier.");
   }
 } finally {
   if (browser) await browser.close();
+  if (localApi) localApi.close();
   preview.kill("SIGTERM");
 }
 

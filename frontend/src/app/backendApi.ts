@@ -120,7 +120,7 @@ export function getIndustryMonitor(): Promise<IndustryMonitorResponse> {
 
 export function reviewIndustryUpdate(
   id: string,
-  action: "mark_reviewed" | "dismiss" | "needs_account_match",
+  action: "mark_reviewed" | "dismiss" | "needs_account_match" | "restore_previous",
   reason?: string,
 ): Promise<{ id: string; reviewStatus: IndustryUpdateRecord["reviewStatus"] }> {
   return backendJson(`/industry-monitor/updates/${encodeURIComponent(id)}`, {

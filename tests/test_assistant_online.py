@@ -183,3 +183,25 @@ def test_refusal_and_empty_output_fail_closed():
             settings=_settings(),
             client=client,
         )
+
+
+def test_live_current_news_web_search_opt_in():
+    settings = Settings()
+    if not (
+        settings.ask_online_enabled
+        and settings.ask_web_search_enabled
+        and settings.anthropic_api_key
+        and __import__("os").environ.get("BTX_LIVE_ASK_EVAL") == "1"
+    ):
+        pytest.skip("Set BTX_LIVE_ASK_EVAL=1 plus Ask online credentials to run live current-news web search.")
+    result = run_online_answer(
+        message="What is the latest public NASA procurement news this week?",
+        requested_mode="web",
+        workspace_summary="CONFIDENTIAL_WORKSPACE_MARKER",
+        workspace_citations=[],
+        settings=settings,
+    )
+    assert result.actual_mode == "web"
+    assert result.metadata["search_count"] > 0
+    assert result.citations
+    assert all(item["source_type"].startswith("public_") for item in result.citations)

@@ -35,9 +35,16 @@ export function WorkItemSourceNote({ source, error }: { source: "backend" | "una
 }
 
 export function WorkItemList({ items, empty = "No work items yet.", world }: { items: WorkItem[]; empty?: string; world?: World }) {
+  if (items.length === 0) {
+    return (
+      <div className="work-item-list" aria-label="Controlled work queue">
+        <EmptyState headline="No work items" body={empty} icon="work_queue" />
+      </div>
+    );
+  }
   return (
     <div className="work-item-list" role="table" aria-label="Controlled work queue">
-      {items.length > 0 && (
+      <div role="rowgroup">
         <div className="work-item-table-head" role="row">
           <span role="columnheader">Decision / action</span>
           <span role="columnheader">Account</span>
@@ -47,7 +54,8 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
           <span role="columnheader">Priority</span>
           <span role="columnheader">External effect</span>
         </div>
-      )}
+      </div>
+      <div role="rowgroup">
       {items.map((item) => {
         const overdue = item.due_date ? new Date(item.due_date) < new Date() && !TERMINAL_STATUSES.has(item.status) : false;
         return (
@@ -70,7 +78,7 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
           </button>
         );
       })}
-      {items.length === 0 && <EmptyState headline="No work items" body={empty} icon="work_queue" />}
+      </div>
     </div>
   );
 }

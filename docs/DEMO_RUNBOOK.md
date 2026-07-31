@@ -187,16 +187,15 @@ remain unverified rather than assumed:
 6. Ask returns a live grounded answer with citations across both accounts.
 7. The four surfaces audited for loading, empty, stale, and failure states.
 
-### Known issues to weigh before recording
+### Release checks before recording
 
-- The Clerk instance is a **development** instance (`unbiased-gecko-3.accounts.dev`).
-  Its sign-in screen renders a "Development mode" badge, which will appear on
-  camera if the sign-in is filmed. Sign in before recording, or move to a
-  production Clerk instance.
-- `test:phase0` and `test:identity` are red and run in CI, so CI is red. Both were
-  already red before this work. They fail inside signal-to-account resolution by
-  domain, which neither journey touches: Lockheed and nLIGHT link through backend
-  relationship records. The demo is unaffected; CI is not trustworthy until fixed.
+- `cd frontend && npm run test:release-critical`
+- `python3 -m pytest -q`
+- `python3 tooling/verify_deployment_parity.py --api-url https://btx-platform.fly.dev`
+
+The Clerk development instance (`unbiased-gecko-3.accounts.dev`) renders a
+"Development mode" badge on the sign-in screen. Sign in before recording, or
+move the target deployment to a production Clerk instance.
 
 ## Exact Ask Questions
 

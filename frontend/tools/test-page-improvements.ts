@@ -21,7 +21,7 @@ assert(industry.includes("Record retrieved") && industry.includes("Last successf
 assert(industry.includes("New since"), "Industry filters must define New since the relevant run.");
 assert(industry.includes("wordBoundary") && industry.includes("…"), "Industry summaries must truncate at word boundaries with ellipses.");
 assert(industry.includes("uniqueReasons"), "Industry relevance reasons must remove duplicated summaries.");
-assert(industry.includes("Undo is available") && industry.includes("undoLastReview"), "Industry review mutations need reversible feedback.");
+assert(industry.includes("Undo will restore the prior backend review status") && industry.includes("restore_previous") && industry.includes("undoLastReview"), "Industry review mutations need reversible backend feedback.");
 
 assert(prospects.includes("Not scored"), "Prospects must distinguish not scored from a real zero score.");
 assert(prospects.includes("nextBestAction") && prospects.includes("Next best action"), "Prospects must establish one next-best action.");

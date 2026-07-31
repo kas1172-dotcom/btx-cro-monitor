@@ -169,20 +169,35 @@ export function IndustryUpdates({ world }: { world: World }) {
         updates: current.updates.map((item) => item.id === update.id ? { ...item, reviewStatus: result.reviewStatus } : item),
       } : current);
       setUndoReview({ id: update.id, previous, label: `Undo ${action === "dismiss" ? "dismiss" : action === "mark_reviewed" ? "review" : "queue change"}` });
-      setStatus(action === "needs_account_match" ? "Queued for account-evidence assessment. Undo is available before refresh." : "Review saved. Undo is available before refresh.");
+      setStatus(action === "needs_account_match" ? "Queued for account-evidence assessment. Undo will restore the prior backend review status." : "Review saved. Undo will restore the prior backend review status.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The review could not be saved.");
     }
   }
 
-  function undoLastReview() {
+  async function undoLastReview() {
     if (!undoReview) return;
-    setMonitor((current) => current ? {
-      ...current,
-      updates: current.updates.map((item) => item.id === undoReview.id ? { ...item, reviewStatus: undoReview.previous } : item),
-    } : current);
-    setStatus("Review change undone locally. Refresh or save another review to reconcile with the backend.");
-    setUndoReview(null);
+    if (!BACKEND_ENDPOINT) {
+      setMonitor((current) => current ? {
+        ...current,
+        updates: current.updates.map((item) => item.id === undoReview.id ? { ...item, reviewStatus: undoReview.previous } : item),
+      } : current);
+      setStatus("Review change undone in the stored snapshot view. No backend record was modified.");
+      setUndoReview(null);
+      return;
+    }
+    setStatus("Restoring previous review status…");
+    try {
+      const result = await reviewIndustryUpdate(undoReview.id, "restore_previous");
+      setMonitor((current) => current ? {
+        ...current,
+        updates: current.updates.map((item) => item.id === undoReview.id ? { ...item, reviewStatus: result.reviewStatus } : item),
+      } : current);
+      setStatus("Previous review status restored.");
+      setUndoReview(null);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The review change could not be restored.");
+    }
   }
 
   async function draftWork(update: IndustryUpdateRecord) {

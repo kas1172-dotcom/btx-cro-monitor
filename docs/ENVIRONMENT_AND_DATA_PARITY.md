@@ -21,6 +21,34 @@ Deployment order:
    `python3 tooling/verify_deployment_parity.py --api-url https://API_HOST`.
 5. Only serve the new revision after verification succeeds.
 
+For the current Fly deployment, the verification command is:
+
+```bash
+python3 tooling/verify_deployment_parity.py \
+  --api-url https://btx-platform.fly.dev
+```
+
+If `/environment` returns `401` or `403`, the live API is still on an older
+auth-gated revision and does not satisfy the public environment contract. Deploy
+the current backend image, run Alembic, reset/verify the demo tenant, and rerun
+this command before publishing the frontend as releaseable.
+
+Persistent invalidation of affected legacy deliverables is intentionally a
+tenant-scoped live-data operation. Dry-run first:
+
+```bash
+python3 tooling/invalidate_unsafe_deliverables.py --tenant-id btx-demo-command-cockpit
+```
+
+Then, only with the deployed database configuration loaded:
+
+```bash
+python3 tooling/invalidate_unsafe_deliverables.py \
+  --tenant-id btx-demo-command-cockpit \
+  --confirm \
+  --confirm-text INVALIDATE_Q2_2026_REVENUE_REVIEW
+```
+
 Never use `create_all()` in production. Never hand-edit demo tenant rows; reset
 them through the repository tool so code, schema, and seed remain atomic and
 auditable.

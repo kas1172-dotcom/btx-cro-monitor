@@ -292,28 +292,30 @@ build; it identifies the Clerk instance and is not a secret.
 
 ## CI (WP10-C)
 
-`.github/workflows/ci.yml` (`01 CI`) runs on every PR into `main` and on push to `main`:
-frontend typecheck, build, and the fast test suites (`test:metrics`,
-`test:rail`, `test:settings`, `test:tour`, `test:phase0`,
-`test:identity`, `test:map`, `test:deliverables`), plus
-backend `pytest`.
+`.github/workflows/ci.yml` (`01 CI`) runs on every PR into `main` and on push to
+`main`. The frontend job runs `npm run test:release-critical`, which includes
+typecheck, lint, build, dependency checks, route/loading/accessibility/mobile
+contracts, browser E2E, deployment smoke, CRM write gating, and the generated
+control harness. The backend job runs `pytest` plus deployment parity contract
+checks.
 
-The same workflow also contains an optional `e2e` job for the Playwright
-browser suite (`frontend/tools/test-e2e-playwright.ts`). It is skipped by
-default; set repo variable `RUN_E2E=1` to build the cockpit, boot it, sign in
-through Clerk when configured, and walk the four core surfaces at desktop and
-mobile viewports. Real sign-in coverage needs these **optional** repo secrets:
-`VITE_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_EMAIL`, `E2E_CLERK_PASSWORD` (a
-dedicated test user's credentials, not a real BTX user). The HubSpot task-loop
-tier additionally needs `E2E_HUBSPOT_TEST_PORTAL=1`, `E2E_BACKEND_ENDPOINT` (a
-live backend, e.g. the staging deploy above), and `E2E_CLERK_SESSION_TOKEN` (a
-session token minted for the test user against that backend).
+The Playwright browser suite (`frontend/tools/test-e2e-playwright.ts`) always
+boots the cockpit. When no live backend is configured it starts a local smoke
+API with two account fixtures so the CRM rapid account-switch regression is
+exercised instead of skipped. Real Clerk sign-in coverage is opt-in with
+`E2E_CLERK_LOGIN=1` plus `VITE_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_EMAIL`, and
+`E2E_CLERK_PASSWORD` for a dedicated test user. The live HubSpot task-loop tier
+is intentionally disposable-tenant-only and additionally requires
+`E2E_HUBSPOT_TEST_PORTAL=1`, `E2E_BACKEND_ENDPOINT`, and
+`E2E_CLERK_SESSION_TOKEN`. Set `E2E_REQUIRE_HUBSPOT_LOOP=1` in a disposable
+tenant release job to fail the run instead of skipping that proof. Set
+`E2E_REQUIRE_MUTATION_TIER=1` with the control harness variables to fail if the
+mutation harness is not actually pointed at disposable infrastructure.
 
 **Required GitHub settings** (maintainer, one-time): Settings → Branches →
-add a branch protection rule for `main` → enable "Require status checks to
-pass before merging" → select the `frontend` and `backend` jobs from the
-`01 CI` workflow. Add the `e2e` job only if `RUN_E2E=1` is enabled for routine
-PRs.
+add a branch protection rule for `main` → enable "Require status checks to pass
+before merging" → select the `frontend`, `backend`, and `e2e` jobs from the `01
+CI` workflow.
 
 ## Staging deploy (WP10-C)
 

@@ -2679,7 +2679,7 @@ def create_app(
     def patch_industry_update(signal_id: str, payload: dict, request: Request) -> Response:
         action = str(payload.get("action") or "").strip()
         reason = sanitize_external_text(payload.get("reason"), limit=500)
-        if action not in {"mark_reviewed", "dismiss", "needs_account_match"}:
+        if action not in {"mark_reviewed", "dismiss", "needs_account_match", "restore_previous"}:
             return JSONResponse({"code": "validation_error", "detail": "Unsupported industry-update action."}, status_code=422)
         if action == "dismiss" and not reason:
             return JSONResponse({"code": "validation_error", "detail": "A dismissal reason is required."}, status_code=422)
@@ -2695,7 +2695,12 @@ def create_app(
                 return JSONResponse({"code": "not_found", "detail": f"No industry update {signal_id}."}, status_code=404)
             raw = dict(row.raw_payload or {})
             before = raw.get("industry_review")
-            status = {"mark_reviewed": "reviewed", "dismiss": "dismissed", "needs_account_match": "needs_account_match"}[action]
+            if action == "restore_previous":
+                if not isinstance(before, dict) or not before.get("priorState"):
+                    return JSONResponse({"code": "validation_error", "detail": "No previous review state is available to restore."}, status_code=422)
+                status = str(before["priorState"])
+            else:
+                status = {"mark_reviewed": "reviewed", "dismiss": "dismissed", "needs_account_match": "needs_account_match"}[action]
             event = {
                 "reviewer": _actor(request),
                 "timestamp": datetime.now(UTC).isoformat(),

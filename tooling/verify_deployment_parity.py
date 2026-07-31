@@ -4,12 +4,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import ssl
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 from btx_platform.config import get_settings
 from btx_platform.db import assert_schema_current, make_engine, make_session_factory
 from btx_platform.demo.reset import verify_demo_tenant
 from btx_platform.environment import environment_contract
+
+
+def tls_context() -> ssl.SSLContext:
+    try:
+        import certifi  # type: ignore[import-not-found]
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
 
 
 def main() -> int:
@@ -21,8 +32,19 @@ def main() -> int:
     local = environment_contract(settings)
     contract = local
     if args.api_url:
-        with urlopen(f"{args.api_url.rstrip('/')}/environment", timeout=15) as response:  # noqa: S310 - operator-supplied URL
-            contract = json.load(response)
+        environment_url = f"{args.api_url.rstrip('/')}/environment"
+        try:
+            with urlopen(environment_url, timeout=15, context=tls_context()) as response:  # noqa: S310 - operator-supplied URL
+                contract = json.load(response)
+        except HTTPError as exc:
+            if exc.code in {401, 403}:
+                raise SystemExit(
+                    f"{environment_url} returned {exc.code}. /environment must be public and non-secret; "
+                    "deploy the current API revision before claiming environment parity."
+                ) from exc
+            raise SystemExit(f"{environment_url} returned HTTP {exc.code}: {exc.reason}") from exc
+        except URLError as exc:
+            raise SystemExit(f"{environment_url} could not be reached: {exc.reason}") from exc
     revision = contract["revision"]
     if not revision["matchesExpected"]:
         raise SystemExit(f"revision drift: deployed={revision['deployed']} expected={revision['expected']}")

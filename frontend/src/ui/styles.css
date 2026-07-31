@@ -506,7 +506,7 @@ button.context-ribbon-item {
   font-size: 12px;
 }
 .rail-user-chip em {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 11px;
   font-style: normal;
 }
@@ -2154,6 +2154,9 @@ button.work-item-summary:focus-visible {
   font-size: 12px;
   line-height: 1.35;
 }
+.settings-workspace span > em {
+  color: var(--text-secondary);
+}
 .settings-panel {
   min-height: 360px;
   padding: 14px;
@@ -2193,7 +2196,7 @@ button.work-item-summary:focus-visible {
   background: var(--panel-2);
 }
 .settings-status span, .settings-status em {
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 12px;
   font-style: normal;
   line-height: 1.35;
@@ -2304,7 +2307,7 @@ button.work-item-summary:focus-visible {
   border-radius: 8px;
 }
 .settings-runs span, .settings-runs em {
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 12px;
   font-style: normal;
 }

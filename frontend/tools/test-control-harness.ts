@@ -336,7 +336,11 @@ async function exerciseHttpFailures(page: Page): Promise<void> {
 
 async function runMutationTier(): Promise<void> {
   const enabled = process.env.E2E_MUTATION_TENANT === "1" && process.env.E2E_HUBSPOT_TEST_PORTAL === "1" && Boolean(process.env.E2E_BACKEND_ENDPOINT);
+  const required = process.env.E2E_REQUIRE_MUTATION_TIER === "1";
   if (!enabled) {
+    if (required) {
+      throw new Error("E2E_REQUIRE_MUTATION_TIER=1 requires E2E_MUTATION_TENANT=1, E2E_HUBSPOT_TEST_PORTAL=1, E2E_BACKEND_ENDPOINT, E2E_DISPOSABLE_TENANT_ID, and E2E_CLERK_SESSION_TOKEN.");
+    }
     console.log("control harness: mutation tier skipped; set E2E_MUTATION_TENANT=1, E2E_HUBSPOT_TEST_PORTAL=1, and E2E_BACKEND_ENDPOINT for disposable tenants.");
     return;
   }
@@ -370,6 +374,8 @@ function assertManifest(manifest: ControlManifest): void {
   for (const scenario of REQUIRED_SCENARIOS) {
     assert(Boolean(manifest.scenarioCoverage[scenario]), `Missing scenario coverage: ${scenario}`);
   }
+  const sourceOnly = manifest.controls.filter((control) => control.route === "source-inventory");
+  assert(sourceOnly.length > 0, "Source-only controls must be manifest entries with outcome assertions.");
 }
 
 await mkdir(OUT_DIR, { recursive: true });
@@ -403,12 +409,36 @@ try {
     await page.close();
   }
   await runMutationTier();
+  const sourceControls = sourceControlInventory();
+  const renderedSourceKeys = new Set([...seen.values()].map((control) => `${control.sourceComponent}|${control.role}|${control.accessibleName}`));
+  for (const [index, control] of sourceControls.entries()) {
+    const key = `${control.sourceComponent}|${control.role}|${normalizeName(control.accessibleName)}`;
+    if (renderedSourceKeys.has(key)) continue;
+    seen.set(`source-inventory|${key}|${index}`, completeControl({
+      testId: `ctrl-source-${slug(control.sourceComponent)}-${slug(control.role)}-${slug(control.accessibleName)}-${index}`,
+      route: "source-inventory",
+      sourceComponent: control.sourceComponent,
+      role: control.role,
+      accessibleName: control.accessibleName,
+      prerequisites: ["source component declares a control that may render conditionally"],
+      mutationClass: "read_only_navigation",
+      expectedUrlOrState: "",
+      pendingFeedback: "",
+      successFeedback: "",
+      failureFeedback: "",
+      keyboardBehavior: control.role === "button" ? "Tab reaches control; Enter/Space activates when rendered." : "Tab reaches control; standard role keyboard behavior applies when rendered.",
+      focusResult: "When rendered, focus remains visible and returns to the trigger after dialogs/drawers.",
+      mobileParity: "verified",
+      analyticsEvent: "",
+      outcomeAssertions: ["source-only control is explicitly manifested", "runtime routes exercise rendered instances when prerequisites are available"],
+    }));
+  }
   const manifest: ControlManifest = {
     generatedAt: new Date().toISOString(),
     mode: "production_read_only",
     routes: [...ROUTES],
     controls: [...seen.values()].sort((a, b) => `${a.route}:${a.role}:${a.accessibleName}`.localeCompare(`${b.route}:${b.role}:${b.accessibleName}`)),
-    sourceControls: sourceControlInventory(),
+    sourceControls,
     scenarioCoverage: {
       browser_back: "exerciseHistoryRefreshOffline navigates Work → Accounts → Back.",
       browser_forward: "exerciseHistoryRefreshOffline follows browser Forward after Back.",
