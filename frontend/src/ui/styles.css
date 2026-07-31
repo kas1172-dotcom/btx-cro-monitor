@@ -1734,6 +1734,10 @@ button.work-item-summary:focus-visible {
 .ask-markdown p,
 .ask-markdown ul,
 .ask-markdown h3 { margin: 0; }
+.ask-markdown section {
+  display: grid;
+  gap: 6px;
+}
 .ask-markdown ul { padding-left: 18px; }
 .ask-markdown li { margin: 3px 0; }
 .ask-markdown code {
@@ -1755,6 +1759,7 @@ button.work-item-summary:focus-visible {
 .ask-claim-flag.info { border-color: rgba(var(--accent-rgb), .45); color: var(--accent); background: rgba(var(--accent-rgb), .08); }
 .ask-claim-citations {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 6px;
 }
 .ask-claim-citations button {
@@ -1785,6 +1790,11 @@ button.work-item-summary:focus-visible {
 }
 .ask-related-row button,
 .ask-message-actions button { padding: 5px 8px; }
+.ask-related-row button {
+  border-style: dashed;
+  color: var(--accent-text);
+  background: rgba(var(--accent-rgb), .06);
+}
 .ask-message-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .ask-edit-form { display: grid; gap: 8px; }
 .ask-edit-form textarea { min-height: 90px; resize: vertical; }
@@ -1802,13 +1812,21 @@ button.work-item-summary:focus-visible {
 .ask-draft-preview strong { font-size: 14px; }
 .ask-draft-preview p { color: var(--muted); font-size: 12px; }
 .ask-workspace-composer {
+  position: sticky;
+  bottom: 0;
+  z-index: 12;
+  width: min(900px, calc(100% - 24px));
   display: grid;
-  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr) auto;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr);
+  justify-self: center;
+  align-items: stretch;
   gap: 10px;
+  margin: 10px 12px 12px;
   padding: 12px;
-  border-top: 1px solid var(--line);
-  background: rgba(var(--panel-rgb), .96);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(var(--panel-rgb), .98);
+  box-shadow: 0 -12px 38px rgba(var(--page-rgb), .38);
 }
 .ask-context-chip {
   min-width: 0;
@@ -1876,7 +1894,19 @@ button.work-item-summary:focus-visible {
   color: var(--accent);
 }
 .ask-workspace-composer label span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.ask-workspace-composer textarea { min-height: 64px; max-height: 160px; resize: vertical; }
+.ask-workspace-composer label { position: relative; }
+.ask-workspace-composer textarea {
+  min-height: 64px;
+  max-height: 160px;
+  resize: vertical;
+  padding-right: 86px;
+}
+.ask-workspace-composer > button[type="submit"] {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  min-height: 40px;
+}
 .ask-workspace-composer button:disabled { opacity: .55; cursor: not-allowed; }
 .ask-citation-panel { display: grid; align-content: start; gap: 12px; }
 .ask-citation-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
@@ -5375,6 +5405,23 @@ input[type="checkbox"]:checked::after {
   gap: 4px;
   width: 100%;
   text-align: left;
+}
+.ask-citation-card details {
+  justify-self: end;
+  position: relative;
+}
+.ask-citation-card summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.ask-citation-card summary::-webkit-details-marker { display: none; }
+.ask-citation-card details[open] button {
+  margin-top: 6px;
 }
 
 @media print {

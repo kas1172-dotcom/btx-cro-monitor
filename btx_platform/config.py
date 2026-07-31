@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 45.0
     llm_max_body_bytes: int = 524_288
     ask_online_enabled: bool = False
-    ask_web_search_enabled: bool = False
+    ask_web_search_enabled: bool = True
     ask_default_source_mode: str = "automatic"
     ask_model: str = "claude-haiku-4-5-20251001"
     ask_web_max_uses: int = 3

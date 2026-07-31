@@ -28,7 +28,13 @@ function displayTime(value: string): string {
 }
 
 function sanitizeInline(value: string): string {
-  return value.replace(/<[^>]*>/g, "").replace(/javascript:/gi, "").trim();
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/javascript:/gi, "")
+    .replace(/\bactionPriority\b/g, "action priority")
+    .replace(/\bPWIN\b/g, "probability of win")
+    .replace(/\bpwin\b/g, "probability of win")
+    .trim();
 }
 
 function inlineMarkdown(value: string): ReactNode[] {
@@ -43,11 +49,25 @@ function inlineMarkdown(value: string): ReactNode[] {
 }
 
 function SanitizedMarkdown({ text }: { text: string }) {
-  const blocks = sanitizeInline(text).split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+  const normalized = sanitizeInline(text)
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]*,/g, ",")
+    .replace(/([^\n])\n(?!(?:#{1,6}\s+|[-*]\s+|\d+\.\s+))/g, "$1 ");
+  const blocks = normalized.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
   return (
     <div className="ask-markdown">
       {blocks.map((block, index) => {
         const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+        if (lines[0] && /^#{1,3}\s+/.test(lines[0])) {
+          const heading = lines[0].replace(/^#{1,3}\s+/, "");
+          const body = lines.slice(1).join(" ").trim();
+          return (
+            <section key={index}>
+              <h3>{inlineMarkdown(heading)}</h3>
+              {body ? <p>{inlineMarkdown(body)}</p> : null}
+            </section>
+          );
+        }
         if (lines.every((line) => /^[-*]\s+/.test(line))) {
           return <ul key={index}>{lines.map((line, itemIndex) => <li key={itemIndex}>{inlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>)}</ul>;
         }
@@ -62,8 +82,9 @@ function SanitizedMarkdown({ text }: { text: string }) {
 function generatedTitle(text: string): string {
   const cleaned = sanitizeInline(text).replace(/[?.!]+$/g, "");
   const words = cleaned.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "New Ask conversation";
-  return words.slice(0, 8).join(" ");
+  const suffix = new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  if (words.length === 0) return `Ask conversation ${suffix}`;
+  return `${words.slice(0, 8).join(" ")} · ${suffix}`;
 }
 
 function accountName(world: World, accountId?: string | null): string | null {
@@ -104,6 +125,12 @@ function sourceClass(citation: AssistantCitation): string {
   if (type === "work_item") return "Workspace work";
   if (type === "score") return "Derived workspace analysis";
   return "Workspace evidence";
+}
+
+function sourceModeLabel(mode: AssistantMessage["metadata"]["actual_source_mode"], searchCount?: number): string {
+  if (mode === "web") return searchCount ? `Public web · ${searchCount} search${searchCount === 1 ? "" : "es"}` : "Public web";
+  if (mode === "workspace_web") return searchCount ? `Workspace + public web · ${searchCount} search${searchCount === 1 ? "" : "es"}` : "Workspace + public web";
+  return "Workspace records only";
 }
 
 function messageQuality(message: AssistantMessage): Array<{ tone: "warning" | "danger" | "info"; label: string }> {
@@ -203,7 +230,7 @@ function MessageBubble({
         <span>{isUser ? "You" : "Ask"}</span>
         <em>{displayTime(message.created_at)}</em>
       </div>
-      {!isUser && <div className="ask-answer-source">{message.metadata?.actual_source_mode?.replace("_", " + ") ?? "workspace"} · {message.metadata?.as_of ? `as of ${displayTime(message.metadata.as_of)}` : "as-of unavailable"}</div>}
+      {!isUser && <div className="ask-answer-source">{sourceModeLabel(message.metadata?.actual_source_mode, message.metadata?.search_count)} · {message.metadata?.as_of ? `as of ${displayTime(message.metadata.as_of)}` : "as-of unavailable"}</div>}
       {quality.map((item) => <div key={item.label} className={`ask-claim-flag ${item.tone}`} role="status">{item.label}</div>)}
       {editing ? (
         <form
@@ -222,7 +249,7 @@ function MessageBubble({
       )}
       {!isUser && message.citations.length > 0 && (
         <div className="ask-claim-citations" aria-label="Citations attached to this answer">
-          {message.citations.slice(0, 6).map((citation) => (
+          {message.citations.slice(0, 4).map((citation) => (
             <button key={citation.id} type="button" onClick={(event) => onEvidence(citation, event.currentTarget)}>
               <span>{sourceClass(citation)}</span>
               <strong>{citation.title}</strong>
@@ -563,7 +590,10 @@ export function AskSurface({ world }: { world: World }) {
                   <span>{sourceClass(citation)} · {displayLabel(citation.claim_classification)}{citation.relationship_status ? ` · ${displayLabel(citation.relationship_status)}` : ""}</span>
                   <em>{citation.claim}</em>
                 </button>
-                <button type="button" onClick={() => navigateTo(citation.route)}>Open record</button>
+                <details>
+                  <summary>More</summary>
+                  <button type="button" onClick={() => navigateTo(citation.route)}>Open record</button>
+                </details>
               </div>
             ))}
             {selected && selected.messages.every((message) => message.citations.length === 0) && <div className="rail-quiet-empty">No citations yet.</div>}
