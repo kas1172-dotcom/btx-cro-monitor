@@ -35,7 +35,14 @@ function plainSourceText(value: string): string {
 export function OperatingSnapshot() {
   const snapshot = useOperatingSnapshot();
 
-  if (!snapshot) return <div className="loading">loading production view...</div>;
+  if (!snapshot) {
+    return (
+      <div className="surface-skeleton surface-skeleton-cards" role="status" aria-label="Preparing production view">
+        <div className="surface-skeleton-head"><span /><strong /></div>
+        <div className="surface-skeleton-grid" aria-hidden="true"><span /><span /><span /></div>
+      </div>
+    );
+  }
 
   const connected = snapshot.integrations.filter((i) => i.status === "connected");
   const available = snapshot.integrations.filter((i) => i.status === "available");

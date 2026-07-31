@@ -256,7 +256,7 @@ export function TodayBrief({ world }: { world: World }) {
         </p>
       ) : world.isStale ? (
         <p className="surface-notice" role="status">
-          These records are more than a minute old. <button type="button" onClick={world.refresh}>Refresh</button>
+          These records are more than five minutes old. <button type="button" onClick={world.refresh}>Refresh</button>
         </p>
       ) : null}
 

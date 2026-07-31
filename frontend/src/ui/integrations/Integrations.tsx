@@ -55,7 +55,12 @@ export function Integrations() {
         </button>
       </div>
 
-      {!snapshot || !selected ? <div className="loading">loading data sources...</div> : (
+      {!snapshot || !selected ? (
+        <div className="surface-skeleton surface-skeleton-cards" role="status" aria-label="Preparing data sources">
+          <div className="surface-skeleton-head"><span /><strong /></div>
+          <div className="surface-skeleton-grid" aria-hidden="true"><span /><span /><span /></div>
+        </div>
+      ) : (
         <div className="integration-layout">
           <section className="integration-list">
             {integrations.map((item) => (

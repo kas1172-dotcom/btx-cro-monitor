@@ -40,21 +40,37 @@ const IndustryUpdates = lazy(() => import("./ui/intelligence/IndustryUpdates.tsx
 const DeliverableWizard = lazy(() => import("./ui/deliverables/DeliverableWizard.tsx").then((module) => ({ default: module.DeliverableWizard })));
 
 const ROUTE_LOAD_LABELS: Record<AppRoute["id"], { title: string; detail: string }> = {
-  today: { title: "Preparing briefing", detail: "Loading account signals, work state, and source health." },
-  work: { title: "Loading work queue", detail: "Checking current assignments, approvals, and execution status." },
-  accounts: { title: "Loading account workspace", detail: "Resolving account records, CRM provenance, contacts, and deals." },
-  programs: { title: "Loading program tracker", detail: "Collecting program signals and contract context." },
-  industry_updates: { title: "Loading industry updates", detail: "Collecting monitor records and source freshness." },
-  prospecting: { title: "Loading prospects", detail: "Scoring account records and mapped opportunities." },
-  capacity: { title: "Loading capacity", detail: "Checking facility and operating-data availability." },
-  analysis: { title: "Loading analysis", detail: "Preparing metrics, charts, and freshness checks." },
-  map: { title: "Loading map", detail: "Resolving mapped accounts and geography." },
-  ask: { title: "Loading assistant workspace", detail: "Preparing conversations and account context." },
-  deliverables: { title: "Loading deliverables", detail: "Preparing saved documents and source-backed figures." },
-  integrations: { title: "Loading integrations", detail: "Checking CRM, monitor, and backend source health." },
-  settings: { title: "Loading settings", detail: "Preparing environment and source configuration." },
+  today: { title: "Preparing briefing", detail: "Fetching account signals, work state, and source health." },
+  work: { title: "Preparing work queue", detail: "Checking current assignments, approvals, and execution status." },
+  accounts: { title: "Preparing account workspace", detail: "Resolving account records, CRM provenance, contacts, and deals." },
+  programs: { title: "Preparing program tracker", detail: "Collecting program signals and contract context." },
+  industry_updates: { title: "Preparing industry updates", detail: "Collecting monitor records and source freshness." },
+  prospecting: { title: "Preparing prospects", detail: "Scoring account records and mapped opportunities." },
+  capacity: { title: "Preparing capacity", detail: "Checking facility and operating-data availability." },
+  analysis: { title: "Preparing analysis", detail: "Preparing metrics, charts, and freshness checks." },
+  map: { title: "Preparing map", detail: "Resolving mapped accounts and geography." },
+  ask: { title: "Preparing assistant workspace", detail: "Preparing conversations and account context." },
+  deliverables: { title: "Preparing deliverables", detail: "Preparing saved documents and source-backed figures." },
+  integrations: { title: "Preparing integrations", detail: "Checking CRM, monitor, and backend source health." },
+  settings: { title: "Preparing settings", detail: "Preparing environment and source configuration." },
   not_found: { title: "Checking route", detail: "Looking up the requested cockpit route." },
 };
+
+function SurfaceSkeleton({ label, variant = "cards" }: { label: string; variant?: "cards" | "map" | "document" | "settings" }) {
+  return (
+    <section className={`surface-skeleton surface-skeleton-${variant}`} role="status" aria-label={label}>
+      <div className="surface-skeleton-head">
+        <span />
+        <strong />
+      </div>
+      <div className="surface-skeleton-grid" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+    </section>
+  );
+}
 
 export function App() {
   const { city, brainResponse, activeCompanyId, demoAction, tourRequested, deliverableWizardRequest } = useStore();
@@ -147,7 +163,7 @@ export function App() {
   const renderDefault = () => {
     if (route.id === "not_found") return <RouteNotFound path={route.path} />;
     if (settingsActive) return (
-      <Suspense fallback={<div className="loading">loading settings...</div>}>
+      <Suspense fallback={<SurfaceSkeleton label="Preparing settings workspace" variant="settings" />}>
         <SettingsWorkspace />
       </Suspense>
     );
@@ -159,42 +175,42 @@ export function App() {
       case "accounts": return <Account360 world={world} accountId={routedAccountId} onSelectAccount={(accountId) => navigateTo(accountPath(accountId))} />;
       case "ask": return <AskSurface world={world} />;
       case "prospecting": return (
-        <Suspense fallback={<div className="loading">loading prospecting...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing prospecting workspace" />}>
           <Prospecting world={world} />
         </Suspense>
       );
       case "trip_planner": return (
-        <Suspense fallback={<div className="loading">loading trip planner...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing trip planner" variant="map" />}>
           <TripPlanner world={world} />
         </Suspense>
       );
       case "map": return viewWorld ? (
-        <Suspense fallback={<div className="loading">loading map…</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing map workspace" variant="map" />}>
           <ProspectMap world={viewWorld} selectedAccountId={previewAccountId} onSelectAccount={(accountId) => navigateTo(`/map?account=${encodeURIComponent(accountId)}`)} />
         </Suspense>
-      ) : <div className="loading">loading map…</div>;
+      ) : <SurfaceSkeleton label="Preparing map workspace" variant="map" />;
       case "analysis": return (
-        <Suspense fallback={<div className="loading">loading analysis...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing analysis dashboard" />}>
           <AnalysisDashboard world={world} />
         </Suspense>
       );
       case "capacity": return (
-        <Suspense fallback={<div className="loading">loading capacity...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing capacity workspace" />}>
           <CapacityAssessment world={world} />
         </Suspense>
       );
       case "programs": return (
-        <Suspense fallback={<div className="loading">loading programs...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing program tracker" />}>
           <ProgramContractTracker world={world} />
         </Suspense>
       );
       case "industry_updates": return (
-        <Suspense fallback={<div className="loading">loading industry updates...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing industry updates" />}>
           <IndustryUpdates world={world} />
         </Suspense>
       );
       case "deliverables": return (
-        <Suspense fallback={<div className="loading">loading deliverables...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing deliverables" variant="document" />}>
           {route.deliverableView === "insert_figure" ? (
             <AnalysisView
               key={route.query.toString()}
@@ -211,12 +227,12 @@ export function App() {
         </Suspense>
       );
       case "hubspot": return (
-        <Suspense fallback={<div className="loading">loading HubSpot...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing CRM records" />}>
           <HubSpotViewer world={world} />
         </Suspense>
       );
       case "settings": return (
-        <Suspense fallback={<div className="loading">loading settings...</div>}>
+        <Suspense fallback={<SurfaceSkeleton label="Preparing settings workspace" variant="settings" />}>
         <SettingsWorkspace />
         </Suspense>
       );
@@ -414,7 +430,7 @@ export function App() {
             <TourHud world={world} autoStart onDismiss={clearTourRequest} />
           )}
           {world && deliverableWizardRequest && (
-            <Suspense fallback={<div className="loading">loading wizard...</div>}>
+            <Suspense fallback={<SurfaceSkeleton label="Preparing deliverable wizard" variant="document" />}>
               <DeliverableWizard
                 key={deliverableWizardRequest.id}
                 world={world}
@@ -513,7 +529,7 @@ function RoutedDocumentViewer({ deliverableId, localDeliverables, world }: { del
       </section>
     );
   }
-  return <div className="loading">loading saved deliverable…</div>;
+  return <SurfaceSkeleton label="Preparing saved deliverable" variant="document" />;
 }
 
 function RouteNotFound({ path }: { path: string }) {

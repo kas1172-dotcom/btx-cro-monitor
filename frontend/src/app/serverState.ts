@@ -32,7 +32,7 @@ export interface QueryResult<T> {
   refresh: () => void;
 }
 
-const STALE_AFTER_MS = 60_000;
+export const STALE_AFTER_MS = 300_000;
 const SLOW_AFTER_MS = 4_000;
 export const ROUTE_DATA_TIMEOUT_MS = 12_000;
 const queryStates = new Map<string, QueryState<unknown>>();

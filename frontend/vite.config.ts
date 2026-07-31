@@ -13,7 +13,6 @@ export default defineConfig(({ command }) => ({
   base: command === "build" ? process.env.VITE_BASE_PATH || "/btx-cro-monitor/cockpit/" : "/",
   plugins: [react()],
   build: {
-    modulePreload: false,
     // Large Office-export vendors are lazy-loaded only after a user requests a
     // download. Keep the mobile landing chunk warning focused on eager code.
     chunkSizeWarningLimit: 1000,

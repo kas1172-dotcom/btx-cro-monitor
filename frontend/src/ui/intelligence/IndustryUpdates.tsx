@@ -122,7 +122,7 @@ export function IndustryUpdates({ world }: { world: World }) {
   const [monitor, setMonitor] = useState<IndustryMonitorResponse | null>(null);
   const [filter, setFilter] = useState<Filter>("new_high");
   const [runOpen, setRunOpen] = useState(false);
-  const [status, setStatus] = useState("Loading collection evidence…");
+  const [status, setStatus] = useState("Preparing collection evidence.");
   const [undoReview, setUndoReview] = useState<{ id: string; previous: IndustryUpdateRecord["reviewStatus"]; label: string } | null>(null);
 
   useEffect(() => {
@@ -226,7 +226,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       <div className={`monitor-proof monitor-proof-${monitor?.state ?? "running"}`} role="status" aria-live="polite">
         <div>
           <span>Industry monitor</span>
-          <strong>{monitor?.status ?? "Loading monitor status"}</strong>
+          <strong>{monitor?.status ?? "Preparing monitor status"}</strong>
           <em>{monitor?.run ? `${explicitDateLabel("Last successful run", monitor.run.lastSuccessfulAt)} · ${ageLabel(monitor.run.lastSuccessfulAt)}` : "No successful run is available"}</em>
         </div>
         {monitor?.run && (

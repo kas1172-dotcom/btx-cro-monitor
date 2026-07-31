@@ -87,7 +87,7 @@ export function TripPlanner({ world }: { world: World }) {
               <h2>Market map</h2>
               <span>{stops.length} itinerary stops</span>
             </div>
-            <Suspense fallback={<div className="loading">loading map...</div>}>
+            <Suspense fallback={<div className="surface-skeleton surface-skeleton-map" role="status" aria-label="Preparing itinerary map"><div className="surface-skeleton-head"><span /><strong /></div><div className="surface-skeleton-grid" aria-hidden="true"><span /><span /><span /></div></div>}>
               <ProspectMap world={world} />
             </Suspense>
           </section>

@@ -427,7 +427,7 @@ export function AskSurface({ world }: { world: World }) {
             <button type="button" className="ask-drawer-close" onClick={() => setHistoryOpen(false)}>Close</button>
             <label>Search<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Account or topic" /></label>
           </div>
-          {loading && <div className="rail-quiet-empty">Loading conversations...</div>}
+          {loading && <div className="ask-skeleton" role="status" aria-label="Preparing conversations"><i /><i /><i /></div>}
           {!loading && conversations.length === 0 && <div className="rail-quiet-empty">No conversations yet.</div>}
           <div className="ask-conversation-group">
             <span>Active</span>

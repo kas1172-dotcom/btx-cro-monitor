@@ -187,7 +187,7 @@ function sectionCopy(section: SettingsSection): { title: string; body: string } 
 function EngineTuningPanel() {
   const [weights, setWeights] = useState<WeightsConfig>(() => readLocal(WEIGHTS_KEY, defaultWeights as WeightsConfig));
   const [saved, setSaved] = useState<EngineConfigResponse<WeightsConfig> | null>(null);
-  const [status, setStatus] = useState(LIVE_MODE ? "Loading backend scoring weights..." : "Local mode: changes save to this browser.");
+  const [status, setStatus] = useState(LIVE_MODE ? "Preparing backend scoring weights." : "Local mode: changes save to this browser.");
   const errors = useMemo(() => {
     const next: string[] = [];
     for (const [eventType, row] of Object.entries(weights.weights)) {
@@ -310,7 +310,7 @@ function EngineTuningPanel() {
 function SourcesPanel() {
   const [registry, setRegistry] = useState<SourceRegistryDocument>(() => readLocal(SOURCES_KEY, DEFAULT_SOURCE_REGISTRY));
   const [saved, setSaved] = useState<EngineConfigResponse<SourceRegistryDocument> | null>(null);
-  const [status, setStatus] = useState(LIVE_MODE ? "Loading backend source registry..." : "Local mode: changes save to this browser.");
+  const [status, setStatus] = useState(LIVE_MODE ? "Preparing backend source registry." : "Local mode: changes save to this browser.");
   const [requestText, setRequestText] = useState(() => readLocal(SOURCE_REQUESTS_KEY, ""));
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [pendingRemove, setPendingRemove] = useState<SourceRegistryItem | null>(null);

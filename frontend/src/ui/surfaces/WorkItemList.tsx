@@ -29,7 +29,7 @@ export function WorkItemSourceNote({ source, error }: { source: "backend" | "una
   if (source === "backend") return null;
   return (
     <div className="live-inline-status" title={error ?? undefined}>
-      {error ? "Backend work-item service is unavailable. No local queue was generated." : "Backend work items are loading."}
+      {error ? "Backend work-item service is unavailable. No local queue was generated." : "Backend work items are being prepared."}
     </div>
   );
 }
