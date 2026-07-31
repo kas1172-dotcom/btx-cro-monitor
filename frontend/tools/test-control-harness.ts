@@ -339,17 +339,24 @@ async function runMutationTier(): Promise<void> {
   const required = process.env.E2E_REQUIRE_MUTATION_TIER === "1";
   if (!enabled) {
     if (required) {
-      throw new Error("E2E_REQUIRE_MUTATION_TIER=1 requires E2E_MUTATION_TENANT=1, E2E_HUBSPOT_TEST_PORTAL=1, E2E_BACKEND_ENDPOINT, E2E_DISPOSABLE_TENANT_ID, and E2E_CLERK_SESSION_TOKEN.");
+      throw new Error("E2E_REQUIRE_MUTATION_TIER=1 requires E2E_MUTATION_TENANT=1, E2E_HUBSPOT_TEST_PORTAL=1, E2E_BACKEND_ENDPOINT, E2E_DISPOSABLE_TENANT_ID, and either E2E_CLERK_SESSION_TOKEN or Clerk login credentials.");
     }
     console.log("control harness: mutation tier skipped; set E2E_MUTATION_TENANT=1, E2E_HUBSPOT_TEST_PORTAL=1, and E2E_BACKEND_ENDPOINT for disposable tenants.");
     return;
   }
   assert(process.env.E2E_DISPOSABLE_TENANT_ID, "Mutation tier requires E2E_DISPOSABLE_TENANT_ID.");
-  assert(process.env.E2E_CLERK_SESSION_TOKEN, "Mutation tier requires E2E_CLERK_SESSION_TOKEN.");
+  const hasAuth = Boolean(process.env.E2E_CLERK_SESSION_TOKEN) || (
+    process.env.E2E_CLERK_LOGIN === "1" &&
+    Boolean(process.env.VITE_CLERK_PUBLISHABLE_KEY) &&
+    Boolean(process.env.E2E_CLERK_EMAIL) &&
+    Boolean(process.env.E2E_CLERK_PASSWORD)
+  );
+  assert(hasAuth, "Mutation tier requires E2E_CLERK_SESSION_TOKEN or E2E_CLERK_LOGIN=1 with Clerk credentials.");
   console.log(`control harness: mutation tier enabled for disposable tenant ${process.env.E2E_DISPOSABLE_TENANT_ID}.`);
-  // The live mutation tier intentionally delegates to the existing HubSpot loop
-  // and backend-gated E2E suites in CI. This harness refuses to run unless the
-  // disposable tenant variables above are present.
+  await run("npm", ["run", "test:e2e"], {
+    ...process.env,
+    E2E_REQUIRE_HUBSPOT_LOOP: "1",
+  });
 }
 
 function assertManifest(manifest: ControlManifest): void {
@@ -455,7 +462,7 @@ try {
     },
     mutationTenant: {
       enabled: process.env.E2E_MUTATION_TENANT === "1" && process.env.E2E_HUBSPOT_TEST_PORTAL === "1" && Boolean(process.env.E2E_BACKEND_ENDPOINT),
-      requirement: "Set E2E_MUTATION_TENANT=1, E2E_DISPOSABLE_TENANT_ID, E2E_HUBSPOT_TEST_PORTAL=1, E2E_BACKEND_ENDPOINT, and E2E_CLERK_SESSION_TOKEN. Never run mutation tier against production.",
+      requirement: "Set E2E_MUTATION_TENANT=1, E2E_DISPOSABLE_TENANT_ID, E2E_HUBSPOT_TEST_PORTAL=1, E2E_BACKEND_ENDPOINT, and E2E_CLERK_SESSION_TOKEN or Clerk login credentials. Never run mutation tier against production.",
     },
   };
   assertManifest(manifest);

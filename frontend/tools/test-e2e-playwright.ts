@@ -11,9 +11,9 @@
 // 2. HubSpot task loop (env-gated): only runs when E2E_BACKEND_ENDPOINT and
 //    E2E_HUBSPOT_TEST_PORTAL=1 are set, i.e. a maintainer has pointed this at
 //    a live backend wired to a HubSpot test portal (the seeded portal
-//    246683028 documented in docs/DEMO_HUBSPOT_TASK.md works). CI has no such
-//    portal/credentials provisioned, so this tier skips there by design -
-//    the same "manual credential required" boundary as deploy-staging.yml.
+//    246683028 documented in docs/DEMO_HUBSPOT_TASK.md works). The tier can
+//    use E2E_CLERK_SESSION_TOKEN or mint one from a real Clerk login when
+//    E2E_CLERK_LOGIN=1 and Clerk credentials are configured.
 import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { createServer, type Server, type ServerResponse } from "node:http";
@@ -240,6 +240,24 @@ async function signInWithClerkIfConfigured(page: Page): Promise<void> {
   await page.getByRole("button", { name: /continue|sign in/i }).click();
 }
 
+async function clerkSessionTokenFromPage(page: Page): Promise<string | null> {
+  if (!CLERK_LOGIN_ENABLED) return null;
+  await signInWithClerkIfConfigured(page);
+  await page.waitForFunction(
+    async () => {
+      const clerk = (window as unknown as { Clerk?: { loaded?: boolean; session?: { getToken?: () => Promise<string | null> } } }).Clerk;
+      if (!clerk?.loaded || !clerk.session?.getToken) return false;
+      return Boolean(await clerk.session.getToken());
+    },
+    undefined,
+    { timeout: 20000 },
+  );
+  return page.evaluate(async () => {
+    const clerk = (window as unknown as { Clerk?: { session?: { getToken?: () => Promise<string | null> } } }).Clerk;
+    return clerk?.session?.getToken ? await clerk.session.getToken() : null;
+  });
+}
+
 async function openSurface(page: Page, label: RegExp, componentId: string): Promise<void> {
   await page.getByRole("link", { name: label }).first().click();
   await page.locator(`[data-surface-component='${componentId}']`).waitFor({ timeout: 10000 });
@@ -350,9 +368,14 @@ async function transitionWorkItem(backendEndpoint: string, authHeaders: Record<s
 
 async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
   const backendEndpoint = process.env.E2E_BACKEND_ENDPOINT!;
-  const clerkToken = process.env.E2E_CLERK_SESSION_TOKEN; // minted out-of-band by the maintainer for this run
+  let clerkToken = process.env.E2E_CLERK_SESSION_TOKEN; // optionally minted out-of-band by the maintainer for this run
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   if (!clerkToken) {
-    throw new Error("E2E_HUBSPOT_TEST_PORTAL=1 requires E2E_CLERK_SESSION_TOKEN (a valid session token for backend calls).");
+    clerkToken = await clerkSessionTokenFromPage(page) ?? undefined;
+  }
+  if (!clerkToken) {
+    await page.close();
+    throw new Error("E2E_HUBSPOT_TEST_PORTAL=1 requires E2E_CLERK_SESSION_TOKEN or E2E_CLERK_LOGIN=1 with Clerk credentials.");
   }
   const authHeaders = { authorization: `Bearer ${clerkToken}` };
 
@@ -362,8 +385,6 @@ async function runHubSpotTaskLoop(browser: Browser): Promise<void> {
   }
   console.log(`e2e: seeded work item ${itemId} for the HubSpot task loop.`);
 
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  await signInWithClerkIfConfigured(page);
   await page.goto(`${BASE_URL}/work/${encodeURIComponent(itemId)}`, { waitUntil: "networkidle" });
   await page.locator("[data-surface-component='surface-work-queue']").waitFor({ timeout: 10000 });
 
