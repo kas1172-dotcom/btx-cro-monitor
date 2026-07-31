@@ -125,6 +125,7 @@ export function IndustryUpdates({ world }: { world: World }) {
   const [runOpen, setRunOpen] = useState(false);
   const [status, setStatus] = useState("Preparing collection evidence.");
   const [undoReview, setUndoReview] = useState<{ id: string; previous: IndustryUpdateRecord["reviewStatus"]; label: string } | null>(null);
+  const [busyAction, setBusyAction] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -155,12 +156,15 @@ export function IndustryUpdates({ world }: { world: World }) {
   );
 
   async function review(update: IndustryUpdateRecord, action: "mark_reviewed" | "dismiss" | "needs_account_match") {
+    const busyKey = `${update.id}:${action}`;
+    if (busyAction) return;
     if (!BACKEND_ENDPOINT) {
       setStatus("Review changes require the backend; the stored snapshot was not modified.");
       return;
     }
     const reason = action === "dismiss" ? window.prompt("Why is this update not relevant?")?.trim() : undefined;
     if (action === "dismiss" && !reason) return;
+    setBusyAction(busyKey);
     setStatus("Saving review…");
     try {
       const result = await reviewIndustryUpdate(update.id, action, reason);
@@ -173,11 +177,14 @@ export function IndustryUpdates({ world }: { world: World }) {
       setStatus(action === "needs_account_match" ? "Queued for account-evidence assessment. Undo will restore the prior backend review status." : "Review saved. Undo will restore the prior backend review status.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The review could not be saved.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
   async function undoLastReview() {
     if (!undoReview) return;
+    if (busyAction) return;
     if (!BACKEND_ENDPOINT) {
       setMonitor((current) => current ? {
         ...current,
@@ -187,6 +194,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       setUndoReview(null);
       return;
     }
+    setBusyAction("undo-review");
     setStatus("Restoring previous review status…");
     try {
       const result = await reviewIndustryUpdate(undoReview.id, "restore_previous");
@@ -198,14 +206,19 @@ export function IndustryUpdates({ world }: { world: World }) {
       setUndoReview(null);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The review change could not be restored.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
   async function draftWork(update: IndustryUpdateRecord) {
+    const busyKey = `${update.id}:draft`;
+    if (busyAction) return;
     if (!BACKEND_ENDPOINT) {
       setStatus("Work-item drafting requires the backend; no external action occurred.");
       return;
     }
+    setBusyAction(busyKey);
     setStatus("Creating an internal work-item draft…");
     try {
       const item = await createIndustryWorkItem(update.id);
@@ -213,6 +226,8 @@ export function IndustryUpdates({ world }: { world: World }) {
       navigateTo(`/work/${encodeURIComponent(item.id)}`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The work-item draft could not be created.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
@@ -249,7 +264,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       <p className="industry-mode-label">
         <strong>{monitor?.ingestionMode.replace(/_/g, " ").toUpperCase() ?? "CHECKING MODE"}</strong>
         {" "}{status}
-        {undoReview && <button type="button" onClick={undoLastReview}>{undoReview.label}</button>}
+        {undoReview && <button type="button" disabled={Boolean(busyAction)} onClick={undoLastReview}>{busyAction === "undo-review" ? "Restoring..." : undoReview.label}</button>}
       </p>
 
       {runOpen && monitor?.run && (
@@ -316,10 +331,10 @@ export function IndustryUpdates({ world }: { world: World }) {
             {update.sourceVariants.length > 0 && <p className="muted">{update.sourceVariants.length} syndicated source variant{update.sourceVariants.length === 1 ? "" : "s"} grouped with this story.</p>}
             <div className="industry-actions">
               <ExternalLink href={update.canonicalUrl} label={`Review evidence at the original source for ${update.headline}`} />
-              <button type="button" onClick={() => void review(update, "mark_reviewed")}>Mark reviewed</button>
-              <button type="button" onClick={() => void review(update, "needs_account_match")}>Assess account relevance</button>
-              <button type="button" onClick={() => void draftWork(update)}>Create work-item draft</button>
-              <button type="button" onClick={() => void review(update, "dismiss")}>Dismiss</button>
+              <button type="button" disabled={Boolean(busyAction)} onClick={() => void review(update, "mark_reviewed")}>{busyAction === `${update.id}:mark_reviewed` ? "Saving..." : "Mark reviewed"}</button>
+              <button type="button" disabled={Boolean(busyAction)} onClick={() => void review(update, "needs_account_match")}>{busyAction === `${update.id}:needs_account_match` ? "Queueing..." : "Assess account relevance"}</button>
+              <button type="button" disabled={Boolean(busyAction)} onClick={() => void draftWork(update)}>{busyAction === `${update.id}:draft` ? "Creating..." : "Create work-item draft"}</button>
+              <button type="button" disabled={Boolean(busyAction)} onClick={() => void review(update, "dismiss")}>{busyAction === `${update.id}:dismiss` ? "Dismissing..." : "Dismiss"}</button>
             </div>
           </article>
         ))}

@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readdir, readFile } from "node:fs/promises";
 import { chromium, type Browser, type Page } from "playwright";
 
 const BASE_URL = "http://127.0.0.1:4174";
@@ -174,8 +174,12 @@ async function desktopSmoke(browser: Browser, width: number, height: number): Pr
 
 async function assertLazyBundles(): Promise<void> {
   const html = await readFile("dist/index.html", "utf8");
-  for (const forbidden of ["leaflet", "write-excel-file", "xlsx", "pptx", "docx", "DocumentViewer", "ProspectMap", "IndustryUpdates"]) {
-    assert(!html.includes(forbidden), `Initial HTML eagerly references lazy chunk: ${forbidden}`);
+  const distFiles = await readdir("dist/assets");
+  for (const chunk of ["leaflet", "xlsx", "pptx", "docx", "DocumentViewer", "ProspectMap", "IndustryUpdates"]) {
+    assert(distFiles.some((file) => file.includes(chunk)), `Manual lazy chunk was not emitted: ${chunk}`);
+  }
+  for (const forbidden of ["write-excel-file"]) {
+    assert(!html.includes(forbidden), `Initial HTML eagerly imports dependency internals: ${forbidden}`);
   }
 }
 

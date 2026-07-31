@@ -190,6 +190,7 @@ function EngineTuningPanel() {
   const [weights, setWeights] = useState<WeightsConfig>(() => readLocal(WEIGHTS_KEY, defaultWeights as WeightsConfig));
   const [saved, setSaved] = useState<EngineConfigResponse<WeightsConfig> | null>(null);
   const [status, setStatus] = useState(LIVE_MODE ? "Preparing backend scoring weights." : "Local mode: changes save to this browser.");
+  const [saving, setSaving] = useState(false);
   const errors = useMemo(() => {
     const next: string[] = [];
     for (const [eventType, row] of Object.entries(weights.weights)) {
@@ -241,14 +242,17 @@ function EngineTuningPanel() {
   }
 
   async function save(): Promise<void> {
+    if (saving) return;
     if (errors.length > 0) {
       setStatus("Fix validation errors before saving.");
       return;
     }
+    setSaving(true);
     setStatus("Saving...");
     if (!LIVE_MODE) {
       window.localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights));
       setStatus("Saved to local settings.");
+      setSaving(false);
       return;
     }
     try {
@@ -260,6 +264,8 @@ function EngineTuningPanel() {
       setStatus("Saved to backend.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Save failed.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -304,7 +310,7 @@ function EngineTuningPanel() {
         ))}
       </div>
       </section>
-      <button className="settings-primary" disabled={errors.length > 0} onClick={() => void save()}>Save scoring weights</button>
+      <button className="settings-primary" disabled={saving || errors.length > 0} onClick={() => void save()}>{saving ? "Saving..." : "Save scoring weights"}</button>
     </div>
   );
 }
@@ -316,6 +322,7 @@ function SourcesPanel() {
   const [requestText, setRequestText] = useState(() => readLocal(SOURCE_REQUESTS_KEY, ""));
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [pendingRemove, setPendingRemove] = useState<SourceRegistryItem | null>(null);
+  const [busyAction, setBusyAction] = useState<"save" | "run" | null>(null);
   const enabledCount = useMemo(() => registry.sources.filter((source) => source.enabled).length, [registry]);
   const errors = useMemo(() => {
     const next: string[] = [];
@@ -381,15 +388,18 @@ function SourcesPanel() {
   }
 
   async function save(): Promise<void> {
+    if (busyAction) return;
     if (errors.length > 0) {
       setStatus("Fix validation errors before saving.");
       return;
     }
+    setBusyAction("save");
     setStatus("Saving...");
     if (!LIVE_MODE) {
       window.localStorage.setItem(SOURCES_KEY, JSON.stringify(registry));
       window.localStorage.setItem(SOURCE_REQUESTS_KEY, JSON.stringify(requestText));
       setStatus("Saved to local settings.");
+      setBusyAction(null);
       return;
     }
     try {
@@ -401,14 +411,18 @@ function SourcesPanel() {
       setStatus("Saved to backend.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Save failed.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
   async function runNow(): Promise<void> {
+    if (busyAction) return;
     if (!LIVE_MODE) {
       setStatus("Run collection is available only when VITE_BACKEND_ENDPOINT is configured.");
       return;
     }
+    setBusyAction("run");
     setStatus("Triggering collection...");
     try {
       const run = await backendJson<PipelineRun>("/pipeline/run", { method: "POST" });
@@ -416,6 +430,8 @@ function SourcesPanel() {
       loadRuns();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Pipeline trigger failed.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
@@ -466,8 +482,8 @@ function SourcesPanel() {
       </div>
       <div className="settings-inline-actions">
         <button type="button" onClick={addSource}>Add source</button>
-        <button type="button" className="settings-primary" disabled={errors.length > 0} onClick={() => void save()}>Save sources</button>
-        <button type="button" onClick={() => void runNow()}>Run collection now</button>
+        <button type="button" className="settings-primary" disabled={Boolean(busyAction) || errors.length > 0} onClick={() => void save()}>{busyAction === "save" ? "Saving..." : "Save sources"}</button>
+        <button type="button" disabled={Boolean(busyAction)} onClick={() => void runNow()}>{busyAction === "run" ? "Triggering..." : "Run collection now"}</button>
       </div>
       <label className="settings-request">
         <span>Free-text source suggestions</span>

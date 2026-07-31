@@ -289,6 +289,7 @@ export function AskSurface({ world }: { world: World }) {
   const [context, setContext] = useState<AssistantContext>(routeCtx);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [conversationBusy, setConversationBusy] = useState<string | null>(null);
   const [sourceMode, setSourceMode] = useState<AssistantSourceMode>("automatic");
   const [error, setError] = useState<string | null>(null);
   const [createdRoute, setCreatedRoute] = useState<string | null>(null);
@@ -387,6 +388,8 @@ export function AskSurface({ world }: { world: World }) {
   }
 
   async function startConversation() {
+    if (conversationBusy) return;
+    setConversationBusy("new");
     setError(null);
     try {
       const created = await createAssistantConversation(context, routePrompt ? generatedTitle(routePrompt) : undefined);
@@ -396,21 +399,39 @@ export function AskSurface({ world }: { world: World }) {
       void loadConversations(created.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create conversation.");
+    } finally {
+      setConversationBusy(null);
     }
   }
 
   async function renameConversation(conversation: AssistantConversation) {
+    if (conversationBusy) return;
     const title = window.prompt("Conversation name", conversation.title);
     if (!title?.trim()) return;
-    const updated = await updateAssistantConversation(conversation.id, { title: title.trim() });
-    setSelected(updated);
-    void loadConversations(updated.id);
+    setConversationBusy("rename");
+    try {
+      const updated = await updateAssistantConversation(conversation.id, { title: title.trim() });
+      setSelected(updated);
+      void loadConversations(updated.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not rename conversation.");
+    } finally {
+      setConversationBusy(null);
+    }
   }
 
   async function setConversationStatus(conversation: AssistantConversation, status: "active" | "archived") {
+    if (conversationBusy) return;
+    setConversationBusy(status);
+    try {
     const updated = await updateAssistantConversation(conversation.id, { status });
     setSelected(updated);
     void loadConversations(updated.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update conversation status.");
+    } finally {
+      setConversationBusy(null);
+    }
   }
 
   function handleCreated(routePath: string) {
@@ -451,7 +472,7 @@ export function AskSurface({ world }: { world: World }) {
       <div className="ask-workspace-grid">
         <aside className={historyOpen ? "ask-conversation-sidebar drawer-open" : "ask-conversation-sidebar"} aria-label="Ask conversations">
           <div className="ask-sidebar-actions">
-            <button type="button" onClick={() => void startConversation()}>New conversation</button>
+            <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void startConversation()}>{conversationBusy === "new" ? "Creating..." : "New conversation"}</button>
             <button type="button" className="ask-drawer-close" onClick={() => setHistoryOpen(false)}>Close</button>
             <label>Search<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Account or topic" /></label>
           </div>
@@ -498,10 +519,10 @@ export function AskSurface({ world }: { world: World }) {
                   <button type="button" onClick={() => setHistoryOpen(true)}>History</button>
                   <button type="button" onClick={() => setCitationsOpen(true)}>Evidence</button>
                   <button type="button" onClick={() => navigateTo(pathWithFocus(!isFocus))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
-                  <button type="button" onClick={() => void renameConversation(selected)}>Rename</button>
+                  <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void renameConversation(selected)}>{conversationBusy === "rename" ? "Renaming..." : "Rename"}</button>
                   {selected.status === "archived"
-                    ? <button type="button" onClick={() => void setConversationStatus(selected, "active")}>Restore</button>
-                    : <button type="button" onClick={() => void setConversationStatus(selected, "archived")}>Archive</button>}
+                    ? <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void setConversationStatus(selected, "active")}>{conversationBusy === "active" ? "Restoring..." : "Restore"}</button>
+                    : <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void setConversationStatus(selected, "archived")}>{conversationBusy === "archived" ? "Archiving..." : "Archive"}</button>}
                 </div>
               </div>
               <div className="ask-message-list" aria-live="polite">

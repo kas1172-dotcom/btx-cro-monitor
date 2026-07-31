@@ -4525,6 +4525,75 @@ input[type="checkbox"]:checked::after {
 }
 
 @media (max-width: 640px) {
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .surface-page,
+  .quiet-content,
+  .editor-window,
+  .surface-panel,
+  .current-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .account360-layout,
+  .prospecting-grid,
+  .hubspot-viewer-grid,
+  .settings-grid,
+  .settings-source-row,
+  .settings-weight-row,
+  .settings-weight-head,
+  .work-detail-grid,
+  .today-development-grid,
+  .library-toolbar,
+  .capacity-grid,
+  .analysis-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .settings-weight-head {
+    display: none;
+  }
+  .settings-weight-row {
+    gap: 10px;
+  }
+  .settings-weight-row label {
+    min-width: 0;
+  }
+  .work-table,
+  .pipeline-table-view,
+  .settings-weight-table {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  button,
+  [role="button"],
+  .button-like,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+  .industry-actions,
+  .document-actions,
+  .settings-inline-actions,
+  .account-actions,
+  .hubspot-actions,
+  .crm-write-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .industry-actions > *,
+  .document-actions > *,
+  .settings-inline-actions > *,
+  .account-actions > *,
+  .hubspot-actions > *,
+  .crm-write-actions > * {
+    flex: 1 1 150px;
+  }
   html, body, #root { height: 100dvh; min-height: 100dvh; overflow: hidden; }
   body { font-size: 14px; }
   .quiet-cockpit {
