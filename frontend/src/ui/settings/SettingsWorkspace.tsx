@@ -5,6 +5,8 @@ import clientConfig from "../../../../clients/btx/config.json";
 import { SETTINGS_SECTIONS } from "../../app/settingsSections.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { applyScoringConfig } from "../../app/config.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
+import { formatDateTime } from "../../app/format.ts";
 import { clearMemory } from "../../memory/localMemory.ts";
 import { resetUiState, setState, useStore, type SettingsSection } from "../../store/store.ts";
 import type { WeightsConfig } from "../../engine/decision/weights.ts";
@@ -146,7 +148,7 @@ function applyWeights(document: WeightsConfig): void {
 
 function updatedLabel(response?: EngineConfigResponse<unknown> | null): string {
   if (!response) return LIVE_MODE ? "Not loaded from backend yet" : "Local draft";
-  return `v${response.version} saved ${new Date(response.updated_at).toLocaleString()}`;
+  return `Version ${response.version} saved ${formatDateTime(response.updated_at)}`;
 }
 
 function sectionCopy(section: SettingsSection): { title: string; body: string } {
@@ -265,7 +267,7 @@ function EngineTuningPanel() {
   return (
     <div className="settings-live-panel">
       <div className="settings-status">
-        <strong>{LIVE_MODE ? "Backend scoring_weights" : "Local scoring_weights"}</strong>
+        <strong>{LIVE_MODE ? "Backend scoring weights" : "Local scoring weights"}</strong>
         <span>{updatedLabel(saved)}</span>
         <em>{status}</em>
       </div>
@@ -280,7 +282,7 @@ function EngineTuningPanel() {
         </div>
         {eventTypes.map((eventType) => (
           <div key={eventType} className="settings-weight-row">
-            <strong id={`weight-${eventType}-label`}>{eventType}</strong>
+            <strong id={`weight-${eventType}-label`}>{displayLabel(eventType)}</strong>
             {DIMENSIONS.map((dimension) => (
               <label key={dimension}>
                 <span>{DIMENSION_LABELS[dimension]}</span>
@@ -420,7 +422,7 @@ function SourcesPanel() {
   return (
     <div className="settings-live-panel">
       <div className="settings-status">
-        <strong>{LIVE_MODE ? "Backend source_registry" : "Local source_registry"}</strong>
+        <strong>{LIVE_MODE ? "Backend source registry" : "Local source registry"}</strong>
         <span>{enabledCount} enabled of {registry.sources.length} sources · {updatedLabel(saved)}</span>
         <em>{status}</em>
       </div>
@@ -477,7 +479,7 @@ function SourcesPanel() {
           {runs.slice(0, 5).map((run) => (
             <div key={run.id}>
               <strong>{run.status}</strong>
-              <span>{run.mechanism} · {new Date(run.triggered_at).toLocaleString()}</span>
+              <span>{displayLabel(run.mechanism)} · {formatDateTime(run.triggered_at)}</span>
               <em>{run.detail ?? run.id}</em>
             </div>
           ))}

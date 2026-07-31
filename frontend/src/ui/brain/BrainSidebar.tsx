@@ -74,7 +74,7 @@ export function BrainSidebar({
     <nav className="brain-rail" aria-label="Cockpit navigation">
       <div className="rail-brand" aria-label="BTX">
         <span>BTX</span>
-        <strong>Steel & Signal</strong>
+        <strong>Revenue cockpit</strong>
       </div>
       <div className="brain-rail-group brain-rail-primary">
         <div className="brain-rail-group-label">Operate</div>

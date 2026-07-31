@@ -216,7 +216,7 @@ export function Prospecting({ world }: { world: World }) {
                 : "Select a city for an in-market visit plan. For now, these are the strongest national targets in the current data."}
             </p>
           </div>
-          <button onClick={() => setProspectView("map")}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
+          <button onClick={() => setProspectView("map")}>{selectedMarket ? "Open map" : "Choose on map"}</button>
         </div>
         <div className="visit-plan-list">
           {visitPlanRows.map((row, index) => {
@@ -288,8 +288,8 @@ export function Prospecting({ world }: { world: World }) {
       <section className="prospecting-grid">
         <div className="current-panel current-panel-wide">
           <div className="panel-head">
-            <h2>Top New Prospects</h2>
-            <button onClick={() => setProspectView("map")}>Open Map</button>
+            <h2>Top new prospects</h2>
+            <button onClick={() => setProspectView("map")}>Open map</button>
           </div>
           {topProspects.map((row, index) => {
             const expanded = expandedProspectId === row.company.id;
@@ -347,7 +347,7 @@ export function Prospecting({ world }: { world: World }) {
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Nearby / Market-Based Prospects</h2>
+            <h2>Nearby market-based prospects</h2>
           </div>
           {marketProspects.map((row) => (
             <article key={row.company.id} className="current-mini-row">
@@ -368,7 +368,7 @@ export function Prospecting({ world }: { world: World }) {
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Recommended Next Actions</h2>
+            <h2>Recommended next actions</h2>
           </div>
           {recommendedActions.map((r) => (
             <article key={r.subject_id} className="rec-row">
@@ -388,7 +388,7 @@ export function Prospecting({ world }: { world: World }) {
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Buying Signals</h2>
+            <h2>Buying signals</h2>
           </div>
           {buyingSignals.map((signal) => (
             <article key={signal.id} className="current-signal-row">
@@ -407,7 +407,7 @@ export function Prospecting({ world }: { world: World }) {
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Outreach Queue</h2>
+            <h2>Outreach queue</h2>
           </div>
           {outreachQueue.map((row) => (
             <article key={row.company.id} className="outreach-row">

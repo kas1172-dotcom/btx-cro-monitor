@@ -867,11 +867,12 @@ button.context-ribbon-item {
   min-height: 38px;
   border: 1px solid var(--accent);
   border-radius: 8px;
-  background: rgba(var(--accent-rgb), .14);
-  color: var(--accent-text);
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), .96), rgba(var(--accent-rgb), .72));
+  color: var(--bg);
   padding: 8px 12px;
   cursor: pointer;
   font-weight: var(--font-semibold);
+  box-shadow: 0 10px 24px rgba(var(--accent-rgb), .18);
 }
 .today-development-grid {
   display: grid;
@@ -2532,6 +2533,86 @@ button.work-item-summary:focus-visible {
 }
 .placeholder h2 { color: var(--text); margin: 0; }
 
+select,
+textarea,
+input:not([type]),
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text-primary);
+  min-height: 44px;
+  padding: 10px 12px;
+}
+select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-secondary) 50%),
+    linear-gradient(135deg, var(--text-secondary) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-repeat: no-repeat;
+  background-size: 6px 6px, 6px 6px;
+  padding-right: 34px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(.72);
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  opacity: .35;
+}
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+  display: inline-grid;
+  place-items: center;
+  vertical-align: middle;
+}
+input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: var(--font-semibold);
+}
+
+.score-explain-list {
+  display: grid;
+  gap: 10px;
+}
+.score-explain-list > div {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 12px;
+}
+.score-explain-list > div > * {
+  margin: 0;
+}
+.score-explain-list button {
+  justify-self: start;
+}
+
 .surface-skeleton {
   width: 100%;
   min-height: min(520px, calc(100dvh - 160px));
@@ -3446,8 +3527,18 @@ button.work-item-summary:focus-visible {
 .monitor-source-list article { display: grid; gap: 4px; padding: 12px; border: 1px solid var(--line); background: var(--panel); }
 .monitor-source-list span, .monitor-source-list em { color: var(--muted); font-size: 12px; font-style: normal; }
 .industry-filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-.industry-filter-bar button { white-space: nowrap; }
-.industry-filter-bar button.active { border-color: var(--accent); color: var(--accent); }
+.industry-filter-bar button {
+  white-space: nowrap;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text-secondary);
+  border-radius: 999px;
+}
+.industry-filter-bar button.active {
+  background: rgba(var(--accent-rgb), .14);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
 .industry-feed { display: grid; gap: 14px; }
 .industry-update-card { display: grid; gap: 16px; padding: 20px; border: 1px solid var(--line); background: var(--panel); }
 .industry-update-card header { display: flex; justify-content: space-between; gap: 18px; }
@@ -5062,6 +5153,10 @@ button.work-item-summary:focus-visible {
   cursor: pointer;
   text-decoration: none;
 }
+.priority-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+}
 .evidence-close:hover,
 .evidence-drawer-actions button:hover,
 .evidence-record-actions button:hover,
@@ -5526,7 +5621,7 @@ button.work-item-summary:focus-visible {
   cursor: pointer;
 }
 
-/* Steel & Signal redesign */
+/* Revenue cockpit theme */
 :root {
   --canvas: #09121d;
   --sidebar: #0b1622;

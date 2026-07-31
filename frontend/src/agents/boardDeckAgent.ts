@@ -127,7 +127,6 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
     const revenue = metricNumber(f, "revenue");
     const bookings = metricNumber(f, "bookings");
     const backlog = metricNumber(f, "backlog");
-    const priorBacklog = metricNumber(f, "priorBacklog");
     const bookToBill = metricNumber(f, "bookToBill");
     const winRate = metricNumber(f, "winRate");
     const capacity = metricNumber(f, "capacity");

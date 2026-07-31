@@ -23,3 +23,23 @@ export function companyLinks(company: Company): Array<{ label: string; url: stri
     company.source_url ? { label: "Source", url: company.source_url } : null,
   ].filter((item): item is { label: string; url: string } => Boolean(item));
 }
+
+export function formatDateTime(value: string | Date | null | undefined): string {
+  if (!value) return "Date unavailable";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return date.toLocaleString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export function formatDateOnly(value: string | Date | null | undefined): string {
+  if (!value) return "Date unavailable";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return date.toLocaleDateString();
+}

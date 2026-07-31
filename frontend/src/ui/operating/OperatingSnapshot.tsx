@@ -51,7 +51,7 @@ export function OperatingSnapshot() {
     <div className="operating">
       <section className="operating-head">
         <p className="eyebrow">Production view</p>
-        <h1>What data is the brain using right now?</h1>
+        <h1>Current data sources</h1>
         <p>
           Backend CRM records, monitor engine market output, and production context feed one runtime adapter. Capacity remains labeled as ERP pending until a live ERP source is connected.
         </p>
@@ -67,7 +67,7 @@ export function OperatingSnapshot() {
         <div>
           <span>Capacity sources</span>
           <strong>{snapshot.capacity.length}</strong>
-          <em>{plainSourceText(snapshot.capacity[0]?.source_name ?? "ERP pending")}</em>
+              <em>{snapshot.capacity.length ? plainSourceText(snapshot.capacity[0]?.source_name ?? "ERP pending") : "ERP integration pending"}</em>
           <ProvenanceBadge label="Production context" />
         </div>
         <div>
@@ -84,9 +84,9 @@ export function OperatingSnapshot() {
       </section>
 
       <section className="operating-grid">
-        <div className="operating-panel">
+        {snapshot.crm.length > 0 && <div className="operating-panel">
           <div className="panel-head">
-            <h2>CRM View</h2>
+            <h2>CRM records</h2>
           </div>
           {snapshot.crm.map((row) => (
             <div key={row.account_id} className="operating-row">
@@ -96,11 +96,11 @@ export function OperatingSnapshot() {
               <small>{row.next_step}</small>
             </div>
           ))}
-        </div>
+        </div>}
 
-        <div className="operating-panel">
+        {snapshot.capacity.length > 0 && <div className="operating-panel">
           <div className="panel-head">
-            <h2>Capacity / ERP pending</h2>
+            <h2>Capacity context</h2>
           </div>
           {snapshot.capacity.map((row) => (
             <div key={row.facility_id} className="operating-row">
@@ -110,7 +110,7 @@ export function OperatingSnapshot() {
               <small>Constraint: {row.constraint}</small>
             </div>
           ))}
-        </div>
+        </div>}
 
         <div className="operating-panel">
           <div className="panel-head">

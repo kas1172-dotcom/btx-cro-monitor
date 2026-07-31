@@ -1,3 +1,4 @@
+import { formatDateTime } from "./format.ts";
 import type { SourceHealth, WorldSnapshot } from "./revenueDataClient.ts";
 
 export type ConnectionMode =
@@ -106,12 +107,12 @@ export function sourcePermissionLabel(source: SourceCapability): string {
 export function sourceFreshness(source: SourceCapability): { relative: string; exact: string } {
   if (!source.retrievedAt) return { relative: "Retrieval time unavailable", exact: "Unavailable" };
   const date = new Date(source.retrievedAt);
-  if (Number.isNaN(date.getTime())) return { relative: "Retrieval time unavailable", exact: source.retrievedAt };
+  if (Number.isNaN(date.getTime())) return { relative: "Retrieval time unavailable", exact: "Unavailable" };
   const minutes = Math.max(0, Math.round((Date.now() - date.getTime()) / 60_000));
   const relative = minutes < 60
     ? `${minutes} minute${minutes === 1 ? "" : "s"} ago`
     : minutes < 1_440
       ? `${Math.round(minutes / 60)} hour${Math.round(minutes / 60) === 1 ? "" : "s"} ago`
       : `${Math.round(minutes / 1_440)} day${Math.round(minutes / 1_440) === 1 ? "" : "s"} ago`;
-  return { relative, exact: date.toLocaleString() };
+  return { relative, exact: formatDateTime(source.retrievedAt) };
 }

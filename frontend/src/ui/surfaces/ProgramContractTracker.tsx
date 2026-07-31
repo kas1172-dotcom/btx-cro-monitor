@@ -40,7 +40,7 @@ export function ProgramContractTracker({ world }: { world: World }) {
     <section className="surface-page" data-surface-component="surface-program-contract-tracker">
       <SurfaceHeader
         eyebrow="Signals"
-        headline={`${programSignals.length} signals relevant to BTX capabilities.`}
+        headline={`${programSignals.length} signals relevant to BTX capabilities`}
         subline="Funding, contract, and program news stays market-level until a verified account link is available."
       />
       <div className="program-signal-list">

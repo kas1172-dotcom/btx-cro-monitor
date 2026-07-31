@@ -532,7 +532,7 @@ function RoutedDocumentViewer({ deliverableId, localDeliverables, world }: { del
   return <SurfaceSkeleton label="Preparing saved deliverable" variant="document" />;
 }
 
-function RouteNotFound({ path }: { path: string }) {
+function RouteNotFound({ path: _path }: { path: string }) {
   return (
     <section className="surface-page" data-surface-component="surface-not-found">
       <div className="surface-panel">

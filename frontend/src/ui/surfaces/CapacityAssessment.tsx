@@ -4,6 +4,7 @@ import { formatMetricValue } from "../../metrics/chartSpec.ts";
 import { OperatingSnapshot } from "../operating/OperatingSnapshot.tsx";
 import { SurfaceHeader } from "../primitives.tsx";
 import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "../../app/sourceRegistry.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
 import { canonicalMetrics, formatCanonicalMetric } from "../../app/canonicalMetrics.ts";
 
 export function CapacityAssessment({ world }: { world: World }) {
@@ -19,7 +20,7 @@ export function CapacityAssessment({ world }: { world: World }) {
     <section className="surface-page" data-surface-component="surface-capacity-assessment">
       <SurfaceHeader
         eyebrow="Capacity assessment"
-        headline="Machining capacity compared with committed backlog and visible demand."
+        headline="Machining capacity compared with committed backlog and visible demand"
         subline="A compact production view for work-center load, delivery risk, backlog, and open demand."
       />
       <div className="account360-kpis">
@@ -48,9 +49,9 @@ export function CapacityAssessment({ world }: { world: World }) {
             const freshness = sourceFreshness(source);
             return (
               <article key={source.id}>
-                <span>{source.environment}</span>
+                <span>{displayLabel(source.environment)}</span>
                 <strong>{source.name}: {sourceModeLabel(source)}</strong>
-                <em>{sourcePermissionLabel(source)} · {freshness.relative} · {freshness.exact}</em>
+                <em>{sourcePermissionLabel(source)} · updated {freshness.relative}</em>
               </article>
             );
           })}

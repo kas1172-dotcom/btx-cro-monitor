@@ -24,6 +24,7 @@ import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 import { buildWorkTimeline } from "../../app/timeline.ts";
 import { MeaningfulTimeline } from "../timeline/MeaningfulTimeline.tsx";
 import { canonicalMetrics, formatCanonicalMetric } from "../../app/canonicalMetrics.ts";
+import { formatDateTime } from "../../app/format.ts";
 
 const STATUSES: Array<WorkItemStatus | "all"> = [
   "all",
@@ -302,7 +303,7 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
         <span>Status: {plainWorkStatus(item.status)}</span>
         <span>Approval: {plainApprovalState(item.approval_state)}</span>
         <span>Execution: {plainExecutionState(item.execution_state)}</span>
-        <span>Updated: {new Date(item.updated_at).toLocaleString()}</span>
+        <span>Updated: {formatDateTime(item.updated_at)}</span>
       </div>
       <details className="work-diagnostics">
         <summary>Technical details</summary>
@@ -361,14 +362,14 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
         <h3 id="work-notes-title">Notes and findings</h3>
         <label>Add note<textarea aria-label="Add work note" placeholder="Add a note or finding" value={note} onChange={(event) => setNote(event.target.value)} /></label>
         <button type="button" disabled={Boolean(busyAction) || !note.trim()} title={!note.trim() ? "Enter a note before adding it." : undefined} onClick={() => { if (busyAction || !note.trim()) return; setBusyAction("note"); void addWorkItemNote(item, note).then(() => { setNote(""); setMessage("Note added."); }).catch((err) => setError(err instanceof Error ? err.message : "Could not add note.")).finally(() => setBusyAction(null)); }}>{busyAction === "note" ? "Adding..." : "Add note"}</button>
-        {item.notes.map((entry) => <p key={entry.id}><strong>{titleCase(entry.note_type)}</strong> {entry.body} <span>{new Date(entry.created_at).toLocaleString()}</span></p>)}
+        {item.notes.map((entry) => <p key={entry.id}><strong>{titleCase(entry.note_type)}</strong> {entry.body} <span>{formatDateTime(entry.created_at)}</span></p>)}
       </section>
       <section className="work-audit" aria-labelledby="work-audit-title">
         <h3 id="work-audit-title">Audit history</h3>
         {item.audit_history.map((entry, index) => (
           <p key={`${String(entry.id ?? entry.timestamp)}-${index}`}>
             <strong>{titleCase(String(entry.event_type ?? entry.action ?? "event"))}</strong>
-            <span>{new Date(String(entry.timestamp)).toLocaleString()} · {String(entry.actor ?? "system")}</span>
+            <span>{formatDateTime(String(entry.timestamp))} · {String(entry.actor ?? "system")}</span>
           </p>
         ))}
       </section>

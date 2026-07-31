@@ -56,6 +56,11 @@ function scoreDisplay(score: ScoreSnapshot | null): string {
   return score.score === null ? "More information needed" : String(Math.round(score.score));
 }
 
+function accountListScoreLabel(score: ScoreSnapshot | null): string {
+  const display = scoreDisplay(score);
+  return display === "More information needed" ? "Attractiveness needs more information" : `Attractiveness ${display}`;
+}
+
 function scoreStatus(score: ScoreSnapshot | null): string {
   return score?.result.status.replace(/_/g, " ") ?? "insufficient data";
 }
@@ -209,7 +214,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               <AccountToken name={row.company.name} riskScore={row.score?.dimensions.risk.score} size="sm" />
               <span className="account360-list-row-main">
                 <strong>{row.company.name}</strong>
-                <span>{scoreDisplay(row.attractiveness)} attractiveness</span>
+                <span>{accountListScoreLabel(row.attractiveness)}</span>
                 <em>{row.linkedSignals.length} confirmed signal{row.linkedSignals.length === 1 ? "" : "s"} · {money(row.openPipeline)} open</em>
               </span>
             </button>

@@ -116,7 +116,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
   return (
     <section className="surface-page deliverable-library" data-surface-component="surface-deliverable-library">
       <SurfaceHeader
-        eyebrow="Deliverables"
+        eyebrow="Library"
         headline="Deliverables"
         subline="Browse saved briefs, decks, memos, and analysis views; open one to edit, download, or create CRM follow-up."
       />

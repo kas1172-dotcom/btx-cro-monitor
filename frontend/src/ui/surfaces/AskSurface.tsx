@@ -14,6 +14,7 @@ import {
   type AssistantSourceMode,
 } from "../../app/assistantApi.ts";
 import { navigateTo, useAppRoute } from "../../app/router.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
 import type { World } from "../../app/useWorld.ts";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
 import { useWorkItems } from "../../app/workItems.ts";
@@ -412,7 +413,7 @@ export function AskSurface({ world }: { world: World }) {
   return (
     <section className={isFocus ? "surface-page ask-surface ask-workspace record-focus-mode" : "surface-page ask-surface ask-workspace"} data-surface-component="surface-ask">
       <SurfaceHeader
-        eyebrow="Ask"
+        eyebrow="Assistant"
         headline="Ask"
         subline="Grounded answers use internal records, current work, deliverables, scores, and cited account signals."
       />
@@ -559,7 +560,7 @@ export function AskSurface({ world }: { world: World }) {
               <div key={`${message.id}-${citation.id}`} className="ask-citation-card">
                 <button type="button" onClick={(event) => openCitationEvidence(citation, event.currentTarget)}>
                   <strong>{citation.title}</strong>
-                  <span>{sourceClass(citation)} · {citation.claim_classification}{citation.relationship_status ? ` · ${citation.relationship_status}` : ""}</span>
+                  <span>{sourceClass(citation)} · {displayLabel(citation.claim_classification)}{citation.relationship_status ? ` · ${displayLabel(citation.relationship_status)}` : ""}</span>
                   <em>{citation.claim}</em>
                 </button>
                 <button type="button" onClick={() => navigateTo(citation.route)}>Open record</button>

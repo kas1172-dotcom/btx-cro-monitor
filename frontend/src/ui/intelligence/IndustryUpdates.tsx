@@ -10,6 +10,7 @@ import {
 import type { World } from "../../app/useWorld.ts";
 import { navigateTo } from "../../app/router.ts";
 import { signalHeadline, signalSourceName } from "../../app/signalProvenance.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 
@@ -296,9 +297,9 @@ export function IndustryUpdates({ world }: { world: World }) {
                 <p>{explicitDateLabel("Record retrieved", update.retrievedAt)} · {explicitDateLabel("Published", update.publicationDate)} · {explicitDateLabel("Event date", update.eventDate)}</p>
               </div>
               <div className="industry-classifications">
-                <span>{update.relationshipState.replace(/_/g, " ")}</span>
+                <span>{displayLabel(update.relationshipState)}</span>
                 <span>Public source</span>
-                <span>{update.reviewStatus.replace(/_/g, " ")}</span>
+                <span>{displayLabel(update.reviewStatus)}</span>
               </div>
             </header>
             <p>{wordBoundary(update.normalizedSummary)}</p>
@@ -307,7 +308,7 @@ export function IndustryUpdates({ world }: { world: World }) {
               <div><dt>BTX capability relevance</dt><dd>{update.capabilityTags.join(" · ") || "Capability match requires review"}</dd></div>
             </dl>
             <div className="industry-hypothesis">
-              <strong>Why Jamie is seeing this</strong>
+              <strong>Why this appears</strong>
               {uniqueReasons(update.normalizedSummary, update.relevanceReasons).map((reason) => <p key={reason}>{wordBoundary(reason, 180)}</p>)}
               {uniqueReasons(update.normalizedSummary, update.relevanceReasons).length === 0 && <p>Matched configured monitor relevance rules; no additional non-duplicate summary was provided.</p>}
               {update.relationshipState !== "confirmed_account_development" && <em>Relevance is a hypothesis. No BTX opportunity or account impact has been confirmed.</em>}

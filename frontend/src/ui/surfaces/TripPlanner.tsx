@@ -69,7 +69,7 @@ export function TripPlanner({ world }: { world: World }) {
     <section className="surface-page trip-planner-surface" data-surface-component="surface-trip-planner">
       <SurfaceHeader
         eyebrow="Trip planner"
-        headline="Build a field itinerary from geography, priority, and validated account context."
+        headline="Build a field itinerary from geography, priority, and validated account context"
         subline="Generate a candidate route, inspect the stops, then open the itinerary as a saved deliverable with calendar export."
       />
 

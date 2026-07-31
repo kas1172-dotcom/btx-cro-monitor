@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 import type { EvidencePackage } from "../../app/evidence.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
+import { formatDateTime } from "../../app/format.ts";
 import { navigateTo } from "../../app/router.ts";
 import type { MeaningfulTimelineEvent } from "../../app/timeline.ts";
 
 function displayDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  return formatDateTime(value);
 }
 
 function categoryLabel(value: MeaningfulTimelineEvent["category"]): string {
-  return value.replace(/_/g, " ");
+  return displayLabel(value);
 }
 
 export function MeaningfulTimeline({
@@ -52,7 +52,6 @@ export function MeaningfulTimeline({
                 role="group"
                 tabIndex={0}
                 aria-label={`${event.title}, ${displayDate(event.occurredAt)}`}
-                title={new Date(event.occurredAt).toISOString()}
               >
                 <div className="timeline-event-head">
                   <span>{categoryLabel(event.category)}</span>
@@ -61,8 +60,8 @@ export function MeaningfulTimeline({
                 <strong>{event.title}</strong>
                 {event.summary && <p>{event.summary}</p>}
                 <div className="timeline-event-meta">
-                  {event.actorLabel && <span>{event.actorLabel}</span>}
-                  <span>{event.sourceRecordType}</span>
+                  {event.actorLabel && <span>{displayLabel(event.actorLabel)}</span>}
+                  <span>{displayLabel(event.sourceRecordType)}</span>
                   {event.dataClassification && <span>{event.dataClassification}</span>}
                 </div>
                 <div className="timeline-event-actions">

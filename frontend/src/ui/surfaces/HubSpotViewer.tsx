@@ -9,6 +9,8 @@ import type { World } from "../../app/useWorld.ts";
 import type { Company, Contact, Opportunity } from "../../engine/brain/entities.ts";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "../../app/sourceRegistry.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
+import { plural } from "../../app/format.ts";
 
 type ListType = "company" | "contact";
 
@@ -195,9 +197,9 @@ export function HubSpotViewer({ world }: { world: World }) {
             const freshness = sourceFreshness(source);
             return (
               <article key={source.id}>
-                <span>{source.environment} · {source.verification}</span>
+                <span>{displayLabel(source.environment)} · {displayLabel(source.verification)}</span>
                 <strong>{source.name}: {sourceModeLabel(source)}</strong>
-                <em>{sourcePermissionLabel(source)} · {freshness.relative} · {freshness.exact}</em>
+                <em>{sourcePermissionLabel(source)} · updated {freshness.relative}</em>
               </article>
             );
           })}
@@ -227,7 +229,7 @@ export function HubSpotViewer({ world }: { world: World }) {
               <div key={row.stage}>
                 <span>{row.stage.replace(/_/g, " ")}</span>
                 <strong>{money(row.value)}</strong>
-                <em>{row.count} deals</em>
+                <em>{plural(row.count, "deal")}</em>
               </div>
             ))}
           </div>
