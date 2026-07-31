@@ -35,7 +35,7 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
     const priorResult = computeMetric(metric, world, undefined, prior);
 
     let topAccountName = "";
-    let topAccountValue = 0;
+    let topAccountValue: number | null = null;
     let activeAccountCount = 0;
 
     if (metric === "revenue" || metric === "margin_trend" || metric === "customer_concentration") {
@@ -49,12 +49,12 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
         .sort((a, b) => b.value - a.value);
       activeAccountCount = accountValues.length;
       topAccountName = accountValues[0]?.name ?? "";
-      topAccountValue = accountValues[0]?.value ?? 0;
+      topAccountValue = accountValues[0]?.value ?? null;
     }
 
     const qoqChange = result.value !== null && priorResult.value !== null && priorResult.value > 0
       ? ((result.value - priorResult.value) / priorResult.value) * 100
-      : 0;
+      : null;
 
     return {
       facts: {
@@ -69,7 +69,7 @@ export const analysisAnnotationAgent: DeliverableAgent<Inputs> = {
         topAccountName,
         topAccountValue,
         activeAccountCount,
-        topSharePct: result.value !== null && result.value > 0 ? Math.round((topAccountValue / result.value) * 100) : 0,
+        topSharePct: result.value !== null && result.value > 0 && topAccountValue !== null ? Math.round((topAccountValue / result.value) * 100) : null,
       },
       entityIds: world.companies.filter((c) => c.relationship === "customer").map((c) => c.id).slice(0, 6),
       sources: [...result.provenance, ...priorResult.provenance],

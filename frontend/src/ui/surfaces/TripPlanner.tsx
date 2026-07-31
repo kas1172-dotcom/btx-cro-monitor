@@ -5,6 +5,7 @@ import { runAgent } from "../../agents/runAgent.ts";
 import type { Deliverable } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
+import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { TripInputForm, type TripFormValues } from "../trips/TripInputForm.tsx";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { formatAddress } from "../../app/format.ts";
@@ -96,14 +97,10 @@ export function TripPlanner({ world }: { world: World }) {
               <h2>Itinerary stops</h2>
               <button
                 type="button"
-                onClick={() => setState({
-                  activeDeliverable: itinerary,
-                  activeDeliverableOrigin: "generation",
-                  activeTab: "deliverables",
-                  activeCompanyId: null,
-                  brainResponse: null,
-                  activeAnalysisSpec: null,
-                })}
+                onClick={() => {
+                  setState({ activeCompanyId: null, brainResponse: null });
+                  navigateTo(deliverablePath(itinerary.backendRecordId ?? itinerary.id));
+                }}
               >
                 Open itinerary
               </button>

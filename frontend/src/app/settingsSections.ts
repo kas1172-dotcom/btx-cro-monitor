@@ -23,11 +23,6 @@ export const SETTINGS_SECTIONS: SettingsSectionSpec[] = [
     summary: "Client-tunable scoring, thresholds, targets, capacity assumptions, and profile settings.",
   },
   {
-    id: "prompts",
-    label: "Prompts & rubrics",
-    summary: "Power-user prompt, rubric, example, and vocabulary overrides.",
-  },
-  {
     id: "sources",
     label: "Source admin",
     summary: "Monitor source registry, collection runs, and source requests.",

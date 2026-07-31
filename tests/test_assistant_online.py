@@ -63,7 +63,8 @@ def _settings(**overrides):
     ("question", "requested", "enabled", "expected"),
     [
         ("Summarize this account", "automatic", True, "workspace"),
-        ("What changed this week?", "automatic", True, "workspace_web"),
+        ("What changed this week?", "automatic", True, "web"),
+        ("What changed in the BTX workspace this week?", "automatic", True, "workspace_web"),
         ("Use workspace only for current work", "automatic", True, "workspace"),
         ("Research public funding", "web", True, "web"),
         ("Research public funding", "web", False, "workspace"),
@@ -114,6 +115,29 @@ def test_workspace_web_uses_server_search_and_preserves_citations():
     sent = client.messages.calls[0]
     assert sent["tools"][0] == {"type": "web_search_20250305", "name": "web_search", "max_uses": 3}
     assert sent["messages"][0]["content"][0]["type"] == "document"
+
+
+def test_primary_government_sources_are_not_labeled_as_reporting():
+    client = FakeClient([SimpleNamespace(
+        stop_reason="end_turn",
+        content=[_block(type="text", text="Direct answer with evidence.", citations=[_block(
+            type="web_search_result_location",
+            url="https://sam.gov/opp/test?utm_source=x",
+            title="SAM.gov notice",
+            cited_text="Solicitation notice.",
+        )])],
+        usage=SimpleNamespace(input_tokens=120, output_tokens=80, server_tool_use=SimpleNamespace(web_search_requests=1)),
+    )])
+    result = run_online_answer(
+        message="Latest public contract notice",
+        requested_mode="web",
+        workspace_summary="",
+        workspace_citations=[],
+        settings=_settings(),
+        client=client,
+    )
+    assert result.citations[0]["source_type"] == "public_government"
+    assert result.citations[0]["data_classification"] == "primary_government"
 
 
 def test_web_mode_does_not_send_workspace_document():

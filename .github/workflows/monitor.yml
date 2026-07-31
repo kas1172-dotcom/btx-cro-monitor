@@ -64,10 +64,10 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Set up Node 20
+      - name: Set up pinned Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
 
       - name: Install engine
         run: pip install -e ".[dev,platform]"
@@ -232,3 +232,4 @@ jobs:
           vite_backend_endpoint: ${{ secrets.VITE_BACKEND_ENDPOINT }}
           vite_clerk_publishable_key: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           clerk_environment: development
+          deployment_mode: demo

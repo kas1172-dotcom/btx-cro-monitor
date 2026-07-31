@@ -1,3 +1,5 @@
+import { assertCrmWriteAllowed } from "./crmWriteSafety.ts";
+
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 
@@ -184,6 +186,7 @@ export async function createHubSpotList(input: {
   listType: "company" | "contact";
   idempotencyKey?: string;
 }): Promise<HubSpotListCreateResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotListCreateResponse>("/crm/lists", {
     method: "POST",
     headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
@@ -197,6 +200,7 @@ export async function addRecordsToHubSpotList(input: {
   recordIds: string[];
   idempotencyKey?: string;
 }): Promise<HubSpotListMembershipResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotListMembershipResponse>(`/crm/lists/${encodeURIComponent(input.listId)}/records`, {
     method: "PUT",
     headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
@@ -228,6 +232,7 @@ export interface HubSpotImportResponse {
 }
 
 export async function importProspectsToHubSpot(rows: HubSpotImportRowInput[], idempotencyKey?: string): Promise<HubSpotImportResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotImportResponse>("/crm/import/prospects", {
     method: "POST",
     headers: idempotencyKey ? { "X-Idempotency-Key": idempotencyKey } : undefined,
@@ -255,6 +260,7 @@ export async function createHubSpotTask(input: {
   dealId?: string | null;
   idempotencyKey?: string;
 }): Promise<HubSpotTaskResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotTaskResponse>("/crm/task", {
     method: "POST",
     headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,

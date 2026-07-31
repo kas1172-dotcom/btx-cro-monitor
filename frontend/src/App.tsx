@@ -12,13 +12,17 @@ import { WorkQueue } from "./ui/surfaces/WorkQueue.tsx";
 import { Account360 } from "./ui/surfaces/Account360.tsx";
 import { AskSurface } from "./ui/surfaces/AskSurface.tsx";
 import { ALL_SURFACES, countForSurface, type TabId } from "./app/surfaces.ts";
+import { canonicalMetricForSurface, type DisplayMetric } from "./app/canonicalMetrics.ts";
 import { createWorkItem } from "./app/workItems.ts";
-import { AppShell } from "./ui/primitives.tsx";
+import { AppShell, SurfaceHeader } from "./ui/primitives.tsx";
 import { CommandPalette } from "./ui/CommandPalette.tsx";
 import type { Deliverable } from "./deliverables/types.ts";
+import { getStoredDeliverable, recordToDeliverable } from "./app/deliverablesApi.ts";
 import { checkAiStatus, getAiStatusSnapshot, subscribeAiStatus } from "./app/aiStatus.ts";
-import { accountPath, navigateTo, useAppRoute } from "./app/router.ts";
+import { accountPath, deliverablePath, figureInsertPath, figureSpecFromRoute, navigateTo, useAppRoute } from "./app/router.ts";
 import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "./app/sourceRegistry.ts";
+import { BUILD_ENVIRONMENT, loadEnvironmentContract, type EnvironmentContract } from "./app/environmentContract.ts";
+import type { AppRoute } from "./app/router.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const AnalysisView = lazy(() => import("./ui/analysis/AnalysisView.tsx").then((module) => ({ default: module.AnalysisView })));
@@ -35,21 +39,39 @@ const DocumentViewer = lazy(() => import("./ui/deliverables/DocumentViewer.tsx")
 const IndustryUpdates = lazy(() => import("./ui/intelligence/IndustryUpdates.tsx").then((module) => ({ default: module.IndustryUpdates })));
 const DeliverableWizard = lazy(() => import("./ui/deliverables/DeliverableWizard.tsx").then((module) => ({ default: module.DeliverableWizard })));
 
+const ROUTE_LOAD_LABELS: Record<AppRoute["id"], { title: string; detail: string }> = {
+  today: { title: "Preparing briefing", detail: "Loading account signals, work state, and source health." },
+  work: { title: "Loading work queue", detail: "Checking current assignments, approvals, and execution status." },
+  accounts: { title: "Loading account workspace", detail: "Resolving account records, CRM provenance, contacts, and deals." },
+  programs: { title: "Loading program tracker", detail: "Collecting program signals and contract context." },
+  industry_updates: { title: "Loading industry updates", detail: "Collecting monitor records and source freshness." },
+  prospecting: { title: "Loading prospects", detail: "Scoring account records and mapped opportunities." },
+  capacity: { title: "Loading capacity", detail: "Checking facility and operating-data availability." },
+  analysis: { title: "Loading analysis", detail: "Preparing metrics, charts, and freshness checks." },
+  map: { title: "Loading map", detail: "Resolving mapped accounts and geography." },
+  ask: { title: "Loading assistant workspace", detail: "Preparing conversations and account context." },
+  deliverables: { title: "Loading deliverables", detail: "Preparing saved documents and source-backed figures." },
+  integrations: { title: "Loading integrations", detail: "Checking CRM, monitor, and backend source health." },
+  settings: { title: "Loading settings", detail: "Preparing environment and source configuration." },
+  not_found: { title: "Checking route", detail: "Looking up the requested cockpit route." },
+};
+
 export function App() {
-  const { city, brainResponse, activeCompanyId, demoAction, activeDeliverable, activeDeliverableOrigin, activeAnalysisSpec, tourRequested, deliverableWizardRequest } = useStore();
+  const { city, brainResponse, activeCompanyId, demoAction, tourRequested, deliverableWizardRequest } = useStore();
   const route = useAppRoute();
   const routeTab = route.tab;
   const [workItemStatus, setWorkItemStatus] = useState("");
   const [commandOpen, setCommandOpen] = useState(false);
   const [systemOpen, setSystemOpen] = useState(false);
+  const [environment, setEnvironment] = useState<EnvironmentContract>(BUILD_ENVIRONMENT);
   const handledWizardSaveIds = useRef(new Set<number>());
   const memory = useMemory();
   const marketWorld = useWorld(city); // selected-market scope; null means all markets.
   const world = useWorld(null); // global - dashboard, graph, and the dossier
   const aiStatus = useSyncExternalStore(subscribeAiStatus, getAiStatusSnapshot, getAiStatusSnapshot);
-  const settingsActive = routeTab === "settings" && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const homeActive = routeTab === "brief" && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
-  const marketScoped = routeTab === "map" && !homeActive && !settingsActive && !brainResponse && !activeDeliverable && !activeAnalysisSpec;
+  const settingsActive = routeTab === "settings" && !brainResponse;
+  const homeActive = routeTab === "brief" && !settingsActive && !brainResponse;
+  const marketScoped = routeTab === "map" && !homeActive && !settingsActive && !brainResponse;
   const viewWorld = marketScoped ? marketWorld ?? world : world;
   const cityOptions = [...new Set((world?.companies ?? []).map((company) => company.location.city).filter(Boolean))].sort();
 
@@ -62,6 +84,9 @@ export function App() {
 
   useEffect(() => {
     void checkAiStatus();
+    void loadEnvironmentContract().then(setEnvironment).catch(() => {
+      // Build truth remains visible if the diagnostic is temporarily unavailable.
+    });
   }, []);
 
   useEffect(() => {
@@ -104,11 +129,21 @@ export function App() {
         setState({ brainResponse: null });
         return;
       }
+      if (route.query.has("view")) {
+        event.stopPropagation();
+        navigateTo(route.path);
+        return;
+      }
+      if (route.id === "deliverables" && route.deliverableView !== "library") {
+        event.stopPropagation();
+        navigateTo("/deliverables");
+        return;
+      }
       goHome();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [brainResponse, commandOpen, previewAccountId]);
+  }, [brainResponse, commandOpen, previewAccountId, route]);
   const renderDefault = () => {
     if (route.id === "not_found") return <RouteNotFound path={route.path} />;
     if (settingsActive) return (
@@ -116,17 +151,7 @@ export function App() {
         <SettingsWorkspace />
       </Suspense>
     );
-    if (!world) return <div className="loading">loading…</div>;
-    if (activeAnalysisSpec) return (
-      <Suspense fallback={<div className="loading">loading analysis...</div>}>
-        <AnalysisView world={world} initialSpec={activeAnalysisSpec} />
-      </Suspense>
-    );
-    if (activeDeliverable) return (
-      <Suspense fallback={<div className="loading">loading deliverable…</div>}>
-        <DocumentViewer deliverable={activeDeliverable} world={world} openedFrom={activeDeliverableOrigin ?? "generation"} />
-      </Suspense>
-    );
+    if (!world || !world.worldSnapshot) return <RouteDataFallback route={route} world={world} />;
     if (brainResponse) return <BrainResponseWorkspace response={brainResponse} world={viewWorld ?? world} />;
     switch (routeTab) {
       case "brief": return <TodayBrief world={world} />;
@@ -170,7 +195,19 @@ export function App() {
       );
       case "deliverables": return (
         <Suspense fallback={<div className="loading">loading deliverables...</div>}>
-          <DeliverableLibrary world={world} />
+          {route.deliverableView === "insert_figure" ? (
+            <AnalysisView
+              key={route.query.toString()}
+              world={world}
+              initialSpec={figureSpecFromRoute(route)}
+              onCancel={() => navigateTo("/deliverables")}
+              onSpecChange={(spec) => navigateTo(figureInsertPath(spec), { replace: true })}
+            />
+          ) : route.deliverableView === "document" && route.deliverableId ? (
+            <RoutedDocumentViewer deliverableId={route.deliverableId} localDeliverables={memory.deliverables} world={world} />
+          ) : (
+            <DeliverableLibrary world={world} />
+          )}
         </Suspense>
       );
       case "hubspot": return (
@@ -180,7 +217,7 @@ export function App() {
       );
       case "settings": return (
         <Suspense fallback={<div className="loading">loading settings...</div>}>
-          <SettingsWorkspace />
+        <SettingsWorkspace />
         </Suspense>
       );
       default: return <TodayBrief world={world} />;
@@ -189,6 +226,9 @@ export function App() {
   const counts = Object.fromEntries(
     ALL_SURFACES.map((surface) => [surface.id, countForSurface(surface.id, world, memory)]),
   ) as Partial<Record<TabId, number>>;
+  const surfaceMetrics = Object.fromEntries(
+    ALL_SURFACES.map((surface) => [surface.id, canonicalMetricForSurface(surface.id, world, memory)]),
+  ) as Partial<Record<TabId, DisplayMetric>>;
 
   const rightPanelOpen = dossierOpen || contextPanelOpen;
   const surfaceTitle = ALL_SURFACES.find((surface) => surface.id === (settingsActive ? "settings" : homeActive ? "brief" : routeTab))?.label ?? "Cockpit";
@@ -214,28 +254,14 @@ export function App() {
         await createWorkItem({ ...request.afterSave.draft, evidence: artifactRef });
         if (request.afterSave.openDeliverable) {
           closeDeliverableWizard();
-          setState({
-            activeDeliverable: deliverable,
-            activeDeliverableOrigin: "generation",
-            activeTab: "deliverables",
-            activeCompanyId: null,
-            brainResponse: null,
-            activeAnalysisSpec: null,
-          });
+          navigateTo(deliverablePath(deliverable.backendRecordId ?? deliverable.id));
         }
         setWorkItemStatus("Created work item.");
       } catch (error) {
         setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
         if (request.afterSave.openDeliverable) {
           closeDeliverableWizard();
-          setState({
-            activeDeliverable: deliverable,
-            activeDeliverableOrigin: "generation",
-            activeTab: "deliverables",
-            activeCompanyId: null,
-            brainResponse: null,
-            activeAnalysisSpec: null,
-          });
+          navigateTo(deliverablePath(deliverable.backendRecordId ?? deliverable.id));
         }
       }
     }
@@ -245,7 +271,12 @@ export function App() {
     <AppShell
       className={shellClassName}
       rightW={rightW}
-      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : routeTab} counts={counts} />}
+      banner={environment.isDemonstration ? (
+        <div className="environment-demo-banner" role="status" aria-label="Demonstration environment">
+          {environment.demoNotice ?? "Demonstration — internal records are illustrative"}
+        </div>
+      ) : null}
+      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : routeTab} counts={counts} metrics={surfaceMetrics} />}
       topbar={(
         <header className="quiet-topbar">
           <div className="surface-title">
@@ -403,6 +434,86 @@ export function App() {
       <CommandPalette world={world} open={commandOpen} onClose={() => setCommandOpen(false)} />
     </AppShell>
   );
+}
+
+function RouteDataFallback({ route, world }: { route: AppRoute; world: ReturnType<typeof useWorld> }) {
+  const copy = ROUTE_LOAD_LABELS[route.id];
+  const elapsedSeconds = Math.round((world?.loadElapsedMs ?? 0) / 1000);
+  const error = world?.loadErrors[0] ?? null;
+  const isError = world?.queryStatus === "error";
+  const delayed = Boolean(world?.isTimedOut);
+  const offline = Boolean(world?.isOffline || world?.loadErrorKind === "offline");
+  const auth = world?.loadErrorKind === "auth";
+  const status = offline
+    ? "Browser appears offline."
+    : auth
+      ? "Your session may have expired."
+      : isError
+        ? "The data service rejected the request."
+        : delayed
+          ? "This route is taking longer than expected."
+          : "Request in progress.";
+  return (
+    <section className="surface-page route-data-state" data-surface-component={`surface-route-${route.id}`}>
+      <SurfaceHeader eyebrow="Route data" headline={copy.title} subline={copy.detail} />
+      <div className="route-skeleton-grid" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className={isError || offline || auth ? "route-data-card error" : "route-data-card"} role={isError || offline || auth ? "alert" : "status"}>
+        <strong>{status}</strong>
+        <p>
+          {delayed && !isError ? `Still waiting after ${Math.max(elapsedSeconds, 1)} seconds. You can navigate elsewhere while this keeps trying.` : null}
+          {isError && error ? error : null}
+          {!delayed && !isError ? "The cockpit shell stays available while this route loads." : null}
+        </p>
+        <div className="route-data-actions">
+          <button type="button" onClick={() => world?.refresh()}>Retry</button>
+          <button type="button" onClick={() => navigateTo("/today")}>Open Briefing</button>
+          <button type="button" onClick={() => navigateTo("/work")}>Open Work</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RoutedDocumentViewer({ deliverableId, localDeliverables, world }: { deliverableId: string; localDeliverables: Deliverable[]; world: NonNullable<ReturnType<typeof useWorld>> }) {
+  const local = localDeliverables.find((item) => item.id === deliverableId || item.backendRecordId === deliverableId) ?? null;
+  const [remote, setRemote] = useState<Deliverable | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setRemote(null);
+    setError("");
+    if (local) return;
+    let current = true;
+    void getStoredDeliverable(deliverableId)
+      .then((record) => {
+        if (current) setRemote(recordToDeliverable(record));
+      })
+      .catch(() => {
+        if (current) setError("This saved deliverable is unavailable.");
+      });
+    return () => {
+      current = false;
+    };
+  }, [deliverableId, local]);
+
+  const deliverable = local ?? remote;
+  if (deliverable) return <DocumentViewer key={deliverableId} deliverable={deliverable} world={world} openedFrom="library" />;
+  if (error) {
+    return (
+      <section className="surface-page">
+        <div className="surface-panel">
+          <h1>Deliverable not found</h1>
+          <p>{error}</p>
+          <button type="button" onClick={() => navigateTo("/deliverables")}>Back to Deliverables</button>
+        </div>
+      </section>
+    );
+  }
+  return <div className="loading">loading saved deliverable…</div>;
 }
 
 function RouteNotFound({ path }: { path: string }) {

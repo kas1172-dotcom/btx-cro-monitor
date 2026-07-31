@@ -80,7 +80,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
         aov: metrics.aov.value,
         pipelineCoverage: metrics.pipelineCoverage.value,
         topRiskName: nameOf(topRisk[0]?.subject_id ?? ""),
-        topRiskScore: topRisk[0]?.dimensions.risk.score ?? 0,
+        topRiskScore: topRisk[0]?.dimensions.risk.score ?? null,
         riskRows: JSON.stringify(topRisk.map((risk) => {
           const score = risk.dimensions.risk;
           return {
@@ -125,7 +125,7 @@ export const boardDeckAgent: DeliverableAgent<Inputs> = {
           id: "executive-summary",
           heading: "Executive Summary",
           blocks: [
-            { kind: "text", text: `Verdict: ${f.quarter} is a healthy but capacity-sensitive quarter, with demand slightly ahead of shipments and account risk requiring follow-up.` },
+            { kind: "text", text: `Verdict: ${f.quarter} is a capacity-sensitive quarter, with demand slightly ahead of shipments and account risk requiring follow-up.` },
             { kind: "text", text: `Evidence: revenue was ${money(Number(f.revenue))}, bookings were ${money(Number(f.bookings))}, bookings were ${Number(f.bookToBill).toFixed(2)}x shipped revenue, and backlog ended at ${money(Number(f.backlog))}.` },
             { kind: "text", text: `Implication: leadership should protect ${f.topRiskName}, prioritize high-fit work, and avoid filling constrained capacity with low-fit demand.` },
           ],

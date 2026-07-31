@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type React from "react";
 import defaultWeights from "../../../data/config/scoring-weights.v1.json";
 import clientConfig from "../../../../clients/btx/config.json";
 import { SETTINGS_SECTIONS } from "../../app/settingsSections.ts";
@@ -57,6 +58,7 @@ const DIMENSION_LABELS: Record<Dimension, string> = {
   competitivePressure: "Competitive pressure",
 };
 const LIVE_MODE = Boolean(BACKEND_ENDPOINT);
+const VISIBLE_SETTINGS_SECTIONS = SETTINGS_SECTIONS.filter((section) => section.id !== "prompts");
 
 const DEFAULT_SOURCE_REGISTRY: SourceRegistryDocument = {
   sources: ((clientConfig as { sources: Array<Record<string, unknown>> }).sources ?? []).map((source) => ({
@@ -83,14 +85,6 @@ function clearAllThreads(): void {
   window.dispatchEvent(new Event("btx:clear-chatpil-thread"));
 }
 
-function resetDemo(): void {
-  if (!window.confirm("Reset workspace and clear all local state?")) return;
-  clearAllThreads();
-  clearMemory();
-  resetUiState();
-  window.location.reload();
-}
-
 function readLocal<T>(key: string, fallback: T): T {
   try {
     const raw = window.localStorage.getItem(key);
@@ -98,6 +92,52 @@ function readLocal<T>(key: string, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+function SettingHelp({ id, children }: { id: string; children: React.ReactNode }) {
+  return <p id={id} className="settings-field-help">{children}</p>;
+}
+
+function ErrorSummary({ errors }: { errors: string[] }) {
+  if (errors.length === 0) return null;
+  return (
+    <div className="settings-error-summary" role="alert" aria-labelledby="settings-error-summary-title">
+      <strong id="settings-error-summary-title">Fix these settings before saving</strong>
+      <ul>{errors.map((error) => <li key={error}>{error}</li>)}</ul>
+    </div>
+  );
+}
+
+interface ConfirmDialogProps {
+  title: string;
+  body: string;
+  confirmLabel: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmDialog({ title, body, confirmLabel, onConfirm, onCancel }: ConfirmDialogProps) {
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    cancelRef.current?.focus();
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onCancel();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onCancel]);
+  return (
+    <div className="settings-dialog-backdrop" role="presentation">
+      <section className="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-confirm-title" aria-describedby="settings-confirm-body">
+        <h2 id="settings-confirm-title">{title}</h2>
+        <p id="settings-confirm-body">{body}</p>
+        <div className="settings-inline-actions">
+          <button type="button" className="settings-danger" onClick={onConfirm}>{confirmLabel}</button>
+          <button type="button" ref={cancelRef} onClick={onCancel}>Cancel</button>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function applyWeights(document: WeightsConfig): void {
@@ -148,6 +188,18 @@ function EngineTuningPanel() {
   const [weights, setWeights] = useState<WeightsConfig>(() => readLocal(WEIGHTS_KEY, defaultWeights as WeightsConfig));
   const [saved, setSaved] = useState<EngineConfigResponse<WeightsConfig> | null>(null);
   const [status, setStatus] = useState(LIVE_MODE ? "Loading backend scoring weights..." : "Local mode: changes save to this browser.");
+  const errors = useMemo(() => {
+    const next: string[] = [];
+    for (const [eventType, row] of Object.entries(weights.weights)) {
+      for (const dimension of DIMENSIONS) {
+        const value = row?.[dimension];
+        if (value !== undefined && (!Number.isFinite(value) || value < -100 || value > 100)) {
+          next.push(`${eventType} ${DIMENSION_LABELS[dimension]} must be between -100 and 100 points.`);
+        }
+      }
+    }
+    return next;
+  }, [weights]);
 
   useEffect(() => {
     let alive = true;
@@ -187,6 +239,10 @@ function EngineTuningPanel() {
   }
 
   async function save(): Promise<void> {
+    if (errors.length > 0) {
+      setStatus("Fix validation errors before saving.");
+      return;
+    }
     setStatus("Saving...");
     if (!LIVE_MODE) {
       window.localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights));
@@ -213,6 +269,10 @@ function EngineTuningPanel() {
         <span>{updatedLabel(saved)}</span>
         <em>{status}</em>
       </div>
+      <ErrorSummary errors={errors} />
+      <section className="settings-field-section" aria-labelledby="settings-scoring-section">
+        <h3 id="settings-scoring-section">Scoring event weights</h3>
+        <p>Adjust how much each signal event contributes to each score dimension. Leave a field blank to use no contribution.</p>
       <div className="settings-weight-table">
         <div className="settings-weight-head">
           <span>Event type</span>
@@ -220,19 +280,29 @@ function EngineTuningPanel() {
         </div>
         {eventTypes.map((eventType) => (
           <div key={eventType} className="settings-weight-row">
-            <strong>{eventType}</strong>
+            <strong id={`weight-${eventType}-label`}>{eventType}</strong>
             {DIMENSIONS.map((dimension) => (
-              <input
-                key={dimension}
-                type="number"
-                value={weights.weights[eventType]?.[dimension] ?? ""}
-                onChange={(event) => updateWeight(eventType, dimension, event.target.value)}
-              />
+              <label key={dimension}>
+                <span>{DIMENSION_LABELS[dimension]}</span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min={-100}
+                  max={100}
+                  step={1}
+                  aria-describedby={`weight-${eventType}-${dimension}-help`}
+                  aria-invalid={errors.some((error) => error.startsWith(`${eventType} ${DIMENSION_LABELS[dimension]}`))}
+                  value={weights.weights[eventType]?.[dimension] ?? ""}
+                  onChange={(event) => updateWeight(eventType, dimension, event.target.value)}
+                />
+                <SettingHelp id={`weight-${eventType}-${dimension}-help`}>Unit: points. Validation: blank or -100 to 100.</SettingHelp>
+              </label>
             ))}
           </div>
         ))}
       </div>
-      <button className="settings-primary" onClick={() => void save()}>Save scoring weights</button>
+      </section>
+      <button className="settings-primary" disabled={errors.length > 0} onClick={() => void save()}>Save scoring weights</button>
     </div>
   );
 }
@@ -243,7 +313,26 @@ function SourcesPanel() {
   const [status, setStatus] = useState(LIVE_MODE ? "Loading backend source registry..." : "Local mode: changes save to this browser.");
   const [requestText, setRequestText] = useState(() => readLocal(SOURCE_REQUESTS_KEY, ""));
   const [runs, setRuns] = useState<PipelineRun[]>([]);
+  const [pendingRemove, setPendingRemove] = useState<SourceRegistryItem | null>(null);
   const enabledCount = useMemo(() => registry.sources.filter((source) => source.enabled).length, [registry]);
+  const errors = useMemo(() => {
+    const next: string[] = [];
+    const seen = new Set<string>();
+    for (const [index, source] of registry.sources.entries()) {
+      const row = source.name.trim() || `source ${index + 1}`;
+      if (!source.id.trim()) next.push(`${row} needs a stable source ID.`);
+      if (seen.has(source.id)) next.push(`${row} has a duplicate source ID.`);
+      seen.add(source.id);
+      if (!source.name.trim()) next.push(`${row} needs a display name.`);
+      try {
+        const url = new URL(source.url);
+        if (url.protocol !== "https:") next.push(`${row} URL must use HTTPS.`);
+      } catch {
+        next.push(`${row} URL must be a valid absolute HTTPS URL.`);
+      }
+    }
+    return next;
+  }, [registry]);
 
   function loadRuns(): void {
     if (!LIVE_MODE) return;
@@ -290,6 +379,10 @@ function SourcesPanel() {
   }
 
   async function save(): Promise<void> {
+    if (errors.length > 0) {
+      setStatus("Fix validation errors before saving.");
+      return;
+    }
     setStatus("Saving...");
     if (!LIVE_MODE) {
       window.localStorage.setItem(SOURCES_KEY, JSON.stringify(registry));
@@ -331,33 +424,53 @@ function SourcesPanel() {
         <span>{enabledCount} enabled of {registry.sources.length} sources · {updatedLabel(saved)}</span>
         <em>{status}</em>
       </div>
+      <ErrorSummary errors={errors} />
       <div className="settings-source-list">
-        {registry.sources.map((source) => (
+        {registry.sources.map((source, index) => (
           <div key={source.id} className="settings-source-row">
+            <h3 id={`source-${source.id}-heading`}>Source {index + 1}: {source.name || "Unnamed source"}</h3>
             <label>
-              <input type="checkbox" checked={source.enabled} onChange={(event) => updateSource(source.id, { enabled: event.target.checked })} />
-              <span>Enabled</span>
+              <span>Collection status</span>
+              <input type="checkbox" checked={source.enabled} aria-describedby={`source-${source.id}-enabled-help`} onChange={(event) => updateSource(source.id, { enabled: event.target.checked })} />
+              <SettingHelp id={`source-${source.id}-enabled-help`}>Default: enabled. Turn off to keep the source in the registry without collecting from it.</SettingHelp>
             </label>
-            <select value={source.type} onChange={(event) => updateSource(source.id, { type: event.target.value as SourceType })}>
-              <option value="rss">RSS</option>
-              <option value="json_api">JSON API</option>
-              <option value="html_list">HTML list</option>
-            </select>
-            <input value={source.name} onChange={(event) => updateSource(source.id, { name: event.target.value })} />
-            <input value={source.url} onChange={(event) => updateSource(source.id, { url: event.target.value })} />
-            <input value={source.notes} placeholder="Notes" onChange={(event) => updateSource(source.id, { notes: event.target.value })} />
-            <button onClick={() => setRegistry((current) => ({ sources: current.sources.filter((item) => item.id !== source.id) }))}>Remove</button>
+            <label>
+              <span>Source type</span>
+              <select value={source.type} aria-describedby={`source-${source.id}-type-help`} onChange={(event) => updateSource(source.id, { type: event.target.value as SourceType })}>
+                <option value="rss">RSS feed</option>
+                <option value="json_api">JSON API</option>
+                <option value="html_list">HTML list</option>
+              </select>
+              <SettingHelp id={`source-${source.id}-type-help`}>Validation: choose the parser that matches the upstream source format.</SettingHelp>
+            </label>
+            <label>
+              <span>Display name</span>
+              <input value={source.name} aria-describedby={`source-${source.id}-name-help`} aria-invalid={!source.name.trim()} onChange={(event) => updateSource(source.id, { name: event.target.value })} />
+              <SettingHelp id={`source-${source.id}-name-help`}>Required. Used in user-facing source labels and diagnostics.</SettingHelp>
+            </label>
+            <label>
+              <span>Collection URL</span>
+              <input type="url" value={source.url} aria-describedby={`source-${source.id}-url-help`} onChange={(event) => updateSource(source.id, { url: event.target.value })} />
+              <SettingHelp id={`source-${source.id}-url-help`}>Required. Unit: HTTPS URL. Validation: absolute URL beginning with https://.</SettingHelp>
+            </label>
+            <label>
+              <span>Administration notes</span>
+              <input value={source.notes} aria-describedby={`source-${source.id}-notes-help`} placeholder="Owner, scope, or collection caveats" onChange={(event) => updateSource(source.id, { notes: event.target.value })} />
+              <SettingHelp id={`source-${source.id}-notes-help`}>Optional. Keep operational details here; users see source names elsewhere.</SettingHelp>
+            </label>
+            <button type="button" onClick={() => setPendingRemove(source)}>Remove source</button>
           </div>
         ))}
       </div>
       <div className="settings-inline-actions">
-        <button onClick={addSource}>Add source</button>
-        <button className="settings-primary" onClick={() => void save()}>Save sources</button>
-        <button onClick={() => void runNow()}>Run collection now</button>
+        <button type="button" onClick={addSource}>Add source</button>
+        <button type="button" className="settings-primary" disabled={errors.length > 0} onClick={() => void save()}>Save sources</button>
+        <button type="button" onClick={() => void runNow()}>Run collection now</button>
       </div>
       <label className="settings-request">
         <span>Free-text source suggestions</span>
-        <textarea value={requestText} onChange={(event) => setRequestText(event.target.value)} placeholder="Request another source or API here." />
+        <textarea value={requestText} aria-describedby="source-request-help" onChange={(event) => setRequestText(event.target.value)} placeholder="Request another source or API here." />
+        <SettingHelp id="source-request-help">Optional. These requests are saved as text for follow-up; they do not start collection automatically.</SettingHelp>
       </label>
       {runs.length > 0 && (
         <div className="settings-runs">
@@ -370,14 +483,59 @@ function SourcesPanel() {
           ))}
         </div>
       )}
+      {pendingRemove && (
+        <ConfirmDialog
+          title={`Remove ${pendingRemove.name}?`}
+          body="This removes the source from this registry draft. Existing collected records are not deleted by this action. Save sources afterward to persist the removal."
+          confirmLabel="Remove source"
+          onCancel={() => setPendingRemove(null)}
+          onConfirm={() => {
+            setRegistry((current) => ({ sources: current.sources.filter((item) => item.id !== pendingRemove.id) }));
+            setPendingRemove(null);
+            setStatus("Source removed from draft. Save sources to persist.");
+          }}
+        />
+      )}
     </div>
   );
 }
 
 export function SettingsWorkspace() {
   const { activeSettingsSection, activeTab } = useStore();
-  const active = SETTINGS_SECTIONS.find((section) => section.id === activeSettingsSection) ?? SETTINGS_SECTIONS[0];
+  const [confirmAction, setConfirmAction] = useState<null | "current_conversation" | "all_conversations" | "memory" | "workspace">(null);
+  const active = VISIBLE_SETTINGS_SECTIONS.find((section) => section.id === activeSettingsSection) ?? VISIBLE_SETTINGS_SECTIONS[0];
   const copy = sectionCopy(active.id);
+  const confirmCopy = {
+    current_conversation: {
+      title: "Clear current conversation?",
+      body: `This removes the Ask conversation stored for ${activeTab}. It does not delete account records, saved deliverables, or source data.`,
+      label: "Clear current conversation",
+      action: () => clearCurrentThread(activeTab),
+    },
+    all_conversations: {
+      title: "Clear all conversations?",
+      body: "This removes every local Ask conversation stored in this browser. Account records, saved deliverables, and source data remain unchanged.",
+      label: "Clear all conversations",
+      action: clearAllThreads,
+    },
+    memory: {
+      title: "Clear notes and activity?",
+      body: "This removes saved notes, generated deliverable records, and local activity history from this browser. It does not change backend source records.",
+      label: "Clear notes and activity",
+      action: clearMemory,
+    },
+    workspace: {
+      title: "Reset this workspace?",
+      body: "This clears local conversations, notes, drafts, activity, and UI state, then reloads the workspace. Backend data and external systems are not changed.",
+      label: "Reset workspace",
+      action: () => {
+        clearAllThreads();
+        clearMemory();
+        resetUiState();
+        window.location.reload();
+      },
+    },
+  } satisfies Record<NonNullable<typeof confirmAction>, { title: string; body: string; label: string; action: () => void }>;
 
   return (
     <section className="settings-workspace" data-surface-component="surface-settings">
@@ -385,7 +543,7 @@ export function SettingsWorkspace() {
 
       <div className="settings-layout">
         <nav className="settings-nav" aria-label="Settings sections">
-          {SETTINGS_SECTIONS.map((section) => (
+          {VISIBLE_SETTINGS_SECTIONS.map((section) => (
             <button
               key={section.id}
               className={section.id === active.id ? "active" : ""}
@@ -403,19 +561,19 @@ export function SettingsWorkspace() {
           </div>
           {active.id === "general" ? (
             <div className="settings-actions">
-              <button onClick={() => clearCurrentThread(activeTab)}>
-                <strong>Clear this chat</strong>
-                <span>Remove the Ask thread stored for the current tab.</span>
+              <button type="button" onClick={() => setConfirmAction("current_conversation")}>
+                <strong>Clear current conversation</strong>
+                <span>Remove the Ask conversation stored for the current route context.</span>
               </button>
-              <button onClick={clearAllThreads}>
-                <strong>Clear all chats</strong>
-                <span>Remove every local Ask thread from this browser.</span>
+              <button type="button" onClick={() => setConfirmAction("all_conversations")}>
+                <strong>Clear all conversations</strong>
+                <span>Remove every local Ask conversation from this browser.</span>
               </button>
-              <button onClick={clearMemory}>
-                <strong>Clear notes + activity</strong>
+              <button type="button" onClick={() => setConfirmAction("memory")}>
+                <strong>Clear notes and activity</strong>
                 <span>Remove saved notes, generated deliverable records, and activity history.</span>
               </button>
-              <button onClick={resetDemo}>
+              <button type="button" onClick={() => setConfirmAction("workspace")}>
                 <strong>Reset workspace</strong>
                 <span>Remove local chats, notes, drafts, and activity, then reload this workspace.</span>
               </button>
@@ -428,13 +586,22 @@ export function SettingsWorkspace() {
             <SourcesPanel />
           ) : active.id === "integrations" ? (
             <Integrations />
-          ) : (
-            <div className="settings-placeholder">
-              <p>{copy.body}</p>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
+      {confirmAction && (
+        <ConfirmDialog
+          title={confirmCopy[confirmAction].title}
+          body={confirmCopy[confirmAction].body}
+          confirmLabel={confirmCopy[confirmAction].label}
+          onCancel={() => setConfirmAction(null)}
+          onConfirm={() => {
+            const action = confirmCopy[confirmAction].action;
+            setConfirmAction(null);
+            action();
+          }}
+        />
+      )}
     </section>
   );
 }

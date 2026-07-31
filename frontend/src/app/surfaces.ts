@@ -1,6 +1,6 @@
 import type { World } from "./useWorld.ts";
 import type { MemoryState } from "../memory/types.ts";
-import { openWorkItems } from "./workItems.ts";
+import { canonicalCountForSurface } from "./canonicalMetrics.ts";
 
 export type CoreTab = "brief" | "work_queue" | "accounts" | "ask";
 export type AnalyticalTab = "industry_updates" | "prospecting" | "trip_planner" | "map" | "analysis" | "capacity" | "programs";
@@ -61,35 +61,5 @@ export const TAB_LABELS: Record<TabId, string> = {
 };
 
 export function countForSurface(surface: TabId, world: World | null, memory: MemoryState | null): number | undefined {
-  if (!world) return undefined;
-  switch (surface) {
-    case "brief":
-      return world.analysis.valid.length;
-    case "work_queue":
-      return openWorkItems(world).length;
-    case "accounts":
-      return world.companies.length;
-    case "ask":
-      return undefined;
-    case "industry_updates":
-      return world.analysis.valid.filter((signal) => signal.artifact).length;
-    case "prospecting":
-      return world.companies.filter((company) => company.business_motion === "prospect_new_business" || company.account_status === "target_prospect" || company.account_status === "new_logo").length;
-    case "trip_planner":
-      return memory?.deliverables.filter((deliverable) => deliverable.type === "itinerary").length ?? world.prospects.length;
-    case "map":
-      return world.prospects.length;
-    case "analysis":
-      return world.opportunities.filter((opportunity) => opportunity.stage !== "won" && opportunity.stage !== "lost").length;
-    case "capacity":
-      return world.facilities.length || world.snapshot?.capacity.length;
-    case "programs":
-      return world.analysis.valid.length;
-    case "deliverables":
-      return memory?.deliverables.length;
-    case "hubspot":
-      return world.contacts.length + world.opportunities.length;
-    case "settings":
-      return memory ? memory.activity.length + memory.notes.length : undefined;
-  }
+  return canonicalCountForSurface(surface, world, memory);
 }

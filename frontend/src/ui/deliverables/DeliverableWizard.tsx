@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { visibleSources } from "../../app/sourceLabels.ts";
 import { saveStoredDeliverable, hasDeliverablesBackend, recordToDeliverable } from "../../app/deliverablesApi.ts";
+import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { DELIVERABLE_TEMPLATE_OPTIONS, deliverableTemplateOption } from "../../agents/deliverableRegistry.ts";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { buildWizardPrefill, validatePrefillProvenance, type WizardPrefill } from "../../deliverables/wizardPrefill.ts";
 import type { Deliverable } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
-import { setState } from "../../store/store.ts";
 import type { DeliverableWizardStep } from "../../store/store.ts";
 import { ScopePill } from "../primitives.tsx";
 
@@ -143,14 +143,7 @@ export function DeliverableWizard({
 
   function openInEditor() {
     if (!preview) return;
-    setState({
-      activeDeliverable: preview,
-      activeDeliverableOrigin: "generation",
-      activeTab: "deliverables",
-      brainResponse: null,
-      activeAnalysisSpec: null,
-      activeCompanyId: null,
-    });
+    navigateTo(deliverablePath(preview.backendRecordId ?? preview.id));
     onClose();
   }
 

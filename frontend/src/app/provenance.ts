@@ -2,12 +2,13 @@ import type { Company, Contact, Facility, Opportunity } from "../engine/brain/en
 import type { Signal } from "../engine/signals/contract.ts";
 import type { World } from "./useWorld.ts";
 
-export type ProvenanceLabel = "CRM" | "Monitor" | "Production context";
+export type ProvenanceLabel = "CRM" | "Monitor" | "Production context" | "Illustrative sample";
 
 type ProvenanceRecord = {
   data_provenance?: string;
   source_name?: string;
   source_mode?: string;
+  dataClassification?: string;
   artifact?: unknown;
 };
 
@@ -18,6 +19,7 @@ function sourceName(record: ProvenanceRecord): string {
 export function provenanceForRecord(record: Company | Contact | Facility | Opportunity | Signal | null | undefined): ProvenanceLabel {
   if (!record) return "Production context";
   const meta = record as ProvenanceRecord;
+  if (meta.dataClassification === "simulated") return "Illustrative sample";
   if (meta.artifact) return "Monitor";
   const text = sourceName(meta);
   if (text.includes("hubspot") || text.includes("crm") || text.includes("live")) return "CRM";

@@ -6,6 +6,7 @@ from typing import Any
 DEMO_TENANT_ID = "btx-demo-command-cockpit"
 DEMO_DISPLAY_NAME = "BTX Demonstration Workspace"
 DEMO_ACTOR = "demo.reset@btx.local"
+DEMO_REPOSITORY_REVISION = "779198f"
 
 
 def _iso(dt: datetime) -> str:
@@ -374,6 +375,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "is_demonstration": True,
             "reference_date": reset_at,
             "metadata": {
+                "repositoryRevision": DEMO_REPOSITORY_REVISION,
+                "dataProvenance": "Repository demo seed; internal CRM, contact, opportunity, and operating records are illustrative.",
                 "programs": [
                     {"id": "directed-energy", "name": "Directed-energy laser defense", "dataClassification": "public"},
                     {"id": "laser-power", "name": "Laser power transmission", "dataClassification": "public"},

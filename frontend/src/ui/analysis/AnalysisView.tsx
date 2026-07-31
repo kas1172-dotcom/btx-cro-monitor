@@ -7,7 +7,8 @@ import { METRICS } from "../../metrics/catalog.ts";
 import { runAgent } from "../../agents/runAgent.ts";
 import type { Deliverable } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
-import { openDemoAction, setState } from "../../store/store.ts";
+import { openDemoAction } from "../../store/store.ts";
+import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { AnalysisFigure } from "./ChartFigure.tsx";
 import { FigureTypePicker } from "./FigureTypePicker.tsx";
 import { humanSourceLabel, humanSourceReason } from "../../app/sourceLabels.ts";
@@ -15,26 +16,32 @@ import { humanSourceLabel, humanSourceReason } from "../../app/sourceLabels.ts";
 const METRIC_IDS = Object.keys(METRICS) as MetricId[];
 
 function computeAnnotation(spec: ChartSpec, result: ChartResult): string {
+  if (result.state !== "available") {
+    return `${result.meta.label} is ${result.state}. ${result.reason} No trend, concentration, demand, risk, margin, pipeline, or capacity conclusion was generated.`;
+  }
   const unit = result.meta.unit;
   const fmtV = (value: number) => formatMetricValue(value, unit);
 
   if (spec.viz === "heatmap" && result.grid) {
     const grid = result.grid;
+    if (grid.values.some((row) => row.some((value) => value === null))) {
+      return `${result.meta.label} is only partially available. Missing cells are not treated as zero, so portfolio totals, trends, and concentration conclusions are suppressed.`;
+    }
     const completeCols = grid.cols.filter((col) => !col.includes("(QTD)"));
     const lastCol = completeCols.at(-1);
     const lastColIndex = lastCol ? grid.cols.indexOf(lastCol) : -1;
     const totals = grid.rows.map((row, rowIndex) => ({
       name: row,
-      value: lastColIndex >= 0 ? (grid.values[rowIndex][lastColIndex] ?? 0) : 0,
+      value: lastColIndex >= 0 ? grid.values[rowIndex][lastColIndex] : null,
     }));
-    const sorted = [...totals].sort((a, b) => b.value - a.value);
+    const sorted = totals.filter((row): row is { name: string; value: number } => row.value !== null).sort((a, b) => b.value - a.value);
     const top = sorted[0];
     const totalValue = grid.values.flat().filter((value): value is number => value !== null).reduce((sum, value) => sum + value, 0);
     const topShare = totalValue > 0 ? ((top?.value ?? 0) / totalValue) * 100 : 0;
 
     const firstColIndex = completeCols.length > 1 ? grid.cols.indexOf(completeCols[0]) : -1;
-    const firstSum = firstColIndex >= 0 ? grid.values.map((row) => row[firstColIndex] ?? 0).reduce((sum, value) => sum + value, 0) : 0;
-    const lastSum = lastColIndex >= 0 ? grid.values.map((row) => row[lastColIndex] ?? 0).reduce((sum, value) => sum + value, 0) : 0;
+    const firstSum = firstColIndex >= 0 ? grid.values.map((row) => row[firstColIndex] as number).reduce((sum, value) => sum + value, 0) : 0;
+    const lastSum = lastColIndex >= 0 ? grid.values.map((row) => row[lastColIndex] as number).reduce((sum, value) => sum + value, 0) : 0;
     const trend = lastSum > firstSum ? "growing" : lastSum < firstSum ? "declining" : "flat";
 
     return [
@@ -82,7 +89,7 @@ async function saveAnalysisFigure(deliverable: Deliverable): Promise<Deliverable
   }
 }
 
-export function AnalysisView({ world, initialSpec }: { world: World; initialSpec: ChartSpec }) {
+export function AnalysisView({ world, initialSpec, onCancel, onSpecChange }: { world: World; initialSpec: ChartSpec; onCancel?: () => void; onSpecChange?: (spec: ChartSpec) => void }) {
   const [spec, setSpec] = useState(initialSpec);
   const [saveStatus, setSaveStatus] = useState("");
   const [saving, setSaving] = useState(false);
@@ -93,6 +100,10 @@ export function AnalysisView({ world, initialSpec }: { world: World; initialSpec
   const scopeLabel = `All markets · ${spec.timeRange ? `${spec.timeRange.from} to ${spec.timeRange.to}` : "all time"}`;
 
   async function saveFigure() {
+    if (result.state !== "available") {
+      setSaveStatus(`Generation blocked: ${result.meta.label} is ${result.state}. ${result.reason}`);
+      return;
+    }
     setSaving(true);
     setSaveStatus("Saving figure...");
     try {
@@ -117,14 +128,7 @@ export function AnalysisView({ world, initialSpec }: { world: World; initialSpec
       };
       const saved = await saveAnalysisFigure(withFigure);
       setSaveStatus("Saved figure.");
-      setState({
-        activeDeliverable: saved,
-        activeDeliverableOrigin: "generation",
-        activeTab: "deliverables",
-        activeCompanyId: null,
-        brainResponse: null,
-        activeAnalysisSpec: null,
-      });
+      navigateTo(deliverablePath(saved.backendRecordId ?? saved.id), { replace: true });
     } catch (error) {
       setSaveStatus(error instanceof Error ? error.message : "Could not save the figure.");
     } finally {
@@ -137,6 +141,7 @@ export function AnalysisView({ world, initialSpec }: { world: World; initialSpec
       <div className="quiet-view-head">
         <p className="eyebrow">Analysis Figure Hub</p>
         <h1>{result.meta.label} by {spec.rows ?? "portfolio"}</h1>
+        {onCancel && <button type="button" onClick={onCancel} aria-label="Cancel figure insertion">Back / Cancel</button>}
       </div>
       <p className="analysis-subtitle">{subtitle}</p>
       <p className="analysis-scope">{scopeLabel}</p>
@@ -149,20 +154,32 @@ export function AnalysisView({ world, initialSpec }: { world: World; initialSpec
           </div>
           <label>
             Metric
-            <select value={spec.metric} onChange={(event) => setSpec({ ...spec, metric: event.target.value as MetricId })}>
+            <select value={spec.metric} onChange={(event) => {
+              const next = { ...spec, metric: event.target.value as MetricId };
+              setSpec(next);
+              onSpecChange?.(next);
+            }}>
               {METRIC_IDS.map((id) => <option key={id} value={id}>{METRICS[id].label}</option>)}
             </select>
           </label>
           <label>
             Period
-            <select value={spec.cols ?? "quarter"} onChange={(event) => setSpec({ ...spec, cols: event.target.value as ChartSpec["cols"] })}>
+            <select value={spec.cols ?? "quarter"} onChange={(event) => {
+              const next = { ...spec, cols: event.target.value as ChartSpec["cols"] };
+              setSpec(next);
+              onSpecChange?.(next);
+            }}>
               <option value="quarter">Quarter</option>
               <option value="month">Month</option>
             </select>
           </label>
-          <FigureTypePicker spec={spec} world={world} onSelect={(viz) => setSpec({ ...spec, viz })} />
+          <FigureTypePicker spec={spec} world={world} onSelect={(viz) => {
+            const next = { ...spec, viz };
+            setSpec(next);
+            onSpecChange?.(next);
+          }} />
           <div className="analysis-control-actions">
-            <button onClick={() => void saveFigure()} disabled={saving}>{saving ? "Saving..." : "Save figure deliverable"}</button>
+            <button onClick={() => void saveFigure()} disabled={saving || result.state !== "available"}>{saving ? "Saving..." : "Save figure deliverable"}</button>
             <button onClick={() => openDemoAction({ title: "Add analysis view to board deck", action: "follow_up", evidence: `${result.meta.label} ${spec.viz}` })}>Add to deck</button>
           </div>
           {saveStatus && <div className={saveStatus.startsWith("Saved") || saveStatus.startsWith("Saving") ? "live-inline-status" : "live-inline-status error"}>{saveStatus}</div>}

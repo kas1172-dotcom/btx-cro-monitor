@@ -58,7 +58,8 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
     const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
     const opportunities = world.opportunities.filter((item) => item.company_id === company.id);
     const contact = world.contacts.find((item) => item.company_id === company.id);
-    const openPipeline = opportunities.some((item) => item.stage !== "won" && item.stage !== "lost" && (item.value ?? 0) > 0);
+    const valuedOpenPipeline = opportunities.filter((item) => item.stage !== "won" && item.stage !== "lost" && item.value !== null);
+    const openPipeline = valuedOpenPipeline.some((item) => (item.value as number) > 0);
     const missingEvidence = [
       company.cage_code ? "" : "CAGE match",
       contact ? "" : "contact",
@@ -68,6 +69,9 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
     const capacity = world.snapshot?.capacity ?? [];
     const localCapacity = capacity.find((item) => item.city === company.location.city);
     const relevantCapacity = localCapacity ? [localCapacity, ...capacity.filter((item) => item.facility_id !== localCapacity.facility_id)] : capacity;
+    if (relevantCapacity.length === 0) {
+      throw new Error("Capabilities assessment generation blocked: required capacity facts are unavailable.");
+    }
     const total5Axis = relevantCapacity.reduce((sum, item) => sum + item.available_5_axis_hours_next_30d, 0);
     const totalTurning = relevantCapacity.reduce((sum, item) => sum + item.available_turning_hours_next_30d, 0);
     const constraints = [...new Set(relevantCapacity.map((item) => item.constraint).filter(Boolean))].slice(0, 4);
@@ -88,8 +92,9 @@ export const capabilitiesAssessmentAgent: DeliverableAgent<Inputs> = {
         opportunityCount: opportunities.length,
         total5Axis,
         totalTurning,
+        capacityWindowDays: 30,
         capacityStatus: relevantCapacity[0]?.capacity_status ?? "capacity not available",
-        quotedLeadTimeDays: relevantCapacity[0]?.quoted_lead_time_days ?? 0,
+        quotedLeadTimeDays: relevantCapacity[0]?.quoted_lead_time_days ?? null,
         constraints: constraints.join(", ") || "No major constraints recorded",
         verdict,
         missingEvidence: missingEvidence.join(", ") || "No major evidence gaps recorded",

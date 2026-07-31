@@ -69,6 +69,7 @@ class AssistantContext(BaseModel):
     signal_id: str | None = None
     deliverable_id: str | None = None
     route: str | None = None
+    metric_states: dict[str, dict] | None = None
 
 
 class AssistantCitation(BaseModel):

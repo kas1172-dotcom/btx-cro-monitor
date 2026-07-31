@@ -1,5 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import type { TabId } from "./surfaces.ts";
+import type { ChartSpec, MetricId } from "../metrics/types.ts";
 
 export type RouteId =
   | "today"
@@ -26,6 +27,7 @@ export interface AppRoute {
   programId: string | null;
   conversationId: string | null;
   deliverableId: string | null;
+  deliverableView?: "library" | "document" | "insert_figure";
   query: URLSearchParams;
 }
 
@@ -116,7 +118,21 @@ export function parseAppRoute(pathname: string, search = ""): AppRoute {
   if (root === "analysis") return { id: "analysis", tab: "analysis", path: clean, accountId: query.get("account"), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "map") return { id: "map", tab: "map", path: clean, accountId: query.get("account"), workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "ask") return { id: "ask", tab: "ask", path: clean, accountId: null, workItemId: null, programId: null, conversationId: decodeSegment(child), deliverableId: null, query };
-  if (root === "deliverables") return { id: "deliverables", tab: "deliverables", path: clean, accountId: query.get("account"), workItemId: null, programId: null, conversationId: null, deliverableId: decodeSegment(child), query };
+  if (root === "deliverables") {
+    const insertFigure = child === "figures" && parts[2] === "new";
+    return {
+      id: "deliverables",
+      tab: "deliverables",
+      path: clean,
+      accountId: query.get("account"),
+      workItemId: null,
+      programId: null,
+      conversationId: null,
+      deliverableId: insertFigure ? null : decodeSegment(child),
+      deliverableView: insertFigure ? "insert_figure" : child ? "document" : "library",
+      query,
+    };
+  }
   if (root === "integrations") return { id: "integrations", tab: "hubspot", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "settings") return { id: "settings", tab: "settings", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   return { id: "not_found", tab: "brief", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
@@ -157,6 +173,39 @@ export function accountPath(accountId: string): string {
 
 export function workItemPath(workItemId: string): string {
   return `/work/${encodeURIComponent(workItemId)}`;
+}
+
+export function deliverablePath(deliverableId: string): string {
+  return `/deliverables/${encodeURIComponent(deliverableId)}`;
+}
+
+const FIGURE_DEFAULTS: ChartSpec = { metric: "revenue", viz: "heatmap", rows: "account", cols: "quarter" };
+
+export function figureInsertPath(spec: ChartSpec = FIGURE_DEFAULTS): string {
+  const query = new URLSearchParams({
+    metric: spec.metric,
+    viz: spec.viz,
+    rows: spec.rows ?? "account",
+    cols: spec.cols ?? "quarter",
+  });
+  return `/deliverables/figures/new?${query.toString()}`;
+}
+
+export function figureSpecFromRoute(route: AppRoute): ChartSpec {
+  const metrics: MetricId[] = ["revenue", "bookings", "backlog", "book_to_bill", "pipeline_coverage", "win_rate", "avg_order_value", "margin_trend", "customer_concentration", "capacity_utilization", "on_time_delivery", "repeat_revenue_rate", "pipeline_by_stage", "revenue_yoy_change"];
+  const visualizations: ChartSpec["viz"][] = ["heatmap", "trend", "ranked_bar", "retention_grid"];
+  const rows: NonNullable<ChartSpec["rows"]>[] = ["account", "segment", "region"];
+  const cols: NonNullable<ChartSpec["cols"]>[] = ["month", "quarter", "program"];
+  const metric = route.query.get("metric") as MetricId | null;
+  const viz = route.query.get("viz") as ChartSpec["viz"] | null;
+  const row = route.query.get("rows") as ChartSpec["rows"] | null;
+  const col = route.query.get("cols") as ChartSpec["cols"] | null;
+  return {
+    metric: metric && metrics.includes(metric) ? metric : FIGURE_DEFAULTS.metric,
+    viz: viz && visualizations.includes(viz) ? viz : FIGURE_DEFAULTS.viz,
+    rows: row && rows.includes(row) ? row : FIGURE_DEFAULTS.rows,
+    cols: col && cols.includes(col) ? col : FIGURE_DEFAULTS.cols,
+  };
 }
 
 export function tabForRoute(route: RouteId): TabId {

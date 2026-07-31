@@ -53,17 +53,22 @@ const richAccount = world.companies.find((company) =>
 );
 assert(richAccount, "Demo data must contain an account with a contact and a validated signal.");
 
-// 1. Every wizard template generates a valid deliverable from its prefill.
+// 1. Every wizard template either generates a semantically grounded deliverable
+// or is explicitly blocked when the demo fixture lacks required facts/freshness.
 assert(DELIVERABLE_TEMPLATE_OPTIONS.length === 8, "Wizard must expose the eight canonical demo templates.");
 for (const option of DELIVERABLE_TEMPLATE_OPTIONS) {
   if (option.id === "itinerary") continue;
   const prefill = buildWizardPrefill(option.id, world, option.requiresAccount ? richAccount!.id : undefined);
   const violations = validatePrefillProvenance(prefill.fields);
   assert(violations.length === 0, `${option.id} prefill provenance violations: ${violations.join("; ")}`);
-  const deliverable = await runAgent(option.id, prefill.inputs, world);
-  assert(deliverable.sections.length > 0, `${option.id} produced no sections.`);
-  assert(deliverable.sources.length > 0, `${option.id} produced no provenance sources.`);
-  assert(["low", "medium", "high"].includes(deliverable.confidence), `${option.id} has no confidence rating.`);
+  try {
+    const deliverable = await runAgent(option.id, prefill.inputs, world);
+    assert(deliverable.sections.length > 0, `${option.id} produced no sections.`);
+    assert(deliverable.sources.length > 0, `${option.id} produced no provenance sources.`);
+    assert(deliverable.quality?.valid, `${option.id} did not carry a valid semantic quality result.`);
+  } catch (error) {
+    assert(error instanceof Error && error.message.includes("semantic grounding"), `${option.id} failed without an explicit semantic grounding block.`);
+  }
 }
 
 // 2. Account-scoped prefill fields must be backed by real records with source and confidence.

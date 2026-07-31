@@ -5,7 +5,7 @@ import type { Deliverable, DeliverableSection } from "../../deliverables/types.t
 import type { World } from "../../app/useWorld.ts";
 import type { Company, Contact, Opportunity } from "../../engine/brain/entities.ts";
 import { deliverableToMarkdown } from "../../deliverables/markdown.ts";
-import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts";
+import { openDemoAction } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { hasDeliverablesBackend, recordToDeliverable, saveStoredDeliverable } from "../../app/deliverablesApi.ts";
@@ -23,12 +23,13 @@ import {
 import { uiTokens } from "../../app/uiTokens.ts";
 import { deliverableMetaLabel, visibleSources } from "../../app/sourceLabels.ts";
 import { evidenceFromDeliverableSource, type EvidencePackage } from "../../app/evidence.ts";
-import { navigateTo, useAppRoute } from "../../app/router.ts";
+import { deliverablePath, navigateTo, useAppRoute } from "../../app/router.ts";
 import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
 import { DarkMapTiles } from "../map/DarkMapTiles.tsx";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 import { DeliverableBriefingMode } from "../modes/BriefingMode.tsx";
 import type { ChartSpec } from "../../metrics/types.ts";
+import { assessDeliverableQuality, invalidateLegacyDeliverable } from "../../deliverables/quality.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -100,7 +101,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   const [taskDialog, setTaskDialog] = useState<TaskDialog | null>(null);
   const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const current = useMemo(() => ({ ...deliverable, title, sections }), [deliverable, sections, title]);
+  const current = useMemo(() => invalidateLegacyDeliverable({ ...deliverable, title, sections }), [deliverable, sections, title]);
   const markdown = useMemo(() => deliverableToMarkdown(current), [current]);
   const viewMode = route.query.get("view");
   const isFocus = viewMode === "focus";
@@ -139,7 +140,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       const choice = window.confirm("Save changes before closing?");
       if (choice) void saveCurrent();
     }
-    closeDeliverable();
+    navigateTo("/deliverables");
   }
 
   async function saveCurrent() {
@@ -151,14 +152,15 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       ],
     };
     const localSaved = saveDeliverable(saved);
-    setState({ activeDeliverable: localSaved, activeDeliverableOrigin: openedFrom === "library" ? "library" : "generation" });
     setSaveStatus("Saved locally.");
     try {
       if (hasDeliverablesBackend()) {
         const record = await saveStoredDeliverable(localSaved);
         const persisted = recordToDeliverable(record);
         saveDeliverable(persisted);
-        setState({ activeDeliverable: persisted, activeDeliverableOrigin: openedFrom === "library" ? "library" : "generation" });
+        if ((persisted.backendRecordId ?? persisted.id) !== (deliverable.backendRecordId ?? deliverable.id)) {
+          navigateTo(deliverablePath(persisted.backendRecordId ?? persisted.id), { replace: true });
+        }
         setSaveStatus("Saved to program memory.");
       }
       setDirty(false);
@@ -309,14 +311,18 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   const lockedTokens = factTokens([deliverable.title, textFromSections(deliverable.sections)].join(" "));
   const currentText = textFromSections(sections);
   const missingLockedTokens = lockedTokens.filter((token) => !currentText.includes(token));
+  const semanticQuality = current.quality ?? assessDeliverableQuality(current);
   const checklist = [
-    { label: "Sources attached", ok: deliverable.sources.length > 0 },
+    { label: "Claims map to exact source facts", ok: semanticQuality.claimSourceGrounded },
+    { label: "Required data is available", ok: semanticQuality.dataAvailable },
+    { label: "Source freshness is known", ok: semanticQuality.freshnessKnown },
+    { label: "Sources are attached", ok: deliverable.sources.length > 0 },
     { label: "No banned terms", ok: bannedHits(currentText).length === 0 },
     { label: "No em dashes", ok: !currentText.includes("\u2014") },
-    { label: "Locked facts unchanged", ok: missingLockedTokens.length === 0 },
+    { label: "Locked facts are source-valid and unchanged", ok: semanticQuality.lockedFactsValid && missingLockedTokens.length === 0 },
     { label: "Confidence matches evidence", ok: !(deliverable.confidence === "high" && /needs qualification|missing/i.test(deliverable.confidenceReason ?? "")) },
   ];
-  const sendBlocked = checklist.some((item) => !item.ok) || suggestions.some((item) => Boolean(item.warning));
+  const sendBlocked = Boolean(current.invalidatedAt) || checklist.some((item) => !item.ok) || suggestions.some((item) => Boolean(item.warning));
 
   if (isBriefing) {
     return (
@@ -367,6 +373,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
           <button onClick={openTaskFlow}>Create task</button>
         </div>
       </header>
+      {current.invalidatedAt && <div className="live-inline-status error" role="alert">{current.invalidationReason}</div>}
 
       {taskDialog && (
         <div className="task-confirmation" role="dialog" aria-modal="true" aria-labelledby="task-confirm-title">

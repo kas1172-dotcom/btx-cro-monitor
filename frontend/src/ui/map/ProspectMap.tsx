@@ -17,6 +17,8 @@ import { uiTokens } from "../../app/uiTokens.ts";
 import { AccountToken } from "../common/AccountToken.tsx";
 import { DarkMapTiles } from "./DarkMapTiles.tsx";
 import { prospectQualificationLabel } from "../../app/confidence.ts";
+import { EmptyState } from "../primitives.tsx";
+import { canonicalMetrics, formatCanonicalMetric } from "../../app/canonicalMetrics.ts";
 
 function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   const map = useMap();
@@ -58,45 +60,68 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
   const marketLabel = world.city ?? "All Markets";
   const initialZoom = world.city ? 11 : 4;
   const watchKey = `${world.city ?? "all"}:${markers.length}:${selectedAccountId ?? "none"}`;
+  const mappedMetric = formatCanonicalMetric(canonicalMetrics(world).mapped_accounts);
+  const omittedCompanies = world.companies.filter((company) => !markers.some((marker) => marker.company.id === company.id));
 
   return (
     <div className="map-shell" data-surface-component="surface-map">
-      <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
-        <MapSizeInvalidator watchKey={watchKey} />
-        <FitMapBounds points={markers.map((marker) => marker.center)} watchKey={watchKey} />
-        <ZoomControl position="bottomright" />
-        <DarkMapTiles />
-        {markers.map(({ company: c, center: markerCenter, opportunity: opp, scoreStatus, prospect, radius }) => {
-          const active = c.id === selectedAccountId;
-          const color = prospect ? uiTokens.color.success : uiTokens.color.textMuted;
-          return (
-            <CircleMarker
-              key={c.id}
-              center={markerCenter}
-              radius={radius}
-              pathOptions={{
-                color: active ? uiTokens.color.textPrimary : color,
-                weight: active ? 3 : 1,
-                fillColor: color,
-                fillOpacity: prospect ? 0.78 : 0.45,
-              }}
-              eventHandlers={{ click: () => onSelectAccount?.(c.id) }}
-            >
-              <Tooltip direction="top" opacity={0.93} permanent={false} sticky={false}>
-                <strong>{c.name}</strong>
-                {prospect ? `  ·  attractiveness ${Math.round(opp)} (${scoreStatus})` : `  ·  ${c.relationship}`}
-              </Tooltip>
-            </CircleMarker>
-          );
-        })}
-      </MapContainer>
+      {markers.length > 0 ? (
+        <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
+          <MapSizeInvalidator watchKey={watchKey} />
+          <FitMapBounds points={markers.map((marker) => marker.center)} watchKey={watchKey} />
+          <ZoomControl position="bottomright" />
+          <DarkMapTiles />
+          {markers.map(({ company: c, center: markerCenter, opportunity: opp, scoreStatus, prospect, radius }) => {
+            const active = c.id === selectedAccountId;
+            const color = prospect ? uiTokens.color.success : uiTokens.color.textMuted;
+            return (
+              <CircleMarker
+                key={c.id}
+                center={markerCenter}
+                radius={radius}
+                pathOptions={{
+                  color: active ? uiTokens.color.textPrimary : color,
+                  weight: active ? 3 : 1,
+                  fillColor: color,
+                  fillOpacity: prospect ? 0.78 : 0.45,
+                }}
+                eventHandlers={{ click: () => onSelectAccount?.(c.id) }}
+              >
+                <Tooltip direction="top" opacity={0.93} permanent={false} sticky={false}>
+                  <strong>{c.name}</strong>
+                  {prospect ? `  ·  attractiveness ${Math.round(opp)} (${scoreStatus})` : `  ·  ${c.relationship}`}
+                </Tooltip>
+              </CircleMarker>
+            );
+          })}
+        </MapContainer>
+      ) : (
+        <section className="map-empty-remediation">
+          <EmptyState headline="No accounts have coordinates yet" body="The map is hidden until at least one account has latitude and longitude." icon="map" />
+          <div className="assumption-box">
+            <strong>Coordinate remediation workflow</strong>
+            <ol>
+              <li>Add latitude and longitude to the account record or canonical account record.</li>
+              <li>Re-run the account import/geocoding job.</li>
+              <li>Refresh this page and confirm the mapped-account count increases.</li>
+            </ol>
+          </div>
+        </section>
+      )}
 
       <aside className="map-rail">
         <div className="map-rail-head">
           <span>{marketLabel}</span>
-          <strong>{markers.length} mapped</strong>
+          <strong>{mappedMetric.displayValue} mapped</strong>
+          <em>{mappedMetric.provenanceLabel}</em>
         </div>
-        {omittedCount > 0 && <p className="map-rail-note">{omittedCount} account{omittedCount === 1 ? "" : "s"} omitted: missing coordinates</p>}
+        {omittedCount > 0 && (
+          <details className="map-rail-note">
+            <summary>{omittedCount} account{omittedCount === 1 ? "" : "s"} omitted: missing coordinates</summary>
+            <p>Add coordinates to show these records on the map.</p>
+            <ul>{omittedCompanies.slice(0, 8).map((company) => <li key={company.id}>{company.name} · {company.location.city || "city unavailable"}</li>)}</ul>
+          </details>
+        )}
         <div className="map-prospect-list">
           {world.prospects.slice(0, 12).map((p, i) => {
             const qualification = prospectQualificationLabel({
@@ -105,11 +130,11 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
               opportunities: world.opportunities.filter((opportunity) => opportunity.company_id === p.company.id),
               fitMatched: p.fit.matched,
             });
+            const scoreText = p.score ? String(p.opportunity) : "Not scored";
             return (
-            <button
+            <article
               key={p.company.id}
               className={p.company.id === selectedAccountId ? "map-prospect active" : "map-prospect"}
-              onClick={() => onSelectAccount?.(p.company.id)}
             >
               <span className="map-prospect-rank">
                 <span className="rank-badge">#{i + 1}</span>
@@ -118,10 +143,11 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
               <span className="map-prospect-main">
                 <strong>{p.company.name}</strong>
                 <em>
-                  Attractiveness {p.opportunity} · {qualification.label} · {p.company.location.city}
+                  Attractiveness {scoreText} · {qualification.label} · {p.company.location.city}
                 </em>
                 {p.topSignal && <small>{p.topSignal.event_type}: {p.topSignal.source_quote}</small>}
                 <span className="map-prospect-actions">
+                  <button type="button" onClick={() => onSelectAccount?.(p.company.id)}>Show on map</button>
                   <AskButton
                     label="Explain"
                     prompt={explainRankingPrompt(p.company.name, `Map rank #${i + 1}. Account attractiveness ${p.opportunity}, ${qualification.label}, missing ${qualification.gaps.join(", ") || "none"}, market ${marketLabel}. ${rankingExplanation(world, p.company, { rank: i + 1, dimension: "opportunity", fitScore: p.fit.score }).driverLine} Top signal: ${p.topSignal?.source_quote ?? "none"}.`)}
@@ -132,7 +158,7 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
                   />
                 </span>
               </span>
-            </button>
+            </article>
             );
           })}
         </div>

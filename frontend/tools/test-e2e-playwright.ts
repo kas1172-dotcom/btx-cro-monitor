@@ -92,11 +92,30 @@ async function openSurface(page: Page, label: RegExp, componentId: string): Prom
 }
 
 async function walkCoreSurfaces(page: Page): Promise<void> {
-  await page.locator("[data-surface-component='surface-todays-brief']").waitFor({ timeout: 15000 });
+  const demoBanner = page.getByRole("status", { name: "Demonstration environment" });
+  await page.locator("[data-surface-component='surface-todays-brief'], [data-surface-component='surface-route-today']").waitFor({ timeout: 15000 });
+  assert(await demoBanner.isVisible(), "Demo banner is missing from the initial route.");
+  if (!process.env.E2E_BACKEND_ENDPOINT) {
+    assert(await page.getByRole("button", { name: "Retry" }).isVisible(), "No-backend route state should expose retry.");
+    await page.getByRole("link", { name: /^Work/i }).first().click();
+    await page.locator("[data-surface-component='surface-route-work']").waitFor({ timeout: 10000 });
+    assert(await demoBanner.isVisible(), "Demo banner disappeared on Work route-data state.");
+    await page.getByRole("link", { name: /Accounts/i }).first().click();
+    await page.locator("[data-surface-component='surface-route-accounts']").waitFor({ timeout: 10000 });
+    assert(await demoBanner.isVisible(), "Demo banner disappeared on Accounts route-data state.");
+    await page.getByRole("link", { name: /Ask/i }).first().click();
+    await page.locator("[data-surface-component='surface-route-ask']").waitFor({ timeout: 10000 });
+    assert(await demoBanner.isVisible(), "Demo banner disappeared on Ask route-data state.");
+    return;
+  }
   await openSurface(page, /^Work/i, "surface-work-queue");
+  assert(await demoBanner.isVisible(), "Demo banner disappeared on Work.");
   await openSurface(page, /Accounts/i, "surface-account-360");
+  assert(await demoBanner.isVisible(), "Demo banner disappeared on Accounts.");
   await openSurface(page, /Ask/i, "surface-ask");
+  assert(await demoBanner.isVisible(), "Demo banner disappeared on Ask.");
   await openSurface(page, /^Briefing/i, "surface-todays-brief");
+  assert(await demoBanner.isVisible(), "Demo banner disappeared on Briefing.");
 }
 
 async function smokeViewport(browser: Browser, opts: { width: number; height: number; isMobile: boolean }): Promise<void> {
@@ -110,6 +129,59 @@ async function smokeViewport(browser: Browser, opts: { width: number; height: nu
   await walkCoreSurfaces(page);
   await page.screenshot({ path: `${SCREENSHOT_DIR}/cockpit-${opts.width}.png`, fullPage: true });
   await page.close();
+}
+
+async function crmAccountSwitchRegression(browser: Browser): Promise<void> {
+  if (!process.env.E2E_BACKEND_ENDPOINT) {
+    console.log("e2e: account-switch tier skipped because no backend endpoint is configured.");
+    return;
+  }
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await signInWithClerkIfConfigured(page);
+  await page.goto(`${BASE_URL}/accounts`, { waitUntil: "networkidle" });
+  await page.locator("[data-surface-component='surface-account-360']").waitFor();
+  const accountRows = page.locator(".account360-list-row");
+  await accountRows.nth(1).waitFor({ timeout: 15000 }).catch(() => undefined);
+  if (await accountRows.count() === 0) {
+    console.log("e2e: account-switch tier skipped because the active smoke adapter returned no account fixtures.");
+    await page.close();
+    return;
+  }
+  const firstName = (await accountRows.nth(0).locator("strong").first().textContent())?.trim() ?? "";
+  const hasSecondAccount = await accountRows.count() >= 2;
+  const secondName = hasSecondAccount
+    ? (await accountRows.nth(1).locator("strong").first().textContent())?.trim() ?? ""
+    : firstName;
+  await page.getByRole("button", { name: "Prepare HubSpot company" }).click();
+  const legalName = page.getByLabel("Legal name");
+  await legalName.fill("STALE LOCKHEED VALUE");
+  await page.getByRole("button", { name: "Preview company record", exact: true }).first().click();
+  await page.locator(".crm-write-preview").waitFor();
+
+  // Rapid navigation must unmount/reset all account-derived form and preview state.
+  if (hasSecondAccount) {
+    await accountRows.nth(1).click();
+    await page.getByRole("button", { name: "Prepare HubSpot company" }).click();
+    assert(await page.getByLabel("Legal name").inputValue() === secondName, "Account switch retained the first account's form state.");
+    assert(await page.locator(".crm-write-preview").count() === 0, "Account switch retained a stale CRM preview.");
+    await page.goBack();
+  } else {
+    // Minimal smoke fixtures expose one account. A missing target still exercises
+    // route identity invalidation and back-navigation remount behavior.
+    await page.goto(`${BASE_URL}/accounts/mismatched-entity`);
+    assert(await page.locator(".crm-write-preview").count() === 0, "Mismatched route retained a stale CRM preview.");
+    await page.goBack();
+  }
+  await page.getByRole("button", { name: "Prepare HubSpot company" }).click();
+  assert(await page.getByLabel("Legal name").inputValue() === firstName, "Back navigation restored stale edited state.");
+  if (hasSecondAccount) await page.goForward();
+  await page.getByRole("button", { name: "Prepare HubSpot task" }).click();
+  await page.getByRole("button", { name: "Preview task", exact: true }).click();
+  const confirm = page.getByRole("button", { name: "Create HubSpot task" });
+  assert(await confirm.isDisabled(), "CRM write freeze was not enforced after account navigation.");
+  assert(await page.locator("text=/temporarily frozen/i").count() > 0, "Frozen double submit did not surface the safety reason.");
+  await page.close();
+  console.log("e2e: CRM rapid-switch, history, stale-preview, double-submit, and identity freeze verified.");
 }
 
 // ─── HubSpot task loop (env-gated, live backend + test portal) ─────────────
@@ -177,6 +249,9 @@ const buildEnv = { ...process.env } as NodeJS.ProcessEnv;
 // This suite serves the build from "/" through vite preview, whereas a default
 // build targets the GitHub Pages subpath.
 buildEnv.VITE_BASE_PATH = "/";
+buildEnv.VITE_DEPLOYMENT_MODE = "demo";
+buildEnv.VITE_TENANT_ID = "btx-demo-command-cockpit";
+buildEnv.VITE_DEPLOYED_REVISION = "779198f";
 if (CLERK_LOGIN_ENABLED && CLERK_PUBLISHABLE_KEY) buildEnv.VITE_CLERK_PUBLISHABLE_KEY = CLERK_PUBLISHABLE_KEY;
 if (!CLERK_LOGIN_ENABLED) delete buildEnv.VITE_CLERK_PUBLISHABLE_KEY;
 if (HUBSPOT_LOOP_ENABLED) buildEnv.VITE_BACKEND_ENDPOINT = process.env.E2E_BACKEND_ENDPOINT;
@@ -188,6 +263,7 @@ try {
   browser = await chromium.launch();
   await smokeViewport(browser, { width: 1280, height: 900, isMobile: false });
   await smokeViewport(browser, { width: 390, height: 844, isMobile: true });
+  await crmAccountSwitchRegression(browser);
 
   if (HUBSPOT_LOOP_ENABLED) {
     await runHubSpotTaskLoop(browser);

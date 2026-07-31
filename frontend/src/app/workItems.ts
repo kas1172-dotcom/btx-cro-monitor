@@ -4,6 +4,7 @@ import { invalidateQueries } from "./serverState.ts";
 import type { World } from "./useWorld.ts";
 import { signalSourceDate, signalSourceName } from "./signalProvenance.ts";
 import type { Signal } from "../engine/signals/contract.ts";
+import { assertCrmWriteAllowed } from "./crmWriteSafety.ts";
 
 export type WorkItemType =
   | "account_action"
@@ -501,6 +502,7 @@ export function hubSpotTaskIdempotencyKey(item: WorkItem): string {
 }
 
 export async function executeHubSpotTask(input: ExecuteHubSpotTaskInput): Promise<ExecuteHubSpotTaskResult> {
+  assertCrmWriteAllowed();
   const result = await backendJson<ExecuteHubSpotTaskResult>(`/work-items/${input.item.id}/execute/hubspot-task`, {
     method: "POST",
     headers: { "x-idempotency-key": hubSpotTaskIdempotencyKey(input.item) },

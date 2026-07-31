@@ -26,15 +26,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node 22
+      - name: Set up pinned Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install deps
         run: npm ci
+
+      - name: Release-critical frontend gate
+        run: npm run test:release-critical
+        env:
+          RELEASE_GATE_STRICT_NODE: "1"
 
       - name: Typecheck
         run: npm run typecheck
@@ -45,6 +50,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Assert demo and production environment rules
+        run: |
+          env VITE_BACKEND_ENDPOINT=https://api.example.test VITE_CLERK_PUBLISHABLE_KEY=pk_test_ci CLERK_DEPLOYMENT_ENVIRONMENT=development VITE_DEPLOYMENT_MODE=demo VITE_DEPLOYED_REVISION=779198f npm run validate:production-env
+          if env VITE_BACKEND_ENDPOINT=https://api.example.test VITE_CLERK_PUBLISHABLE_KEY=pk_test_ci CLERK_DEPLOYMENT_ENVIRONMENT=development VITE_DEPLOYMENT_MODE=production VITE_DEPLOYED_REVISION=779198f npm run validate:production-env; then
+            echo "::error::Production accepted Clerk development credentials."
+            exit 1
+          fi
+
       - name: check:design
         run: npm run check:design
 
@@ -53,6 +66,9 @@ jobs:
 
       - name: test:metrics
         run: npm run test:metrics
+
+      - name: test:metric-availability
+        run: npm run test:metric-availability
 
       - name: test:rail
         run: npm run test:rail
@@ -111,6 +127,13 @@ jobs:
       - name: pytest
         run: python3 -m pytest -q
 
+      - name: Environment contract and revision parity
+        run: python3 tooling/verify_deployment_parity.py --contract-only
+        env:
+          BTX_DEPLOYMENT_MODE: demo
+          BTX_TENANT_ID: btx-demo-command-cockpit
+          BTX_DEPLOYED_REVISION: 779198f
+
   e2e:
     runs-on: ubuntu-latest
     defaults:
@@ -120,24 +143,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node 22
-        if: vars.RUN_E2E == '1'
+      - name: Set up pinned Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install deps
-        if: vars.RUN_E2E == '1'
         run: npm ci
 
       - name: Install Playwright browsers
-        if: vars.RUN_E2E == '1'
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E suite
-        if: vars.RUN_E2E == '1'
         run: npm run test:e2e
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
@@ -149,13 +168,9 @@ jobs:
           E2E_CLERK_SESSION_TOKEN: ${{ secrets.E2E_CLERK_SESSION_TOKEN }}
 
       - name: Upload screenshots
-        if: always() && vars.RUN_E2E == '1'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-screenshots
           path: /tmp/btx-e2e-smoke
           retention-days: 14
-
-      - name: E2E skipped
-        if: vars.RUN_E2E != '1'
-        run: echo "E2E skipped by default. Set repository variable RUN_E2E=1 to enable browser E2E."

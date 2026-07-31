@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ANALYTICAL_SURFACES,
   CORE_SURFACES,
@@ -9,8 +9,9 @@ import {
 import { navigateTo, pathForTab, toBrowserPath } from "../../app/router.ts";
 import { CountBadge, UiIcon } from "../primitives.tsx";
 import { CockpitRailIdentity } from "../../app/clerkAuth.tsx";
+import type { DisplayMetric } from "../../app/canonicalMetrics.ts";
 
-const SECONDARY_IDS: TabId[] = ["industry_updates", "programs", "prospecting", "capacity", "analysis", "map"];
+export const SECONDARY_IDS: TabId[] = ["industry_updates", "prospecting", "trip_planner", "map", "analysis", "capacity", "programs"];
 const UTILITY_IDS: TabId[] = ["deliverables", "hubspot", "settings"];
 const PRIMARY_IDS: TabId[] = ["brief", "work_queue", "accounts"];
 
@@ -33,17 +34,23 @@ function primaryTabFor(surface: TabId): TabId {
 export function BrainSidebar({
   activeTab,
   counts,
+  metrics,
 }: {
   activeTab: TabId;
   counts: Partial<Record<TabId, number>>;
+  metrics?: Partial<Record<TabId, DisplayMetric>>;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [intelligenceOpen, setIntelligenceOpen] = useState(SECONDARY_IDS.includes(activeTab));
+  const routeIsSecondary = SECONDARY_IDS.includes(activeTab);
+  const [secondaryOpen, setSecondaryOpen] = useState(routeIsSecondary);
   const primaryActiveTab = primaryTabFor(activeTab);
   const primary = surfacesFor(PRIMARY_IDS);
   const ask = surfaceById.get("ask");
   const intelligence = surfacesFor(SECONDARY_IDS);
   const utilities = surfacesFor(UTILITY_IDS);
+  useEffect(() => {
+    if (routeIsSecondary) setSecondaryOpen(true);
+  }, [routeIsSecondary]);
   const link = (surface: SurfaceSpec, compact = false) => (
     <a
       key={surface.id}
@@ -60,7 +67,7 @@ export function BrainSidebar({
     >
       <span><UiIcon name={surface.id} /></span>
       <strong>{surface.label}</strong>
-      {counts[surface.id] ? <CountBadge value={counts[surface.id] ?? 0} /> : null}
+      {counts[surface.id] ? <CountBadge value={counts[surface.id] ?? 0} label={metrics?.[surface.id]?.displayLabel ?? surface.title} /> : null}
     </a>
   );
   return (
@@ -74,16 +81,16 @@ export function BrainSidebar({
         {primary.map((surface) => link(surface))}
         <button
           type="button"
-          className={SECONDARY_IDS.includes(activeTab) ? "brain-rail-btn active" : "brain-rail-btn"}
-          onClick={() => setIntelligenceOpen((value) => !value)}
-          aria-expanded={intelligenceOpen}
-          aria-controls="intelligence-navigation"
+          className={routeIsSecondary ? "brain-rail-btn brain-rail-secondary-toggle active" : "brain-rail-btn brain-rail-secondary-toggle"}
+          onClick={() => setSecondaryOpen((value) => !value)}
+          aria-expanded={secondaryOpen}
+          aria-controls="secondary-navigation"
         >
           <span><UiIcon name="signal" /></span>
-          <strong>Intelligence</strong>
-          <span className="nav-disclosure" aria-hidden="true">{intelligenceOpen ? "−" : "+"}</span>
+          <strong>More navigation</strong>
+          <span className="nav-disclosure" aria-hidden="true">{secondaryOpen ? "▴" : "▾"}</span>
         </button>
-        {intelligenceOpen && <div id="intelligence-navigation" className="intelligence-navigation">{intelligence.map((surface) => link(surface, true))}</div>}
+        {secondaryOpen && <div id="secondary-navigation" className="intelligence-navigation">{intelligence.map((surface) => link(surface, true))}</div>}
         {ask ? link(ask) : null}
       </div>
       <div className="brain-rail-group brain-rail-utility">
@@ -96,10 +103,10 @@ export function BrainSidebar({
         onClick={() => setMoreOpen((value) => !value)}
         aria-expanded={moreOpen}
         aria-controls="mobile-more-menu"
-        aria-label="Open navigation"
+        aria-label="More navigation"
       >
         <span><UiIcon name="chevron" /></span>
-        <strong>Navigation</strong>
+        <strong>More navigation</strong>
       </button>
       {moreOpen && (
         <div id="mobile-more-menu" className="mobile-more-menu">
@@ -109,6 +116,7 @@ export function BrainSidebar({
               href={toBrowserPath(pathForTab(surface.id))}
               aria-label={surface.label}
               aria-current={primaryActiveTab === surface.id ? "page" : undefined}
+              className={primaryActiveTab === surface.id ? "active" : undefined}
               onClick={(event) => {
                 event.preventDefault();
                 setMoreOpen(false);

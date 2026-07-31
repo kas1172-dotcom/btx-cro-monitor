@@ -35,6 +35,7 @@ from btx_platform.config import Settings, get_settings
 from btx_platform.db import assert_schema_current, init_db, make_engine, make_session_factory
 from btx_platform.demo.definitions import DEMO_TENANT_ID
 from btx_platform.engine_config import CLIENT_CONFIG_PATH, config_history, latest_config, put_config, seed_engine_configs
+from btx_platform.environment import environment_contract
 from btx_platform.health import platform_health
 from btx_platform.observability import capture_exception, configure_observability, new_request_id, set_request_id
 from btx_platform.hubspot import HubSpotClient, HubSpotError, HubSpotTaskAssociation, hubspot_payload, map_companies
@@ -94,7 +95,7 @@ from btx_platform.schemas import (
 
 logger = logging.getLogger(__name__)
 CRM_CACHE_TTL_SECONDS = 300
-PUBLIC_PATHS = {"/health", "/artifacts/latest", "/operating-baseline"}
+PUBLIC_PATHS = {"/health", "/environment", "/artifacts/latest", "/operating-baseline"}
 # Mutating routes require at least "analyst"; a viewer can read but not write.
 MUTATING_ROUTE_MIN_ROLE = "analyst"
 MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
@@ -490,6 +491,21 @@ def _get_tenant_work_item(session, item_id: str, tenant_id: str) -> models.WorkI
 
 
 def _deliverable_response(row: models.Deliverable) -> dict:
+    document = dict(row.document or {})
+    if row.title.strip().lower() == "q2 2026 revenue review" and not document.get("invalidatedAt"):
+        document.update({
+            "invalidatedAt": datetime.now(UTC).isoformat(),
+            "invalidationReason": "Legacy review predates typed metric availability and semantic grounding; regenerate from current sources.",
+            "quality": {
+                "valid": False,
+                "errors": ["Legacy revenue review requires regeneration under the current metric-state contract."],
+                "claimSourceGrounded": False,
+                "dataAvailable": False,
+                "freshnessKnown": False,
+                "lockedFactsValid": False,
+                "checkedAt": datetime.now(UTC).isoformat(),
+            },
+        })
     return DeliverableResponse(
         id=row.id,
         type=row.type,
@@ -498,7 +514,7 @@ def _deliverable_response(row: models.Deliverable) -> dict:
         program_id=row.program_id,
         trip_id=row.trip_id,
         entity_ids=row.entity_ids,
-        document=row.document,
+        document=document,
         created_at=row.created_at.isoformat(),
         updated_at=row.updated_at.isoformat(),
     ).model_dump()
@@ -951,6 +967,10 @@ def create_app(
             "integrations": detail["integrations"],
             "generated_at": detail["generated_at"],
         }
+
+    @app.get("/environment")
+    def environment() -> dict:
+        return environment_contract(settings)
 
     @app.get("/artifacts/latest")
     def latest_artifacts() -> Response:

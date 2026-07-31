@@ -17,6 +17,7 @@ from btx_platform.config import Settings  # noqa: E402
 from btx_platform.db import init_db, make_engine, make_session_factory  # noqa: E402
 from btx_platform.intelligence import upsert_canonical_accounts  # noqa: E402
 from btx_platform.ratelimit import RateLimiter  # noqa: E402
+from pydantic import ValidationError  # noqa: E402
 from tests.auth_helpers import make_clerk_fixture  # noqa: E402
 
 CLERK = make_clerk_fixture()
@@ -46,6 +47,34 @@ def _build(tmp_path: Path, *, rate_limiter: RateLimiter | None = None, **overrid
 def test_auth_rejects_protected_routes(tmp_path: Path):
     client, _sf, _settings = _build(tmp_path)
     assert client.get("/engine-config/scoring_weights").status_code == 401
+
+
+def test_environment_diagnostic_is_public_and_explicit(tmp_path: Path):
+    client, _sf, _settings = _build(
+        tmp_path,
+        deployment_mode="demo",
+        tenant_id="btx-demo-command-cockpit",
+        deployed_revision="779198f",
+        external_writes_enabled=True,
+        hubspot_access_token="test-token",
+        hubspot_environment="sandbox",
+    )
+    response = client.get("/environment")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["isDemonstration"] is True
+    assert body["demoNotice"] == "Demonstration — internal records are illustrative"
+    assert body["externalWrites"]["capable"] is False
+    assert body["revision"]["matchesExpected"] is True
+
+
+def test_production_rejects_clerk_development_credentials():
+    with pytest.raises(ValidationError, match="rejects Clerk development"):
+        Settings(
+            deployment_mode="production",
+            clerk_secret_key="sk_test_not-a-real-secret",
+            clerk_issuer="https://example.clerk.accounts.dev",
+        )
 
 
 def test_auth_rejects_expired_session(tmp_path: Path):

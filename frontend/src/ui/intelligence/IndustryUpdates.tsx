@@ -22,12 +22,6 @@ function dateTime(value: string | null | undefined): string {
   return parsed.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
-function dateOnly(value: string | null | undefined): string {
-  if (!value) return "Event date unavailable";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "Event date unavailable" : parsed.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
-
 function ageLabel(value: string | null | undefined): string {
   if (!value) return "never";
   const elapsed = Date.now() - new Date(value).getTime();
@@ -37,6 +31,25 @@ function ageLabel(value: string | null | undefined): string {
   const hours = Math.round(minutes / 60);
   if (hours < 48) return `${hours} hr ago`;
   return `${Math.round(hours / 24)} days ago`;
+}
+
+function explicitDateLabel(label: string, value: string | null | undefined): string {
+  return `${label}: ${dateTime(value)}`;
+}
+
+function wordBoundary(text: string, max = 220): string {
+  if (text.length <= max) return text;
+  const trimmed = text.slice(0, max + 1);
+  const boundary = trimmed.lastIndexOf(" ");
+  return `${trimmed.slice(0, boundary > 80 ? boundary : max).trim()}…`;
+}
+
+function uniqueReasons(summary: string, reasons: string[]): string[] {
+  const normalizedSummary = summary.trim().toLowerCase();
+  return reasons.filter((reason, index, list) => {
+    const normalized = reason.trim().toLowerCase();
+    return normalized && normalized !== normalizedSummary && list.findIndex((item) => item.trim().toLowerCase() === normalized) === index;
+  });
 }
 
 function storedFallback(world: World): IndustryMonitorResponse {
@@ -110,6 +123,7 @@ export function IndustryUpdates({ world }: { world: World }) {
   const [filter, setFilter] = useState<Filter>("new_high");
   const [runOpen, setRunOpen] = useState(false);
   const [status, setStatus] = useState("Loading collection evidence…");
+  const [undoReview, setUndoReview] = useState<{ id: string; previous: IndustryUpdateRecord["reviewStatus"]; label: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -149,14 +163,26 @@ export function IndustryUpdates({ world }: { world: World }) {
     setStatus("Saving review…");
     try {
       const result = await reviewIndustryUpdate(update.id, action, reason);
+      const previous = update.reviewStatus;
       setMonitor((current) => current ? {
         ...current,
         updates: current.updates.map((item) => item.id === update.id ? { ...item, reviewStatus: result.reviewStatus } : item),
       } : current);
-      setStatus(action === "needs_account_match" ? "Queued for account-evidence assessment." : "Review saved.");
+      setUndoReview({ id: update.id, previous, label: `Undo ${action === "dismiss" ? "dismiss" : action === "mark_reviewed" ? "review" : "queue change"}` });
+      setStatus(action === "needs_account_match" ? "Queued for account-evidence assessment. Undo is available before refresh." : "Review saved. Undo is available before refresh.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The review could not be saved.");
     }
+  }
+
+  function undoLastReview() {
+    if (!undoReview) return;
+    setMonitor((current) => current ? {
+      ...current,
+      updates: current.updates.map((item) => item.id === undoReview.id ? { ...item, reviewStatus: undoReview.previous } : item),
+    } : current);
+    setStatus("Review change undone locally. Refresh or save another review to reconcile with the backend.");
+    setUndoReview(null);
   }
 
   async function draftWork(update: IndustryUpdateRecord) {
@@ -186,7 +212,7 @@ export function IndustryUpdates({ world }: { world: World }) {
         <div>
           <span>Industry monitor</span>
           <strong>{monitor?.status ?? "Loading monitor status"}</strong>
-          <em>{monitor?.run ? `Last successful run ${ageLabel(monitor.run.lastSuccessfulAt)}` : "No successful run is available"}</em>
+          <em>{monitor?.run ? `${explicitDateLabel("Last successful run", monitor.run.lastSuccessfulAt)} · ${ageLabel(monitor.run.lastSuccessfulAt)}` : "No successful run is available"}</em>
         </div>
         {monitor?.run && (
           <>
@@ -207,6 +233,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       <p className="industry-mode-label">
         <strong>{monitor?.ingestionMode.replace(/_/g, " ").toUpperCase() ?? "CHECKING MODE"}</strong>
         {" "}{status}
+        {undoReview && <button type="button" onClick={undoLastReview}>{undoReview.label}</button>}
       </p>
 
       {runOpen && monitor?.run && (
@@ -233,7 +260,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       <div className="industry-filter-bar" aria-label="Industry update filters">
         {([
           ["new_high", "New & high relevance · 7 days"],
-          ["new", "New"],
+          ["new", `New since ${monitor?.run ? dateTime(monitor.run.lastSuccessfulAt) : "last run"}`],
           ["needs_review", "Needs review"],
           ["customers", "Customers"],
           ["prospects", "Prospects"],
@@ -251,7 +278,7 @@ export function IndustryUpdates({ world }: { world: World }) {
               <div>
                 <p className="eyebrow">{update.publisher}</p>
                 <h2 id={`industry-${update.id}`}>{update.headline}</h2>
-                <p>Event {dateOnly(update.eventDate)} · Published {dateOnly(update.publicationDate)} · Retrieved {ageLabel(update.retrievedAt)}</p>
+                <p>{explicitDateLabel("Record retrieved", update.retrievedAt)} · {explicitDateLabel("Published", update.publicationDate)} · {explicitDateLabel("Event date", update.eventDate)}</p>
               </div>
               <div className="industry-classifications">
                 <span>{update.relationshipState.replace(/_/g, " ")}</span>
@@ -259,14 +286,15 @@ export function IndustryUpdates({ world }: { world: World }) {
                 <span>{update.reviewStatus.replace(/_/g, " ")}</span>
               </div>
             </header>
-            <p>{update.normalizedSummary}</p>
+            <p>{wordBoundary(update.normalizedSummary)}</p>
             <dl className="industry-context">
               <div><dt>Market / program / company</dt><dd>{[...update.entities.map((entity) => entity.name), ...update.markets].slice(0, 4).join(" · ") || "Market context"}</dd></div>
               <div><dt>BTX capability relevance</dt><dd>{update.capabilityTags.join(" · ") || "Capability match requires review"}</dd></div>
             </dl>
             <div className="industry-hypothesis">
               <strong>Why Jamie is seeing this</strong>
-              {update.relevanceReasons.map((reason) => <p key={reason}>{reason}</p>)}
+              {uniqueReasons(update.normalizedSummary, update.relevanceReasons).map((reason) => <p key={reason}>{wordBoundary(reason, 180)}</p>)}
+              {uniqueReasons(update.normalizedSummary, update.relevanceReasons).length === 0 && <p>Matched configured monitor relevance rules; no additional non-duplicate summary was provided.</p>}
               {update.relationshipState !== "confirmed_account_development" && <em>Relevance is a hypothesis. No BTX opportunity or account impact has been confirmed.</em>}
             </div>
             {update.sourceVariants.length > 0 && <p className="muted">{update.sourceVariants.length} syndicated source variant{update.sourceVariants.length === 1 ? "" : "s"} grouped with this story.</p>}
