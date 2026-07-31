@@ -142,6 +142,13 @@ def test_demo_world_snapshot_loads_expected_story(tmp_path: Path):
     account_status = {account["id"]: account["account_status"] for account in body["accounts"]}
     assert account_status["demo-acct-lockheed"] == "current_customer"
     assert account_status["demo-acct-nlight"] == "target_prospect"
+    account_locations = {account["id"]: account["location"] for account in body["accounts"]}
+    assert account_locations["demo-acct-lockheed"]["lat"] == 32.7555
+    assert account_locations["demo-acct-lockheed"]["lon"] == -97.3308
+    assert account_locations["demo-acct-nlight"]["lat"] == 45.5871
+    assert account_locations["demo-acct-nlight"]["lon"] == -122.3995
+    assert account_locations["demo-acct-pulse-space"]["lat"] == 47.6101
+    assert account_locations["demo-acct-pulse-space"]["lon"] == -122.2015
     # The prospect journey must name what it is missing rather than fill the gaps in.
     nlight_research = next(item for item in body["workItems"] if item["id"] == "demo-wi-research-nlight")
     assert len(nlight_research["missing_information"]) == 4

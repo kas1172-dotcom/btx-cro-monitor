@@ -71,12 +71,13 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
   const health = pipelineHealth(opportunities);
   const rec = world.analysis.recById.get(accountId);
   const score = world.analysis.byId.get(accountId);
-  const openPipelineValue = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost").reduce((sum, o) => sum + (o.value ?? 0), 0);
+  const valuedOpenPipeline = opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost" && o.value !== null);
+  const openPipelineValue = valuedOpenPipeline.length ? valuedOpenPipeline.reduce((sum, o) => sum + (o.value as number), 0) : null;
   const topSignal = signals.sort((a, b) => b.confidence - a.confidence)[0];
   const confidence = evidenceConfidence({
     hasVerifiedLink: company.relationship === "customer" || Boolean(topSignal?.relationships?.some((relationship) => relationship.canonical_account_id === accountId && relationship.review_status === "accepted")),
     hasContact: contacts.length > 0,
-    hasPipeline: openPipelineValue > 0,
+    hasPipeline: openPipelineValue !== null,
     hasDatedSignal: Boolean(topSignal?.detected_at || topSignal?.artifact?.source_date),
   });
   const topSignalAccount = world.companies.find((c) => c.id === topSignal?.subject_id)?.name ?? "Portfolio monitor";
@@ -108,8 +109,8 @@ export function buildMeetingBriefContext(accountId: string, world: World): Agent
       city: company.location.city,
       relationship: company.relationship,
       accountStatus: company.account_status ?? "unknown",
-      opportunityScore: score?.dimensions.opportunity.score ?? 0,
-      riskScore: score?.dimensions.risk.score ?? 0,
+      opportunityScore: score?.dimensions.opportunity.score ?? null,
+      riskScore: score?.dimensions.risk.score ?? null,
       fitScore: fit.score,
       matchedCapabilities: fit.matched.join(", ") || "No direct match recorded",
       missingCapabilities: fit.missing.join(", ") || "No major gaps recorded",

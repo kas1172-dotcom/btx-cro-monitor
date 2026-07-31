@@ -10,6 +10,7 @@ import {
   UTILITY_SURFACES,
   countForSurface,
 } from "../src/app/surfaces.ts";
+import { SECONDARY_IDS } from "../src/ui/brain/BrainSidebar.tsx";
 import { deriveWorkItems, draftToCreatePayload, filterWorkItems } from "../src/app/workItems.ts";
 import newsData from "../data/demo/btx/news.json";
 import extractedData from "../data/demo/btx/extracted-signals.json";
@@ -62,6 +63,7 @@ const componentIds = new Set(ALL_SURFACES.map((surface) => surface.componentId))
 
 assert(CORE_SURFACES.map((surface) => surface.id).join(",") === "brief,work_queue,accounts,ask", "Primary nav must be the four core surfaces.");
 assert(ANALYTICAL_SURFACES.map((surface) => surface.id).join(",") === "industry_updates,prospecting,trip_planner,map,analysis,capacity,programs", "Analytical routes must appear in the workspace navigation.");
+assert(SECONDARY_IDS.join(",") === ANALYTICAL_SURFACES.map((surface) => surface.id).join(","), "More navigation must include every secondary analytical route.");
 assert(UTILITY_SURFACES.map((surface) => surface.id).join(",") === "deliverables,hubspot,settings", "Utility nav must expose Deliverable Editor, HubSpot, and Settings.");
 assert(TAB_IDS.join(",") === "brief,work_queue,accounts,ask,industry_updates,prospecting,map,analysis,capacity,programs,deliverables,hubspot,settings", "Navigable tabs must include core, analytical, and utility routes.");
 assert(PRIMARY_TAB_IDS.join(",") === "brief,work_queue,accounts,ask", "Primary rail must be the four-surface cockpit.");

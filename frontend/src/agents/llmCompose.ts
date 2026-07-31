@@ -22,6 +22,18 @@ interface LlmComposeResult {
   sections: LlmSection[];
 }
 
+export function parseLlmComposeText(text: string): (LlmComposeResult & { ok: true }) | { ok: false; reason: string; parseFailure: true } {
+  try {
+    const parsed = JSON.parse(text) as Partial<LlmComposeResult>;
+    if (!Array.isArray(parsed.sections) || !parsed.sections.every((section) => typeof section.id === "string" && typeof section.text === "string")) {
+      return { ok: false, reason: "LLM response failed to parse: invalid sections contract", parseFailure: true };
+    }
+    return { ok: true, sections: parsed.sections };
+  } catch (error) {
+    return { ok: false, reason: `LLM response failed to parse: ${error instanceof Error ? error.message : "invalid JSON"}`, parseFailure: true };
+  }
+}
+
 interface GroundingResult {
   ok: boolean;
   violations: string[];
@@ -41,9 +53,15 @@ export async function maybeComposeWithLlm(input: {
   }
 
   const first = await composeOnce(input, false);
-  if (!first.ok) return withFallbackNotice(input.template, first.reason);
+  if (!first.ok) {
+    if (first.parseFailure) throw new Error(`Deliverable generation blocked: ${first.reason}`);
+    return withFallbackNotice(input.template, first.reason);
+  }
   const critiqued = await critiqueAndRevise(input, first);
-  if (!critiqued.ok) return { ...first.deliverable, compositionPath: `Composed: LLM (${LLM_MODELS.composition})` };
+  if (!critiqued.ok) {
+    if (critiqued.parseFailure) throw new Error(`Deliverable generation blocked: ${critiqued.reason}`);
+    return { ...first.deliverable, compositionPath: `Composed: LLM (${LLM_MODELS.composition})` };
+  }
   return { ...critiqued.deliverable, compositionPath: `Composed: LLM (${LLM_MODELS.composition})` };
 }
 
@@ -73,7 +91,7 @@ async function composeOnce(input: {
   outputSchema: SectionSpec[];
   rubric: string;
   validate: (deliverable: Deliverable, ctx: AgentContext) => ValidationResult;
-}, retry: boolean): Promise<{ ok: true; deliverable: Deliverable } | { ok: false; reason: string }> {
+}, retry: boolean): Promise<{ ok: true; deliverable: Deliverable } | { ok: false; reason: string; parseFailure?: boolean }> {
   const system = `You compose CRO deliverable prose for the Revenue Brain.
 Use only the provided context facts, output schema, and rubric.
 Reproduce every numeric value exactly as provided. Do not invent, recompute, round, or alter numbers.
@@ -126,7 +144,7 @@ async function critiqueAndRevise(input: {
   outputSchema: SectionSpec[];
   rubric: string;
   validate: (deliverable: Deliverable, ctx: AgentContext) => ValidationResult;
-}, draft: { ok: true; deliverable: Deliverable }): Promise<{ ok: true; deliverable: Deliverable } | { ok: false; reason: string }> {
+}, draft: { ok: true; deliverable: Deliverable }): Promise<{ ok: true; deliverable: Deliverable } | { ok: false; reason: string; parseFailure?: boolean }> {
   const system = `Critique and revise CRO deliverable prose.
 Rubric: answer-first, every claim evidenced, no generic filler, each section has a clear so-what.
 Use only the provided facts and existing draft. Preserve every numeric value exactly.
@@ -154,7 +172,7 @@ ${VOICE_RULES_PROMPT}`;
     : { ok: false, reason: `critique validation failed: ${validation.errors.join("; ")}` };
 }
 
-async function callJson(system: string, content: string): Promise<(LlmComposeResult & { ok: true }) | { ok: false; reason: string }> {
+async function callJson(system: string, content: string): Promise<(LlmComposeResult & { ok: true }) | { ok: false; reason: string; parseFailure?: boolean }> {
   if (!COPILOT_ENDPOINT) return { ok: false, reason: "VITE_COPILOT_ENDPOINT is not configured" };
   const controller = new AbortController();
   const timer = globalThis.setTimeout(() => controller.abort(), LLM_TIMEOUT_MS.composition);
@@ -172,17 +190,14 @@ async function callJson(system: string, content: string): Promise<(LlmComposeRes
     }
     const data = (await response.json()) as { text?: string };
     if (!data.text) return { ok: false, reason: "/llm returned no text" };
-    const parsed = JSON.parse(data.text) as Partial<LlmComposeResult>;
-    if (!Array.isArray(parsed.sections)) return { ok: false, reason: "LLM returned JSON without sections" };
-    if (!parsed.sections.every((section) => typeof section.id === "string" && typeof section.text === "string")) {
-      return { ok: false, reason: "LLM returned invalid section objects" };
-    }
+    const parsed = parseLlmComposeText(data.text);
+    if (!parsed.ok) return parsed;
     markAiLive(LLM_MODELS.composition);
-    return { ok: true, sections: parsed.sections };
+    return parsed;
   } catch (error) {
     const reason = error instanceof Error ? error.message : "LLM call failed";
     markAiOffline(reason);
-    return { ok: false, reason };
+    return { ok: false, reason: error instanceof SyntaxError ? `LLM response failed to parse: ${reason}` : reason, parseFailure: error instanceof SyntaxError };
   } finally {
     globalThis.clearTimeout(timer);
   }

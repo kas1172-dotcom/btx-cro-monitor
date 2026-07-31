@@ -17,13 +17,14 @@ const DEFAULT_SPEC: ChartSpec = {
 export function AnalysisDashboard({ world }: { world: World }) {
   const metrics = PRIMARY_METRICS.map((metricId) => computeMetric(metricId, world));
   const hasApprovedAnalytics = metrics.some((metric) =>
-    metric.value !== null && metric.provenance.some((source) => source.records.length > 0)
+    metric.state === "available" && metric.provenance.some((source) => source.records.length > 0)
   );
+  const unavailableMetrics = metrics.filter((metric) => metric.state !== "available");
   return (
     <section className="surface-page" data-surface-component="surface-analysis-dashboard">
       <SurfaceHeader
         eyebrow="Analysis dashboard"
-        headline="Pipeline, bookings, backlog, win rate, and production-load trends."
+        headline="Pipeline, bookings, backlog, win rate, and production-load trends"
         subline="Revenue views for account planning, board updates, and client-ready figures."
       />
       <div className="account360-kpis">
@@ -32,17 +33,28 @@ export function AnalysisDashboard({ world }: { world: World }) {
           return (
             <div key={metricId}>
               <span>{metric.label}</span>
-              <strong>{formatMetricValue(metric.value, metric.unit)}</strong>
+              <strong>{metric.state === "available" ? formatMetricValue(metric.value, metric.unit) : metric.state === "stale" ? `Stale: ${formatMetricValue(metric.value, metric.unit)}` : metric.state === "error" ? "Source error" : "Not available"}</strong>
+              <em>{metric.reason}</em>
             </div>
           );
         })}
       </div>
       {hasApprovedAnalytics ? (
-        <AnalysisView world={world} initialSpec={DEFAULT_SPEC} />
+        <>
+          {unavailableMetrics.length > 0 && (
+            <section className="surface-panel" aria-labelledby="analysis-partial-title">
+              <h2 id="analysis-partial-title">Partial analysis data</h2>
+              <p>Available metrics may be shown, but unavailable, stale, or errored metrics are excluded from conclusions and generated figures.</p>
+              <ul>{unavailableMetrics.map((metric) => <li key={metric.label}><strong>{metric.label}</strong>: {metric.state}. {metric.reason}</li>)}</ul>
+            </section>
+          )}
+          <AnalysisView world={world} initialSpec={DEFAULT_SPEC} />
+        </>
       ) : (
         <section className="surface-panel">
           <h2>Financial analysis unavailable</h2>
           <p>No approved revenue, bookings, backlog, win-loss, or operating-capacity dataset is connected. Precise figures and concentration conclusions are suppressed.</p>
+          <ul>{metrics.map((metric) => <li key={metric.label}><strong>{metric.label}</strong>: {metric.state}. {metric.reason}</li>)}</ul>
           <div className="assumption-box">
             <strong>Data basis</strong>
             <p>Required source: approved financial or operating records with a retrieval timestamp and validation status.</p>

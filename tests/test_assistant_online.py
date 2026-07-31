@@ -63,7 +63,8 @@ def _settings(**overrides):
     ("question", "requested", "enabled", "expected"),
     [
         ("Summarize this account", "automatic", True, "workspace"),
-        ("What changed this week?", "automatic", True, "workspace_web"),
+        ("What changed this week?", "automatic", True, "web"),
+        ("What changed in the BTX workspace this week?", "automatic", True, "workspace_web"),
         ("Use workspace only for current work", "automatic", True, "workspace"),
         ("Research public funding", "web", True, "web"),
         ("Research public funding", "web", False, "workspace"),
@@ -116,6 +117,29 @@ def test_workspace_web_uses_server_search_and_preserves_citations():
     assert sent["messages"][0]["content"][0]["type"] == "document"
 
 
+def test_primary_government_sources_are_not_labeled_as_reporting():
+    client = FakeClient([SimpleNamespace(
+        stop_reason="end_turn",
+        content=[_block(type="text", text="Direct answer with evidence.", citations=[_block(
+            type="web_search_result_location",
+            url="https://sam.gov/opp/test?utm_source=x",
+            title="SAM.gov notice",
+            cited_text="Solicitation notice.",
+        )])],
+        usage=SimpleNamespace(input_tokens=120, output_tokens=80, server_tool_use=SimpleNamespace(web_search_requests=1)),
+    )])
+    result = run_online_answer(
+        message="Latest public contract notice",
+        requested_mode="web",
+        workspace_summary="",
+        workspace_citations=[],
+        settings=_settings(),
+        client=client,
+    )
+    assert result.citations[0]["source_type"] == "public_government"
+    assert result.citations[0]["data_classification"] == "primary_government"
+
+
 def test_web_mode_does_not_send_workspace_document():
     client = FakeClient([_response()])
     run_online_answer(
@@ -159,3 +183,25 @@ def test_refusal_and_empty_output_fail_closed():
             settings=_settings(),
             client=client,
         )
+
+
+def test_live_current_news_web_search_opt_in():
+    settings = Settings()
+    if not (
+        settings.ask_online_enabled
+        and settings.ask_web_search_enabled
+        and settings.anthropic_api_key
+        and __import__("os").environ.get("BTX_LIVE_ASK_EVAL") == "1"
+    ):
+        pytest.skip("Set BTX_LIVE_ASK_EVAL=1 plus Ask online credentials to run live current-news web search.")
+    result = run_online_answer(
+        message="What is the latest public NASA procurement news this week?",
+        requested_mode="web",
+        workspace_summary="CONFIDENTIAL_WORKSPACE_MARKER",
+        workspace_citations=[],
+        settings=settings,
+    )
+    assert result.actual_mode == "web"
+    assert result.metadata["search_count"] > 0
+    assert result.citations
+    assert all(item["source_type"].startswith("public_") for item in result.citations)

@@ -54,9 +54,8 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
     const topRiskSignal = world.analysis.valid.find((signal) => signal.id === riskSignalId) ??
       world.analysis.valid.find((signal) => signal.subject_id === topRisk?.subject_id);
     const topAction = topOpportunity ? world.analysis.recById.get(topOpportunity.company.id) : world.analysis.recommendations[0];
-    const pipelineValue = world.opportunities
-      .filter((o) => o.stage !== "won" && o.stage !== "lost")
-      .reduce((sum, o) => sum + (o.value ?? 0), 0);
+    const valuedPipeline = world.opportunities.filter((o) => o.stage !== "won" && o.stage !== "lost" && o.value !== null);
+    const pipelineValue = valuedPipeline.length ? valuedPipeline.reduce((sum, o) => sum + (o.value as number), 0) : null;
     const nameOf = (id?: string | null) => world.companies.find((c) => c.id === id)?.name ?? "No account available";
     const topSignalAccount = nameOf(topSignal?.subject_id);
     const topRiskAccount = nameOf(topRisk?.subject_id);
@@ -69,10 +68,10 @@ export const weeklyMemoAgent: DeliverableAgent<Inputs> = {
       facts: {
         title: inputs.title ?? "Weekly CRO Memo",
         topOpportunityName: topOpportunity?.company.name ?? "No opportunity available",
-        topOpportunityScore: topOpportunity?.opportunity ?? 0,
-        topOpportunityFit: topOpportunity?.fit.score ?? 0,
+        topOpportunityScore: topOpportunity?.opportunity ?? null,
+        topOpportunityFit: topOpportunity?.fit.score ?? null,
         topRiskName: topRiskAccount,
-        topRiskScore: topRisk?.dimensions.risk.score ?? 0,
+        topRiskScore: topRisk?.dimensions.risk.score ?? null,
         topSignalType: topSignal ? displayLabel(topSignal.event_type) : "No signal available",
         topSignalQuote: topSignal ? signalEvidenceForCompany(topSignalAccount, topSignal, "") : "",
         topRiskQuote: topRiskSignal ? signalEvidenceForCompany(topRiskAccount, topRiskSignal, "") : "",

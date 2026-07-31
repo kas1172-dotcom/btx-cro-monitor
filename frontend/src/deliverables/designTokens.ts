@@ -85,7 +85,7 @@ export function stripEmDashes(text: string): string {
 
 export function assertNoEmDash(text: string): void {
   if (/[\u2013\u2014]/.test(text)) {
-    throw new Error("Steel & Signal deliverables cannot contain em or en dashes.");
+    throw new Error("Deliverables cannot contain em or en dashes.");
   }
 }
 

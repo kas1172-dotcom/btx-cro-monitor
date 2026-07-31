@@ -39,6 +39,7 @@ export function AppShell({
   rightW,
   rail,
   topbar,
+  banner,
   onMainClickCapture,
   children,
   side,
@@ -47,6 +48,7 @@ export function AppShell({
   rightW: string;
   rail: ReactNode;
   topbar: ReactNode;
+  banner?: ReactNode;
   onMainClickCapture?: () => void;
   children: ReactNode;
   side?: ReactNode;
@@ -54,7 +56,7 @@ export function AppShell({
   return (
     <div className={className} style={{ "--right-w": rightW } as CSSProperties}>
       {rail}
-      <main className="quiet-main" onClickCapture={onMainClickCapture}>{topbar}{children}</main>
+      <main className="quiet-main" onClickCapture={onMainClickCapture}>{banner}{topbar}{children}</main>
       {side}
     </div>
   );
@@ -70,8 +72,8 @@ export function SurfaceHeader({ eyebrow, headline, subline }: { eyebrow: string;
   );
 }
 
-export function CountBadge({ value }: { value: number }) {
-  return <em className="count-badge">{value}</em>;
+export function CountBadge({ value, label }: { value: number; label?: string }) {
+  return <em className="count-badge" title={label} aria-label={label}>{value}</em>;
 }
 
 export function StatusChip({ tone = "info", label, value }: { tone?: "success" | "warning" | "danger" | "info"; label: string; value: ReactNode }) {

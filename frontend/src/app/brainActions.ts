@@ -9,6 +9,16 @@ import { saveBrainMemoryNote, saveDeliverable } from "../memory/localMemory.ts";
 import { setState } from "../store/store.ts";
 import type { MetricId } from "../metrics/types.ts";
 import { defaultDateAnchor, defaultTripWindow, latestCompletedQuarter } from "./dateDefaults.ts";
+import { deliverablePath, figureInsertPath, navigateTo } from "./router.ts";
+
+function openGeneratedDeliverable(deliverable: Deliverable): void {
+  if (typeof window === "undefined") {
+    setState({ brainResponse: null, activeDeliverable: deliverable, activeCompanyId: null });
+    return;
+  }
+  setState({ brainResponse: null, activeCompanyId: null });
+  navigateTo(deliverablePath(deliverable.backendRecordId ?? deliverable.id));
+}
 
 export interface BrainActionOptions {
   accountId?: string;
@@ -89,7 +99,7 @@ export async function dispatchBrainQuestion(
       instructions,
     }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: "map", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("board deck") || lower.includes("quarterly board")) {
     events.composing?.("Building board deck");
@@ -99,7 +109,7 @@ export async function dispatchBrainQuestion(
       instructions,
     }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: "analysis", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("analysis view") || lower.includes("show revenue by client") || lower.includes("revenue heatmap")) {
     events.composing?.("Preparing analysis view");
@@ -110,18 +120,19 @@ export async function dispatchBrainQuestion(
       instructions,
     }, world);
     saveDeliverable(deliverable);
-    setState({
-      brainResponse: response,
-      activeTab: "analysis",
-      activeDeliverable: null,
-      activeAnalysisSpec: {
-        viz: "heatmap",
-        metric: options.metric ?? "revenue",
-        rows: "account",
-        cols: "quarter",
-        color: "revenue_yoy_change",
-      },
-    });
+    const spec = {
+      viz: "heatmap",
+      metric: options.metric ?? "revenue",
+      rows: "account",
+      cols: "quarter",
+      color: "revenue_yoy_change",
+    } as const;
+    if (typeof window === "undefined") {
+      setState({ brainResponse: null, activeCompanyId: null, activeAnalysisSpec: spec });
+    } else {
+      setState({ brainResponse: null, activeCompanyId: null });
+      navigateTo(figureInsertPath(spec));
+    }
     result = { completion: "analysis", response, deliverable: null };
   } else if (lower.includes("meeting brief")) {
     const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
@@ -129,7 +140,7 @@ export async function dispatchBrainQuestion(
     events.composing?.("Composing meeting brief");
     const deliverable = await runAgent("meeting_brief", { accountId: selectedAccountId, instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: "accounts", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("sales pitch") || lower.includes("draft a pitch") || lower.includes("one-page pitch") || lower.includes("one page pitch")) {
     const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
@@ -137,7 +148,7 @@ export async function dispatchBrainQuestion(
     events.composing?.("Drafting sales pitch");
     const deliverable = await runAgent("sales_pitch", { accountId: selectedAccountId, instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: "work_queue", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("capabilities assessment") || lower.includes("can we actually serve") || lower.includes("should we chase") || lower.includes("can btx serve")) {
     const selectedAccountId = namedAccountId(q, world) ?? options.accountId ?? firstAvailableAccountId(world);
@@ -145,19 +156,19 @@ export async function dispatchBrainQuestion(
     events.composing?.("Checking fit and capacity");
     const deliverable = await runAgent("capabilities_assessment", { accountId: selectedAccountId, instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: "capacity", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("draft outreach") || lower.includes("outreach")) {
     events.composing?.("Drafting outreach");
     const deliverable = await runAgent("outreach", { instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: "work_queue", activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("weekly brief") || lower.includes("care about this week")) {
     events.composing?.("Composing weekly brief");
     const deliverable = await runAgent("weekly_memo", { title: "Weekly CRO Memo", instructions }, world);
     saveDeliverable(deliverable);
-    setState({ brainResponse: response, activeTab: routeArea(response), activeDeliverable: deliverable, activeAnalysisSpec: null });
+    openGeneratedDeliverable(deliverable);
     result = { completion: "deliverable", response, deliverable };
   } else if (lower.includes("activity log") || lower.includes("saved to brain")) {
     setState({ activeTab: "settings", brainResponse: null, activeDeliverable: null, activeAnalysisSpec: null });

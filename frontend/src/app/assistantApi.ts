@@ -8,6 +8,7 @@ export interface AssistantContext {
   signal_id?: string | null;
   deliverable_id?: string | null;
   route?: string | null;
+  metric_states?: Record<string, { state: "available" | "unavailable" | "stale" | "error"; value: number | null; reason: string; asOf: string | null }>;
 }
 
 export interface AssistantCitation {

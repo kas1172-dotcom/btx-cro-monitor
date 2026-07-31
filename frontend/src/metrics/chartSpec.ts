@@ -53,6 +53,7 @@ function accountName(world: World, id: string): string {
 
 export function computeChart(spec: ChartSpec, world: World): ChartResult {
   const metric = METRICS[spec.metric];
+  const metricResult = computeMetric(spec.metric, world, spec.filters, spec.timeRange);
   if (spec.viz === "trend") {
     const rows = trendRows(spec);
     const byMonth = new Map<string, number>();
@@ -60,7 +61,9 @@ export function computeChart(spec: ChartSpec, world: World): ChartResult {
     return {
       spec,
       meta: { label: metric.label, unit: metric.unit },
-      provenance: computeMetric(spec.metric, world, spec.filters, spec.timeRange).provenance,
+      provenance: metricResult.provenance,
+      state: metricResult.state,
+      reason: metricResult.reason,
       series: [{ label: metric.label, points: [...byMonth.entries()].map(([x, y]) => ({ x, y })) }],
       legend: { colorEncodes: "Value over time", min: null, max: null, midLabel: "", qtdNote: "" },
     };
@@ -74,7 +77,9 @@ export function computeChart(spec: ChartSpec, world: World): ChartResult {
     return {
       spec,
       meta: { label: metric.label, unit: metric.unit },
-      provenance: computeMetric(spec.metric, world, spec.filters, spec.timeRange).provenance,
+      provenance: metricResult.provenance,
+      state: metricResult.state,
+      reason: metricResult.reason,
       series: [{ label: metric.label, points: sorted.map(([id, y]) => ({ x: accountName(world, id), y })) }],
       legend: buildHeatmapLegend(rankedValues, metric.unit),
     };
@@ -96,7 +101,9 @@ export function computeChart(spec: ChartSpec, world: World): ChartResult {
   return {
     spec,
     meta: { label: metric.label, unit: metric.unit },
-    provenance: computeMetric(spec.metric, world, spec.filters, spec.timeRange).provenance,
+    provenance: metricResult.provenance,
+    state: metricResult.state,
+    reason: metricResult.reason,
     grid: { rows: accountIds.map((id) => accountName(world, id)), cols, values, qtdCols },
     legend,
   };

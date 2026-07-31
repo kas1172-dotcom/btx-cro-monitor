@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createHubSpotTask, importProspectsToHubSpot } from "../../app/backendApi.ts";
+import { createCrmSubmissionLock, crmWriteBlockReason, type CrmEntityIdentity } from "../../app/crmWriteSafety.ts";
 import type { Company, Contact } from "../../engine/brain/entities.ts";
 
 type Mode = "closed" | "company_form" | "company_preview" | "task_form" | "task_preview";
@@ -12,6 +13,7 @@ interface CrmWriteActionsProps {
   defaultTaskBody?: string;
   environment?: "sandbox" | "developer" | "production" | "none";
   writeConnected?: boolean;
+  currentRouteEntityId?: string | null;
 }
 
 function keyPart(value: string): string {
@@ -31,8 +33,13 @@ export function CrmWriteActions({
   defaultTaskBody,
   environment = "none",
   writeConnected = false,
+  currentRouteEntityId = null,
 }: CrmWriteActionsProps) {
+  const entityIdRef = useRef(company.id);
+  const submissionLockRef = useRef(createCrmSubmissionLock());
   const [mode, setMode] = useState<Mode>("closed");
+  const [formEntityId, setFormEntityId] = useState(company.id);
+  const [previewEntityId, setPreviewEntityId] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState(company.name);
   const [domain, setDomain] = useState(company.domains?.[0] ?? company.website_url?.replace(/^https?:\/\//, "").replace(/\/$/u, "") ?? "");
   const [city, setCity] = useState(company.location.city ?? "");
@@ -45,18 +52,62 @@ export function CrmWriteActions({
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState("normal");
   const [result, setResult] = useState<string>("");
+  const [resultDetails, setResultDetails] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [hubspotCompanyId, setHubspotCompanyId] = useState(company.hubspot_company_id ?? "");
 
+  useEffect(() => {
+    entityIdRef.current = company.id;
+    submissionLockRef.current = createCrmSubmissionLock();
+    setMode("closed");
+    setFormEntityId(company.id);
+    setPreviewEntityId(null);
+    setCompanyName(company.name);
+    setDomain(company.domains?.[0] ?? company.website_url?.replace(/^https?:\/\//, "").replace(/\/$/u, "") ?? "");
+    setCity(company.location.city ?? "");
+    setRegion(company.location.state ?? "");
+    setRelationship(company.relationship === "customer" ? "customer" : "prospect");
+    setProgram(company.known_programs?.[0] ?? "");
+    setNotes("");
+    setTaskSubject(defaultTaskSubject ?? `Follow up with ${company.name}`);
+    setTaskBody(defaultTaskBody ?? `Review next step for ${company.name}.`);
+    setDueDate("");
+    setPriority("normal");
+    setResult("");
+    setResultDetails(null);
+    setError("");
+    setBusy(false);
+    setHubspotCompanyId(company.hubspot_company_id ?? "");
+  }, [company.id, company.name, company.domains, company.website_url, company.location.city, company.location.state, company.relationship, company.known_programs, company.hubspot_company_id, defaultTaskBody, defaultTaskSubject]);
+
   const companyKey = useMemo(() => `crm-company:${keyPart(companyName || company.id)}:${keyPart(domain || "no-domain")}`, [company.id, companyName, domain]);
   const taskKey = useMemo(() => `crm-task:${company.id}:${keyPart(taskSubject)}`, [company.id, taskSubject]);
-  const writesAllowed = writeConnected && (environment === "sandbox" || environment === "developer");
+  const identity: CrmEntityIdentity = {
+    formEntityId,
+    targetEntityId: company.id,
+    previewEntityId,
+    routeEntityId: currentRouteEntityId,
+  };
+  const writeBlockReason = crmWriteBlockReason(identity)
+    ?? (!writeConnected || (environment !== "sandbox" && environment !== "developer")
+      ? "Execution is disabled until the source registry confirms a sandbox or developer portal."
+      : null);
+  const writesAllowed = writeBlockReason === null;
 
   async function confirmCompany() {
+    if (!submissionLockRef.current.acquire()) return;
+    const blocked = crmWriteBlockReason(identity);
+    if (blocked || !writesAllowed) {
+      setError(blocked ?? "CRM execution is disabled.");
+      submissionLockRef.current.release();
+      return;
+    }
+    const submittedEntityId = company.id;
     setBusy(true);
     setError("");
     setResult("");
+    setResultDetails(null);
     try {
       const response = await importProspectsToHubSpot([
         {
@@ -74,17 +125,30 @@ export function CrmWriteActions({
       ], companyKey);
       const row = response.rows[0];
       if (!row || row.status === "failed" || !row.company_id) throw new Error(row?.reason ?? "HubSpot did not return a company id.");
-      setHubspotCompanyId(row.company_id);
-      setResult(`HubSpot company ${row.company_id} created or verified${row.company_record_url ? `: ${row.company_record_url}` : ""}.`);
-      setMode("closed");
+      if (entityIdRef.current === submittedEntityId) {
+        setHubspotCompanyId(row.company_id);
+        setResult("HubSpot company created or verified.");
+        setResultDetails({ company_id: row.company_id, company_record_url: row.company_record_url, idempotency_key: companyKey, target_entity_id: submittedEntityId });
+        setMode("closed");
+        setPreviewEntityId(null);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Company creation failed.");
+      if (entityIdRef.current === submittedEntityId) setError(err instanceof Error ? err.message : "Company creation failed.");
     } finally {
-      setBusy(false);
+      if (entityIdRef.current === submittedEntityId) setBusy(false);
+      submissionLockRef.current.release();
     }
   }
 
   async function confirmTask() {
+    if (!submissionLockRef.current.acquire()) return;
+    const blocked = crmWriteBlockReason(identity);
+    if (blocked || !writesAllowed) {
+      setError(blocked ?? "CRM execution is disabled.");
+      submissionLockRef.current.release();
+      return;
+    }
+    const submittedEntityId = company.id;
     setBusy(true);
     setError("");
     setResult("");
@@ -98,22 +162,34 @@ export function CrmWriteActions({
         contactId: contact?.id?.startsWith("hubspot-contact-") ? contact.id : undefined,
         idempotencyKey: taskKey,
       });
-      setResult(`HubSpot task ${response.id} ${response.duplicate ? "already existed" : "created or verified"}: ${response.record_url}`);
-      setMode("closed");
+      if (entityIdRef.current === submittedEntityId) {
+        setResult(response.duplicate ? "HubSpot task already existed; duplicate submission was safely ignored." : "HubSpot task created or verified.");
+        setResultDetails({ task_id: response.id, record_url: response.record_url, duplicate: response.duplicate, idempotency_key: taskKey, target_entity_id: submittedEntityId });
+        setMode("closed");
+        setPreviewEntityId(null);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Task creation failed.");
+      if (entityIdRef.current === submittedEntityId) setError(err instanceof Error ? err.message : "Task creation failed.");
     } finally {
-      setBusy(false);
+      if (entityIdRef.current === submittedEntityId) setBusy(false);
+      submissionLockRef.current.release();
     }
   }
 
   return (
     <div className="crm-write-actions">
       <div className="crm-write-buttons">
-        {variant !== "queue" && <button type="button" onClick={() => setMode("company_form")}>Add company to HubSpot</button>}
-        <button type="button" onClick={() => setMode("task_form")}>Create task in HubSpot</button>
+        {variant !== "queue" && <button type="button" onClick={() => setMode("company_form")}>Prepare HubSpot company</button>}
+        <button type="button" onClick={() => setMode("task_form")}>Prepare HubSpot task</button>
       </div>
-      {result && <p className="crm-write-result">{result}</p>}
+      {result && (
+        <div className="crm-write-result" role="status">
+          <p>{result}</p>
+          {typeof resultDetails?.record_url === "string" && <a href={resultDetails.record_url} target="_blank" rel="noreferrer">Open HubSpot record</a>}
+          {typeof resultDetails?.company_record_url === "string" && <a href={resultDetails.company_record_url} target="_blank" rel="noreferrer">Open HubSpot company</a>}
+          {resultDetails && <details><summary>Technical details</summary><pre>{JSON.stringify(resultDetails, null, 2)}</pre></details>}
+        </div>
+      )}
       {error && <p className="crm-write-error" role="alert">{error}</p>}
 
       {mode === "company_form" && (
@@ -125,7 +201,7 @@ export function CrmWriteActions({
           <label>Relationship<select value={relationship} onChange={(event) => setRelationship(event.target.value as "customer" | "prospect")}><option value="prospect">Prospect</option><option value="customer">Customer</option></select></label>
           <label>Program<input value={program} onChange={(event) => setProgram(event.target.value)} /></label>
           <label>Notes<textarea value={notes} onChange={(event) => setNotes(event.target.value)} /></label>
-          <div><button type="button" onClick={() => setMode("company_preview")}>Preview</button><button type="button" onClick={() => setMode("closed")}>Cancel</button></div>
+          <div><button type="button" onClick={() => { setPreviewEntityId(formEntityId); setMode("company_preview"); }}>Preview company record</button><button type="button" onClick={() => { setPreviewEntityId(null); setMode("closed"); }}>Cancel</button></div>
         </div>
       )}
 
@@ -136,10 +212,11 @@ export function CrmWriteActions({
           <p>{companyName || "Unnamed company"} · {domain || "no domain"} · {city}{state ? `, ${state}` : ""} · {relationship}</p>
           {program && <p>Program: {program}</p>}
           {notes && <p>Notes: {notes}</p>}
-          <p>Idempotency key: {companyKey}</p>
+          <p>Idempotency protection: enabled.</p>
           <p>Verification plan: retrieve the company by returned HubSpot ID and confirm its association fields.</p>
-          {!writesAllowed && <p role="alert">Execution is disabled until the source registry confirms a sandbox or developer portal.</p>}
-          <div><button type="button" disabled={busy || !writesAllowed} onClick={() => void confirmCompany()}>{busy ? "Creating..." : "Confirm create"}</button><button type="button" onClick={() => setMode("company_form")}>Back</button></div>
+          {!writesAllowed && <p role="alert">{writeBlockReason}</p>}
+          <details><summary>Technical details</summary><pre>{JSON.stringify({ idempotency_key: companyKey, form_entity_id: formEntityId, preview_entity_id: previewEntityId, target_entity_id: company.id, route_entity_id: currentRouteEntityId }, null, 2)}</pre></details>
+          <div><button type="button" disabled={busy || !writesAllowed} title={!writesAllowed ? writeBlockReason ?? "CRM writing is disabled." : undefined} onClick={() => void confirmCompany()}>{busy ? "Creating..." : "Create HubSpot company"}</button><button type="button" onClick={() => setMode("company_form")}>Back to edit</button></div>
         </div>
       )}
 
@@ -149,7 +226,7 @@ export function CrmWriteActions({
           <label>Notes<textarea value={taskBody} onChange={(event) => setTaskBody(event.target.value)} /></label>
           <label>Due date<input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} /></label>
           <label>Priority<select value={priority} onChange={(event) => setPriority(event.target.value)}><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></label>
-          <div><button type="button" onClick={() => setMode("task_preview")}>Preview</button><button type="button" onClick={() => setMode("closed")}>Cancel</button></div>
+          <div><button type="button" onClick={() => { setPreviewEntityId(formEntityId); setMode("task_preview"); }}>Preview task</button><button type="button" onClick={() => { setPreviewEntityId(null); setMode("closed"); }}>Cancel</button></div>
         </div>
       )}
 
@@ -161,10 +238,11 @@ export function CrmWriteActions({
           <p>{company.name}{contact ? ` · ${contact.name}` : ""}{dueDate ? ` · due ${dueDate}` : ""} · {priority}</p>
           <p>{hubspotCompanyId || company.hubspot_company_id ? "Associated to HubSpot company." : "No HubSpot company association yet. Add company first if this should attach to a company record."}</p>
           <p>{taskBody}</p>
-          <p>Idempotency key: {taskKey}</p>
+          <p>Idempotency protection: enabled.</p>
           <p>Verification plan: retrieve the task by returned HubSpot ID and confirm the target company association.</p>
-          {!writesAllowed && <p role="alert">Execution is disabled until the source registry confirms a sandbox or developer portal.</p>}
-          <div><button type="button" disabled={busy || !writesAllowed} onClick={() => void confirmTask()}>{busy ? "Creating..." : "Confirm create"}</button><button type="button" onClick={() => setMode("task_form")}>Back</button></div>
+          {!writesAllowed && <p role="alert">{writeBlockReason}</p>}
+          <details><summary>Technical details</summary><pre>{JSON.stringify({ idempotency_key: taskKey, form_entity_id: formEntityId, preview_entity_id: previewEntityId, target_entity_id: company.id, route_entity_id: currentRouteEntityId, hubspot_company_id: hubspotCompanyId || company.hubspot_company_id }, null, 2)}</pre></details>
+          <div><button type="button" disabled={busy || !writesAllowed} title={!writesAllowed ? writeBlockReason ?? "CRM writing is disabled." : undefined} onClick={() => void confirmTask()}>{busy ? "Creating..." : "Create HubSpot task"}</button><button type="button" onClick={() => setMode("task_form")}>Back to edit</button></div>
         </div>
       )}
     </div>

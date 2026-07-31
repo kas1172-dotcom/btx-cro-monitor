@@ -1,6 +1,7 @@
 import type { ZodSchema } from "zod";
 import type { World } from "../app/useWorld.ts";
 import type { Deliverable, DeliverableSection, ProvenanceEntry, ValidationResult } from "../deliverables/types.ts";
+import type { MetricResult } from "../metrics/types.ts";
 
 export type DeliverableAudience = "prospect" | "internal" | "board";
 export type DeliverableForm = "email" | "memo" | "brief" | "deck" | "itinerary" | "view" | "one_pager";
@@ -9,6 +10,7 @@ export interface AgentContext {
   facts: Record<string, string | number | boolean | null>;
   entityIds: string[];
   sources: ProvenanceEntry[];
+  metricStates?: Record<string, MetricResult>;
 }
 
 export interface SectionSpec {

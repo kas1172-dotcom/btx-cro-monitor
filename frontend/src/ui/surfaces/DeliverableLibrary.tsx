@@ -7,9 +7,9 @@ import {
   recordToDeliverable,
 } from "../../app/deliverablesApi.ts";
 import type { Deliverable, DeliverableType } from "../../deliverables/types.ts";
-import type { ChartSpec } from "../../metrics/types.ts";
 import { useMemory } from "../../memory/localMemory.ts";
-import { openDeliverableWizard, setState } from "../../store/store.ts";
+import { openDeliverableWizard } from "../../store/store.ts";
+import { deliverablePath, figureInsertPath, navigateTo } from "../../app/router.ts";
 import { EmptyState, ListRow, SurfaceHeader } from "../primitives.tsx";
 
 export interface LibraryItem {
@@ -29,13 +29,6 @@ const typeLabels: Record<DeliverableType, string> = {
   outreach: "Outreach",
   sales_pitch: "Sales pitch",
   capabilities_assessment: "Capabilities assessment",
-};
-
-const DEFAULT_FIGURE_SPEC: ChartSpec = {
-  metric: "revenue",
-  viz: "heatmap",
-  rows: "account",
-  cols: "quarter",
 };
 
 function labelType(type: DeliverableType): string {
@@ -123,7 +116,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
   return (
     <section className="surface-page deliverable-library" data-surface-component="surface-deliverable-library">
       <SurfaceHeader
-        eyebrow="Deliverables"
+        eyebrow="Library"
         headline="Deliverables"
         subline="Browse saved briefs, decks, memos, and analysis views; open one to edit, download, or create CRM follow-up."
       />
@@ -155,13 +148,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
           New deliverable
         </button>
         <button
-          onClick={() => setState({
-            activeAnalysisSpec: DEFAULT_FIGURE_SPEC,
-            activeTab: "analysis",
-            activeDeliverable: null,
-            activeCompanyId: null,
-            brainResponse: null,
-          })}
+          onClick={() => navigateTo(figureInsertPath())}
         >
           Insert figure
         </button>
@@ -175,14 +162,7 @@ export function DeliverableLibrary({ world }: { world: World }) {
           <button
             key={`${item.source}-${item.deliverable.backendRecordId ?? item.deliverable.id}`}
             className="deliverable-library-card"
-            onClick={() => setState({
-              activeDeliverable: item.deliverable,
-              activeDeliverableOrigin: "library",
-              activeTab: "deliverables",
-              brainResponse: null,
-              activeAnalysisSpec: null,
-              activeCompanyId: null,
-            })}
+            onClick={() => navigateTo(deliverablePath(item.deliverable.backendRecordId ?? item.deliverable.id))}
           >
             <ListRow
               name={item.deliverable.title}

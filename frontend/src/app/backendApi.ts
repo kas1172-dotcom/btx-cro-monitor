@@ -1,3 +1,5 @@
+import { assertCrmWriteAllowed } from "./crmWriteSafety.ts";
+
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 
@@ -5,11 +7,36 @@ export const BACKEND_ENDPOINT = env?.VITE_BACKEND_ENDPOINT ?? processEnv?.VITE_B
 
 /** Minimal shape of the global Clerk singleton once ClerkProvider has mounted. */
 interface ClerkGlobal {
+  loaded?: boolean;
   session?: { getToken(): Promise<string | null> } | null;
 }
 
+const CLERK_READY_TIMEOUT_MS = 2_500;
+const CLERK_READY_POLL_MS = 50;
+
+function hasConfiguredClerk(): boolean {
+  const key = env?.VITE_CLERK_PUBLISHABLE_KEY ?? processEnv?.VITE_CLERK_PUBLISHABLE_KEY ?? "";
+  return key.startsWith("pk_test_") || key.startsWith("pk_live_");
+}
+
+function clerkGlobal(): ClerkGlobal | undefined {
+  return (globalThis as { Clerk?: ClerkGlobal }).Clerk;
+}
+
+async function waitForClerkSession(timeoutMs = CLERK_READY_TIMEOUT_MS): Promise<ClerkGlobal | null> {
+  if (!hasConfiguredClerk()) return null;
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const clerk = clerkGlobal();
+    if (clerk?.session) return clerk;
+    if (clerk?.loaded && clerk.session === null) return clerk;
+    await new Promise((resolve) => globalThis.setTimeout(resolve, CLERK_READY_POLL_MS));
+  }
+  return clerkGlobal() ?? null;
+}
+
 async function clerkSessionToken(): Promise<string | null> {
-  const clerk = (globalThis as { Clerk?: ClerkGlobal }).Clerk;
+  const clerk = await waitForClerkSession();
   if (!clerk?.session) return null;
   try {
     return await clerk.session.getToken();
@@ -35,6 +62,21 @@ export async function backendJson<T>(path: string, init: RequestInit = {}): Prom
     throw new Error(`Backend ${path} failed (${response.status}): ${body}`);
   }
   return response.json() as Promise<T>;
+}
+
+export function warmBackendHealth(): void {
+  if (!BACKEND_ENDPOINT || typeof fetch === "undefined") return;
+  const url = `${BACKEND_ENDPOINT.replace(/\/$/, "")}/health`;
+  void fetch(url, {
+    method: "GET",
+    cache: "no-store",
+    credentials: "omit",
+    keepalive: true,
+    headers: { accept: "application/json" },
+  }).catch(() => {
+    // Best-effort cold-start wake-up only; render and authenticated requests own
+    // their separate error states.
+  });
 }
 
 export interface IndustryMonitorSource {
@@ -118,7 +160,7 @@ export function getIndustryMonitor(): Promise<IndustryMonitorResponse> {
 
 export function reviewIndustryUpdate(
   id: string,
-  action: "mark_reviewed" | "dismiss" | "needs_account_match",
+  action: "mark_reviewed" | "dismiss" | "needs_account_match" | "restore_previous",
   reason?: string,
 ): Promise<{ id: string; reviewStatus: IndustryUpdateRecord["reviewStatus"] }> {
   return backendJson(`/industry-monitor/updates/${encodeURIComponent(id)}`, {
@@ -184,6 +226,7 @@ export async function createHubSpotList(input: {
   listType: "company" | "contact";
   idempotencyKey?: string;
 }): Promise<HubSpotListCreateResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotListCreateResponse>("/crm/lists", {
     method: "POST",
     headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
@@ -197,6 +240,7 @@ export async function addRecordsToHubSpotList(input: {
   recordIds: string[];
   idempotencyKey?: string;
 }): Promise<HubSpotListMembershipResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotListMembershipResponse>(`/crm/lists/${encodeURIComponent(input.listId)}/records`, {
     method: "PUT",
     headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,
@@ -228,6 +272,7 @@ export interface HubSpotImportResponse {
 }
 
 export async function importProspectsToHubSpot(rows: HubSpotImportRowInput[], idempotencyKey?: string): Promise<HubSpotImportResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotImportResponse>("/crm/import/prospects", {
     method: "POST",
     headers: idempotencyKey ? { "X-Idempotency-Key": idempotencyKey } : undefined,
@@ -255,6 +300,7 @@ export async function createHubSpotTask(input: {
   dealId?: string | null;
   idempotencyKey?: string;
 }): Promise<HubSpotTaskResponse> {
+  assertCrmWriteAllowed();
   return backendJson<HubSpotTaskResponse>("/crm/task", {
     method: "POST",
     headers: input.idempotencyKey ? { "X-Idempotency-Key": input.idempotencyKey } : undefined,

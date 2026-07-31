@@ -21,6 +21,7 @@ import { DemoActionButton } from "../actions/DemoActionButton.tsx";
 import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
+import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { setState } from "../../store/store.ts";
 
 function fitLabel(score: number): string {
@@ -67,7 +68,8 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
           : { accountId: activeCompany.id };
       const deliverable = await runAgent(agentId, inputs, world);
       saveDeliverable(deliverable);
-      setState({ activeDeliverable: deliverable, activeCompanyId: null, activeTab: deliverable.brainArea, brainResponse: null, activeAnalysisSpec: null });
+      setState({ activeCompanyId: null, brainResponse: null });
+      navigateTo(deliverablePath(deliverable.backendRecordId ?? deliverable.id));
     } finally {
       setBusyDeliverable(null);
     }
@@ -94,10 +96,10 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
       <section className="dossier-actions">
         <h4>Create deliverable</h4>
         <div className="dossier-action-row">
-          <button onClick={() => void createDeliverable("meeting_brief")} disabled={busyDeliverable !== null}>{busyDeliverable === "meeting_brief" ? "Creating..." : "Meeting brief"}</button>
-          <button onClick={() => void createDeliverable("outreach")} disabled={busyDeliverable !== null}>{busyDeliverable === "outreach" ? "Creating..." : "Outreach"}</button>
-          <button onClick={() => void createDeliverable("sales_pitch")} disabled={busyDeliverable !== null}>{busyDeliverable === "sales_pitch" ? "Creating..." : "Sales pitch"}</button>
-          <button onClick={() => void createDeliverable("capabilities_assessment")} disabled={busyDeliverable !== null}>{busyDeliverable === "capabilities_assessment" ? "Creating..." : "Capabilities assessment"}</button>
+          <button title={busyDeliverable !== null ? "Another deliverable is still being created." : undefined} onClick={() => void createDeliverable("meeting_brief")} disabled={busyDeliverable !== null}>{busyDeliverable === "meeting_brief" ? "Creating..." : "Create meeting brief"}</button>
+          <button title={busyDeliverable !== null ? "Another deliverable is still being created." : undefined} onClick={() => void createDeliverable("outreach")} disabled={busyDeliverable !== null}>{busyDeliverable === "outreach" ? "Creating..." : "Create outreach draft"}</button>
+          <button title={busyDeliverable !== null ? "Another deliverable is still being created." : undefined} onClick={() => void createDeliverable("sales_pitch")} disabled={busyDeliverable !== null}>{busyDeliverable === "sales_pitch" ? "Creating..." : "Create sales pitch"}</button>
+          <button title={busyDeliverable !== null ? "Another deliverable is still being created." : undefined} onClick={() => void createDeliverable("capabilities_assessment")} disabled={busyDeliverable !== null}>{busyDeliverable === "capabilities_assessment" ? "Creating..." : "Create capabilities assessment"}</button>
         </div>
       </section>
 
@@ -112,7 +114,7 @@ export function Dossier({ world, companyId }: { world: World; companyId: string 
             prompt={nextActionPrompt(company.name, `Dossier recommendation: ${actionLabel(rec.action)}. Reason: ${rec.reason}.`)}
           />
           <DemoActionButton
-            label="Create CRM Task"
+            label="Create CRM task"
             action={{
               action: "crm_task",
               title: "Create CRM Task",

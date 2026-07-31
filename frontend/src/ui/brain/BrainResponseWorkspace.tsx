@@ -52,7 +52,7 @@ export function BrainResponseWorkspace({ response, world }: { response: BrainRes
       </section>
       {response.focusView === "map" && (
         <div className="brain-map-wrap">
-          <Suspense fallback={<div className="loading">loading map…</div>}>
+          <Suspense fallback={<div className="surface-skeleton surface-skeleton-map" role="status" aria-label="Preparing embedded map"><div className="surface-skeleton-head"><span /><strong /></div><div className="surface-skeleton-grid" aria-hidden="true"><span /><span /><span /></div></div>}>
             <ProspectMap world={world} />
           </Suspense>
         </div>

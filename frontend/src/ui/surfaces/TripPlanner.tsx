@@ -5,6 +5,7 @@ import { runAgent } from "../../agents/runAgent.ts";
 import type { Deliverable } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { setState } from "../../store/store.ts";
+import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { TripInputForm, type TripFormValues } from "../trips/TripInputForm.tsx";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { formatAddress } from "../../app/format.ts";
@@ -68,7 +69,7 @@ export function TripPlanner({ world }: { world: World }) {
     <section className="surface-page trip-planner-surface" data-surface-component="surface-trip-planner">
       <SurfaceHeader
         eyebrow="Trip planner"
-        headline="Build a field itinerary from geography, priority, and validated account context."
+        headline="Build a field itinerary from geography, priority, and validated account context"
         subline="Generate a candidate route, inspect the stops, then open the itinerary as a saved deliverable with calendar export."
       />
 
@@ -86,7 +87,7 @@ export function TripPlanner({ world }: { world: World }) {
               <h2>Market map</h2>
               <span>{stops.length} itinerary stops</span>
             </div>
-            <Suspense fallback={<div className="loading">loading map...</div>}>
+            <Suspense fallback={<div className="surface-skeleton surface-skeleton-map" role="status" aria-label="Preparing itinerary map"><div className="surface-skeleton-head"><span /><strong /></div><div className="surface-skeleton-grid" aria-hidden="true"><span /><span /><span /></div></div>}>
               <ProspectMap world={world} />
             </Suspense>
           </section>
@@ -96,14 +97,10 @@ export function TripPlanner({ world }: { world: World }) {
               <h2>Itinerary stops</h2>
               <button
                 type="button"
-                onClick={() => setState({
-                  activeDeliverable: itinerary,
-                  activeDeliverableOrigin: "generation",
-                  activeTab: "deliverables",
-                  activeCompanyId: null,
-                  brainResponse: null,
-                  activeAnalysisSpec: null,
-                })}
+                onClick={() => {
+                  setState({ activeCompanyId: null, brainResponse: null });
+                  navigateTo(deliverablePath(itinerary.backendRecordId ?? itinerary.id));
+                }}
               >
                 Open itinerary
               </button>

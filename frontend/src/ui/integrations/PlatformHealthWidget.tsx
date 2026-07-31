@@ -78,9 +78,9 @@ export function PlatformHealthWidget() {
 
   if (state.kind === "loading") {
     return (
-      <div className="platform-health-widget">
+      <div className="platform-health-widget" role="status" aria-label="Checking platform health">
         <p className="eyebrow">Platform health</p>
-        <p className="muted">Checking backend, monitor freshness, and integrations…</p>
+        <div className="health-skeleton" aria-hidden="true"><span /><span /></div>
       </div>
     );
   }

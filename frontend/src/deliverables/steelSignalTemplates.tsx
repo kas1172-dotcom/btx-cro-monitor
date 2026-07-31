@@ -117,9 +117,9 @@ export function MonthlyNewsletterTemplate({ deliverable, world }: { deliverable:
       number: `0${index + 1}`,
       title: signal ? newsletterTitle(signal, fallback.title) : fallback.title,
       tell: signal ? newsletterTell(signal, fallback.tell) : fallback.tell,
-      show: index === 0 ? "$2.4B" : index === 1 ? "2 programs" : "+8%",
-      showSub: index === 0 ? "award value, multi-year" : index === 1 ? "seeking re-shore capacity" : "YoY in relevant lines",
-      soWhat: signal?.scope === "specific_account" ? "Account-linked evidence is ready for a work-item follow-up." : marketSoWhat(index),
+      show: signal?.value ? `$${(signal.value / 1_000_000).toFixed(1)}M` : "Not available",
+      showSub: signal?.value ? "Sourced public value" : "No sourced numeric value",
+      soWhat: signal ? (signal.scope === "specific_account" ? "Account-linked evidence is ready for a work-item follow-up." : marketSoWhat(index)) : "No conclusion available until a source record is attached.",
     };
   });
   return (
@@ -150,8 +150,8 @@ export function RetentionEarningsHeatmap({ world }: { world: World }) {
         <thead><tr><th>Account</th>{quarters.map((q) => <th key={q}>{q}</th>)}<th>Status</th></tr></thead>
         <tbody>{companies.map((company, rowIndex) => <tr key={company.id}><th>{company.name}</th>{quarters.map((quarter, colIndex) => {
           const value = heatValue(world, company, rowIndex, colIndex);
-          return <td key={quarter} style={{ background: heatColor(value) }}>${value}K</td>;
-        })}<td><span className={`ss-status-dot ${retentionStatus(rowIndex).toLowerCase().replace(/\s+/g, "-")}`} />{retentionStatus(rowIndex)}</td></tr>)}</tbody>
+          return <td key={quarter} style={{ background: value === null ? steelSignal.colors.bg : heatColor(value) }}>{value === null ? "Not available" : `$${value}K`}</td>;
+        })}<td><span className="ss-status-dot" />Not available</td></tr>)}</tbody>
       </table>
     </Figure>
   );
@@ -286,7 +286,7 @@ function coreCapabilities(): Array<[string, string]> {
 
 function fitPercent(deliverable: Deliverable): string {
   const text = deliverableText(deliverable);
-  return text.match(/\b(\d{2,3})%\b/)?.[0] ?? "91%";
+  return text.match(/\b(\d{2,3})%\b/)?.[0] ?? "Not available";
 }
 
 function normalizeStoryKey(value: string): string {
@@ -294,14 +294,14 @@ function normalizeStoryKey(value: string): string {
 }
 
 const newsletterFallbacks: Array<{ title: string; tell: string }> = [
-  { title: "F-35 sustainment demand rises", tell: "Public award activity points to growing build-to-print spares demand through FY27." },
-  { title: "Structures schedule pressure opens a capacity lane", tell: "A tier-one supplier signal suggests domestic machining capacity may matter this month." },
-  { title: "Budget lines lift precision-component demand", tell: "Defense funding requests show a market-level tailwind for precision aerospace components." },
+  { title: "Story unavailable", tell: "No sourced market record is attached to this section." },
+  { title: "Story unavailable", tell: "No sourced market record is attached to this section." },
+  { title: "Story unavailable", tell: "No sourced market record is attached to this section." },
 ];
 
-function heatValue(world: World, company: Company, rowIndex: number, colIndex: number): number {
-  const base = world.opportunities.filter((opp) => opp.company_id === company.id).reduce((sum, opp) => sum + (opp.value ?? 0), 0) / 1000;
-  return Math.round((base || 120 + rowIndex * 85) * (0.72 + colIndex * 0.09));
+function heatValue(world: World, company: Company, _rowIndex: number, _colIndex: number): number | null {
+  const values = world.opportunities.filter((opp) => opp.company_id === company.id && opp.value !== null).map((opp) => opp.value as number);
+  return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / 1000) : null;
 }
 
 function heatColor(value: number): string {
@@ -309,10 +309,6 @@ function heatColor(value: number): string {
   if (value > 550) return steelSignal.colors.teal;
   if (value > 250) return steelSignal.colors.provenanceBorder;
   return steelSignal.colors.bg;
-}
-
-function retentionStatus(index: number): string {
-  return ["Growing", "Stable", "Stable", "Growing", "At risk", "Stable", "Soft", "Churned"][index] ?? "Stable";
 }
 
 function escapeHtml(value: string): string {

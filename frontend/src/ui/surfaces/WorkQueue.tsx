@@ -18,11 +18,13 @@ import {
 } from "../../app/workItems.ts";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
-import { plainActionLabel, plainWorkStatus, primaryWorkAction } from "../../app/presentation.ts";
+import { plainActionLabel, plainApprovalState, plainExecutionState, plainWorkStatus, plainWorkType, primaryWorkAction } from "../../app/presentation.ts";
 import { buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 import { buildWorkTimeline } from "../../app/timeline.ts";
 import { MeaningfulTimeline } from "../timeline/MeaningfulTimeline.tsx";
+import { canonicalMetrics, formatCanonicalMetric } from "../../app/canonicalMetrics.ts";
+import { formatDateTime } from "../../app/format.ts";
 
 const STATUSES: Array<WorkItemStatus | "all"> = [
   "all",
@@ -90,6 +92,29 @@ function nextActionLabel(action: WorkItemTransitionAction): string {
   return plainActionLabel(action);
 }
 
+type BusyAction = WorkItemTransitionAction | "metadata" | "note" | "hubspot_preview" | "hubspot_execute";
+
+function actionProgressLabel(action: BusyAction): string {
+  if (action === "dismiss") return "Dismissing...";
+  if (action === "reject") return "Returning...";
+  if (action === "record_outcome") return "Recording...";
+  if (action === "close") return "Closing...";
+  if (action === "note") return "Adding...";
+  if (action === "hubspot_preview") return "Previewing...";
+  if (action === "hubspot_execute") return "Executing...";
+  return "Saving...";
+}
+
+function preActivationReason(action: WorkItemTransitionAction): string | null {
+  if (action === "dismiss" || action === "reject") return "A reason is required before this action runs.";
+  if (action === "record_outcome") return "An outcome summary is required before this action runs.";
+  return null;
+}
+
+function needsConfirmation(action: WorkItemTransitionAction): boolean {
+  return action === "dismiss" || action === "reject" || action === "record_outcome" || action === "close";
+}
+
 function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
   const route = useAppRoute();
   const [draft, setDraft] = useState({
@@ -103,6 +128,11 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
   const [note, setNote] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [busyAction, setBusyAction] = useState<BusyAction | null>(null);
+  const [pendingAction, setPendingAction] = useState<WorkItemTransitionAction | null>(null);
+  const [pendingReason, setPendingReason] = useState("");
+  const [pendingOutcome, setPendingOutcome] = useState("");
+  const [undoAction, setUndoAction] = useState<{ item: WorkItem; label: string } | null>(null);
   const [preview, setPreview] = useState<HubSpotTaskPreview | null>(null);
   const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -124,26 +154,76 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
     setEvidence(next);
   }
 
-  async function run(action: WorkItemTransitionAction) {
+  async function run(action: WorkItemTransitionAction, details: { reason?: string; outcome?: string } = {}) {
+    if (busyAction) return;
     setError(null);
-    const reason = action === "dismiss" || action === "reject" ? window.prompt("Reason required") : undefined;
-    if ((action === "dismiss" || action === "reject") && !reason?.trim()) return;
-    const outcome = action === "record_outcome" ? window.prompt("Outcome") : undefined;
-    if (action === "record_outcome" && !outcome?.trim()) return;
+    setMessage(null);
+    setBusyAction(action);
     try {
-      await transitionWorkItem(item, action, { reason: reason ?? undefined, outcome: outcome ?? undefined });
+      const updated = await transitionWorkItem(item, action, { reason: details.reason?.trim() || undefined, outcome: details.outcome?.trim() || undefined });
       setMessage(`${nextActionLabel(action)} saved.`);
+      setPendingAction(null);
+      setPendingReason("");
+      setPendingOutcome("");
+      setUndoAction(action === "dismiss" || action === "close" ? { item: updated, label: action === "dismiss" ? "Undo dismiss" : "Undo close" } : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not update work item.");
+    } finally {
+      setBusyAction(null);
     }
   }
+
+  function requestAction(action: WorkItemTransitionAction) {
+    setError(null);
+    if (needsConfirmation(action)) {
+      setPendingAction(action);
+      setPendingReason("");
+      setPendingOutcome("");
+      return;
+    }
+    void run(action);
+  }
+
+  async function undoLastAction() {
+    if (!undoAction || busyAction) return;
+    setBusyAction("reopen");
+    setError(null);
+    try {
+      await transitionWorkItem(undoAction.item, "reopen");
+      setMessage(`${undoAction.label} saved.`);
+      setUndoAction(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not undo the last action.");
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  function actionButton(action: WorkItemTransitionAction) {
+    return (
+      <button
+        key={action}
+        type="button"
+        disabled={Boolean(busyAction)}
+        title={busyAction ? "Another action is still pending." : preActivationReason(action) ?? undefined}
+        onClick={() => requestAction(action)}
+      >
+        {busyAction === action ? actionProgressLabel(action) : nextActionLabel(action)}
+      </button>
+    );
+  }
+
+  const pendingActionReady = pendingAction
+    ? ((pendingAction !== "dismiss" && pendingAction !== "reject") || pendingReason.trim().length > 0)
+      && (pendingAction !== "record_outcome" || pendingOutcome.trim().length > 0)
+    : false;
 
   return (
     <section className={isFocus ? "surface-panel work-detail record-focus-mode" : "surface-panel work-detail"} aria-labelledby="work-detail-title">
       <div className="panel-head">
         <div>
           <h2 id="work-detail-title">{item.recommended_action}</h2>
-          <span>{titleCase(item.type)} · {account}</span>
+          <span>{plainWorkType(item.type)} · {account}</span>
         </div>
         <div className="panel-action-group">
           <button type="button" onClick={() => navigateTo(pathWithFocus(!isFocus))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
@@ -163,10 +243,35 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
           <strong>{primary ? plainActionLabel(primary) : "Review current state"}</strong>
           <em>{item.due_date ? `Due ${new Date(item.due_date).toLocaleDateString()}` : "No due date"}</em>
         </div>
-        {primary && <button type="button" onClick={() => void run(primary)}>{plainActionLabel(primary)}</button>}
+        {primary && actionButton(primary)}
       </div>
-      {message && <div className="live-inline-status" role="status">{message}</div>}
+      {message && (
+        <div className="live-inline-status" role="status">
+          {message}
+          {undoAction && <button type="button" disabled={Boolean(busyAction)} onClick={() => void undoLastAction()}>{busyAction === "reopen" ? "Undoing..." : undoAction.label}</button>}
+        </div>
+      )}
       {error && <div className="live-inline-status error" role="alert">{error}</div>}
+      {pendingAction && (
+        <div className="work-preview" role="dialog" aria-label={`${plainActionLabel(pendingAction)} confirmation`}>
+          <strong>{plainActionLabel(pendingAction)}</strong>
+          <p>This action changes the work item after confirmation. Use Cancel to leave it unchanged; Back to queue returns to the work list.</p>
+          {(pendingAction === "dismiss" || pendingAction === "reject") && (
+            <label>Reason required<textarea value={pendingReason} placeholder="Explain why this item should not continue in its current state." onChange={(event) => setPendingReason(event.target.value)} /></label>
+          )}
+          {pendingAction === "record_outcome" && (
+            <label>Outcome required<textarea value={pendingOutcome} placeholder="Summarize what happened and how it was verified." onChange={(event) => setPendingOutcome(event.target.value)} /></label>
+          )}
+          {pendingAction === "close" && <p>Close only when no further owner action is expected. You can undo immediately from the success message if this was accidental.</p>}
+          <div>
+            <button type="button" disabled={!pendingActionReady || Boolean(busyAction)} onClick={() => void run(pendingAction, { reason: pendingReason, outcome: pendingOutcome })}>
+              {busyAction === pendingAction ? actionProgressLabel(pendingAction) : plainActionLabel(pendingAction)}
+            </button>
+            <button type="button" disabled={Boolean(busyAction)} onClick={() => setPendingAction(null)}>Cancel</button>
+          </div>
+          {!pendingActionReady && <p className="muted">{preActivationReason(pendingAction) ?? "Confirm before this action runs."}</p>}
+        </div>
+      )}
       <div className="work-detail-grid">
         <label>Owner<input value={draft.owner} placeholder="Unassigned" onChange={(event) => setDraft({ ...draft, owner: event.target.value })} /></label>
         <label>Priority<select value={draft.priority} onChange={(event) => setDraft({ ...draft, priority: event.target.value as WorkItemPriority })}>{PRIORITIES.filter((value) => value !== "all").map((value) => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
@@ -177,8 +282,11 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
       <label className="work-detail-field">Description<textarea value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
       <button
         type="button"
+        disabled={Boolean(busyAction)}
         onClick={() => {
+          if (busyAction) return;
           setError(null);
+          setBusyAction("metadata");
           void updateWorkItemMetadata(item, {
             owner: draft.owner.trim() || null,
             priority: draft.priority,
@@ -186,27 +294,38 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
             follow_up_date: draft.follow_up_date || null,
             recommended_action: draft.recommended_action,
             description: draft.description || null,
-          }).then(() => setMessage("Metadata saved.")).catch((err) => setError(err instanceof Error ? err.message : "Could not save metadata."));
+          }).then(() => setMessage("Assignment and schedule saved.")).catch((err) => setError(err instanceof Error ? err.message : "Could not save assignment and schedule.")).finally(() => setBusyAction(null));
         }}
       >
-        Save assignment and schedule
+        {busyAction === "metadata" ? "Saving..." : "Save assignment and schedule"}
       </button>
       <div className="work-state-strip">
         <span>Status: {plainWorkStatus(item.status)}</span>
-        <span>Approval: {titleCase(item.approval_state)}</span>
-        <span>Execution: {titleCase(item.execution_state)}</span>
-        <span>Updated: {new Date(item.updated_at).toLocaleString()}</span>
+        <span>Approval: {plainApprovalState(item.approval_state)}</span>
+        <span>Execution: {plainExecutionState(item.execution_state)}</span>
+        <span>Updated: {formatDateTime(item.updated_at)}</span>
       </div>
+      <details className="work-diagnostics">
+        <summary>Technical details</summary>
+        <pre>{JSON.stringify({
+          work_item_id: item.id,
+          status: item.status,
+          approval_state: item.approval_state,
+          execution_state: item.execution_state,
+          external_system: item.external_system,
+          external_record_id: item.external_record_id,
+          execution_idempotency_key: item.execution_idempotency_key,
+          allowed_actions: item.allowed_actions,
+        }, null, 2)}</pre>
+      </details>
       <div className="surface-toolbar">
-        {item.allowed_actions.filter((action) => action !== primary).map((action) => (
-          <button key={action} type="button" onClick={() => void run(action)}>{nextActionLabel(action)}</button>
-        ))}
+        {item.allowed_actions.filter((action) => action !== primary).map((action) => actionButton(action))}
         {item.allowed_actions.filter((action) => action !== primary).length === 0 && <span>No additional permitted actions for your role or this state.</span>}
       </div>
       <div className="surface-toolbar">
-        <button type="button" onClick={() => void previewHubSpotTask({ item, confirmed: false }).then(setPreview).catch((err) => setError(err instanceof Error ? err.message : "Could not preview HubSpot task."))}>Preview HubSpot task</button>
+        <button type="button" disabled={Boolean(busyAction)} onClick={() => { if (busyAction) return; setBusyAction("hubspot_preview"); void previewHubSpotTask({ item, confirmed: false }).then(setPreview).catch((err) => setError(err instanceof Error ? err.message : "Could not preview HubSpot task.")).finally(() => setBusyAction(null)); }}>{busyAction === "hubspot_preview" ? "Previewing..." : "Preview HubSpot task"}</button>
         {preview?.can_execute && (
-          <button type="button" onClick={() => void executeHubSpotTask({ item, confirmed: true, accountName: account }).then(() => setMessage("HubSpot task executed and verified.")).catch((err) => setError(err instanceof Error ? err.message : "HubSpot execution failed."))}>Execute approved task</button>
+          <button type="button" disabled={Boolean(busyAction)} onClick={() => { if (busyAction) return; setBusyAction("hubspot_execute"); void executeHubSpotTask({ item, confirmed: true, accountName: account }).then(() => setMessage("HubSpot task executed and verified.")).catch((err) => setError(err instanceof Error ? err.message : "HubSpot execution failed.")).finally(() => setBusyAction(null)); }}>{busyAction === "hubspot_execute" ? "Executing..." : "Execute approved task"}</button>
         )}
         {item.external_record_url && <a className="accent-action" href={item.external_record_url} target="_blank" rel="noreferrer">Open in HubSpot</a>}
       </div>
@@ -219,10 +338,10 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
           <span>Owner: {preview.hubspot_task.owner_id ?? "Unassigned"}</span>
           <span>Due: {preview.hubspot_task.due_at}</span>
           <span>Approval: {titleCase(preview.approval.state)} · {preview.approval.policy}</span>
-          <span>Idempotency: {preview.idempotency.key} · {preview.idempotency.behavior}</span>
+          <span>Idempotency protection: enabled</span>
           <span>Verification: {preview.verification.method}</span>
           <pre>{preview.hubspot_task.body}</pre>
-          <details><summary>Full proposed payload</summary><pre>{JSON.stringify(preview.proposed_payload, null, 2)}</pre></details>
+          <details><summary>Technical payload and idempotency key</summary><pre>{JSON.stringify({ idempotency: preview.idempotency, proposed_payload: preview.proposed_payload }, null, 2)}</pre></details>
           <button type="button" onClick={() => setPreview(null)}>Close preview</button>
         </div>
       )}
@@ -242,15 +361,15 @@ function WorkItemDetail({ item, world }: { item: WorkItem; world: World }) {
       <section className="work-notes" aria-labelledby="work-notes-title">
         <h3 id="work-notes-title">Notes and findings</h3>
         <label>Add note<textarea aria-label="Add work note" placeholder="Add a note or finding" value={note} onChange={(event) => setNote(event.target.value)} /></label>
-        <button type="button" onClick={() => void addWorkItemNote(item, note).then(() => { setNote(""); setMessage("Note added."); }).catch((err) => setError(err instanceof Error ? err.message : "Could not add note."))}>Add note</button>
-        {item.notes.map((entry) => <p key={entry.id}><strong>{titleCase(entry.note_type)}</strong> {entry.body} <span>{new Date(entry.created_at).toLocaleString()}</span></p>)}
+        <button type="button" disabled={Boolean(busyAction) || !note.trim()} title={!note.trim() ? "Enter a note before adding it." : undefined} onClick={() => { if (busyAction || !note.trim()) return; setBusyAction("note"); void addWorkItemNote(item, note).then(() => { setNote(""); setMessage("Note added."); }).catch((err) => setError(err instanceof Error ? err.message : "Could not add note.")).finally(() => setBusyAction(null)); }}>{busyAction === "note" ? "Adding..." : "Add note"}</button>
+        {item.notes.map((entry) => <p key={entry.id}><strong>{titleCase(entry.note_type)}</strong> {entry.body} <span>{formatDateTime(entry.created_at)}</span></p>)}
       </section>
       <section className="work-audit" aria-labelledby="work-audit-title">
         <h3 id="work-audit-title">Audit history</h3>
         {item.audit_history.map((entry, index) => (
           <p key={`${String(entry.id ?? entry.timestamp)}-${index}`}>
             <strong>{titleCase(String(entry.event_type ?? entry.action ?? "event"))}</strong>
-            <span>{new Date(String(entry.timestamp)).toLocaleString()} · {String(entry.actor ?? "system")}</span>
+            <span>{formatDateTime(String(entry.timestamp))} · {String(entry.actor ?? "system")}</span>
           </p>
         ))}
       </section>
@@ -265,24 +384,28 @@ export function WorkQueue({ world, workItemId }: { world: World; workItemId?: st
   const state = useWorkItems(world, filters);
   const selected = workItemId ? state.items.find((item) => item.id === workItemId) : null;
   const owners = Array.from(new Set(state.items.map((item) => item.owner).filter(Boolean))).sort() as string[];
+  const metrics = canonicalMetrics(world);
+  const openMetric = formatCanonicalMetric(metrics.work_open);
+  const totalMetric = formatCanonicalMetric(metrics.work_total);
+  const reviewMetric = formatCanonicalMetric(metrics.work_review);
 
   return (
     <section className="surface-page" data-surface-component="surface-work-queue">
       <SurfaceHeader
         eyebrow="Work queue"
-        headline={state.error ? "Work queue unavailable" : `${state.items.length} work item${state.items.length === 1 ? "" : "s"}`}
-        subline="Assigned actions move through approval, execution, verification, outcome, and closure."
+        headline={state.error ? "Work queue unavailable" : `${state.items.length} filtered work item${state.items.length === 1 ? "" : "s"}`}
+        subline={`${openMetric.displayValue} ${openMetric.displayLabel.toLowerCase()} · ${totalMetric.displayValue} ${totalMetric.displayLabel.toLowerCase()} · ${reviewMetric.displayValue} ${reviewMetric.displayLabel.toLowerCase()} · ${totalMetric.provenanceLabel}`}
       />
       <WorkItemSourceNote source={state.source} error={state.error} />
       {state.error ? (
         <EmptyState headline="Work items could not be loaded" body="Retry after the data service recovers." icon="work_queue" />
       ) : workItemId ? (
-        selected ? <WorkItemDetail item={selected} world={world} /> : <EmptyState headline="Work item not found" body="This work item is not in the current tenant or no longer exists." icon="work_queue" />
+        selected ? <WorkItemDetail key={selected.id} item={selected} world={world} /> : <EmptyState headline="Work item not found" body="This work item is not in the current tenant or no longer exists." icon="work_queue" />
       ) : (
         <>
           <div className="work-filter-grid" aria-label="Work item filters">
-            <label>Status<select value={filters.status ?? "all"} onChange={(event) => updateFilter(filters, { status: event.target.value as WorkItemStatus | "all" })}>{STATUSES.map((value) => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
-            <label>Type<select value={filters.type ?? "all"} onChange={(event) => updateFilter(filters, { type: event.target.value as WorkItemType | "all" })}>{TYPES.map((value) => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
+            <label>Status<select value={filters.status ?? "all"} onChange={(event) => updateFilter(filters, { status: event.target.value as WorkItemStatus | "all" })}>{STATUSES.map((value) => <option key={value} value={value}>{value === "all" ? "All statuses" : plainWorkStatus(value)}</option>)}</select></label>
+            <label>Type<select value={filters.type ?? "all"} onChange={(event) => updateFilter(filters, { type: event.target.value as WorkItemType | "all" })}>{TYPES.map((value) => <option key={value} value={value}>{value === "all" ? "All types" : plainWorkType(value)}</option>)}</select></label>
             <label>Owner<select value={filters.owner ?? ""} onChange={(event) => updateFilter(filters, { owner: event.target.value })}><option value="">Any owner</option><option value="unassigned">Unassigned</option>{owners.map((owner) => <option key={owner} value={owner}>{owner}</option>)}</select></label>
             <label>Priority<select value={filters.priority ?? "all"} onChange={(event) => updateFilter(filters, { priority: event.target.value as WorkItemPriority | "all" })}>{PRIORITIES.map((value) => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
             <label>Sort<select value={filters.sort ?? "updated"} onChange={(event) => updateFilter(filters, { sort: event.target.value as WorkItemFilters["sort"] })}><option value="updated">Updated</option><option value="priority">Priority</option><option value="due_date">Due date</option><option value="account">Account</option></select></label>

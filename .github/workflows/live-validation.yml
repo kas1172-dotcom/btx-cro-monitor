@@ -1,0 +1,84 @@
+name: Live credentialed validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ask-live-current-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run live Ask current-news web-search proof
+        run: pytest tests/test_assistant_online.py::test_live_current_news_web_search_opt_in -q -rs
+        env:
+          BTX_LIVE_ASK_EVAL: "1"
+          BTX_ASK_ONLINE_ENABLED: "1"
+          BTX_ASK_WEB_SEARCH_ENABLED: "1"
+          BTX_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  disposable-mutation-harness:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pinned Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run disposable mutation control harness
+        run: npm run test:control-harness
+        env:
+          E2E_REQUIRE_MUTATION_TIER: "1"
+          E2E_MUTATION_TENANT: ${{ vars.E2E_MUTATION_TENANT }}
+          E2E_DISPOSABLE_TENANT_ID: ${{ vars.E2E_DISPOSABLE_TENANT_ID }}
+          E2E_HUBSPOT_TEST_PORTAL: ${{ vars.E2E_HUBSPOT_TEST_PORTAL }}
+          E2E_BACKEND_ENDPOINT: ${{ secrets.VITE_BACKEND_ENDPOINT }}
+          E2E_CLERK_LOGIN: "1"
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          E2E_CLERK_EMAIL: ${{ secrets.E2E_CLERK_EMAIL }}
+          E2E_CLERK_PASSWORD: ${{ secrets.E2E_CLERK_PASSWORD }}
+          E2E_CLERK_SESSION_TOKEN: ${{ secrets.E2E_CLERK_SESSION_TOKEN }}
+
+      - name: Upload control harness manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-control-harness
+          path: /tmp/btx-control-harness
+          retention-days: 14
+
+      - name: Upload E2E screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-e2e-screenshots
+          path: /tmp/btx-e2e-smoke
+          retention-days: 14

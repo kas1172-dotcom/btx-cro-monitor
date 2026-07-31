@@ -17,6 +17,7 @@ import { ImportListModal } from "../prospecting/ImportListModal.tsx";
 import { ProspectMap } from "../map/ProspectMap.tsx";
 import { prospectQualificationLabel, qualitativeSignalConfidence } from "../../app/confidence.ts";
 import { CrmWriteActions } from "../actions/CrmWriteActions.tsx";
+import { useAppRoute } from "../../app/router.ts";
 
 const PROSPECT_STATUSES = new Set<AccountStatus>(["target_prospect", "new_logo"]);
 const PROSPECT_MOTIONS = new Set<BusinessMotion>(["prospect_new_business"]);
@@ -84,7 +85,21 @@ function visitReason(row: { opportunity: number; qualification: { label: string;
   return `Opportunity ${row.opportunity} and ${row.qualification.label} make this a practical market stop${contact}.${gaps}`;
 }
 
+function scoreLabel(row: { score?: unknown; rankedProspect?: unknown; opportunity: number }): string {
+  if (!row.score && !row.rankedProspect) return "Not scored";
+  return String(row.opportunity);
+}
+
+function nextBestAction(row: { contact?: { name: string }; signals: Signal[]; qualification: { gaps: string[] }; company: Company }): string {
+  if (row.contact && row.signals.length > 0) return `Draft outreach to ${row.contact.name}`;
+  if (row.contact) return `Qualify timing with ${row.contact.name}`;
+  if (row.signals.length > 0) return "Find a decision-maker";
+  if (row.qualification.gaps.length > 0) return `Resolve ${row.qualification.gaps[0]}`;
+  return "Review fit before outreach";
+}
+
 export function Prospecting({ world }: { world: World }) {
+  const route = useAppRoute();
   const { city } = useStore();
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [expandedProspectId, setExpandedProspectId] = useState<string | null>(null);
@@ -163,7 +178,7 @@ export function Prospecting({ world }: { world: World }) {
 
       {prospectView === "map" && (
         <section className="surface-panel prospects-map-panel" aria-label="Prospect map">
-          <ProspectMap world={world} />
+          <ProspectMap world={world} prospectsOnly />
         </section>
       )}
 
@@ -181,7 +196,7 @@ export function Prospecting({ world }: { world: World }) {
         <div>
           <span>Revenue potential</span>
           <strong>{money(totalRevenue)}</strong>
-          <em>estimated from current pipeline records</em>
+          <em>{prospectRows.some((row) => row.revenue > 0) ? "estimated from current pipeline records" : "No pipeline value available"}</em>
         </div>
         <div>
           <span>Outreach queue</span>
@@ -201,7 +216,7 @@ export function Prospecting({ world }: { world: World }) {
                 : "Select a city for an in-market visit plan. For now, these are the strongest national targets in the current data."}
             </p>
           </div>
-          <button onClick={() => setProspectView("map")}>{selectedMarket ? "Open Map" : "Choose on Map"}</button>
+          <button onClick={() => setProspectView("map")}>{selectedMarket ? "Open map" : "Choose on map"}</button>
         </div>
         <div className="visit-plan-list">
           {visitPlanRows.map((row, index) => {
@@ -212,7 +227,7 @@ export function Prospecting({ world }: { world: World }) {
                 <span className="rank-badge">#{index + 1}</span>
                 <div>
                   <strong>{row.company.name}</strong>
-                  <em>{row.company.location.city} · {visitReason(row)}</em>
+                  <em>{row.company.location.city} · score {scoreLabel(row)} · next best action: {nextBestAction(row)}</em>
                   {expanded && (
                     <div className="scan-detail-panel">
                       <p><b>Address:</b> {formatAddress(row.company.location) ?? row.company.location.city}</p>
@@ -244,10 +259,12 @@ export function Prospecting({ world }: { world: World }) {
                         />
                       </div>
                       <CrmWriteActions
+                        key={row.company.id}
                         company={row.company}
                         contact={row.contact}
                         environment={world.sources.find((source) => source.id.includes("hubspot"))?.environment ?? "none"}
                         writeConnected={world.sources.find((source) => source.id.includes("hubspot"))?.canWrite ?? false}
+                        currentRouteEntityId={route.accountId}
                         variant="prospect"
                         defaultTaskSubject={`Qualify ${row.company.name}`}
                         defaultTaskBody={`${whyNow(row.signals)} Missing evidence: ${row.qualification.gaps.join(", ") || "none"}.`}
@@ -257,7 +274,7 @@ export function Prospecting({ world }: { world: World }) {
                 </div>
                 <div className="visit-plan-meta">
                   <span>{row.qualification.label}</span>
-                  <span>Opportunity {row.opportunity}</span>
+                  <span>Opportunity {scoreLabel(row)}</span>
                   <button type="button" onClick={() => setExpandedProspectId(expanded ? null : `visit-${row.company.id}`)}>
                     {expanded ? "Hide" : "Details"}
                   </button>
@@ -271,8 +288,8 @@ export function Prospecting({ world }: { world: World }) {
       <section className="prospecting-grid">
         <div className="current-panel current-panel-wide">
           <div className="panel-head">
-            <h2>Top New Prospects</h2>
-            <button onClick={() => setProspectView("map")}>Open Map</button>
+            <h2>Top new prospects</h2>
+            <button onClick={() => setProspectView("map")}>Open map</button>
           </div>
           {topProspects.map((row, index) => {
             const expanded = expandedProspectId === row.company.id;
@@ -281,14 +298,14 @@ export function Prospecting({ world }: { world: World }) {
               <span className="rank-badge">#{index + 1}</span>
               <span className="prospect-card-main">
                 <strong>{row.company.name}</strong>
-                <em>{row.company.location.city} · {row.qualification.label} · {row.contact ? "contact ready" : "find contact"}</em>
+                <em>{row.company.location.city} · {row.qualification.label} · score {scoreLabel(row)} · next best action: {nextBestAction(row)}</em>
                 {expanded && (
                   <div className="scan-detail-panel">
                     {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
                     <RankingWhy explanation={rankingExplanation(world, row.company, { rank: index + 1, dimension: "opportunity", fitScore: row.fit })} />
-                    <span><b>Why this company?</b> {row.qualification.label} with opportunity {row.opportunity}; {row.qualification.gaps.length ? `missing ${row.qualification.gaps.join(", ")}` : `estimated revenue ${money(row.revenue)}`}.</span>
+                    <span><b>Why this company?</b> {row.qualification.label} with opportunity {scoreLabel(row)}; {row.qualification.gaps.length ? `missing ${row.qualification.gaps.join(", ")}` : `estimated revenue ${money(row.revenue)}`}.</span>
                     <span><b>Why now?</b> {whyNow(row.signals)}</span>
-                    <span><b>Next:</b> {recommendedOutreach(row.company, row.contact?.name)}</span>
+                    <span><b>Next best action:</b> {nextBestAction(row)}. {recommendedOutreach(row.company, row.contact?.name)}</span>
                     <span className="link-row">
                       {companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}
                       {row.signals[0] && <ExternalLink href={row.signals[0].source_url} label="Top signal source" />}
@@ -330,48 +347,51 @@ export function Prospecting({ world }: { world: World }) {
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Nearby / Market-Based Prospects</h2>
+            <h2>Nearby market-based prospects</h2>
           </div>
           {marketProspects.map((row) => (
-            <button key={row.company.id} className="current-mini-row" onClick={() => setState({ activeCompanyId: row.company.id })}>
+            <article key={row.company.id} className="current-mini-row">
               <strong>{row.company.name}</strong>
-              <span>{row.company.location.city} · {row.qualification.label} · opportunity {row.opportunity}</span>
+              <span>{row.company.location.city} · {row.qualification.label} · opportunity {scoreLabel(row)}</span>
+              <span>Next best action: {nextBestAction(row)}</span>
               {formatAddress(row.company.location) && <span>{formatAddress(row.company.location)}</span>}
               <em>{row.contact ? `Call ${row.contact.name}` : "Contact discovery needed"}</em>
               <span className="link-row">{companyLinks(row.company).map((link) => <ExternalLink key={link.label} href={link.url} label={link.label} />)}</span>
+              <button type="button" onClick={() => setState({ activeCompanyId: row.company.id })}>Open dossier</button>
               <AskButton
                 label="Why this account?"
                 prompt={explainRankingPrompt(row.company.name, `Market-based prospect. City ${row.company.location.city}, ${row.qualification.label}, opportunity ${row.opportunity}, contact ${row.contact?.name ?? "not available"}, missing ${row.qualification.gaps.join(", ") || "none"}.`)}
               />
-            </button>
+            </article>
           ))}
         </div>
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Recommended Next Actions</h2>
+            <h2>Recommended next actions</h2>
           </div>
           {recommendedActions.map((r) => (
-            <button key={r.subject_id} className="rec-row" onClick={() => setState({ activeCompanyId: r.subject_id })}>
+            <article key={r.subject_id} className="rec-row">
               <span className={`rec-tag rec-${r.action}`} title={actionDescription(r.action)}>
                 {actionLabel(r.action)}
               </span>
               <span className="rec-name">{nameOf(r.subject_id)}</span>
               <span className="muted">{r.reason}</span>
+              <button type="button" onClick={() => setState({ activeCompanyId: r.subject_id })}>Open dossier</button>
               <AskButton
                 label="What next?"
                 prompt={nextActionPrompt(nameOf(r.subject_id), `Prospecting recommendation: ${actionLabel(r.action)}. Priority ${r.priority}. Reason: ${r.reason}.`)}
               />
-            </button>
+            </article>
           ))}
         </div>
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Buying Signals</h2>
+            <h2>Buying signals</h2>
           </div>
           {buyingSignals.map((signal) => (
-            <button key={signal.id} className="current-signal-row" onClick={() => setState({ activeCompanyId: signal.subject_id })}>
+            <article key={signal.id} className="current-signal-row">
               <span className="sig-type">{titleCase(signal.event_type)}</span>
               <strong>{nameOf(signal.subject_id)}</strong>
               <span>{signal.source_quote}</span>
@@ -379,20 +399,22 @@ export function Prospecting({ world }: { world: World }) {
                 <ExternalLink href={signal.source_url} label="Source" />
                 <ExternalLink href={signal.document_url} label="Document" />
               </span>
+              <button type="button" onClick={() => setState({ activeCompanyId: signal.subject_id })}>Open dossier</button>
               <AskButton label="Expand signal" prompt={expandSignalPrompt(signal, nameOf(signal.subject_id))} />
-            </button>
+            </article>
           ))}
         </div>
 
         <div className="current-panel">
           <div className="panel-head">
-            <h2>Outreach Queue</h2>
+            <h2>Outreach queue</h2>
           </div>
           {outreachQueue.map((row) => (
-            <button key={row.company.id} className="outreach-row" onClick={() => setState({ activeCompanyId: row.company.id })}>
+            <article key={row.company.id} className="outreach-row">
               <strong>{row.contact?.name}</strong>
               <span>{row.contact?.title} · {row.company.name}</span>
               <em>{recommendedOutreach(row.company, row.contact?.name)}</em>
+              <button type="button" onClick={() => setState({ activeCompanyId: row.company.id })}>Open dossier</button>
               <AskButton
                 label="Draft outreach"
                 prompt={outreachPrompt(row.company, `Outreach queue contact ${row.contact?.name}, ${row.contact?.title}. Recommended next step: ${recommendedOutreach(row.company, row.contact?.name)}`)}
@@ -406,7 +428,7 @@ export function Prospecting({ world }: { world: World }) {
                   evidence: row.signals[0]?.source_quote,
                 }}
               />
-            </button>
+            </article>
           ))}
         </div>
       </section>

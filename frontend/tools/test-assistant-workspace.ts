@@ -19,16 +19,22 @@ for (const token of [
   "deliverable_draft",
   "AssistantSourceMode",
   "workspace_web",
-  "Web search active",
   "Cancel research",
   "actual_source_mode",
-  "sources_reviewed",
+  "as-of unavailable",
+  "SanitizedMarkdown",
+  "messageQuality",
+  "ask-mobile-switcher",
+  "drawer-open",
+  "Primary government source",
+  "Unsupported answer",
 ]) {
   assert(askSurface.includes(token), `Ask workspace missing ${token}`);
 }
 
 assert(!askSurface.includes("dispatchBrainQuestion"), "Ask page must not use the old local question dispatcher.");
 assert(!askSurface.includes("AskBrainBar"), "Ask page must not render the old local Ask bar.");
+assert(!askSurface.includes("tool_activity.map"), "Ask page must not render model/process narration as message content.");
 assert(askButton.includes("navigateTo(`/ask?prompt="), "Contextual Ask buttons should deep-link to /ask.");
 assert(account360.includes("Ask about this account"), "Account 360 needs a contextual Ask action.");
 assert(workQueue.includes("Ask about this work"), "Work item detail needs a contextual Ask action.");

@@ -11,6 +11,7 @@ import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { WorkItemSourceNote } from "./WorkItemList.tsx";
 import { buildSignalEvidence, buildWorkItemEvidence, type EvidencePackage } from "../../app/evidence.ts";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
+import { formatDateTime } from "../../app/format.ts";
 
 type BriefLink = {
   label: string;
@@ -256,7 +257,7 @@ export function TodayBrief({ world }: { world: World }) {
         </p>
       ) : world.isStale ? (
         <p className="surface-notice" role="status">
-          These records are more than a minute old. <button type="button" onClick={world.refresh}>Refresh</button>
+          These records are more than five minutes old. <button type="button" onClick={world.refresh}>Refresh</button>
         </p>
       ) : null}
 
@@ -349,7 +350,7 @@ export function TodayBrief({ world }: { world: World }) {
             {completed.map((item) => (
               <button key={item.id} type="button" onClick={() => navigateTo(`/work/${encodeURIComponent(item.id)}`)}>
                 <strong>{item.recommended_action}</strong>
-                <span>{plainWorkStatus(item.status)} · {new Date(item.updated_at).toLocaleString()}</span>
+                <span>{plainWorkStatus(item.status)} · {formatDateTime(item.updated_at)}</span>
               </button>
             ))}
           </div>

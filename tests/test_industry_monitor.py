@@ -174,6 +174,13 @@ def test_review_and_work_item_draft_do_not_mutate_scores_or_write_crm(tmp_path):
     )
     assert review.status_code == 200
     assert review.json()["reviewStatus"] == "needs_account_match"
+    restore = client.patch(
+        "/industry-monitor/updates/monitor-story-1",
+        headers=headers,
+        json={"action": "restore_previous"},
+    )
+    assert restore.status_code == 200
+    assert restore.json()["reviewStatus"] == "new"
     draft = client.post("/industry-monitor/updates/monitor-story-1/work-item", headers=headers)
     assert draft.status_code == 201
     assert draft.json()["external_system"] is None

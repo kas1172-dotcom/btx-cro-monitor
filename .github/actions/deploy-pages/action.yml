@@ -12,6 +12,9 @@ inputs:
     description: Clerk instance type expected by this deployment (development or production).
     required: false
     default: production
+  deployment_mode:
+    description: Explicit deployment truth (demo or production).
+    required: true
 
 outputs:
   page_url:
@@ -36,7 +39,7 @@ runs:
     - name: Set up Node
       uses: actions/setup-node@v4
       with:
-        node-version: "22"
+        node-version-file: .nvmrc
 
     - name: Build Enterprise Brain cockpit
       working-directory: frontend
@@ -46,14 +49,22 @@ runs:
         VITE_COPILOT_ENDPOINT: ${{ inputs.vite_backend_endpoint }}/llm
         VITE_CLERK_PUBLISHABLE_KEY: ${{ inputs.vite_clerk_publishable_key }}
         CLERK_DEPLOYMENT_ENVIRONMENT: ${{ inputs.clerk_environment }}
+        VITE_DEPLOYMENT_MODE: ${{ inputs.deployment_mode }}
+        VITE_DEPLOYED_REVISION: ${{ github.sha }}
+        VITE_TENANT_ID: btx-demo-command-cockpit
+        VITE_SOURCE_TYPE: repository_seed
+        VITE_DATA_PROVENANCE: Repository demo seed; internal records are illustrative
+        RELEASE_GATE_STRICT_NODE: "1"
       run: |
         if [ -z "$VITE_BACKEND_ENDPOINT" ] || [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ]; then
           echo "::error::Missing one or more frontend deploy secrets: VITE_BACKEND_ENDPOINT, VITE_CLERK_PUBLISHABLE_KEY"
           exit 1
         fi
         npm ci
+        npm run test:release-critical
         npm run validate:production-env
         npm run build
+        npm run smoke:deployment
 
     - name: Assemble site
       shell: bash

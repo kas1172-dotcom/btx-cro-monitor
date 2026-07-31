@@ -29,22 +29,63 @@ const WORK_STATUS_LABELS: Record<string, string> = {
 };
 
 const ACTION_LABELS: Record<WorkItemTransitionAction, string> = {
-  triage: "Confirm review complete",
+  triage: "Mark reviewed",
   prepare: "Prepare work",
-  request_approval: "Request approval",
-  approve: "Approve action",
-  reject: "Reject with reason",
+  request_approval: "Send for approval",
+  approve: "Approve work",
+  reject: "Return for changes",
   start: "Start work",
-  mark_executed: "Mark executed",
+  mark_executed: "Mark as executed",
   verify: "Verify result",
   record_outcome: "Record outcome",
-  dismiss: "Dismiss with reason",
+  dismiss: "Dismiss work",
   close: "Close work",
   reopen: "Reopen work",
 };
 
+const APPROVAL_STATE_LABELS: Record<string, string> = {
+  not_required: "No approval needed",
+  pending: "Approval needed",
+  approved: "Approved",
+  rejected: "Returned for changes",
+};
+
+const EXECUTION_STATE_LABELS: Record<string, string> = {
+  not_started: "Not started",
+  pending: "Execution pending",
+  executed: "Executed; verification pending",
+  verified: "Verified",
+  failed: "Execution failed",
+};
+
+const WORK_TYPE_LABELS: Record<string, string> = {
+  account_action: "Account action",
+  research_task: "Research task",
+  customer_question: "Customer question",
+  capacity_check: "Capacity check",
+  meeting_brief: "Meeting brief",
+  outreach_draft: "Outreach draft",
+  qualified_opportunity: "Qualified opportunity",
+  relationship_review: "Relationship review",
+  hubspot_task: "HubSpot task",
+  dismissal: "Dismissal record",
+  dismissed: "Dismissed record",
+};
+
 export function plainWorkStatus(status: string): string {
   return WORK_STATUS_LABELS[status] ?? status.replace(/_/g, " ");
+}
+
+export function plainApprovalState(state: string): string {
+  return APPROVAL_STATE_LABELS[state] ?? state.replace(/_/g, " ");
+}
+
+export function plainExecutionState(state: string): string {
+  return EXECUTION_STATE_LABELS[state] ?? state.replace(/_/g, " ");
+}
+
+export function plainWorkType(type: string): string {
+  return WORK_TYPE_LABELS[type] ?? type.replace(/_/g, " ");
 }
 
 export function plainActionLabel(action: WorkItemTransitionAction): string {

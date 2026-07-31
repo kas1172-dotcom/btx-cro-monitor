@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { navigateTo, pathForTab, workItemPath } from "../app/router.ts";
-import { TAB_LABELS, type TabId } from "../app/surfaces.ts";
+import { PRIMARY_TAB_IDS, TAB_LABELS, type TabId } from "../app/surfaces.ts";
+import { SECONDARY_IDS } from "./brain/BrainSidebar.tsx";
 import { contextRibbonItems, demoWorkspaceNotice } from "../app/presentation.ts";
 import type { World } from "../app/useWorld.ts";
 import { UiIcon } from "./primitives.tsx";
@@ -13,12 +14,12 @@ type CommandItem = {
   path: string;
 };
 
-const NAV_ITEMS: TabId[] = ["brief", "work_queue", "accounts", "ask", "programs", "prospecting", "capacity", "analysis", "map", "deliverables", "hubspot", "settings"];
+const NAV_ITEMS: TabId[] = [...PRIMARY_TAB_IDS, ...SECONDARY_IDS, "deliverables", "hubspot", "settings"];
 
 function commandsFor(world: World | null): CommandItem[] {
   const nav = NAV_ITEMS.map((tab) => ({
     id: `nav-${tab}`,
-    group: tab === "brief" || tab === "work_queue" || tab === "accounts" || tab === "ask" ? "Primary" : "Workspace",
+    group: PRIMARY_TAB_IDS.includes(tab) ? "Primary" : SECONDARY_IDS.includes(tab) ? "More navigation" : "Workspace",
     label: TAB_LABELS[tab],
     detail: "Open workspace",
     path: pathForTab(tab),

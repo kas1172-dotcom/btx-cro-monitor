@@ -10,7 +10,7 @@ import type { Analysis, Prospect } from "./intelligence.ts";
 import type { Company, Contact, Facility, Opportunity } from "../engine/brain/entities.ts";
 import type { OperatingSnapshot } from "../engine/brain/operatingSnapshot.ts";
 import { operatingSnapshotFromWorld, revenueDataClient, type ScoreFamilies, type WorldSnapshot } from "./revenueDataClient.ts";
-import { queryKey, useQuery } from "./serverState.ts";
+import { queryKey, useQuery, type QueryErrorKind } from "./serverState.ts";
 import { sourceRegistry, type SourceCapability } from "./sourceRegistry.ts";
 
 export interface World {
@@ -33,6 +33,11 @@ export interface World {
   queryStatus: "idle" | "loading" | "refreshing" | "success" | "error";
   isRefreshing: boolean;
   isStale: boolean;
+  isTimedOut: boolean;
+  isOffline: boolean;
+  loadStartedAt: number | null;
+  loadElapsedMs: number;
+  loadErrorKind: QueryErrorKind | null;
   refresh: () => void;
 }
 
@@ -41,7 +46,7 @@ function filterByCity<T extends { location?: { city?: string | null }; city?: st
   return records.filter((record) => (record.location?.city ?? record.city ?? "").toLowerCase() === city.toLowerCase());
 }
 
-function emptyWorld(city: string | null, message: string): World {
+function emptyWorld(city: string | null, message: string, status: World["queryStatus"] = "error"): World {
   const analysis = analyze([], []);
   return {
     city,
@@ -55,13 +60,18 @@ function emptyWorld(city: string | null, message: string): World {
     worldSnapshot: null,
     scoreResults: null,
     dataSource: "Backend world snapshot",
-    loadErrors: [message],
+    loadErrors: message ? [message] : [],
     sources: [],
     provenanceSources: [],
     provenanceSummary: null,
-    queryStatus: "error",
-    isRefreshing: false,
-    isStale: true,
+    queryStatus: status,
+    isRefreshing: status === "refreshing",
+    isStale: status === "loading" || status === "error",
+    isTimedOut: false,
+    isOffline: typeof navigator !== "undefined" && !navigator.onLine,
+    loadStartedAt: null,
+    loadElapsedMs: 0,
+    loadErrorKind: "api",
     refresh: () => undefined,
   };
 }
@@ -70,7 +80,7 @@ export function useWorld(city: string | null): World | null {
   const configVersion = useSyncExternalStore(subscribeScoringConfig, getScoringConfigVersion, getScoringConfigVersion);
   const worldQuery = useQuery<WorldSnapshot>(
     queryKey(["tenant", "current", "world-snapshot", configVersion]),
-    () => revenueDataClient.getWorldSnapshot(),
+    (signal) => revenueDataClient.getWorldSnapshot(signal),
     [configVersion],
   );
 
@@ -79,14 +89,29 @@ export function useWorld(city: string | null): World | null {
     if (!worldSnapshot) {
       if (worldQuery.error) {
         return {
-          ...emptyWorld(city, worldQuery.error),
+          ...emptyWorld(city, worldQuery.error, worldQuery.status),
           refresh: worldQuery.refresh,
           queryStatus: worldQuery.status,
           isRefreshing: worldQuery.isRefreshing,
           isStale: worldQuery.isStale,
+          isTimedOut: worldQuery.isTimedOut,
+          isOffline: worldQuery.isOffline,
+          loadStartedAt: worldQuery.startedAt,
+          loadElapsedMs: worldQuery.elapsedMs,
+          loadErrorKind: worldQuery.errorKind,
         };
       }
-      return null;
+      return {
+        ...emptyWorld(city, "", worldQuery.status),
+        refresh: worldQuery.refresh,
+        isRefreshing: worldQuery.isRefreshing,
+        isStale: worldQuery.isStale,
+        isTimedOut: worldQuery.isTimedOut,
+        isOffline: worldQuery.isOffline,
+        loadStartedAt: worldQuery.startedAt,
+        loadElapsedMs: worldQuery.elapsedMs,
+        loadErrorKind: worldQuery.errorKind,
+      };
     }
     const companies = filterByCity(worldSnapshot.accounts, city);
     const companyIds = new Set(companies.map((company) => company.id));
@@ -122,6 +147,11 @@ export function useWorld(city: string | null): World | null {
       queryStatus: worldQuery.status,
       isRefreshing: worldQuery.isRefreshing,
       isStale: worldQuery.isStale,
+      isTimedOut: worldQuery.isTimedOut,
+      isOffline: worldQuery.isOffline,
+      loadStartedAt: worldQuery.startedAt,
+      loadElapsedMs: worldQuery.elapsedMs,
+      loadErrorKind: worldQuery.errorKind,
       refresh: worldQuery.refresh,
     };
     draft.provenanceSources = provenanceCounts(draft);

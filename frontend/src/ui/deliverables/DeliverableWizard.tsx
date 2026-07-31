@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 import type { World } from "../../app/useWorld.ts";
 import { visibleSources } from "../../app/sourceLabels.ts";
 import { saveStoredDeliverable, hasDeliverablesBackend, recordToDeliverable } from "../../app/deliverablesApi.ts";
+import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { DELIVERABLE_TEMPLATE_OPTIONS, deliverableTemplateOption } from "../../agents/deliverableRegistry.ts";
 import { runAgent, type AgentId } from "../../agents/runAgent.ts";
 import { buildWizardPrefill, validatePrefillProvenance, type WizardPrefill } from "../../deliverables/wizardPrefill.ts";
 import type { Deliverable } from "../../deliverables/types.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
-import { setState } from "../../store/store.ts";
 import type { DeliverableWizardStep } from "../../store/store.ts";
 import { ScopePill } from "../primitives.tsx";
 
@@ -44,7 +44,7 @@ function blockExcerpt(deliverable: Deliverable): Array<{ heading: string; text: 
       ? firstText.text
       : table && table.kind === "table"
         ? `Table: ${table.columns.join(", ")} (${table.rows.length} rows)`
-        : `${section.blocks.length} block${section.blocks.length === 1 ? "" : "s"}`;
+        : "Chart or structured content is available in the full editor.";
     return { heading: section.heading, text };
   });
 }
@@ -143,14 +143,7 @@ export function DeliverableWizard({
 
   function openInEditor() {
     if (!preview) return;
-    setState({
-      activeDeliverable: preview,
-      activeDeliverableOrigin: "generation",
-      activeTab: "deliverables",
-      brainResponse: null,
-      activeAnalysisSpec: null,
-      activeCompanyId: null,
-    });
+    navigateTo(deliverablePath(preview.backendRecordId ?? preview.id));
     onClose();
   }
 
@@ -159,11 +152,18 @@ export function DeliverableWizard({
       <div className="demo-action-modal deliverable-wizard" role="dialog" aria-modal="true" aria-label="New deliverable">
         <button className="deliverable-wizard-close" onClick={onClose} aria-label="Close">×</button>
         <p className="eyebrow">New deliverable</p>
-        <div className="deliverable-wizard-progress" aria-label="Deliverable wizard progress">
+        <ol className="deliverable-wizard-progress" aria-label="Deliverable wizard progress">
           {WIZARD_STEPS.map((item, index) => (
-            <span key={item.id} className={index <= stepPosition(step) ? "active" : ""}>{item.label}</span>
+            <li
+              key={item.id}
+              className={index < stepPosition(step) ? "complete" : index === stepPosition(step) ? "current" : ""}
+              aria-current={index === stepPosition(step) ? "step" : undefined}
+            >
+              <span>{index + 1}</span>
+              <strong>{item.label}</strong>
+            </li>
           ))}
-        </div>
+        </ol>
 
         {error && <div className="deliverable-wizard-error" role="alert">{error}</div>}
         {notice && <div className="deliverable-wizard-notice" role="status">{notice}</div>}

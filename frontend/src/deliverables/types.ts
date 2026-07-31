@@ -59,6 +59,17 @@ export interface Deliverable {
   form?: "email" | "memo" | "brief" | "deck" | "itinerary" | "view" | "one_pager";
   compositionPath?: string;
   actions: DeliverableAction[];
+  quality?: {
+    valid: boolean;
+    errors: string[];
+    checkedAt: string;
+    claimSourceGrounded: boolean;
+    dataAvailable: boolean;
+    freshnessKnown: boolean;
+    lockedFactsValid: boolean;
+  };
+  invalidatedAt?: string;
+  invalidationReason?: string;
 }
 
 export interface ValidationResult {

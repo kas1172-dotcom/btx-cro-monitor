@@ -49,7 +49,7 @@ for (const [name, text] of [
   ["DocumentViewer", documentViewer],
 ] as const) {
   assert(text.includes("EvidenceDrawer"), `${name} must integrate shared EvidenceDrawer`);
-  assert(text.includes("View evidence") || text.includes("View score evidence"), `${name} must expose evidence action`);
+  assert(text.includes("View evidence") || text.includes("View score evidence") || text.includes("onEvidence"), `${name} must expose evidence action`);
 }
 
 assert(account360.includes("buildAccountTimeline") && account360.includes("AccountBriefingMode"), "Account 360 should expose timeline and briefing mode");

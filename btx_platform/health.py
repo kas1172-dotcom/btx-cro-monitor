@@ -58,7 +58,11 @@ def monitor_artifact_health(settings: Settings, *, now: datetime | None = None) 
         "age_hours": round(age_seconds / 3600, 2),
         "stale": stale,
         "stale_after_days": settings.monitor_stale_after_days,
-        "detail": "Monitor artifact is stale." if stale else "Monitor artifact is fresh.",
+        "detail": (
+            f"Monitor artifact is older than the {settings.monitor_stale_after_days}-day refresh window."
+            if stale
+            else f"Monitor artifact is within the {settings.monitor_stale_after_days}-day refresh window."
+        ),
     }
 
 

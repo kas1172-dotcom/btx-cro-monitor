@@ -7,7 +7,7 @@ const FALLBACK_CENTER: [number, number] = [31.5, -97];
 const avg = (ns: number[]): number => (ns.length ? ns.reduce((a, b) => a + b, 0) / ns.length : 0);
 
 function isProspect(rel: string): boolean {
-  return rel === "target" || rel === "customer";
+  return rel === "target";
 }
 
 function finite(value: unknown): value is number {

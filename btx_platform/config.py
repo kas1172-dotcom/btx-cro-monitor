@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +18,13 @@ class Settings(BaseSettings):
     )
 
     env: str = "dev"
+    deployment_mode: str = "development"  # development | demo | production
+    tenant_id: str = "local"
+    source_type: str = "repository_seed"
+    data_provenance: str = "Repository-backed local data"
+    deployed_revision: str = "unknown"
+    expected_repository_revision: str = "779198f"
+    external_writes_enabled: bool = False
     # SQLite by default so the service runs with zero infra locally; Postgres in prod.
     database_url: str = Field(
         default="sqlite:///./btx_platform.db",
@@ -42,7 +49,7 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 45.0
     llm_max_body_bytes: int = 524_288
     ask_online_enabled: bool = False
-    ask_web_search_enabled: bool = False
+    ask_web_search_enabled: bool = True
     ask_default_source_mode: str = "automatic"
     ask_model: str = "claude-haiku-4-5-20251001"
     ask_web_max_uses: int = 3
@@ -76,9 +83,26 @@ class Settings(BaseSettings):
 
     # Observability, health, retention (WP10-C).
     sentry_dsn: str | None = None
-    monitor_stale_after_days: int = 7
+    monitor_stale_after_days: int = 10
     event_retention_days: int = 90
     audit_retention_days: int = 365
+
+    @model_validator(mode="after")
+    def validate_environment_truth(self) -> "Settings":
+        mode = self.deployment_mode.strip().lower()
+        if self.env.strip().lower() == "prod" and mode == "development":
+            mode = "production"
+        if mode not in {"development", "demo", "production"}:
+            raise ValueError("BTX_DEPLOYMENT_MODE must be development, demo, or production.")
+        self.deployment_mode = mode
+        if mode == "production":
+            secret = (self.clerk_secret_key or "").lower()
+            issuer = (self.clerk_issuer or "").lower()
+            if secret.startswith("sk_test_") or ".accounts.dev" in issuer:
+                raise ValueError("Production rejects Clerk development credentials.")
+        if mode == "demo":
+            self.external_writes_enabled = False
+        return self
 
     @property
     def cors_origins(self) -> list[str]:

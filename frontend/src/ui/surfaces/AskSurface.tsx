@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   askAssistant,
   createAssistantConversation,
@@ -7,21 +7,84 @@ import {
   getAssistantConversation,
   listAssistantConversations,
   updateAssistantConversation,
+  type AssistantCitation,
   type AssistantContext,
   type AssistantConversation,
   type AssistantMessage,
   type AssistantSourceMode,
 } from "../../app/assistantApi.ts";
 import { navigateTo, useAppRoute } from "../../app/router.ts";
+import { displayLabel } from "../../app/displayLabels.ts";
 import type { World } from "../../app/useWorld.ts";
 import { WorkItemList, WorkItemSourceNote } from "./WorkItemList.tsx";
 import { useWorkItems } from "../../app/workItems.ts";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { evidenceFromCitation, type EvidencePackage } from "../../app/evidence.ts";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
+import { computeMetric } from "../../metrics/catalog.ts";
 
 function displayTime(value: string): string {
   return new Date(value).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
+function sanitizeInline(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/javascript:/gi, "")
+    .replace(/\bactionPriority\b/g, "action priority")
+    .replace(/\bPWIN\b/g, "probability of win")
+    .replace(/\bpwin\b/g, "probability of win")
+    .trim();
+}
+
+function inlineMarkdown(value: string): ReactNode[] {
+  const parts = sanitizeInline(value).split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g).filter(Boolean);
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("`") && part.endsWith("`")) return <code key={index}>{part.slice(1, -1)}</code>;
+    const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+    if (link) return <a key={index} href={link[2]} target="_blank" rel="noreferrer">{sanitizeInline(link[1])}</a>;
+    return <Fragment key={index}>{part}</Fragment>;
+  });
+}
+
+function SanitizedMarkdown({ text }: { text: string }) {
+  const normalized = sanitizeInline(text)
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]*,/g, ",")
+    .replace(/([^\n])\n(?!(?:#{1,6}\s+|[-*]\s+|\d+\.\s+))/g, "$1 ");
+  const blocks = normalized.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+  return (
+    <div className="ask-markdown">
+      {blocks.map((block, index) => {
+        const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+        if (lines[0] && /^#{1,3}\s+/.test(lines[0])) {
+          const heading = lines[0].replace(/^#{1,3}\s+/, "");
+          const body = lines.slice(1).join(" ").trim();
+          return (
+            <section key={index}>
+              <h3>{inlineMarkdown(heading)}</h3>
+              {body ? <p>{inlineMarkdown(body)}</p> : null}
+            </section>
+          );
+        }
+        if (lines.every((line) => /^[-*]\s+/.test(line))) {
+          return <ul key={index}>{lines.map((line, itemIndex) => <li key={itemIndex}>{inlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>)}</ul>;
+        }
+        const heading = block.match(/^(#{1,3})\s+(.+)$/);
+        if (heading) return <h3 key={index}>{inlineMarkdown(heading[2])}</h3>;
+        return <p key={index}>{inlineMarkdown(block)}</p>;
+      })}
+    </div>
+  );
+}
+
+function generatedTitle(text: string): string {
+  const cleaned = sanitizeInline(text).replace(/[?.!]+$/g, "");
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  const suffix = new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  if (words.length === 0) return `Ask conversation ${suffix}`;
+  return `${words.slice(0, 8).join(" ")} · ${suffix}`;
 }
 
 function accountName(world: World, accountId?: string | null): string | null {
@@ -49,6 +112,37 @@ function compactContext(context: AssistantContext, world: World): string {
     context.deliverable_id ? `Deliverable ${context.deliverable_id}` : null,
   ].filter(Boolean);
   return parts.join(" · ") || "Workspace";
+}
+
+function sourceClass(citation: AssistantCitation): string {
+  const type = citation.source_type.toLowerCase();
+  const host = (citation.publisher ?? citation.url ?? "").toLowerCase();
+  const gov = host.includes(".gov") || host.includes("sam.gov") || host.includes("defense.gov") || host.includes("congress.gov") || host.includes("usaspending.gov");
+  if (gov || type === "government_source") return "Primary government source";
+  if (type.includes("search") || citation.freshness === "search_snippet") return "Search snippet";
+  if (type.includes("public") || citation.url) return "Reporting/public web";
+  if (citation.data_classification === "crm" || type === "account") return "Workspace CRM";
+  if (type === "work_item") return "Workspace work";
+  if (type === "score") return "Derived workspace analysis";
+  return "Workspace evidence";
+}
+
+function sourceModeLabel(mode: AssistantMessage["metadata"]["actual_source_mode"], searchCount?: number): string {
+  if (mode === "web") return searchCount ? `Public web · ${searchCount} search${searchCount === 1 ? "" : "es"}` : "Public web";
+  if (mode === "workspace_web") return searchCount ? `Workspace + public web · ${searchCount} search${searchCount === 1 ? "" : "es"}` : "Workspace + public web";
+  return "Workspace records only";
+}
+
+function messageQuality(message: AssistantMessage): Array<{ tone: "warning" | "danger" | "info"; label: string }> {
+  if (message.role === "user") return [];
+  const citations = message.citations ?? [];
+  const flags: Array<{ tone: "warning" | "danger" | "info"; label: string }> = [];
+  if (citations.length === 0) flags.push({ tone: "danger", label: "Unsupported answer: no citations were returned." });
+  if (citations.some((citation) => citation.claim_classification === "missing_information" || citation.claim_classification === "missing")) flags.push({ tone: "info", label: "Missing information is called out in the evidence." });
+  if (citations.some((citation) => citation.relationship_status && !["confirmed", "accepted"].includes(citation.relationship_status))) flags.push({ tone: "warning", label: "Contains unconfirmed or conflicting relationship evidence." });
+  if (citations.some((citation) => citation.freshness === "stale" || citation.data_classification === "simulated")) flags.push({ tone: "warning", label: "Contains stale or simulated evidence." });
+  for (const warning of message.metadata?.warnings ?? []) flags.push({ tone: "warning", label: warning });
+  return flags;
 }
 
 function DraftPreview({
@@ -119,40 +213,25 @@ function MessageBubble({
   message,
   onRetry,
   onCreated,
+  onEvidence,
 }: {
   message: AssistantMessage;
   onRetry: (text: string) => void;
   onCreated: (route: string) => void;
+  onEvidence: (citation: AssistantCitation, trigger: HTMLButtonElement) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(message.content);
   const isUser = message.role === "user";
+  const quality = messageQuality(message);
   return (
     <article className={`ask-workspace-message ${isUser ? "user" : "assistant"}`}>
       <div className="ask-message-topline">
         <span>{isUser ? "You" : "Ask"}</span>
         <em>{displayTime(message.created_at)}</em>
       </div>
-      {!isUser && (
-        <div className="ask-engine-mode">
-          {message.metadata?.engine_mode === "llm_connected"
-            ? "AI connected"
-            : message.metadata?.engine_mode === "cached_answer"
-              ? "Cached answer"
-              : message.metadata?.engine_mode === "rules_based_fallback" || message.metadata?.orchestration === "internal_retrieval_v1"
-                ? "AI unavailable · showing rules-based summary"
-                : "Engine unavailable"}
-          {message.metadata?.scope ? ` · ${message.metadata.scope} scope` : ""}
-          {message.metadata?.actual_source_mode ? ` · ${message.metadata.actual_source_mode.replace("_", " + ")}` : ""}
-          {message.metadata?.as_of ? ` · as of ${displayTime(message.metadata.as_of)}` : ""}
-          {typeof message.metadata?.sources_reviewed === "number" ? ` · ${message.metadata.sources_reviewed} sources reviewed` : ""}
-        </div>
-      )}
-      {!isUser && message.metadata?.partial_failure && (
-        <div className="live-inline-status warning" role="status">
-          {(message.metadata.warnings ?? ["Research completed with limitations."]).join(" ")}
-        </div>
-      )}
+      {!isUser && <div className="ask-answer-source">{sourceModeLabel(message.metadata?.actual_source_mode, message.metadata?.search_count)} · {message.metadata?.as_of ? `as of ${displayTime(message.metadata.as_of)}` : "as-of unavailable"}</div>}
+      {quality.map((item) => <div key={item.label} className={`ask-claim-flag ${item.tone}`} role="status">{item.label}</div>)}
       {editing ? (
         <form
           className="ask-edit-form"
@@ -166,11 +245,17 @@ function MessageBubble({
           <div><button type="submit">Resend</button><button type="button" onClick={() => setEditing(false)}>Cancel</button></div>
         </form>
       ) : (
-        <p>{message.content}</p>
+        <SanitizedMarkdown text={message.content} />
       )}
-      {!isUser && message.tool_activity.length > 0 && (
-        <div className="ask-activity-row" aria-label="Ask activity">
-          {message.tool_activity.map((activity) => <span key={activity}>{activity}</span>)}
+      {!isUser && message.citations.length > 0 && (
+        <div className="ask-claim-citations" aria-label="Citations attached to this answer">
+          {message.citations.slice(0, 4).map((citation) => (
+            <button key={citation.id} type="button" onClick={(event) => onEvidence(citation, event.currentTarget)}>
+              <span>{sourceClass(citation)}</span>
+              <strong>{citation.title}</strong>
+              <em>{citation.claim}</em>
+            </button>
+          ))}
         </div>
       )}
       {!isUser && message.related_records.length > 0 && (
@@ -204,10 +289,13 @@ export function AskSurface({ world }: { world: World }) {
   const [context, setContext] = useState<AssistantContext>(routeCtx);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [conversationBusy, setConversationBusy] = useState<string | null>(null);
   const [sourceMode, setSourceMode] = useState<AssistantSourceMode>("automatic");
   const [error, setError] = useState<string | null>(null);
   const [createdRoute, setCreatedRoute] = useState<string | null>(null);
   const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [citationsOpen, setCitationsOpen] = useState(false);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const appliedPrompt = useRef<string | null>(null);
   const requestController = useRef<AbortController | null>(null);
@@ -251,6 +339,23 @@ export function AskSurface({ world }: { world: World }) {
     setContext(routeCtx);
   }, [routePrompt, routeCtx]);
 
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      if (historyOpen) {
+        setHistoryOpen(false);
+        event.stopPropagation();
+        return;
+      }
+      if (citationsOpen) {
+        setCitationsOpen(false);
+        event.stopPropagation();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [citationsOpen, historyOpen]);
+
   async function send(textOverride?: string) {
     const message = (textOverride ?? draft).trim();
     if (!message || sending) return;
@@ -261,9 +366,17 @@ export function AskSurface({ world }: { world: World }) {
     const controller = new AbortController();
     requestController.current = controller;
     try {
-      const response = await askAssistant({ message, conversation_id: currentId, context, source_mode: sourceMode }, controller.signal);
+      const metricIds = ["pipeline_by_stage", "capacity_utilization", "margin_trend", "backlog"] as const;
+      const metric_states = Object.fromEntries(metricIds.map((id) => {
+        const metric = computeMetric(id, world);
+        return [id, { state: metric.state, value: metric.value, reason: metric.reason, asOf: metric.asOf }];
+      }));
+      const response = await askAssistant({ message, conversation_id: currentId, context: { ...context, metric_states }, source_mode: sourceMode }, controller.signal);
       setSelected(response.conversation);
       setDraft("");
+      if (response.conversation.title === "New Ask conversation" || response.conversation.title === "Ask") {
+        void updateAssistantConversation(response.conversation.id, { title: generatedTitle(message) }).then(setSelected).catch(() => undefined);
+      }
       navigateTo(`/ask/${encodeURIComponent(response.conversation.id)}`, { replace: true });
       void loadConversations(response.conversation.id);
     } catch (err) {
@@ -275,30 +388,50 @@ export function AskSurface({ world }: { world: World }) {
   }
 
   async function startConversation() {
+    if (conversationBusy) return;
+    setConversationBusy("new");
     setError(null);
     try {
-      const created = await createAssistantConversation(context);
+      const created = await createAssistantConversation(context, routePrompt ? generatedTitle(routePrompt) : undefined);
       setSelected(created);
       setDraft("");
       navigateTo(`/ask/${encodeURIComponent(created.id)}`);
       void loadConversations(created.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create conversation.");
+    } finally {
+      setConversationBusy(null);
     }
   }
 
   async function renameConversation(conversation: AssistantConversation) {
+    if (conversationBusy) return;
     const title = window.prompt("Conversation name", conversation.title);
     if (!title?.trim()) return;
-    const updated = await updateAssistantConversation(conversation.id, { title: title.trim() });
-    setSelected(updated);
-    void loadConversations(updated.id);
+    setConversationBusy("rename");
+    try {
+      const updated = await updateAssistantConversation(conversation.id, { title: title.trim() });
+      setSelected(updated);
+      void loadConversations(updated.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not rename conversation.");
+    } finally {
+      setConversationBusy(null);
+    }
   }
 
   async function setConversationStatus(conversation: AssistantConversation, status: "active" | "archived") {
+    if (conversationBusy) return;
+    setConversationBusy(status);
+    try {
     const updated = await updateAssistantConversation(conversation.id, { status });
     setSelected(updated);
     void loadConversations(updated.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update conversation status.");
+    } finally {
+      setConversationBusy(null);
+    }
   }
 
   function handleCreated(routePath: string) {
@@ -317,21 +450,33 @@ export function AskSurface({ world }: { world: World }) {
   const selectedContext = selected?.context ?? context;
   const contextLabel = compactContext(selectedContext, world);
   const conversations = [...activeConversations, ...archivedConversations];
+  const citationMessages = selected?.messages.filter((message) => message.role === "assistant" && message.citations.length > 0) ?? [];
+
+  function openCitationEvidence(citation: AssistantCitation, trigger: HTMLButtonElement) {
+    evidenceTriggerRef.current = trigger;
+    setEvidence(evidenceFromCitation(citation));
+    setCitationsOpen(true);
+  }
 
   return (
     <section className={isFocus ? "surface-page ask-surface ask-workspace record-focus-mode" : "surface-page ask-surface ask-workspace"} data-surface-component="surface-ask">
       <SurfaceHeader
-        eyebrow="Ask"
+        eyebrow="Assistant"
         headline="Ask"
         subline="Grounded answers use internal records, current work, deliverables, scores, and cited account signals."
       />
+      <div className="ask-mobile-switcher" aria-label="Ask drawers">
+        <button type="button" onClick={() => setHistoryOpen(true)}>History</button>
+        <button type="button" onClick={() => setCitationsOpen(true)}>Evidence</button>
+      </div>
       <div className="ask-workspace-grid">
-        <aside className="ask-conversation-sidebar" aria-label="Ask conversations">
+        <aside className={historyOpen ? "ask-conversation-sidebar drawer-open" : "ask-conversation-sidebar"} aria-label="Ask conversations">
           <div className="ask-sidebar-actions">
-            <button type="button" onClick={() => void startConversation()}>New conversation</button>
+            <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void startConversation()}>{conversationBusy === "new" ? "Creating..." : "New conversation"}</button>
+            <button type="button" className="ask-drawer-close" onClick={() => setHistoryOpen(false)}>Close</button>
             <label>Search<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Account or topic" /></label>
           </div>
-          {loading && <div className="rail-quiet-empty">Loading conversations...</div>}
+          {loading && <div className="ask-skeleton" role="status" aria-label="Preparing conversations"><i /><i /><i /></div>}
           {!loading && conversations.length === 0 && <div className="rail-quiet-empty">No conversations yet.</div>}
           <div className="ask-conversation-group">
             <span>Active</span>
@@ -371,25 +516,23 @@ export function AskSurface({ world }: { world: World }) {
                   <p>{contextLabel}</p>
                 </div>
                 <div className="ask-thread-actions">
+                  <button type="button" onClick={() => setHistoryOpen(true)}>History</button>
+                  <button type="button" onClick={() => setCitationsOpen(true)}>Evidence</button>
                   <button type="button" onClick={() => navigateTo(pathWithFocus(!isFocus))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
-                  <button type="button" onClick={() => void renameConversation(selected)}>Rename</button>
+                  <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void renameConversation(selected)}>{conversationBusy === "rename" ? "Renaming..." : "Rename"}</button>
                   {selected.status === "archived"
-                    ? <button type="button" onClick={() => void setConversationStatus(selected, "active")}>Restore</button>
-                    : <button type="button" onClick={() => void setConversationStatus(selected, "archived")}>Archive</button>}
+                    ? <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void setConversationStatus(selected, "active")}>{conversationBusy === "active" ? "Restoring..." : "Restore"}</button>
+                    : <button type="button" disabled={Boolean(conversationBusy)} onClick={() => void setConversationStatus(selected, "archived")}>{conversationBusy === "archived" ? "Archiving..." : "Archive"}</button>}
                 </div>
               </div>
               <div className="ask-message-list" aria-live="polite">
                 {selected.messages.map((message) => (
-                  <MessageBubble key={message.id} message={message} onRetry={(text) => void send(text)} onCreated={handleCreated} />
+                  <MessageBubble key={message.id} message={message} onRetry={(text) => void send(text)} onCreated={handleCreated} onEvidence={openCitationEvidence} />
                 ))}
                 {sending && (
                   <article className="ask-workspace-message assistant pending">
                     <div className="ask-message-topline"><span>Ask</span><em>Working</em></div>
-                    <div className="ask-activity-row" role="status" aria-live="polite">
-                      {sourceMode !== "web" && <span>Checking BTX evidence</span>}
-                      {(sourceMode === "web" || sourceMode === "workspace_web") && <span>Web search active</span>}
-                      <span>Preparing brief</span>
-                    </div>
+                    <p role="status" aria-live="polite">Preparing an evidence-backed answer.</p>
                     <button type="button" onClick={() => requestController.current?.abort()}>Cancel research</button>
                   </article>
                 )}
@@ -458,18 +601,20 @@ export function AskSurface({ world }: { world: World }) {
           </form>
         </main>
 
-        <aside className="ask-citation-panel" aria-label="Citations and context">
+        <aside className={citationsOpen ? "ask-citation-panel drawer-open" : "ask-citation-panel"} aria-label="Citations and context">
           <section>
-            <h2>Citations</h2>
-            {selected?.messages.flatMap((message) => message.citations).slice(-8).map((citation) => (
-              <div key={citation.id} className="ask-citation-card">
-                <button type="button" onClick={(event) => { evidenceTriggerRef.current = event.currentTarget; setEvidence(evidenceFromCitation(citation)); }}>
+            <div className="ask-citation-head"><h2>Evidence</h2><button type="button" className="ask-drawer-close" onClick={() => setCitationsOpen(false)}>Close</button></div>
+            {citationMessages.flatMap((message) => message.citations.map((citation) => ({ message, citation }))).slice(-12).map(({ message, citation }) => (
+              <div key={`${message.id}-${citation.id}`} className="ask-citation-card">
+                <button type="button" onClick={(event) => openCitationEvidence(citation, event.currentTarget)}>
                   <strong>{citation.title}</strong>
-                  <span>{citation.claim_classification} · {citation.data_classification}{citation.relationship_status ? ` · ${citation.relationship_status}` : ""}</span>
+                  <span>{sourceClass(citation)} · {displayLabel(citation.claim_classification)}{citation.relationship_status ? ` · ${displayLabel(citation.relationship_status)}` : ""}</span>
                   <em>{citation.claim}</em>
                 </button>
-                <button type="button" onClick={(event) => { evidenceTriggerRef.current = event.currentTarget; setEvidence(evidenceFromCitation(citation)); }}>View evidence</button>
-                <button type="button" onClick={() => navigateTo(citation.route)}>Open record</button>
+                <details>
+                  <summary>More</summary>
+                  <button type="button" onClick={() => navigateTo(citation.route)}>Open record</button>
+                </details>
               </div>
             ))}
             {selected && selected.messages.every((message) => message.citations.length === 0) && <div className="rail-quiet-empty">No citations yet.</div>}

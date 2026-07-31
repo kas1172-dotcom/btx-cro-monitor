@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import type { TabId } from "../app/surfaces.ts";
 import type { SavedBrainNote } from "../brain/types.ts";
 import type { Deliverable } from "../deliverables/types.ts";
+import { invalidateLegacyDeliverable } from "../deliverables/quality.ts";
 import type { ActivityLogEntry, BrainMemoryNote, MemoryState } from "./types.ts";
 
 const STORAGE_KEY = "btx.revenueBrain.memory.v1";
@@ -27,7 +28,7 @@ function load(): MemoryState {
     const parsed = JSON.parse(raw) as Partial<MemoryState>;
     return {
       notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-      deliverables: Array.isArray(parsed.deliverables) ? parsed.deliverables : [],
+      deliverables: Array.isArray(parsed.deliverables) ? parsed.deliverables.map(invalidateLegacyDeliverable) : [],
       activity: Array.isArray(parsed.activity) ? parsed.activity : [],
     };
   } catch {

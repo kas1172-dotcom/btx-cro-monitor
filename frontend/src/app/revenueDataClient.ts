@@ -137,7 +137,7 @@ export type AskRequest = Record<string, unknown>;
 export type AskResponse = Record<string, unknown>;
 
 export type RevenueDataClient = {
-  getWorldSnapshot(): Promise<WorldSnapshot>;
+  getWorldSnapshot(signal?: AbortSignal): Promise<WorldSnapshot>;
   getWorkItems(filters?: WorkItemFilters): Promise<WorkItem[]>;
   getWorkItem(id: string): Promise<WorkItem>;
   updateWorkItem(id: string, patch: WorkItemPatch): Promise<WorkItem>;
@@ -158,8 +158,8 @@ function query(params: Record<string, string | undefined> = {}): string {
 }
 
 export class BackendRevenueDataClient implements RevenueDataClient {
-  getWorldSnapshot(): Promise<WorldSnapshot> {
-    return backendJson<WorldSnapshot>("/world-snapshot");
+  getWorldSnapshot(signal?: AbortSignal): Promise<WorldSnapshot> {
+    return backendJson<WorldSnapshot>("/world-snapshot", { signal });
   }
 
   async getWorkItems(filters: WorkItemFilters = {}): Promise<WorkItem[]> {

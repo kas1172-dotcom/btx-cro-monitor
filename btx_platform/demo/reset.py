@@ -418,7 +418,12 @@ def _seed_scores(session: Session, seed: dict[str, Any], tenant_id: str) -> None
 def _store_tenant_metadata(session: Session, tenant: models.Tenant, seed: dict[str, Any]) -> None:
     account_overrides = {
         record["id"]: {
-            "location": {"city": record.get("city", ""), "state": record.get("state"), "lat": None, "lon": None},
+            "location": {
+                "city": record.get("city", ""),
+                "state": record.get("state"),
+                "lat": record.get("lat"),
+                "lon": record.get("lon"),
+            },
             "needs": record.get("needs", []),
             "dataClassification": "simulated" if record["relationship"] == "customer" else "public",
         }
@@ -492,6 +497,10 @@ def verify_demo_tenant(session: Session, tenant_id: str | None) -> None:
     tenant = _tenant(session, tenant_id)
     _assert(tenant.id == seed["tenant"]["id"], "Unexpected tenant id.")
     _assert(tenant.is_demonstration, "Tenant marker is not demonstration.")
+    _assert(
+        (tenant.demo_metadata or {}).get("repositoryRevision") == seed["tenant"]["metadata"]["repositoryRevision"],
+        "Demo seed revision does not match repository revision.",
+    )
 
     accounts = session.query(models.CanonicalAccount).filter(models.CanonicalAccount.tenant_id == tenant_id).all()
     signals = session.query(models.IntelligenceSignal).filter(models.IntelligenceSignal.tenant_id == tenant_id).all()

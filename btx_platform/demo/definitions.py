@@ -6,6 +6,7 @@ from typing import Any
 DEMO_TENANT_ID = "btx-demo-command-cockpit"
 DEMO_DISPLAY_NAME = "BTX Demonstration Workspace"
 DEMO_ACTOR = "demo.reset@btx.local"
+DEMO_REPOSITORY_REVISION = "779198f"
 
 
 def _iso(dt: datetime) -> str:
@@ -91,6 +92,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "uei": "CQWLW9XRQTH5",
             "city": "Fort Worth",
             "state": "TX",
+            "lat": 32.7555,
+            "lon": -97.3308,
             "needs": ["5-axis CNC", "AS9100", "ITAR", "build-to-print", "thermal-management hardware"],
         },
         {
@@ -104,6 +107,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "known_customers": ["Department of Defense"],
             "city": "Camas",
             "state": "WA",
+            "lat": 45.5871,
+            "lon": -122.3995,
             "needs": ["optical benches", "thermal-management housings", "precision alignment components"],
         },
         {
@@ -117,6 +122,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "known_customers": ["U.S. Space Force"],
             "city": "Bellevue",
             "state": "WA",
+            "lat": 47.6101,
+            "lon": -122.2015,
             "needs": ["space-rated structures", "thermal-management hardware", "prototype machining"],
         },
     ]
@@ -374,6 +381,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "is_demonstration": True,
             "reference_date": reset_at,
             "metadata": {
+                "repositoryRevision": DEMO_REPOSITORY_REVISION,
+                "dataProvenance": "Repository demo seed; internal CRM, contact, opportunity, and operating records are illustrative.",
                 "programs": [
                     {"id": "directed-energy", "name": "Directed-energy laser defense", "dataClassification": "public"},
                     {"id": "laser-power", "name": "Laser power transmission", "dataClassification": "public"},

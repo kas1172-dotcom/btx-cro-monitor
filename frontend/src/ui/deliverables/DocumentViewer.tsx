@@ -5,7 +5,7 @@ import type { Deliverable, DeliverableSection } from "../../deliverables/types.t
 import type { World } from "../../app/useWorld.ts";
 import type { Company, Contact, Opportunity } from "../../engine/brain/entities.ts";
 import { deliverableToMarkdown } from "../../deliverables/markdown.ts";
-import { closeDeliverable, openDemoAction, setState } from "../../store/store.ts";
+import { openDemoAction } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { hasDeliverablesBackend, recordToDeliverable, saveStoredDeliverable } from "../../app/deliverablesApi.ts";
@@ -23,12 +23,13 @@ import {
 import { uiTokens } from "../../app/uiTokens.ts";
 import { deliverableMetaLabel, visibleSources } from "../../app/sourceLabels.ts";
 import { evidenceFromDeliverableSource, type EvidencePackage } from "../../app/evidence.ts";
-import { navigateTo, useAppRoute } from "../../app/router.ts";
+import { deliverablePath, navigateTo, useAppRoute } from "../../app/router.ts";
 import { AnalysisFigure } from "../analysis/ChartFigure.tsx";
 import { DarkMapTiles } from "../map/DarkMapTiles.tsx";
 import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 import { DeliverableBriefingMode } from "../modes/BriefingMode.tsx";
 import type { ChartSpec } from "../../metrics/types.ts";
+import { assessDeliverableQuality, invalidateLegacyDeliverable } from "../../deliverables/quality.ts";
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
@@ -99,8 +100,9 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   const [versions, setVersions] = useState<VersionEntry[]>(() => [{ id: `${Date.now()}`, label: "v1 original", sections: editableSections(deliverable.sections) }]);
   const [taskDialog, setTaskDialog] = useState<TaskDialog | null>(null);
   const [evidence, setEvidence] = useState<EvidencePackage | null>(null);
+  const [busyAction, setBusyAction] = useState<string | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const current = useMemo(() => ({ ...deliverable, title, sections }), [deliverable, sections, title]);
+  const current = useMemo(() => invalidateLegacyDeliverable({ ...deliverable, title, sections }), [deliverable, sections, title]);
   const markdown = useMemo(() => deliverableToMarkdown(current), [current]);
   const viewMode = route.query.get("view");
   const isFocus = viewMode === "focus";
@@ -139,10 +141,13 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       const choice = window.confirm("Save changes before closing?");
       if (choice) void saveCurrent();
     }
-    closeDeliverable();
+    navigateTo("/deliverables");
   }
 
   async function saveCurrent() {
+    if (busyAction) return;
+    setBusyAction("save");
+    setSaveStatus("Saving...");
     const saved: Deliverable = {
       ...current,
       sources: [
@@ -151,19 +156,22 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       ],
     };
     const localSaved = saveDeliverable(saved);
-    setState({ activeDeliverable: localSaved, activeDeliverableOrigin: openedFrom === "library" ? "library" : "generation" });
     setSaveStatus("Saved locally.");
     try {
       if (hasDeliverablesBackend()) {
         const record = await saveStoredDeliverable(localSaved);
         const persisted = recordToDeliverable(record);
         saveDeliverable(persisted);
-        setState({ activeDeliverable: persisted, activeDeliverableOrigin: openedFrom === "library" ? "library" : "generation" });
+        if ((persisted.backendRecordId ?? persisted.id) !== (deliverable.backendRecordId ?? deliverable.id)) {
+          navigateTo(deliverablePath(persisted.backendRecordId ?? persisted.id), { replace: true });
+        }
         setSaveStatus("Saved to program memory.");
       }
       setDirty(false);
     } catch (error) {
       setSaveStatus(error instanceof Error ? `Saved locally; backend save failed: ${error.message}` : "Saved locally; backend save failed.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
@@ -172,18 +180,28 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   }
 
   async function download(format: DownloadFormat) {
+    if (busyAction) return;
+    setBusyAction(`download-${format}`);
     setMenuOpen(false);
-    if (format === "markdown") downloadMarkdown(current);
-    if (format === "docx") await downloadDocx(current);
-    if (format === "pdf") printDeliverable(current, world);
-    if (format === "pptx" && world) {
-      const { downloadBoardDeck, downloadSalesPitch } = await import("../../deliverables/deck/pptx.ts");
-      if (current.type === "sales_pitch") await downloadSalesPitch(current, world);
-      else await downloadBoardDeck(current, world);
+    setSaveStatus(`Preparing ${format.toUpperCase()}...`);
+    try {
+      if (format === "markdown") downloadMarkdown(current);
+      if (format === "docx") await downloadDocx(current);
+      if (format === "pdf") printDeliverable(current, world);
+      if (format === "pptx" && world) {
+        const { downloadBoardDeck, downloadSalesPitch } = await import("../../deliverables/deck/pptx.ts");
+        if (current.type === "sales_pitch") await downloadSalesPitch(current, world);
+        else await downloadBoardDeck(current, world);
+      }
+      if (format === "xlsx") await downloadXlsx(current);
+      if (format === "csv") downloadCsv(current);
+      if (format === "ics") downloadIcs(current);
+      setSaveStatus(`${format.toUpperCase()} ready.`);
+    } catch (error) {
+      setSaveStatus(error instanceof Error ? error.message : `${format.toUpperCase()} export failed.`);
+    } finally {
+      setBusyAction(null);
     }
-    if (format === "xlsx") await downloadXlsx(current);
-    if (format === "csv") downloadCsv(current);
-    if (format === "ics") downloadIcs(current);
   }
 
   function revisionWarning(text: string): string | undefined {
@@ -198,6 +216,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   }
 
   async function requestSuggestion(instructionOverride?: string) {
+    if (busyAction) return;
     const instruction = (instructionOverride ?? assistantInput).trim();
     if (!instruction) return;
     const target = sections.find((section) => instruction.toLowerCase().includes(section.heading.toLowerCase())) ?? sections.find((section) => section.blocks.some((block) => block.kind === "text"));
@@ -210,6 +229,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       setAssistantInput("");
       return;
     }
+    setBusyAction("suggestion");
     try {
       const text = await requestSectionRevision({
         endpoint,
@@ -229,6 +249,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       }]);
     } finally {
       setAssistantInput("");
+      setBusyAction(null);
     }
   }
 
@@ -309,14 +330,18 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
   const lockedTokens = factTokens([deliverable.title, textFromSections(deliverable.sections)].join(" "));
   const currentText = textFromSections(sections);
   const missingLockedTokens = lockedTokens.filter((token) => !currentText.includes(token));
+  const semanticQuality = current.quality ?? assessDeliverableQuality(current);
   const checklist = [
-    { label: "Sources attached", ok: deliverable.sources.length > 0 },
+    { label: "Claims map to exact source facts", ok: semanticQuality.claimSourceGrounded },
+    { label: "Required data is available", ok: semanticQuality.dataAvailable },
+    { label: "Source freshness is known", ok: semanticQuality.freshnessKnown },
+    { label: "Sources are attached", ok: deliverable.sources.length > 0 },
     { label: "No banned terms", ok: bannedHits(currentText).length === 0 },
     { label: "No em dashes", ok: !currentText.includes("\u2014") },
-    { label: "Locked facts unchanged", ok: missingLockedTokens.length === 0 },
+    { label: "Locked facts are source-valid and unchanged", ok: semanticQuality.lockedFactsValid && missingLockedTokens.length === 0 },
     { label: "Confidence matches evidence", ok: !(deliverable.confidence === "high" && /needs qualification|missing/i.test(deliverable.confidenceReason ?? "")) },
   ];
-  const sendBlocked = checklist.some((item) => !item.ok) || suggestions.some((item) => Boolean(item.warning));
+  const sendBlocked = Boolean(current.invalidatedAt) || checklist.some((item) => !item.ok) || suggestions.some((item) => Boolean(item.warning));
 
   if (isBriefing) {
     return (
@@ -341,7 +366,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         </div>
         <div className="document-actions">
           <button onClick={closeEditor} aria-label={openedFrom === "library" ? "Back to library" : "Close editor"}>{openedFrom === "library" ? "Back" : "×"}</button>
-          <button onClick={() => void saveCurrent()}>Save to Library</button>
+          <button onClick={() => void saveCurrent()} disabled={Boolean(busyAction)}>{busyAction === "save" ? "Saving..." : "Save to Library"}</button>
           <button onClick={copyMarkdown}>Copy</button>
           <button onClick={() => navigateTo(pathWithView(isFocus ? null : "focus"))}>{isFocus ? "Exit focus" : "Focus mode"}</button>
           <button onClick={() => navigateTo(pathWithView("briefing"))}>Briefing mode</button>
@@ -350,8 +375,8 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
             {menuOpen && (
               <div className="download-menu-list">
                 {formats.map((format) => (
-                  <button key={format} onClick={() => void download(format)} disabled={format === "pptx" && !world}>
-                    {format === "pdf" ? "PDF (via Print)" : format === "pptx" ? "PowerPoint (.pptx)" : format === "docx" ? "Word (.docx)" : format === "xlsx" ? "Excel (.xlsx)" : format === "ics" ? "Calendar (.ics)" : format.toUpperCase()}
+                  <button key={format} onClick={() => void download(format)} disabled={Boolean(busyAction) || (format === "pptx" && !world)}>
+                    {busyAction === `download-${format}` ? "Preparing..." : format === "pdf" ? "PDF (via Print)" : format === "pptx" ? "PowerPoint (.pptx)" : format === "docx" ? "Word (.docx)" : format === "xlsx" ? "Excel (.xlsx)" : format === "ics" ? "Calendar (.ics)" : format.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -367,6 +392,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
           <button onClick={openTaskFlow}>Create task</button>
         </div>
       </header>
+      {current.invalidatedAt && <div className="live-inline-status error" role="alert">{current.invalidationReason}</div>}
 
       {taskDialog && (
         <div className="task-confirmation" role="dialog" aria-modal="true" aria-labelledby="task-confirm-title">
@@ -509,11 +535,11 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         <p>{copilotEndpoint ? "Ask for a focused rewrite of a section." : "Assistant needs the connection, manual editing still works."}</p>
         <div className="editor-quick-actions">
           {["Tighten", "More formal", "Shorten to 80 words", "Add evidence", "Soften claims", "Fix to sources"].map((action) => (
-            <button key={action} type="button" onClick={() => void requestSuggestion(action)}>{action}</button>
+            <button key={action} type="button" disabled={Boolean(busyAction)} onClick={() => void requestSuggestion(action)}>{busyAction === "suggestion" ? "Suggesting..." : action}</button>
           ))}
         </div>
         <textarea value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Tighten the subject line, make it more formal, cut it to 80 words..." />
-        <button onClick={() => void requestSuggestion()}>Suggest Revision</button>
+        <button onClick={() => void requestSuggestion()} disabled={Boolean(busyAction) || !assistantInput.trim()}>{busyAction === "suggestion" ? "Suggesting..." : "Suggest revision"}</button>
         <div className="quality-checklist">
           <strong>Quality checklist</strong>
           {checklist.map((item) => (

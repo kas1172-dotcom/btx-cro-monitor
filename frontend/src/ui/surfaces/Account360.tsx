@@ -19,6 +19,9 @@ import { EvidenceDrawer } from "../evidence/EvidenceDrawer.tsx";
 import { buildAccountTimeline } from "../../app/timeline.ts";
 import { MeaningfulTimeline } from "../timeline/MeaningfulTimeline.tsx";
 import { AccountBriefingMode } from "../modes/BriefingMode.tsx";
+import { ProvenanceBadge } from "../common/ProvenanceBadge.tsx";
+import { provenanceForRecord } from "../../app/provenance.ts";
+import { canonicalMetrics, formatCanonicalMetric } from "../../app/canonicalMetrics.ts";
 
 function money(value: number | null): string {
   if (value === null) return "Value not provided";
@@ -51,6 +54,11 @@ function scoreDisplay(score: ScoreSnapshot | null): string {
   if (score.result.status === "provisional") return score.score === null ? "Provisional" : `${Math.round(score.score)} provisional`;
   if (score.result.status === "disqualified") return "Disqualified";
   return score.score === null ? "More information needed" : String(Math.round(score.score));
+}
+
+function accountListScoreLabel(score: ScoreSnapshot | null): string {
+  const display = scoreDisplay(score);
+  return display === "More information needed" ? "Attractiveness needs more information" : `Attractiveness ${display}`;
 }
 
 function scoreStatus(score: ScoreSnapshot | null): string {
@@ -156,6 +164,11 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
   const qualificationGaps = accountScores.flatMap(({ family, label, score }) =>
     (score?.result.missingInputs ?? [`${label} has not been calculated.`]).map((gap) => ({ family, label, gap }))
   );
+  const accountMetrics = canonicalMetrics(world);
+  const totalAccountsMetric = formatCanonicalMetric(accountMetrics.total_accounts);
+  const customerAccountsMetric = formatCanonicalMetric(accountMetrics.customer_accounts);
+  const crmAccountsMetric = formatCanonicalMetric(accountMetrics.crm_synced_accounts);
+  const opportunityMetric = formatCanonicalMetric(accountMetrics.opportunity);
 
   function pathWithView(nextView: string | null): string {
     const params = new URLSearchParams(route.query);
@@ -191,7 +204,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
       <SurfaceHeader
         eyebrow="Accounts / Account 360"
         headline={company.name}
-        subline={formatAddress(company.location) ?? company.location.city}
+        subline={`${formatAddress(company.location) ?? company.location.city} · ${totalAccountsMetric.displayValue} ${totalAccountsMetric.displayLabel.toLowerCase()} · ${customerAccountsMetric.displayValue} ${customerAccountsMetric.displayLabel.toLowerCase()} · ${crmAccountsMetric.displayValue} ${crmAccountsMetric.displayLabel.toLowerCase()} · ${opportunityMetric.displayValue} ${opportunityMetric.displayLabel.toLowerCase()} · ${totalAccountsMetric.provenanceLabel}`}
       />
 
       <div className="account360-layout">
@@ -201,7 +214,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               <AccountToken name={row.company.name} riskScore={row.score?.dimensions.risk.score} size="sm" />
               <span className="account360-list-row-main">
                 <strong>{row.company.name}</strong>
-                <span>{scoreDisplay(row.attractiveness)} attractiveness</span>
+                <span>{accountListScoreLabel(row.attractiveness)}</span>
                 <em>{row.linkedSignals.length} confirmed signal{row.linkedSignals.length === 1 ? "" : "s"} · {money(row.openPipeline)} open</em>
               </span>
             </button>
@@ -304,10 +317,12 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
                 <button type="button" onClick={() => openDeliverableWizard({ accountId: company.id, startStep: "pick" })}>Create deliverable</button>
               </div>
             <CrmWriteActions
+              key={company.id}
               company={company}
               contact={contacts[0]}
               environment={world.sources.find((source) => source.id.includes("hubspot"))?.environment ?? "none"}
               writeConnected={world.sources.find((source) => source.id.includes("hubspot"))?.canWrite ?? false}
+              currentRouteEntityId={route.accountId}
               variant="account"
               defaultTaskSubject={`Follow up with ${company.name}`}
               defaultTaskBody={rec?.reason ?? `Review next step for ${company.name}.`}
@@ -350,12 +365,12 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
           <div className="brief-grid compact">
             <section className="surface-panel">
               <div className="panel-head"><h2>Contacts</h2></div>
-              {contacts.map((contact) => <p key={contact.id}><strong>{contact.name}</strong> · {contact.title}</p>)}
+              {contacts.map((contact) => <p key={contact.id}><strong>{contact.name}</strong> · {contact.title} <ProvenanceBadge label={provenanceForRecord(contact)} /></p>)}
               {contacts.length === 0 && <div className="rail-quiet-empty">No contacts available.</div>}
             </section>
             <section className="surface-panel">
               <div className="panel-head"><h2>Deals</h2></div>
-              {deals.map((deal) => <p key={deal.id}><strong>{deal.name}</strong> · {deal.stage} · {money(deal.value)}</p>)}
+              {deals.map((deal) => <p key={deal.id}><strong>{deal.name}</strong> · {deal.stage} · {money(deal.value)} <ProvenanceBadge label={provenanceForRecord(deal)} /></p>)}
               {deals.length === 0 && <div className="rail-quiet-empty">No deals available.</div>}
             </section>
             <section className="surface-panel">

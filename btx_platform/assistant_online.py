@@ -20,6 +20,8 @@ CURRENT_MARKERS = (
     "search", "browse", "research", "verify", "publicly", "internet", "web",
     "funding", "leadership", "contract", "policy", "competitor", "market",
 )
+WORKSPACE_CONTEXT_MARKERS = ("workspace", "internal", "account", "crm", "work item", "score", "pipeline", "deliverable", "btx")
+GOVERNMENT_HOSTS = ("sam.gov", "defense.gov", "congress.gov", "usaspending.gov", "dod.defense.gov", "sec.gov", "federalregister.gov")
 WORKSPACE_ONLY_MARKERS = ("workspace only", "internal only", "do not search", "no web", "without web")
 CONFIDENTIAL_PATTERNS = (
     re.compile(r"(?i)\b(api[_ -]?key|access[_ -]?token|authorization|bearer|password|secret)\s*[:=]\s*\S+"),
@@ -51,7 +53,10 @@ def choose_source_mode(message: str, requested: SourceMode, *, web_enabled: bool
     if requested == "workspace_web":
         return "workspace_web" if web_enabled else "workspace"
     wants_current = any(marker in lowered for marker in CURRENT_MARKERS)
-    return "workspace_web" if wants_current and web_enabled else "workspace"
+    wants_workspace = any(marker in lowered for marker in WORKSPACE_CONTEXT_MARKERS)
+    if wants_current and web_enabled:
+        return "workspace_web" if wants_workspace else "web"
+    return "workspace"
 
 
 def sanitize_public_query(value: str, *, limit: int = 500) -> tuple[str, int]:
@@ -113,10 +118,12 @@ def _extract(response: Any, *, retrieved_at: str) -> tuple[str, list[dict[str, A
                     continue
                 seen.add(url)
                 title = str(_block_value(item, "title", "") or urlsplit(url).hostname or "Public source")
+                host = urlsplit(url).hostname or ""
+                government = host.endswith(".gov") or any(host == item_host or host.endswith(f".{item_host}") for item_host in GOVERNMENT_HOSTS)
                 digest = hashlib.sha256(url.encode()).hexdigest()[:12]
                 citations.append({
                     "id": f"web:{digest}",
-                    "source_type": "public_web",
+                    "source_type": "public_government" if government else "public_web",
                     "record_id": digest,
                     "title": title[:300],
                     "route": url,
@@ -124,7 +131,7 @@ def _extract(response: Any, *, retrieved_at: str) -> tuple[str, list[dict[str, A
                     "publisher": urlsplit(url).hostname,
                     "claim": str(_block_value(item, "cited_text", ""))[:300],
                     "claim_classification": "public_fact",
-                    "data_classification": "public",
+                    "data_classification": "primary_government" if government else "reporting_or_public_web",
                     "relationship_status": None,
                     "published_at": None,
                     "retrieved_at": retrieved_at,
@@ -178,10 +185,9 @@ def run_online_answer(
     content.append({"type": "text", "text": safe_question})
     messages: list[dict[str, Any]] = [{"role": "user", "content": content}]
     tools: list[dict[str, Any]] = []
-    activity = ["Checking BTX evidence"] if actual_mode != "web" else []
+    activity: list[str] = []
     if actual_mode in {"web", "workspace_web"}:
         tools.append({"type": "web_search_20250305", "name": "web_search", "max_uses": settings.ask_web_max_uses})
-        activity.append("Searching public sources")
 
     api = client or anthropic.Anthropic(
         api_key=settings.anthropic_api_key,
@@ -238,7 +244,6 @@ def run_online_answer(
     merged = [*normalized_workspace, *web_citations]
     if actual_mode == "web":
         merged = web_citations
-    activity.extend(["Validating citations", "Preparing brief"])
     if actual_mode in {"web", "workspace_web"} and not web_citations:
         warnings.append("No citable public result was returned; no live-search claim should be inferred.")
     return OnlineAnswer(

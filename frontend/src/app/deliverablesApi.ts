@@ -1,5 +1,6 @@
 import { BACKEND_ENDPOINT, backendJson } from "./backendApi.ts";
 import type { Deliverable, DeliverableType } from "../deliverables/types.ts";
+import { invalidateLegacyDeliverable } from "../deliverables/quality.ts";
 
 export interface StoredDeliverable {
   id: string;
@@ -23,7 +24,7 @@ export function hasDeliverablesBackend(): boolean {
 }
 
 export function recordToDeliverable(record: StoredDeliverable): Deliverable {
-  return {
+  return invalidateLegacyDeliverable({
     ...record.document,
     id: record.document.id || record.id,
     backendRecordId: record.id,
@@ -34,7 +35,7 @@ export function recordToDeliverable(record: StoredDeliverable): Deliverable {
     programId: record.program_id,
     tripId: record.trip_id,
     entityIds: record.entity_ids ?? record.document.entityIds ?? [],
-  };
+  });
 }
 
 export function deliverableAccountId(deliverable: Deliverable): string | null {

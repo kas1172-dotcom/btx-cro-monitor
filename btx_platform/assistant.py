@@ -108,9 +108,16 @@ def _source_classification(payload: dict | None, fallback: str = "internal") -> 
 
 def _conversation_title(message: str, account: models.CanonicalAccount | None = None) -> str:
     if account is not None:
-        return f"Ask: {account.display_name or account.legal_name}"
+        topic = " ".join(message.strip().split())[:64]
+        return f"{account.display_name or account.legal_name}: {topic}" if topic else f"{account.display_name or account.legal_name} discussion"
     cleaned = " ".join(message.strip().split())
-    return cleaned[:72] if cleaned else "New Ask conversation"
+    if not cleaned:
+        return "New Ask conversation"
+    cleaned = cleaned.rstrip("?.!")
+    stopwords = {"what", "should", "about", "please", "could", "would", "tell", "show", "give", "with", "from"}
+    words = [word for word in cleaned.split() if word.casefold() not in stopwords]
+    title = " ".join((words or cleaned.split())[:8])
+    return title[:72] if title else "New Ask conversation"
 
 
 def _context_dict(context: Any | None) -> dict[str, Any]:
@@ -558,11 +565,7 @@ def answer(
     ctx = _context_dict(context)
     intent = _intent(message)
     workspace_scope = intent in {"data_basis", "workspace_changes"}
-    tool_activity = [
-        "Resolving question intent and scope",
-        "Checking open work",
-        "Reviewing source classifications",
-    ]
+    tool_activity: list[str] = []
     account = _match_account(session, tenant_id, message, ctx, allow_fallback=not workspace_scope)
     signal = _signal_by_context(session, tenant_id, ctx.get("signal_id"))
     contextual_work = _work_by_context(session, tenant_id, ctx.get("work_item_id"))
@@ -682,6 +685,12 @@ def answer(
     work_lines = [f"- {item.recommended_action} ({item.status}, {item.priority})" for item in work_items[:4]]
     deliverable_lines = [f"- {item.title}" for item in deliverables[:3]]
     source_lines = [f"- {item.get('displayName')}: {item.get('availability')}" for item in health[:3]]
+    metric_states = ctx.get("metric_states") if isinstance(ctx.get("metric_states"), dict) else {}
+    metric_lines = [
+        f"- {key}: {value.get('state', 'unavailable')} ({value.get('reason', 'No reason supplied')})"
+        for key, value in metric_states.items()
+        if isinstance(value, dict)
+    ]
     content_parts = [
         f"Based on internal records, here is the supported view for {name}.",
         "",
@@ -700,6 +709,13 @@ def answer(
         content_parts.extend(["", "Existing deliverables:", "\n".join(deliverable_lines)])
     if source_lines:
         content_parts.extend(["", "Source status:", "\n".join(source_lines)])
+    if metric_lines:
+        content_parts.extend([
+            "",
+            "Metric availability:",
+            "\n".join(metric_lines),
+            "- Unavailable, stale, or error metrics are not evidence for a numeric or directional conclusion. A recorded zero remains a real value only when its state is available.",
+        ])
     content_parts.extend([
         "",
         "Missing information:",
@@ -720,10 +736,8 @@ def answer(
     action_draft = None
     deliverable_draft = None
     if any(token in lowered for token in ["draft work", "create work", "task", "follow up"]):
-        tool_activity.append("Preparing a work-item draft")
         action_draft = _draft_work_item(account, relationships, citations)
     if any(token in lowered for token in ["meeting brief", "executive brief", "account brief", "prepare brief"]):
-        tool_activity.append("Preparing a meeting brief")
         deliverable_draft = _draft_deliverable(account, relationships, scores, work_items, citations, health)
 
     return AssistantResult(

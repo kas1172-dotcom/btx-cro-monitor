@@ -35,12 +35,20 @@ export interface QuarterWindow extends TimeRange {
   year: number;
 }
 
-export interface MetricResult {
-  value: number | null;
+export type MetricState = "available" | "unavailable" | "stale" | "error";
+
+interface MetricResultBase {
   label: string;
   unit: "$" | "%" | "ratio" | "count";
   provenance: ProvenanceEntry[];
+  reason: string;
+  asOf: string | null;
 }
+
+export type MetricResult =
+  | (MetricResultBase & { state: "available"; value: number })
+  | (MetricResultBase & { state: "stale"; value: number })
+  | (MetricResultBase & { state: "unavailable" | "error"; value: null });
 
 export interface MetricDefinition {
   id: MetricId;
@@ -73,6 +81,8 @@ export interface ChartResult {
   spec: ChartSpec;
   meta: { label: string; unit: MetricResult["unit"] };
   provenance: ProvenanceEntry[];
+  state: MetricState;
+  reason: string;
   grid?: { rows: string[]; cols: string[]; values: (number | null)[][]; qtdCols: string[] };
   series?: Array<{ label: string; points: Array<{ x: string; y: number }>; qtdPoints?: number[] }>;
   legend?: ChartLegend;

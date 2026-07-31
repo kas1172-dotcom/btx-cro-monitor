@@ -11,7 +11,7 @@ runs:
   steps:
     - uses: actions/setup-node@v4
       with:
-        node-version: "22"
+        node-version-file: .nvmrc
 
     - name: Install deps
       working-directory: frontend
@@ -23,14 +23,14 @@ runs:
       shell: bash
       env:
         ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
-      run: node tools/generate-insights.ts
+      run: npx tsx tools/generate-insights.ts
 
     - name: Extract signals from news
       working-directory: frontend
       shell: bash
       env:
         ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
-      run: node tools/extract-signals.ts
+      run: npx tsx tools/extract-signals.ts
 
     - name: Commit if changed
       shell: bash
