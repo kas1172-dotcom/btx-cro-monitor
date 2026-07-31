@@ -115,11 +115,12 @@ assert(markers.every((marker) => Number.isFinite(marker.center[0]) && Number.isF
 assert(Number.isFinite(center[0]) && Number.isFinite(center[1]), "center included non-finite coordinates");
 
 const small = markers.find((marker) => marker.company.id === "canonical-live-1");
-const large = markers.find((marker) => marker.company.id === "canonical-live-2");
+const customer = markers.find((marker) => marker.company.id === "canonical-live-2");
 const supplier = markers.find((marker) => marker.company.id === "canonical-live-4");
 
-assert(Boolean(small && large && supplier), "expected all valid markers to be present");
-assert((large?.radius ?? 0) > (small?.radius ?? 0), `prospect radius did not scale by backend account attractiveness (${small?.radius} vs ${large?.radius})`);
+assert(Boolean(small && customer && supplier), "expected all valid markers to be present");
+assert((small?.radius ?? 0) > (customer?.radius ?? 0), `target prospect radius should scale while customer radius stays fixed (${small?.radius} vs ${customer?.radius})`);
+assert(customer?.prospect === false && customer?.radius === 5, `customer marker must not be treated as a prospect (${customer?.prospect}, ${customer?.radius})`);
 assert(small?.scoreStatus === "available", `expected backend score status, got ${small?.scoreStatus}`);
 assert(supplier?.radius === 5, `non-prospect radius should stay fixed at 5, got ${supplier?.radius}`);
 
@@ -129,4 +130,4 @@ assert(!/basemaps\.cartocdn|openstreetmap|TileLayer/.test(prospectMapSource), "P
 assert(!/basemaps\.cartocdn|TileLayer/.test(documentViewerSource), "Document maps must not depend on external raster tiles");
 assert(prospectMapSource.includes("DarkMapTiles"), "Prospect map must mount the bundled dark basemap");
 
-console.log("map ok: bundled dark tiles, mixed coordinates filtered, canonical fallback used, backend attractiveness radius scales");
+console.log("map ok: bundled dark tiles, mixed coordinates filtered, canonical fallback used, customers excluded from prospect styling");

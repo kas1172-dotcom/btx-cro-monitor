@@ -53,15 +53,19 @@ function FitMapBounds({ points, watchKey }: { points: Array<[number, number]>; w
   return null;
 }
 
-export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { world: World; selectedAccountId?: string | null; onSelectAccount?: (accountId: string) => void }) {
-  const markers = buildMapMarkers(world.companies, world.analysis.byId, world.scoreResults);
-  const center = mapCenter(mappableCompanies(world.companies));
-  const omittedCount = world.companies.length - markers.length;
+export function ProspectMap({ world, selectedAccountId, onSelectAccount, prospectsOnly = false }: { world: World; selectedAccountId?: string | null; onSelectAccount?: (accountId: string) => void; prospectsOnly?: boolean }) {
+  const prospectCompanies = world.prospects.map((prospect) => prospect.company);
+  const mapCompanies = prospectsOnly ? prospectCompanies : world.companies;
+  const markers = buildMapMarkers(mapCompanies, world.analysis.byId, world.scoreResults);
+  const center = mapCenter(mappableCompanies(mapCompanies));
+  const omittedCount = mapCompanies.length - markers.length;
   const marketLabel = world.city ?? "All Markets";
   const initialZoom = world.city ? 11 : 4;
   const watchKey = `${world.city ?? "all"}:${markers.length}:${selectedAccountId ?? "none"}`;
-  const mappedMetric = formatCanonicalMetric(canonicalMetrics(world).mapped_accounts);
-  const omittedCompanies = world.companies.filter((company) => !markers.some((marker) => marker.company.id === company.id));
+  const mappedMetric = prospectsOnly
+    ? formatCanonicalMetric({ ...canonicalMetrics(world).mapped_accounts, label: "Mapped prospects", value: markers.length, scope: "Prospect records with latitude and longitude" })
+    : formatCanonicalMetric(canonicalMetrics(world).mapped_accounts);
+  const omittedCompanies = mapCompanies.filter((company) => !markers.some((marker) => marker.company.id === company.id));
 
   return (
     <div className="map-shell" data-surface-component="surface-map">
@@ -117,13 +121,13 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
         </div>
         {omittedCount > 0 && (
           <details className="map-rail-note">
-            <summary>{omittedCount} account{omittedCount === 1 ? "" : "s"} omitted: missing coordinates</summary>
+          <summary>{omittedCount} {prospectsOnly ? "prospect" : "account"}{omittedCount === 1 ? "" : "s"} omitted: missing coordinates</summary>
             <p>Add coordinates to show these records on the map.</p>
             <ul>{omittedCompanies.slice(0, 8).map((company) => <li key={company.id}>{company.name} · {company.location.city || "city unavailable"}</li>)}</ul>
           </details>
         )}
         <div className="map-prospect-list">
-          {world.prospects.slice(0, 12).map((p, i) => {
+          {world.prospects.filter((p) => !prospectsOnly || markers.some((marker) => marker.company.id === p.company.id)).slice(0, 12).map((p, i) => {
             const qualification = prospectQualificationLabel({
               company: p.company,
               contact: p.contact,
@@ -163,7 +167,7 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount }: { wor
           })}
         </div>
         <div className="map-legend">
-          <span><i className="legend-prospect" /> prospect/customer</span>
+          <span><i className="legend-prospect" /> prospect</span>
           <span><i className="legend-other" /> supplier/competitor/self</span>
         </div>
         <div className="map-legend">

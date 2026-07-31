@@ -92,6 +92,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "uei": "CQWLW9XRQTH5",
             "city": "Fort Worth",
             "state": "TX",
+            "lat": 32.7555,
+            "lon": -97.3308,
             "needs": ["5-axis CNC", "AS9100", "ITAR", "build-to-print", "thermal-management hardware"],
         },
         {
@@ -105,6 +107,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "known_customers": ["Department of Defense"],
             "city": "Camas",
             "state": "WA",
+            "lat": 45.5871,
+            "lon": -122.3995,
             "needs": ["optical benches", "thermal-management housings", "precision alignment components"],
         },
         {
@@ -118,6 +122,8 @@ def build_demo_seed(anchor: datetime | None = None) -> dict[str, Any]:
             "known_customers": ["U.S. Space Force"],
             "city": "Bellevue",
             "state": "WA",
+            "lat": 47.6101,
+            "lon": -122.2015,
             "needs": ["space-rated structures", "thermal-management hardware", "prototype machining"],
         },
     ]

@@ -69,6 +69,13 @@ function countMetric(id: CanonicalMetricId, label: string, value: number, world:
   return { id, label, value, unit: "count", state: "available", scope, source, asOf: world.worldSnapshot?.generatedAt ?? null };
 }
 
+function isTargetProspect(company: { relationship?: string; business_motion?: string; account_status?: string }): boolean {
+  return company.relationship === "target"
+    || company.business_motion === "prospect_new_business"
+    || company.account_status === "target_prospect"
+    || company.account_status === "new_logo";
+}
+
 export function canonicalMetrics(world: World, _memory?: MemoryState | null): Record<CanonicalMetricId, CanonicalMetric> {
   const sources = world.sources ?? [];
   const companies = world.companies ?? [];
@@ -189,20 +196,21 @@ export function canonicalMetricForSurface(surface: TabId, world: World | null, m
   if (!id) return null;
   if (id in metrics) return formatCanonicalMetric(metrics[id as CanonicalMetricId]);
   const generatedAt = world.worldSnapshot?.generatedAt ?? null;
-  const capacityCount = Array.isArray(world.snapshot?.capacity) ? world.snapshot.capacity.length : 0;
   const companies = world.companies ?? [];
   const opportunities = world.opportunities ?? [];
-  const facilities = world.facilities ?? [];
   const signals = world.analysis?.valid ?? [];
   const prospects = world.prospects ?? [];
+  const prospectAccounts = companies.filter(isTargetProspect);
+  const mappedAccounts = companies.filter((company) => Boolean(company.location?.lat && company.location?.lon));
+  const hasApprovedAnalytics = opportunities.length > 0 && world.sources.some((source) => source.canRead && source.dataMode === "live_external");
   const displayOnly: Record<Exclude<SurfaceMetricId, CanonicalMetricId>, CanonicalMetric> = {
     industry_updates: { id: "signals", label: "Public monitor signals", value: signals.filter((signal) => signal.artifact).length, unit: "count", state: "available", scope: "Signals with public artifacts", source: "Monitor pipeline", asOf: generatedAt },
-    prospects: { id: "total_accounts", label: "Prospect accounts", value: companies.filter((company) => company.business_motion === "prospect_new_business" || company.account_status === "target_prospect" || company.account_status === "new_logo").length, unit: "count", state: "available", scope: "Prospect/new-logo account records", source: "Backend world snapshot", asOf: generatedAt },
+    prospects: { id: "total_accounts", label: "Target prospect accounts", value: prospectAccounts.length, unit: "count", state: "available", scope: "Relationship = target or prospect/new-logo status", source: "Backend world snapshot", asOf: generatedAt },
     trip_planner: { id: "mapped_accounts", label: "Trip plans", value: memory?.deliverables.filter((deliverable) => deliverable.type === "itinerary").length ?? prospects.length, unit: "count", state: "available", scope: "Itinerary deliverables or mapped prospects", source: memory ? "Local deliverable memory" : "Backend world snapshot", asOf: generatedAt },
-    map: { ...metrics.mapped_accounts, label: "Mapped prospects", value: prospects.length, scope: "Prospect records shown on map" },
-    analysis_open_opportunities: { id: "opportunity", label: "Open opportunities", value: opportunities.filter((opportunity) => opportunity.stage !== "won" && opportunity.stage !== "lost").length, unit: "count", state: "available", scope: "Open opportunity records", source: "Backend world snapshot", asOf: generatedAt },
-    capacity_facilities: { id: "mapped_accounts", label: "Facility records", value: facilities.length || capacityCount || null, unit: "count", state: facilities.length || capacityCount ? "available" : "unavailable", scope: "Capacity/facility records", source: "Backend world snapshot", asOf: generatedAt, unavailableReason: "No capacity or facility records are available." },
-    deliverables: { id: "work_total", label: "Deliverables", value: memory?.deliverables.length ?? null, unit: "count", state: memory ? "available" : "unavailable", scope: "Local deliverable library", source: "Local deliverable memory", asOf: generatedAt, unavailableReason: "Local deliverable memory is unavailable." },
+    map: { ...metrics.mapped_accounts, label: "Mapped accounts", value: mappedAccounts.length, scope: "Account records with latitude and longitude" },
+    analysis_open_opportunities: { id: "opportunity", label: "Approved analytics", value: hasApprovedAnalytics ? opportunities.filter((opportunity) => opportunity.stage !== "won" && opportunity.stage !== "lost").length : null, unit: "count", state: hasApprovedAnalytics ? "available" : "unavailable", scope: "Approved financial/opportunity analytics records", source: hasApprovedAnalytics ? "Live backend source" : "Analysis source unavailable", asOf: generatedAt, unavailableReason: "No approved analytics dataset is connected." },
+    capacity_facilities: { ...metrics.crm_synced_accounts, label: "CRM-synced accounts", scope: "Same CRM account records shown on Accounts/Capacity" },
+    deliverables: { id: "work_total", label: "Saved deliverables", value: world.worldSnapshot?.deliverables.length ?? null, unit: "count", state: world.worldSnapshot ? "available" : "unavailable", scope: "Backend saved deliverable records", source: "Backend world snapshot", asOf: generatedAt, unavailableReason: "Backend deliverable summaries are unavailable." },
     hubspot_records: { id: "crm_synced_accounts", label: "CRM records", value: world.contacts.length + world.opportunities.length, unit: "count", state: "available", scope: "Contacts plus opportunities loaded in world snapshot", source: "Backend world snapshot", asOf: generatedAt },
     settings_activity: { id: "work_total", label: "Activity", value: memory ? memory.activity.length + memory.notes.length : null, unit: "count", state: memory ? "available" : "unavailable", scope: "Local activity and notes", source: "Local memory", asOf: generatedAt },
   };

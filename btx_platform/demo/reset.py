@@ -418,7 +418,12 @@ def _seed_scores(session: Session, seed: dict[str, Any], tenant_id: str) -> None
 def _store_tenant_metadata(session: Session, tenant: models.Tenant, seed: dict[str, Any]) -> None:
     account_overrides = {
         record["id"]: {
-            "location": {"city": record.get("city", ""), "state": record.get("state"), "lat": None, "lon": None},
+            "location": {
+                "city": record.get("city", ""),
+                "state": record.get("state"),
+                "lat": record.get("lat"),
+                "lon": record.get("lon"),
+            },
             "needs": record.get("needs", []),
             "dataClassification": "simulated" if record["relationship"] == "customer" else "public",
         }

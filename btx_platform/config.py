@@ -83,7 +83,7 @@ class Settings(BaseSettings):
 
     # Observability, health, retention (WP10-C).
     sentry_dsn: str | None = None
-    monitor_stale_after_days: int = 7
+    monitor_stale_after_days: int = 10
     event_retention_days: int = 90
     audit_retention_days: int = 365
 

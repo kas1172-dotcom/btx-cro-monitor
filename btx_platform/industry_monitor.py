@@ -268,7 +268,7 @@ def monitor_snapshot(
     return {
         "state": state,
         "ingestionMode": ingestion_mode,
-        "status": "Latest data is stale" if stale else "All sources failed" if all_failed else "Some sources failed" if failed else "Collection completed",
+        "status": f"Latest data is outside the {int(stale_after_hours / 24)}-day refresh window" if stale else "All sources failed" if all_failed else "Some sources failed" if failed else "Collection completed",
         "run": {
             "id": run_id,
             "startedAt": run_at,

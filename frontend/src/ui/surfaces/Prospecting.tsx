@@ -178,7 +178,7 @@ export function Prospecting({ world }: { world: World }) {
 
       {prospectView === "map" && (
         <section className="surface-panel prospects-map-panel" aria-label="Prospect map">
-          <ProspectMap world={world} />
+          <ProspectMap world={world} prospectsOnly />
         </section>
       )}
 
