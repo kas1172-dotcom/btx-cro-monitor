@@ -18,6 +18,14 @@ function sectionText(sections: DeliverableSection[]): string {
   }).join(" ");
 }
 
+function claimSentences(text: string): string[] {
+  return text
+    .split(/(?<=[.!?])\s+|[\n;]+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean)
+    .filter((sentence) => !/\b(?:missing|required input|unavailable|not available|no approved source|cannot state|connect approved|not connected|omitted|suppressed)\b/i.test(sentence));
+}
+
 function numericTokens(text: string): string[] {
   return [...new Set([...text.matchAll(/\$\d+(?:,\d{3})*(?:\.\d+)?(?:[kKmM])?|\d+(?:\.\d+)?%|\d+(?:\.\d+)?\s+(?:days?|weeks?|months?|years?|hours?|units?|deals?|opportunities?)/g)]
     .map((match) => match[0].replace(/[$,%]/g, "").replace(/[kKmM]$/, "").replace(/\s+(?:days?|weeks?|months?|years?|hours?|units?|deals?|opportunities?)$/, "")))];
@@ -41,8 +49,9 @@ export function assessDeliverableQuality(deliverable: Deliverable, ctx?: AgentCo
 
   let dataAvailable = true;
   let freshnessKnown = true;
+  const groundedClaimText = claimSentences(text).join(" ");
   for (const claim of DOMAIN_CLAIMS) {
-    if (!claim.pattern.test(text)) continue;
+    if (!claim.pattern.test(groundedClaimText)) continue;
     const states = claim.metrics.map((metric) => ctx?.metricStates?.[metric]).filter(Boolean);
     if (!states.length || states.every((state) => state?.state !== "available")) {
       dataAvailable = false;

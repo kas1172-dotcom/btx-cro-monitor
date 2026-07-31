@@ -101,7 +101,10 @@ class Connector:
         except ValueError as exc:  # JSON decode
             raise ConnectorError(f"invalid JSON: {exc}") from exc
 
-        records = _resolve_path(data, spec.item_path)
+        try:
+            records = _resolve_path(data, spec.item_path)
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            raise ConnectorError(f"item_path {spec.item_path!r} was missing or invalid: {exc}") from exc
         if isinstance(records, dict):
             records = [records]
         if not isinstance(records, list):

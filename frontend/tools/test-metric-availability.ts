@@ -46,6 +46,32 @@ const partial = assessDeliverableQuality(base, {
 });
 assert(!partial.valid && !partial.dataAvailable, "Partial datasets must block unsupported demand and capacity conclusions.");
 
+const missingDisclosure = assessDeliverableQuality(
+  { ...base, sections: [{ id: "missing", heading: "Missing", blocks: [{ kind: "text", text: "Missing required inputs: Margin trend: no approved revenue records were available." }] }] },
+  {
+    facts: {},
+    entityIds: [],
+    sources: [],
+    metricStates: {
+      margin_trend: computeMetric("margin_trend", emptyWorld),
+    },
+  },
+);
+assert(missingDisclosure.valid, "Missing-data disclosure must not be treated as an unsupported margin conclusion.");
+
+const inventedMargin = assessDeliverableQuality(
+  { ...base, sections: [{ id: "margin", heading: "Margin", blocks: [{ kind: "text", text: "Margin is improving." }] }] },
+  {
+    facts: {},
+    entityIds: [],
+    sources: [],
+    metricStates: {
+      margin_trend: computeMetric("margin_trend", emptyWorld),
+    },
+  },
+);
+assert(!inventedMargin.valid && inventedMargin.errors.some((error) => error.includes("margin conclusion")), "Unsupported margin conclusions must still fail.");
+
 const contradictory = assessDeliverableQuality(
   { ...base, sections: [{ id: "missing", heading: "Missing", blocks: [{ kind: "text", text: "Required sections are unavailable." }] }] },
   {

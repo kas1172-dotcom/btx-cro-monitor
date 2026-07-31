@@ -144,6 +144,12 @@ def test_connector_raises_on_non_list_item_path():
         Connector(session).fetch(_spec(), "x")
 
 
+def test_connector_raises_connectorerror_on_missing_item_path():
+    session = _mock_session({"error": "upstream schema changed"})
+    with pytest.raises(ConnectorError, match="item_path"):
+        Connector(session).fetch(_spec(), "x")
+
+
 # ─── facts_from_records ─────────────────────────────────────────────────────
 
 def test_facts_from_records_parses_money_and_skips_missing():
