@@ -181,3 +181,4 @@ try {
   if (browser) await browser.close();
   await stopChild(preview);
 }
+process.exit(0);
