@@ -51,6 +51,7 @@ runs:
         CLERK_DEPLOYMENT_ENVIRONMENT: ${{ inputs.clerk_environment }}
         VITE_DEPLOYMENT_MODE: ${{ inputs.deployment_mode }}
         VITE_DEPLOYED_REVISION: ${{ github.sha }}
+        VITE_BASE_PATH: /btx-cro-monitor/cockpit/
         VITE_TENANT_ID: btx-demo-command-cockpit
         VITE_SOURCE_TYPE: repository_seed
         VITE_DATA_PROVENANCE: Repository demo seed; internal records are illustrative
