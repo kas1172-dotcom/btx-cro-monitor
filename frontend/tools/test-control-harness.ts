@@ -498,3 +498,4 @@ try {
   if (browser) await browser.close();
   preview.kill("SIGTERM");
 }
+process.exit(0);

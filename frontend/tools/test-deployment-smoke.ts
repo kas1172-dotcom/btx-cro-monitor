@@ -134,3 +134,4 @@ try {
 }
 
 console.log("deployment smoke ok: commit/env/banner/counts/routes/ask/write-gate contracts verified");
+process.exit(0);

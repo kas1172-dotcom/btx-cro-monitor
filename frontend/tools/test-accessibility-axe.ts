@@ -159,3 +159,4 @@ try {
 }
 
 console.log(`axe accessibility ok: ${ROUTES.join(", ")}`);
+process.exit(0);

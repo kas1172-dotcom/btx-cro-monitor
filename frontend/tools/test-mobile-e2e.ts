@@ -202,3 +202,4 @@ try {
 }
 
 console.log(`mobile e2e ok: screenshots in ${SCREENSHOT_DIR}`);
+process.exit(0);
