@@ -5,7 +5,7 @@
 
 import { useEffect } from "react";
 import L from "leaflet";
-import { MapContainer, CircleMarker, Tooltip, ZoomControl } from "react-leaflet";
+import { MapContainer, CircleMarker, Popup, Tooltip, ZoomControl } from "react-leaflet";
 import { useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { World } from "../../app/useWorld.ts";
@@ -19,6 +19,7 @@ import { DarkMapTiles } from "./DarkMapTiles.tsx";
 import { prospectQualificationLabel } from "../../app/confidence.ts";
 import { EmptyState } from "../primitives.tsx";
 import { canonicalMetrics, formatCanonicalMetric } from "../../app/canonicalMetrics.ts";
+import { navigateTo } from "../../app/router.ts";
 
 function MapSizeInvalidator({ watchKey }: { watchKey: string }) {
   const map = useMap();
@@ -53,6 +54,30 @@ function FitMapBounds({ points, watchKey }: { points: Array<[number, number]>; w
   return null;
 }
 
+function SelectedMarkerController({ markers, selectedAccountId }: { markers: ReturnType<typeof buildMapMarkers>; selectedAccountId?: string | null }) {
+  const map = useMap();
+  useEffect(() => {
+    const marker = markers.find((item) => item.company.id === selectedAccountId);
+    if (!marker) return;
+    map.flyTo(marker.center, Math.max(map.getZoom(), 10), { duration: 0.45 });
+  }, [map, markers, selectedAccountId]);
+  return null;
+}
+
+function FullBoundsControl({ points }: { points: Array<[number, number]> }) {
+  const map = useMap();
+  if (!points.length) return null;
+  return (
+    <button
+      type="button"
+      className="map-full-bounds"
+      onClick={() => map.fitBounds(L.latLngBounds(points), { padding: [56, 56], maxZoom: 11 })}
+    >
+      Show all markers
+    </button>
+  );
+}
+
 export function ProspectMap({ world, selectedAccountId, onSelectAccount, prospectsOnly = false }: { world: World; selectedAccountId?: string | null; onSelectAccount?: (accountId: string) => void; prospectsOnly?: boolean }) {
   const prospectCompanies = world.prospects
     .map((prospect) => prospect.company)
@@ -75,6 +100,8 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount, prospec
         <MapContainer key={world.city ?? "all"} center={center} zoom={initialZoom} className="map" scrollWheelZoom zoomControl={false}>
           <MapSizeInvalidator watchKey={watchKey} />
           <FitMapBounds points={markers.map((marker) => marker.center)} watchKey={watchKey} />
+          <SelectedMarkerController markers={markers} selectedAccountId={selectedAccountId} />
+          <FullBoundsControl points={markers.map((marker) => marker.center)} />
           <ZoomControl position="bottomright" />
           <DarkMapTiles />
           {markers.map(({ company: c, center: markerCenter, opportunity: opp, scoreStatus, prospect, radius }) => {
@@ -97,6 +124,11 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount, prospec
                   <strong>{c.name}</strong>
                   {prospect ? `  ·  attractiveness ${Math.round(opp)} (${scoreStatus})` : `  ·  ${c.relationship}`}
                 </Tooltip>
+                <Popup>
+                  <strong>{c.name}</strong>
+                  <p>{c.location.city}{c.location.state ? `, ${c.location.state}` : ""} · {c.relationship}</p>
+                  <button type="button" onClick={() => navigateTo(`/accounts/${encodeURIComponent(c.id)}`)}>Open Account 360</button>
+                </Popup>
               </CircleMarker>
             );
           })}

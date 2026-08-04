@@ -223,6 +223,7 @@ def monitor_snapshot(
             "run": None,
             "sources": source_registry_projection(registry, source_health=None, schedule=schedule, run_at=None),
             "updates": [],
+            "rejectedItems": [],
         }
     meta = artifact.get("meta") if isinstance(artifact.get("meta"), dict) else {}
     run_at = _iso(meta.get("run_at"))
@@ -265,6 +266,33 @@ def monitor_snapshot(
         "irrelevantRecordsRejected": max(0, int(meta.get("items_collected") or 0) - int(meta.get("items_after_prefilter") or 0)),
         "failedSources": failed,
     }
+    rejected_items = [
+        {
+            "id": f"{run_id}:irrelevant:{index + 1}",
+            "headline": "Screened out before LLM analysis",
+            "publisher": "Monitor prefilter",
+            "reason": "Did not match configured BTX relevance keywords or matched exclusion terms.",
+            "rejectionClass": "irrelevant",
+            "retrievedAt": run_at,
+            "sourceUrl": None,
+            "audit": "Rejected by deterministic prefilter before account, score, or deliverable use.",
+        }
+        for index in range(min(counts["irrelevantRecordsRejected"], 25))
+    ]
+    rejected_items.extend(
+        {
+            "id": f"{update['id']}:duplicate:{index + 1}",
+            "headline": variant["headline"] or update["headline"],
+            "publisher": variant["publisher"] or "Syndicated source",
+            "reason": f"Duplicate coverage grouped under {update['headline']}.",
+            "rejectionClass": "duplicate",
+            "retrievedAt": update["retrievedAt"],
+            "sourceUrl": variant["url"],
+            "audit": f"Duplicate fingerprint retained as source variant for {update['id']}.",
+        }
+        for update in updates
+        for index, variant in enumerate(update["sourceVariants"])
+    )
     return {
         "state": state,
         "ingestionMode": ingestion_mode,
@@ -283,6 +311,7 @@ def monitor_snapshot(
         },
         "sources": sources,
         "updates": sorted(updates, key=lambda update: (update["relevanceScore"], update["retrievedAt"]), reverse=True),
+        "rejectedItems": rejected_items,
     }
 
 

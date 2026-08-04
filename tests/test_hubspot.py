@@ -741,6 +741,34 @@ def test_hubspot_write_routes_are_server_blocked_outside_sandbox(
     assert {response.json()["environment"] for response in requests} == {reported_environment}
 
 
+def test_hubspot_production_writes_require_explicit_override(monkeypatch, tmp_path: Path):
+    engine = make_engine("sqlite://")
+    init_db(engine)
+    sf = make_session_factory(engine)
+    settings = Settings(
+        env="test",
+        hubspot_access_token="hubspot-token",
+        hubspot_environment="production",
+        hubspot_allow_production_writes=True,
+    )
+    app = create_app(settings=settings, session_factory=sf, clerk_verifier=CLERK.verifier)
+    client = TestClient(app)
+
+    class FakeHubSpotClient:
+        def __init__(self, token: str):
+            assert token == "hubspot-token"
+
+        def create_task(self, **_kwargs):
+            return {"id": "task-production-test"}
+
+    monkeypatch.setattr("btx_platform.api.HubSpotClient", FakeHubSpotClient)
+
+    response = client.post("/crm/task", headers=_headers(), json={"title": "Allowed with explicit override"})
+
+    assert response.status_code == 200
+    assert response.json()["id"] == "task-production-test"
+
+
 def test_work_item_hubspot_task_happy_path_verifies_and_audits(monkeypatch, tmp_path: Path):
     engine = make_engine("sqlite://")
     init_db(engine)

@@ -264,6 +264,7 @@ export function Prospecting({ world }: { world: World }) {
                         contact={row.contact}
                         environment={world.sources.find((source) => source.id.includes("hubspot"))?.environment ?? "none"}
                         writeConnected={world.sources.find((source) => source.id.includes("hubspot"))?.canWrite ?? false}
+                        writeBlockReason={world.sources.find((source) => source.id.includes("hubspot"))?.writeBlockReason ?? null}
                         currentRouteEntityId={route.accountId}
                         variant="prospect"
                         defaultTaskSubject={`Qualify ${row.company.name}`}

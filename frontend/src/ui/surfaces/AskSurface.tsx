@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   askAssistant,
+  askAssistantStream,
   createAssistantConversation,
   createDeliverableFromAssistantDraft,
   createWorkItemFromAssistantDraft,
@@ -289,6 +290,8 @@ export function AskSurface({ world }: { world: World }) {
   const [context, setContext] = useState<AssistantContext>(routeCtx);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [streamingStatus, setStreamingStatus] = useState("Working");
   const [conversationBusy, setConversationBusy] = useState<string | null>(null);
   const [sourceMode, setSourceMode] = useState<AssistantSourceMode>("automatic");
   const [error, setError] = useState<string | null>(null);
@@ -360,6 +363,8 @@ export function AskSurface({ world }: { world: World }) {
     const message = (textOverride ?? draft).trim();
     if (!message || sending) return;
     setSending(true);
+    setStreamingText("");
+    setStreamingStatus("Preparing answer");
     setError(null);
     setCreatedRoute(null);
     const currentId = selected?.status === "active" ? selected.id : null;
@@ -371,9 +376,21 @@ export function AskSurface({ world }: { world: World }) {
         const metric = computeMetric(id, world);
         return [id, { state: metric.state, value: metric.value, reason: metric.reason, asOf: metric.asOf }];
       }));
-      const response = await askAssistant({ message, conversation_id: currentId, context: { ...context, metric_states }, source_mode: sourceMode }, controller.signal);
+      const input = { message, conversation_id: currentId, context: { ...context, metric_states }, source_mode: sourceMode };
+      let response;
+      try {
+        response = await askAssistantStream(input, {
+          onStatus: setStreamingStatus,
+          onDelta: (text) => setStreamingText((current) => `${current}${text}`),
+        }, controller.signal);
+      } catch (streamError) {
+        if (controller.signal.aborted) throw streamError;
+        setStreamingStatus("Stream dropped. Finishing with standard Ask.");
+        response = await askAssistant(input, controller.signal);
+      }
       setSelected(response.conversation);
       setDraft("");
+      setStreamingText("");
       if (response.conversation.title === "New Ask conversation" || response.conversation.title === "Ask") {
         void updateAssistantConversation(response.conversation.id, { title: generatedTitle(message) }).then(setSelected).catch(() => undefined);
       }
@@ -384,6 +401,7 @@ export function AskSurface({ world }: { world: World }) {
     } finally {
       requestController.current = null;
       setSending(false);
+      setStreamingStatus("Working");
     }
   }
 
@@ -531,9 +549,11 @@ export function AskSurface({ world }: { world: World }) {
                 ))}
                 {sending && (
                   <article className="ask-workspace-message assistant pending">
-                    <div className="ask-message-topline"><span>Ask</span><em>Working</em></div>
-                    <p role="status" aria-live="polite">Preparing an evidence-backed answer.</p>
-                    <button type="button" onClick={() => requestController.current?.abort()}>Cancel research</button>
+                    <div className="ask-message-topline"><span>Ask</span><em>{streamingStatus}</em></div>
+                    <div role="status" aria-live="polite">
+                      {streamingText ? <SanitizedMarkdown text={streamingText} /> : <p>Preparing an evidence-backed answer.</p>}
+                    </div>
+                    <button type="button" onClick={() => requestController.current?.abort()}>Stop</button>
                   </article>
                 )}
               </div>

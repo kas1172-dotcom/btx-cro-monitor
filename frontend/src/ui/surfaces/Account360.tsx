@@ -322,6 +322,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
               contact={contacts[0]}
               environment={world.sources.find((source) => source.id.includes("hubspot"))?.environment ?? "none"}
               writeConnected={world.sources.find((source) => source.id.includes("hubspot"))?.canWrite ?? false}
+              writeBlockReason={world.sources.find((source) => source.id.includes("hubspot"))?.writeBlockReason ?? null}
               currentRouteEntityId={route.accountId}
               variant="account"
               defaultTaskSubject={`Follow up with ${company.name}`}

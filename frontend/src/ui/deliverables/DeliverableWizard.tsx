@@ -244,7 +244,7 @@ export function DeliverableWizard({
           <>
             <h2>{preview.title}</h2>
             <p className="deliverable-wizard-hint">
-              Preview only. Nothing is saved until you confirm. Confidence: {preview.confidence}
+              Preview only. Nothing is saved until you confirm. Evidence coverage: {preview.confidence}
               {preview.confidenceReason ? ` (${preview.confidenceReason})` : ""}.
             </p>
             <div className="deliverable-wizard-preview-document">

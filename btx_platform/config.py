@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     ask_daily_search_budget: int = 100
     hubspot_access_token: str | None = None
     hubspot_environment: str = "none"
+    hubspot_allow_production_writes: bool = False
     gmail_allowlist: str = ""
     pipeline_mechanism: str = "subprocess"
     pipeline_output_dir: str = "clients/btx/artifacts"

@@ -13,6 +13,7 @@ interface CrmWriteActionsProps {
   defaultTaskBody?: string;
   environment?: "sandbox" | "developer" | "production" | "none";
   writeConnected?: boolean;
+  writeBlockReason?: string | null;
   currentRouteEntityId?: string | null;
 }
 
@@ -25,6 +26,12 @@ function hubspotCompanyRef(id: string | undefined): string | undefined {
   return id.startsWith("hubspot-company-") ? id : `hubspot-company-${id}`;
 }
 
+function defaultDueDate(): string {
+  const date = new Date();
+  date.setDate(date.getDate() + 2);
+  return date.toISOString().slice(0, 10);
+}
+
 export function CrmWriteActions({
   company,
   contact,
@@ -33,6 +40,7 @@ export function CrmWriteActions({
   defaultTaskBody,
   environment = "none",
   writeConnected = false,
+  writeBlockReason: sourceWriteBlockReason = null,
   currentRouteEntityId = null,
 }: CrmWriteActionsProps) {
   const entityIdRef = useRef(company.id);
@@ -49,7 +57,7 @@ export function CrmWriteActions({
   const [notes, setNotes] = useState("");
   const [taskSubject, setTaskSubject] = useState(defaultTaskSubject ?? `Follow up with ${company.name}`);
   const [taskBody, setTaskBody] = useState(defaultTaskBody ?? `Review next step for ${company.name}.`);
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState(defaultDueDate());
   const [priority, setPriority] = useState("normal");
   const [result, setResult] = useState<string>("");
   const [resultDetails, setResultDetails] = useState<Record<string, unknown> | null>(null);
@@ -72,7 +80,7 @@ export function CrmWriteActions({
     setNotes("");
     setTaskSubject(defaultTaskSubject ?? `Follow up with ${company.name}`);
     setTaskBody(defaultTaskBody ?? `Review next step for ${company.name}.`);
-    setDueDate("");
+    setDueDate(defaultDueDate());
     setPriority("normal");
     setResult("");
     setResultDetails(null);
@@ -90,8 +98,8 @@ export function CrmWriteActions({
     routeEntityId: currentRouteEntityId,
   };
   const writeBlockReason = crmWriteBlockReason(identity)
-    ?? (!writeConnected || (environment !== "sandbox" && environment !== "developer")
-      ? "Execution is disabled until the source registry confirms a sandbox or developer portal."
+    ?? (!writeConnected
+      ? sourceWriteBlockReason ?? "Execution is disabled until the source registry confirms this portal is write-enabled."
       : null);
   const writesAllowed = writeBlockReason === null;
 
@@ -179,12 +187,15 @@ export function CrmWriteActions({
   return (
     <div className="crm-write-actions">
       <div className="crm-write-buttons">
-        {variant !== "queue" && <button type="button" onClick={() => setMode("company_form")}>Prepare HubSpot company</button>}
-        <button type="button" onClick={() => setMode("task_form")}>Prepare HubSpot task</button>
+        {variant !== "queue" && <button type="button" onClick={() => setMode("company_form")}>Add company to HubSpot</button>}
+        <button type="button" onClick={() => setMode("task_form")}>Create task in HubSpot</button>
       </div>
+      {!writesAllowed && <p className="crm-write-disabled" role="note">{writeBlockReason}</p>}
       {result && (
         <div className="crm-write-result" role="status">
           <p>{result}</p>
+          {typeof resultDetails?.company_id === "string" && <p>HubSpot company ID: {resultDetails.company_id}</p>}
+          {typeof resultDetails?.task_id === "string" && <p>HubSpot task ID: {resultDetails.task_id}</p>}
           {typeof resultDetails?.record_url === "string" && <a href={resultDetails.record_url} target="_blank" rel="noreferrer">Open HubSpot record</a>}
           {typeof resultDetails?.company_record_url === "string" && <a href={resultDetails.company_record_url} target="_blank" rel="noreferrer">Open HubSpot company</a>}
           {resultDetails && <details><summary>Technical details</summary><pre>{JSON.stringify(resultDetails, null, 2)}</pre></details>}

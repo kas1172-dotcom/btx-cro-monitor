@@ -118,6 +118,9 @@ def test_live_partial_failure_dedup_and_run_detail_accuracy():
     assert result["run"]["counts"]["failedSources"] == 1
     assert result["run"]["counts"]["duplicatesRejected"] == 1
     assert result["run"]["counts"]["irrelevantRecordsRejected"] == 2
+    assert len(result["rejectedItems"]) == 3
+    assert {item["rejectionClass"] for item in result["rejectedItems"]} == {"duplicate", "irrelevant"}
+    assert all(item["reason"] for item in result["rejectedItems"])
     assert result["updates"][0]["relationshipState"] == "market_only"
     assert result["updates"][0]["relevanceReasons"]
     assert len(result["updates"]) == 1

@@ -15,7 +15,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import ValidationError
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
@@ -121,6 +121,7 @@ TERMINAL_WORK_ITEM_STATUSES = {"dismissed", "closed"}
 ASSISTANT_VIEWER_MUTATIONS = {
     ("POST", "/assistant/conversations"),
     ("POST", "/assistant/ask"),
+    ("POST", "/assistant/ask/stream"),
 }
 
 
@@ -653,6 +654,7 @@ def _source_health(
     data_mode: str | None = None,
     can_read: bool = False,
     can_write: bool = False,
+    write_block_reason: str | None = None,
 ) -> dict:
     now = datetime.now(UTC).isoformat()
     return {
@@ -670,6 +672,7 @@ def _source_health(
         "dataMode": data_mode,
         "canRead": can_read,
         "canWrite": can_write,
+        "writeBlockReason": write_block_reason,
     }
 
 
@@ -689,6 +692,7 @@ def _source_health_from_metadata(record: dict, generated_at: str) -> dict:
         data_mode=record.get("dataMode") if isinstance(record.get("dataMode"), str) else None,
         can_read=bool(record.get("canRead")),
         can_write=bool(record.get("canWrite")),
+        write_block_reason=record.get("writeBlockReason") if isinstance(record.get("writeBlockReason"), str) else None,
     )
 
 
@@ -1024,29 +1028,48 @@ def create_app(
         environment = (settings.hubspot_environment or "none").strip().lower()
         if environment in {"developer", "sandbox"}:
             return None
+        if environment == "production" and settings.hubspot_allow_production_writes:
+            return None
         return JSONResponse(
             {
                 "code": "hubspot_write_disabled",
                 "detail": (
                     "HubSpot writes are disabled. BTX_HUBSPOT_ENVIRONMENT must be "
-                    "classified as developer or sandbox; production and unclassified "
-                    "portals remain preview/read-only."
+                    "classified as developer or sandbox, or production writes must be "
+                    "explicitly enabled with BTX_HUBSPOT_ALLOW_PRODUCTION_WRITES=true. "
+                    "Production and unclassified portals remain preview/read-only by default."
                 ),
                 "environment": environment if environment in {"production"} else "unclassified",
             },
             status_code=403,
         )
 
+    def hubspot_write_block_reason() -> str | None:
+        blocked = hubspot_write_blocked()
+        if blocked is None:
+            return None
+        body = blocked.body.decode("utf-8")
+        try:
+            payload = json.loads(body)
+        except json.JSONDecodeError:
+            return "HubSpot writes are disabled by server policy."
+        detail = payload.get("detail")
+        return detail if isinstance(detail, str) else "HubSpot writes are disabled by server policy."
+
     def source_health_payload() -> list[dict]:
         if settings.hubspot_access_token:
+            write_reason = hubspot_write_block_reason()
             hubspot_health = _source_health(
                 source_key="hubspot",
                 display_name="HubSpot CRM",
                 availability="unavailable",
                 freshness_threshold_minutes=15,
-                connection_mode="configured_unverified",
+                connection_mode="write_connected" if write_reason is None else "configured_unverified",
                 environment=settings.hubspot_environment,
                 data_mode="unavailable",
+                can_read=False,
+                can_write=write_reason is None,
+                write_block_reason=write_reason,
             )
         else:
             hubspot_health = _source_health(
@@ -1108,6 +1131,7 @@ def create_app(
                 contacts = contact_payload.get("records") if isinstance(contact_payload.get("records"), list) else []
                 opportunities = deal_payload.get("records") if isinstance(deal_payload.get("records"), list) else []
                 _sync_canonical_accounts(session_factory, {"records": accounts}, tenant_id)
+                write_reason = hubspot_write_block_reason()
                 source_health.append(_source_health(
                     source_key="hubspot",
                     display_name="HubSpot CRM",
@@ -1115,10 +1139,12 @@ def create_app(
                     record_count=len(accounts) + len(contacts) + len(opportunities),
                     last_successful_sync_at=generated_at,
                     freshness_threshold_minutes=15,
-                    connection_mode="read_connected",
+                    connection_mode="write_connected" if write_reason is None else "read_connected",
                     environment=settings.hubspot_environment,
                     data_mode="live_external",
                     can_read=True,
+                    can_write=write_reason is None,
+                    write_block_reason=write_reason,
                 ))
             except HubSpotError as exc:
                 logger.warning("hubspot.world_snapshot_failed", extra={"status_code": exc.status_code})
@@ -1522,6 +1548,47 @@ def create_app(
             return JSONResponse(response.model_dump())
         finally:
             session.close()
+
+    @app.post("/assistant/ask/stream")
+    def ask_assistant_stream(payload: AssistantAskRequest, request: Request) -> Response:
+        def event(name: str, data: dict) -> str:
+            return f"event: {name}\ndata: {json.dumps(data, default=str)}\n\n"
+
+        def stream():
+            yield event("status", {"message": "Preparing answer"})
+            session = session_factory()
+            try:
+                try:
+                    conversation, user_message, assistant_message = persist_turn(
+                        session,
+                        tenant_id=_tenant_id(request),
+                        actor_user_id=_actor_user_id(request),
+                        conversation_id=payload.conversation_id,
+                        message=(payload.message or payload.prompt or "").strip(),
+                        context=payload.context,
+                        source_mode=payload.source_mode,
+                        settings=settings,
+                    )
+                except AssistantError as exc:
+                    session.rollback()
+                    yield event("error", {"code": exc.code, "detail": exc.detail, "status": exc.status_code})
+                    return
+                session.commit()
+                session.refresh(conversation)
+                content = assistant_message.content or ""
+                for chunk in re.findall(r".{1,220}(?:\s+|$)", content, flags=re.DOTALL) or [content]:
+                    if chunk:
+                        yield event("delta", {"text": chunk})
+                response = AssistantAskResponse(
+                    conversation=AssistantConversationResponse(**conversation_response(session, conversation, include_messages=True)),
+                    user_message=message_response(user_message),
+                    assistant_message=message_response(assistant_message),
+                )
+                yield event("final", response.model_dump())
+            finally:
+                session.close()
+
+        return StreamingResponse(stream(), media_type="text/event-stream")
 
     @app.get("/signal-relationships/review")
     def relationship_review_queue(request: Request) -> Response:

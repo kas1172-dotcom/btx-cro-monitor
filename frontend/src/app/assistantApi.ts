@@ -1,4 +1,4 @@
-import { backendJson } from "./backendApi.ts";
+import { backendHeaders, backendJson, BACKEND_ENDPOINT } from "./backendApi.ts";
 import type { WorkItem } from "./workItems.ts";
 
 export interface AssistantContext {
@@ -122,6 +122,47 @@ export function askAssistant(input: { message: string; conversation_id?: string 
     body: JSON.stringify(input),
     signal,
   });
+}
+
+export async function askAssistantStream(
+  input: { message: string; conversation_id?: string | null; context?: AssistantContext; source_mode?: AssistantSourceMode },
+  handlers: { onStatus?: (message: string) => void; onDelta?: (text: string) => void },
+  signal?: AbortSignal,
+): Promise<AssistantAskResponse> {
+  if (!BACKEND_ENDPOINT) throw new Error("VITE_BACKEND_ENDPOINT is not configured.");
+  const headers = await backendHeaders({ "content-type": "application/json", accept: "text/event-stream" });
+  const response = await fetch(`${BACKEND_ENDPOINT}/assistant/ask/stream`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(input),
+    signal,
+  });
+  if (!response.ok || !response.body) throw new Error(`Backend Ask stream failed (${response.status}).`);
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let final: AssistantAskResponse | null = null;
+  function dispatch(raw: string) {
+    const eventName = raw.match(/^event:\s*(.+)$/m)?.[1]?.trim() ?? "message";
+    const dataLine = raw.split("\n").find((line) => line.startsWith("data:"));
+    if (!dataLine) return;
+    const data = JSON.parse(dataLine.slice(5).trim()) as Record<string, unknown>;
+    if (eventName === "status") handlers.onStatus?.(String(data.message ?? "Working"));
+    if (eventName === "delta") handlers.onDelta?.(String(data.text ?? ""));
+    if (eventName === "error") throw new Error(String(data.detail ?? "Ask stream failed."));
+    if (eventName === "final") final = data as unknown as AssistantAskResponse;
+  }
+  while (true) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+    const parts = buffer.split("\n\n");
+    buffer = parts.pop() ?? "";
+    for (const part of parts) dispatch(part);
+    if (done) break;
+  }
+  if (buffer.trim()) dispatch(buffer);
+  if (!final) throw new Error("Ask stream ended before the final answer arrived.");
+  return final;
 }
 
 export function createWorkItemFromAssistantDraft(payload: Record<string, unknown>): Promise<WorkItem> {

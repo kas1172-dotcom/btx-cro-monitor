@@ -152,6 +152,16 @@ export interface IndustryMonitorResponse {
   };
   sources: IndustryMonitorSource[];
   updates: IndustryUpdateRecord[];
+  rejectedItems?: Array<{
+    id: string;
+    headline: string;
+    publisher: string;
+    reason: string;
+    rejectionClass: "irrelevant" | "duplicate" | string;
+    retrievedAt?: string | null;
+    sourceUrl?: string | null;
+    audit: string;
+  }>;
 }
 
 export function getIndustryMonitor(): Promise<IndustryMonitorResponse> {

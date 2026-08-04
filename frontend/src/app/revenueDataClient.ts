@@ -25,6 +25,7 @@ export interface SourceHealth {
   dataMode?: DataMode;
   canRead?: boolean;
   canWrite?: boolean;
+  writeBlockReason?: string | null;
 }
 
 export interface TenantSummary {

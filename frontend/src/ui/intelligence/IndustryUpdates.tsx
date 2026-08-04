@@ -105,6 +105,7 @@ function storedFallback(world: World): IndustryMonitorResponse {
     } : null,
     sources: [],
     updates,
+    rejectedItems: [],
   };
 }
 
@@ -123,6 +124,7 @@ export function IndustryUpdates({ world }: { world: World }) {
   const [monitor, setMonitor] = useState<IndustryMonitorResponse | null>(null);
   const [filter, setFilter] = useState<Filter>("new_high");
   const [runOpen, setRunOpen] = useState(false);
+  const [rejectedOpen, setRejectedOpen] = useState(false);
   const [status, setStatus] = useState("Preparing collection evidence.");
   const [undoReview, setUndoReview] = useState<{ id: string; previous: IndustryUpdateRecord["reviewStatus"]; label: string } | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
@@ -154,6 +156,7 @@ export function IndustryUpdates({ world }: { world: World }) {
     () => (monitor?.updates ?? []).filter((update) => matchesFilter(update, filter)).slice(0, 50),
     [filter, monitor],
   );
+  const rejectedItems = monitor?.rejectedItems ?? [];
 
   async function review(update: IndustryUpdateRecord, action: "mark_reviewed" | "dismiss" | "needs_account_match") {
     const busyKey = `${update.id}:${action}`;
@@ -231,6 +234,14 @@ export function IndustryUpdates({ world }: { world: World }) {
     }
   }
 
+  function promoteRejected(id: string) {
+    setMonitor((current) => current ? {
+      ...current,
+      rejectedItems: (current.rejectedItems ?? []).filter((item) => item.id !== id),
+    } : current);
+    setStatus("Rejected item promoted for manual review in this browser. The original monitor artifact was not changed.");
+  }
+
   return (
     <section className="surface-page industry-updates-page" data-surface-component="surface-industry-updates">
       <SurfaceHeader
@@ -251,8 +262,8 @@ export function IndustryUpdates({ world }: { world: World }) {
               <div><dt>Sources checked</dt><dd>{monitor.run.counts.sourcesChecked}</dd></div>
               <div><dt>New</dt><dd>{monitor.run.counts.newRecords}</dd></div>
               <div><dt>Unchanged</dt><dd>{monitor.run.counts.unchangedRecords}</dd></div>
-              <div><dt>Duplicates rejected</dt><dd>{monitor.run.counts.duplicatesRejected}</dd></div>
-              <div><dt>Irrelevant rejected</dt><dd>{monitor.run.counts.irrelevantRecordsRejected}</dd></div>
+              <div><dt>Duplicates rejected</dt><dd><button type="button" onClick={() => setRejectedOpen(true)}>{monitor.run.counts.duplicatesRejected}</button></dd></div>
+              <div><dt>Irrelevant rejected</dt><dd><button type="button" onClick={() => setRejectedOpen(true)}>{monitor.run.counts.irrelevantRecordsRejected}</button></dd></div>
               <div><dt>Failed sources</dt><dd>{monitor.run.counts.failedSources}</dd></div>
             </dl>
             <button type="button" onClick={() => setRunOpen((value) => !value)} aria-expanded={runOpen}>
@@ -284,6 +295,31 @@ export function IndustryUpdates({ world }: { world: World }) {
                 {source.sanitizedError && <p>{source.sanitizedError}</p>}
               </article>
             ))}
+          </div>
+        </section>
+      )}
+
+      {rejectedOpen && (
+        <section className="monitor-run-detail" aria-labelledby="monitor-rejected-title">
+          <div>
+            <p className="eyebrow">Screened-out monitor records</p>
+            <h2 id="monitor-rejected-title">Rejected items and reasons</h2>
+            <p>These records were excluded before use in account scoring, briefings, or deliverables. Promotion is local manual review unless a backend review record exists.</p>
+            <button type="button" onClick={() => setRejectedOpen(false)}>Close rejected items</button>
+          </div>
+          <div className="monitor-source-list">
+            {rejectedItems.length ? rejectedItems.slice(0, 50).map((item) => (
+              <article key={item.id}>
+                <strong>{item.headline}</strong>
+                <span>{item.publisher} · {item.rejectionClass}</span>
+                <em>{item.reason}</em>
+                <p>{item.audit}</p>
+                <div className="industry-actions">
+                  {item.sourceUrl && <ExternalLink href={item.sourceUrl} label="Review rejected source" />}
+                  <button type="button" onClick={() => promoteRejected(item.id)}>Promote for manual review</button>
+                </div>
+              </article>
+            )) : <EmptyState headline="No rejected item details retained" body="The monitor reported rejected counts, but this artifact does not include per-record rejected metadata." icon="industry_updates" />}
           </div>
         </section>
       )}

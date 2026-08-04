@@ -3218,6 +3218,11 @@ input[type="checkbox"]:checked::after {
 
 /* Map */
 .map-shell { position: absolute; inset: 0; height: 100%; min-height: calc(100dvh - 48px); overflow: hidden; }
+.map-full-bounds {
+  position: absolute; right: 14px; top: 14px; z-index: 500; min-height: 36px;
+  border: 1px solid var(--line); border-radius: 999px; background: rgba(var(--panel-rgb), .94);
+  color: var(--text); padding: 0 12px; box-shadow: 0 8px 24px rgba(var(--page-rgb), .18);
+}
 .map-rail {
   position: absolute; left: 14px; top: 14px; bottom: 14px; z-index: 500;
   width: min(360px, calc(100% - 28px)); display: flex; flex-direction: column; gap: 8px;

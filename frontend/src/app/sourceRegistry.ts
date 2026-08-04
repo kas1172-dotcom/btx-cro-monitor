@@ -33,6 +33,7 @@ export interface SourceCapability {
   recordCount: number | null;
   canRead: boolean;
   canWrite: boolean;
+  writeBlockReason: string | null;
   verification: "verified" | "unverified" | "failed";
   detail: string;
 }
@@ -73,6 +74,7 @@ export function sourceRegistry(snapshot: WorldSnapshot): SourceCapability[] {
       recordCount: source.recordCount,
       canRead,
       canWrite,
+      writeBlockReason: source.writeBlockReason ?? null,
       verification: ["authentication_failed", "permission_failed"].includes(mode)
         ? "failed"
         : canRead

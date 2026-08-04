@@ -504,7 +504,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
                 </div>
               );
             }
-            return <p key={`${section.id}-${index}`} className="muted">{block.title}: {block.entityIds.join(", ")}</p>;
+            return <p key={`${section.id}-${index}`} className="muted">{block.title}: referenced records {block.entityIds.join(", ")}</p>;
             })}
           </section>
         ))}
