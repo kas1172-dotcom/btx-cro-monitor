@@ -33,7 +33,7 @@ assert(workList.includes("plainWorkStatus") && workList.includes("plainWorkType"
 assert(!workList.includes("{titleCase(item.status)}"), "Work table should not show raw status enum labels.");
 
 assert(!crmWrites.includes("Confirm create"), "CRM confirmation buttons must say exactly what will be created.");
-assert(crmWrites.includes("Prepare HubSpot company") && crmWrites.includes("Prepare HubSpot task"), "CRM write entry points need verb-first labels.");
+assert(crmWrites.includes("Add company to HubSpot") && crmWrites.includes("Create task in HubSpot"), "CRM write entry points need verb-first labels.");
 assert(crmWrites.includes("Create HubSpot company") && crmWrites.includes("Create HubSpot task"), "CRM confirm buttons need entity-specific result language.");
 assert(crmWrites.includes("Idempotency protection: enabled") && crmWrites.includes("Technical details"), "CRM idempotency keys should be disclosed as diagnostics, not primary action copy.");
 

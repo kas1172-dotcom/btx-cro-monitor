@@ -47,6 +47,8 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: fly deploy (staging)
-        run: flyctl deploy --app btx-platform-staging --remote-only
+        run: |
+          flyctl secrets set BTX_DEPLOYMENT_MODE=demo --app btx-platform-staging
+          flyctl deploy --app btx-platform-staging --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
