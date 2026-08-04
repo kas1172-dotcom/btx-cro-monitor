@@ -5840,6 +5840,505 @@
           "importance_score": 35
         }
       ]
+    },
+    {
+      "run_id": "20260804T145452-9d49",
+      "run_at": "2026-08-04T14:54:52.389514Z",
+      "items": [
+        {
+          "item_id": "pinned-lockheed-f35-lot-18-19",
+          "title": "Lockheed, Pentagon finalize deal for 296 F-35s",
+          "raw_title": "Lockheed, Pentagon finalize deal for 296 F-35s",
+          "url": "https://breakingdefense.com/2025/09/lockheed-pentagon-finalize-deal-for-296-f-35s/",
+          "source_id": "Breaking Defense",
+          "published_at": "2026-07-24T09:00:00Z",
+          "collected_at": "2026-07-24T12:00:00Z",
+          "tier": 1,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 95,
+              "so_what": "Lockheed Martin and the F-35 Joint Program Office finalized the Lots 18 and 19 airframe deal, covering 296 aircraft. For BTX, this is a production and sustainment planning signal tied to a verified Lockheed Martin account, CAGE 81755, and the F-35 Lightning II program.",
+              "now_what": "Prepare the Lockheed call around F-35 timing, build-to-print capacity, inspection load, and where BTX can support precision components without overpromising.",
+              "categories": [
+                "Contract Award",
+                "Subcontracting Opportunity"
+              ]
+            },
+            "exec": {
+              "relevance_score": 88,
+              "so_what": "The F-35 Lots 18 and 19 agreement keeps Lockheed production demand visible and gives BTX a timely reason to review account coverage, capacity, and open follow-up.",
+              "now_what": "Assign the account owner to prepare a call brief and confirm whether current BTX capacity can support near-term F-35 related work.",
+              "categories": [
+                "Contract Award"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$24.3 billion",
+            "value": 24300000000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Pinned for demo presence with real source attribution. Account resolution still depends on canonical CAGE and program matching.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Lockheed Martin Corporation",
+              "type": "company"
+            },
+            {
+              "name": "F-35 Lightning II",
+              "type": "program"
+            },
+            {
+              "name": "81755",
+              "type": "identifier"
+            },
+            {
+              "name": "CQWLW9XRQTH5",
+              "type": "identifier"
+            }
+          ],
+          "enrichment": {
+            "facts": [
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "F-35 Lightning II",
+                "label": "Latest Federal Register doc",
+                "value": "Arms Sales Notification",
+                "kind": "text",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/01/14/2026-00531/arms-sales-notification"
+              },
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "F-35 Lightning II",
+                "label": "Published",
+                "value": "2026-01-14",
+                "kind": "date",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/01/14/2026-00531/arms-sales-notification"
+              }
+            ],
+            "queried_entities": [
+              "F-35 Lightning II"
+            ]
+          },
+          "related": [],
+          "importance_score": 95
+        },
+        {
+          "item_id": "40f9e1b5b539cb95",
+          "title": "Information Collection Requirement; Defense Federal Acquisition Regulation…",
+          "raw_title": "Information Collection Requirement; Defense Federal Acquisition Regulation Supplement (DFARS) Part 225, Foreign Acquisition and Related Clauses",
+          "url": "https://www.federalregister.gov/documents/2026/07/31/2026-15549/information-collection-requirement-defense-federal-acquisition-regulation-supplement-dfars-part-225",
+          "source_id": "Federal Register - Dept. of Defense",
+          "published_at": "2026-07-31T00:00:00Z",
+          "collected_at": "2026-08-04T14:53:03.940748Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 15,
+              "so_what": "DoD has submitted to OMB a Paperwork Reduction Act notice for DFARS Part 225 (Foreign Acquisition and Related Clauses) information collection. This affects compliance documentation for foreign sourcing and ITAR controls but does not announce a contract award or solicitation.",
+              "now_what": "BTX Compliance and Contracts teams should review final DFARS rule once published to assess any changes to foreign content reporting or ITAR certification requirements in prime-contract clauses.",
+              "categories": []
+            },
+            "exec": {
+              "relevance_score": 22,
+              "so_what": "DoD is clarifying foreign acquisition and related clauses under DFARS Part 225, signaling potential tightening of ITAR and foreign-content compliance requirements. BTX's ITAR registration and U.S.-only operations likely keep it compliant, but rule details will determine reporting burden.",
+              "now_what": "General Counsel and Compliance Officer should monitor the final DFARS rule notice (expected after OMB review) and assess impact on prime-contract clauses affecting BTX's work scope and certification obligations.",
+              "categories": [
+                "Export Controls / Compliance"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Notice is a PRA submission to OMB; final rule language not yet published. Compliance impact depends on specific rule text and implementation timeline.",
+          "unverified_claims": [],
+          "deep_analysis": {
+            "sections": {
+              "background": "The Defense Acquisition Regulations System (DARS) has submitted an information collection proposal to the Office of Management and Budget under the Paperwork Reduction Act, targeting DFARS Part 225 (Foreign Acquisition and Related Clauses). This is a routine regulatory clearance for compliance and reporting requirements that apply to defense contractors and subcontractors engaged in foreign acquisition, technology, and ITAR-controlled work.",
+              "key_stakeholders": [
+                "Department of Defense",
+                "Office of Management and Budget",
+                "DFARS administrator",
+                "Defense contractors and subcontractors"
+              ],
+              "scenarios": [
+                "If the OMB clearance is granted with minimal burden increase, compliance timelines remain stable and BTX's existing ITAR/export-control reporting processes require no major system changes.",
+                "If the OMB clearance introduces new data-collection or attestation requirements (e.g., expanded foreign-source material tracking or subcontractor ITAR certification), BTX may face increased administrative overhead and potential delays in responding to prime-customer inquiries.",
+                "If the collection clarifies ambiguous DFARS Part 225 definitions (e.g., on deemed exports or technical data handling), BTX could benefit from reduced compliance interpretation disputes with primes and DCMA auditors."
+              ],
+              "recommended_actions": [
+                "Monitor the Federal Register and OMB clearance outcome (expected within 60 days) for any new DFARS Part 225 reporting or data-collection mandates; flag material additions to your ITAR/compliance calendar.",
+                "Audit current DFARS Part 225 attestations and foreign-source disclosures you submit to Lockheed Martin, RTX, and Northrop Grumman to identify any gaps or outdated procedures before new requirements take effect.",
+                "If the OMB package includes specific forms or schedules, schedule a compliance review with your export-control officer to ensure your build-to-print supply-chain and foreign-material sourcing documentation will pass stricter scrutiny."
+              ]
+            }
+          },
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Department of Defense",
+              "type": "agency"
+            },
+            {
+              "name": "Defense Acquisition Regulations System",
+              "type": "agency"
+            },
+            {
+              "name": "Defense Federal Acquisition Regulation Supplement Part 225",
+              "type": "product"
+            }
+          ],
+          "enrichment": null,
+          "related": [],
+          "importance_score": 22
+        },
+        {
+          "item_id": "323e8768cbd8af50",
+          "title": "U.S. Air Force expands Blue Origin rocket cargo contract",
+          "raw_title": null,
+          "url": "https://spacenews.com/u-s-air-force-expands-blue-origin-rocket-cargo-contract/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-08-02T12:03:27Z",
+          "collected_at": "2026-08-04T14:53:04.036519Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 35,
+              "so_what": "U.S. Air Force increased Blue Origin's point-to-point cargo contract by $11.7 million, signaling USAF commitment to rocket-powered logistics; this is not a BTX prime customer program but shows DoD momentum in space cargo that could mature into airframe or structure work for precision-machining subcontractors.",
+              "now_what": "Monitor Blue Origin's selection of primes and subcontractors for point-to-point cargo system development; if RTX or Lockheed Martin become involved in vehicle design or propellant-system integration, flag for BTX capture planning. Near-term actionable signal is limited but trend is worth tracking.",
+              "categories": [
+                "Contract Award",
+                "Budget & Appropriations"
+              ]
+            },
+            "exec": {
+              "relevance_score": 28,
+              "so_what": "USAF expansion of Blue Origin cargo contract confirms DoD interest in responsive space logistics but does not directly affect BTX's core F-35, B-21, or hypersonic exposure; however, it signals growing defense spending on space platforms that may create future precision-machining opportunities if BTX primes become vehicle prime contractors.",
+              "now_what": "Executive should note this as emerging DoD space-cargo priority and task BD to monitor Blue Origin propulsion, tank, and airframe supplier announcements; if BTX primes enter the supply chain, this becomes a material growth vector. No immediate compliance or supply-chain risk from this contract.",
+              "categories": [
+                "Budget & Appropriations",
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$11.7 million",
+            "value": 11700000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Item states Air Force Research Laboratory increased contract value but does not disclose total contract value, full scope, or subcontracting tiers. Blue Origin is the prime; BTX primes' role is not stated. Relevance is conditional on future prime subcontracting announcements.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "U.S. Air Force Research Laboratory",
+              "type": "agency"
+            },
+            {
+              "name": "Blue Origin",
+              "type": "organization"
+            }
+          ],
+          "enrichment": {
+            "facts": [
+              {
+                "enricher_id": "usaspending-awards",
+                "entity": "Blue Origin",
+                "label": "Top recent award",
+                "value": "1988858308.21",
+                "kind": "money",
+                "number": 1988858308.21,
+                "url": null
+              },
+              {
+                "enricher_id": "usaspending-awards",
+                "entity": "Blue Origin",
+                "label": "Awarding agency",
+                "value": "National Aeronautics and Space Administration",
+                "kind": "text",
+                "number": null,
+                "url": null
+              },
+              {
+                "enricher_id": "usaspending-awards",
+                "entity": "Blue Origin",
+                "label": "Top recent award",
+                "value": "181650000.0",
+                "kind": "money",
+                "number": 181650000.0,
+                "url": null
+              }
+            ],
+            "queried_entities": [
+              "Blue Origin"
+            ]
+          },
+          "related": [],
+          "importance_score": 35
+        },
+        {
+          "item_id": "505096150ffbe929",
+          "title": "Spain commits up to $2.3 billion for national military communications for IRIS²",
+          "raw_title": null,
+          "url": "https://spacenews.com/spain-commits-up-to-2-3-billion-for-national-military-communications-for-iris%c2%b2/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T15:57:52Z",
+          "collected_at": "2026-08-04T14:53:04.036519Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 22,
+              "so_what": "Spain is funding a €1.6–2 billion national military satellite-comms constellation under the European IRIS² initiative; potential subcontracting work depends on prime contractors and their supply-chain selections, which are not yet named.",
+              "now_what": "Track IRIS² procurement announcements to identify whether Lockheed, RTX, or Northrop win contracts and subsequently seek precision-machining or assembly subcontractors in the U.S. or allied bases.",
+              "categories": [
+                "Budget & Appropriations"
+              ]
+            },
+            "exec": {
+              "relevance_score": 18,
+              "so_what": "Spain's military comms investment is part of European defense modernization; no immediate impact on BTX's U.S. defense revenue or compliance unless BTX becomes involved in export-controlled IRIS² supply chains.",
+              "now_what": "Monitor for U.S. prime involvement and any ITAR/EAR implications if BTX is considered for export-controlled components; escalate to compliance team if a named prime (Lockheed, RTX, Northrop) is shortlisted.",
+              "categories": [
+                "Budget & Appropriations"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "€1.6 billion to €2 billion ($1.8 to $2.3 billion)",
+            "value": 1600000000.0,
+            "currency": "EUR"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Program-level funding announced; specific contractor selections and subcontracting tier not yet public.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Spain",
+              "type": "place"
+            },
+            {
+              "name": "IRIS²",
+              "type": "program"
+            }
+          ],
+          "enrichment": {
+            "facts": [
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "IRIS²",
+                "label": "Latest Federal Register doc",
+                "value": "Medicare Program; Hospital Inpatient Prospective Payment Systems for Acute Care Hospitals (IPPS) and the Long-Term Care Hospital Prospective Payment System and Policy Changes and Fiscal Year (FY) 2027 Rates; Requirements for Quality Programs; Other Policy Changes; and Adoption of Updated Versions of Certain Health Information Technology Standards",
+                "kind": "text",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/08/04/2026-15833/medicare-program-hospital-inpatient-prospective-payment-systems-for-acute-care-hospitals-ipps-and"
+              },
+              {
+                "enricher_id": "federal-register-program",
+                "entity": "IRIS²",
+                "label": "Published",
+                "value": "2026-08-04",
+                "kind": "date",
+                "number": null,
+                "url": "https://www.federalregister.gov/documents/2026/08/04/2026-15833/medicare-program-hospital-inpatient-prospective-payment-systems-for-acute-care-hospitals-ipps-and"
+              }
+            ],
+            "queried_entities": [
+              "IRIS²"
+            ]
+          },
+          "related": [],
+          "importance_score": 22
+        },
+        {
+          "item_id": "03a76f507072c9e5",
+          "title": "Space Force picks 15 companies for $981 million training range contract",
+          "raw_title": null,
+          "url": "https://spacenews.com/space-force-picks-15-companies-for-981-million-training-range-contract/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T13:18:20Z",
+          "collected_at": "2026-08-04T14:53:04.036519Z",
+          "tier": 2,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 65,
+              "so_what": "Space Force awarded $981 million to 15 vendors for a training-range contract involving satellites, sensors, and systems; vendors will compete for task orders. Precision-machined flight-critical components (integration frames, structural hardware, payload mounts) are likely subcontract openings if BTX's primes (Lockheed, RTX, Northrop) win orders.",
+              "now_what": "BD team should immediately contact Lockheed, RTX, and Northrop to confirm whether they are on the 15-company list and inquire about subcontracting plans; prioritize 5-axis CNC capabilities for satellite structures and sensor mounts.",
+              "categories": [
+                "Contract Award",
+                "Subcontracting Opportunity"
+              ]
+            },
+            "exec": {
+              "relevance_score": 48,
+              "so_what": "A $981 million Space Force multi-award contract was distributed to 15 companies; whether BTX primes are on the list and their subcontracting strategy will determine BTX's access to a significant training-range supply stream.",
+              "now_what": "Capture team should report back within one week on which of BTX's three named primes won contract positions and their stated subcontracting approach; if BTX is not yet included in their sub-team, escalate to BD leadership for prime relationship calls.",
+              "categories": [
+                "Contract Award",
+                "Subcontracting Opportunity"
+              ]
+            }
+          },
+          "dollar_amount": {
+            "raw_text": "$981 million",
+            "value": 981000000.0,
+            "currency": "USD"
+          },
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "15-company list not named in summary; vendor identities and task-order profiles not detailed. Inference that precision machining will be needed is based on satellite/sensor hardware nature, not explicit source statement.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "United States Space Force",
+              "type": "agency"
+            }
+          ],
+          "enrichment": null,
+          "related": [
+            {
+              "item_id": "5f36e674b3a2acca",
+              "title": "The new space wars: lessons from Ukraine and the Middle East",
+              "url": "https://spacenews.com/the-new-space-wars-lessons-from-ukraine-and-the-middle-east/",
+              "via": [
+                "United States Space Force"
+              ]
+            }
+          ],
+          "importance_score": 65
+        },
+        {
+          "item_id": "5f36e674b3a2acca",
+          "title": "The new space wars: lessons from Ukraine and the Middle East",
+          "raw_title": null,
+          "url": "https://spacenews.com/the-new-space-wars-lessons-from-ukraine-and-the-middle-east/",
+          "source_id": "SpaceNews",
+          "published_at": "2026-07-31T12:00:00Z",
+          "collected_at": "2026-08-04T14:53:04.036519Z",
+          "tier": 3,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 12,
+              "so_what": "An opinion piece on space-war lessons from Ukraine and Middle East conflicts; no specific contract, solicitation, or subcontracting opportunity for BTX identified.",
+              "now_what": "No action; this is strategic commentary, not a procurement signal. Monitor if referenced in follow-on Congressional or DoD policy announcements that could affect defense budgets.",
+              "categories": [
+                "Industry News"
+              ]
+            },
+            "exec": {
+              "relevance_score": 24,
+              "so_what": "Strategic analysis of space warfare and its implications is emerging in the policy debate, which may inform future U.S. space-defense spending and priorities in areas where BTX's primes are active (F-35, B-21, hypersonics).",
+              "now_what": "Brief leadership that space-warfare narrative is shaping Congressional and DoD thinking; watch for follow-on appropriations or program decisions tied to these threat lessons, particularly on satellite resilience or ground-based comms for contested environments where BTX primes may need supply-chain support.",
+              "categories": [
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "General opinion/analysis; no specific program, budget, or compliance signal. Inference that this influences future policy is plausible but not stated.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "Chance Saltzman",
+              "type": "person"
+            },
+            {
+              "name": "Brookings Institution",
+              "type": "organization"
+            },
+            {
+              "name": "United States Space Force",
+              "type": "agency"
+            }
+          ],
+          "enrichment": {
+            "facts": [],
+            "queried_entities": [
+              "Brookings Institution"
+            ]
+          },
+          "related": [
+            {
+              "item_id": "03a76f507072c9e5",
+              "title": "Space Force picks 15 companies for $981 million training range contract",
+              "url": "https://spacenews.com/space-force-picks-15-companies-for-981-million-training-range-contract/",
+              "via": [
+                "United States Space Force"
+              ]
+            }
+          ],
+          "importance_score": 24
+        },
+        {
+          "item_id": "1a35e4322105201a",
+          "title": "Europe wants ITAR-free weapons. US firms are trying to adjust.",
+          "raw_title": null,
+          "url": "https://breakingdefense.com/2026/08/europe-wants-itar-free-weapons-us-firms-are-trying-to-adjust/",
+          "source_id": "Breaking Defense",
+          "published_at": "2026-08-04T13:47:01Z",
+          "collected_at": "2026-08-04T14:53:04.072972Z",
+          "tier": 2,
+          "per_edition": {
+            "bd": {
+              "relevance_score": 28,
+              "so_what": "European defense demand for ITAR-free weapons is driving US defense firms to consider non-ITAR supply chains and designs, creating risk that BTX's ITAR-registered capabilities may be deprioritized on European-destined programs, and opportunity if BTX expands non-ITAR precision-machining.",
+              "now_what": "BTX BD and capture team should monitor prime-contractor announcements on ITAR-free alternatives and determine whether BTX should invest in parallel non-ITAR precision-machining capacity or partnerships to compete on European-influenced US defense programs.",
+              "categories": [
+                "Industry News",
+                "Export Controls / Compliance"
+              ]
+            },
+            "exec": {
+              "relevance_score": 62,
+              "so_what": "European skepticism of US arms controls and push for ITAR-free weapons is reshaping US defense prime sourcing strategy, potentially downgrading demand for ITAR-registered suppliers like BTX on programs with European integration or export risk, and exposing BTX to supply-chain displacement.",
+              "now_what": "BTX leadership should engage Lockheed Martin, RTX, and Northrop Grumman account teams to understand implications of ITAR-free procurement mandates on current and future programs; assess whether BTX should develop ITAR-alternative production lines or deepen non-export-controlled capabilities to offset displacement risk.",
+              "categories": [
+                "Export Controls / Compliance",
+                "Industry News"
+              ]
+            }
+          },
+          "dollar_amount": null,
+          "affected_population": null,
+          "action_deadline": null,
+          "confidence_note": "Item reports trend of European procurement preference; specific US prime-contractor adjustments and timeline for implementation are not detailed in this summary.",
+          "unverified_claims": [],
+          "deep_analysis": null,
+          "also_covered_by": [],
+          "entities": [
+            {
+              "name": "European Union",
+              "type": "place"
+            },
+            {
+              "name": "United States",
+              "type": "place"
+            }
+          ],
+          "enrichment": null,
+          "related": [],
+          "importance_score": 62
+        }
+      ]
     }
   ],
   "pinned": []
