@@ -37,10 +37,16 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Release-critical frontend gate
-        run: npm run test:release-critical
+      - name: Node version
+        run: npm run doctor:node
         env:
           RELEASE_GATE_STRICT_NODE: "1"
+
+      - name: Production dependency audit
+        run: npm run audit:prod
+
+      - name: Development dependency risk acceptance
+        run: npm run audit:dev-risk
 
       - name: Typecheck
         run: npm run typecheck
@@ -59,6 +65,9 @@ jobs:
             exit 1
           fi
 
+      - name: test:environment-gate
+        run: npm run test:environment-gate
+
       - name: check:design
         run: npm run check:design
 
@@ -67,6 +76,9 @@ jobs:
 
       - name: test:metrics
         run: npm run test:metrics
+
+      - name: test:canonical-metrics
+        run: npm run test:canonical-metrics
 
       - name: test:metric-availability
         run: npm run test:metric-availability
@@ -85,6 +97,36 @@ jobs:
 
       - name: test:architecture
         run: npm run test:architecture
+
+      - name: test:correctness
+        run: npm run test:correctness
+
+      - name: test:routing
+        run: npm run test:routing
+
+      - name: test:route-data
+        run: npm run test:route-data
+
+      - name: test:navigation
+        run: npm run test:navigation
+
+      - name: test:actions
+        run: npm run test:actions
+
+      - name: test:settings-a11y
+        run: npm run test:settings-a11y
+
+      - name: test:a11y-axe
+        run: npm run test:a11y-axe
+
+      - name: test:page-improvements
+        run: npm run test:page-improvements
+
+      - name: test:mobile-workflow
+        run: npm run test:mobile-workflow
+
+      - name: test:control-harness
+        run: npm run test:control-harness
 
       - name: test:identity
         run: npm run test:identity
@@ -106,6 +148,21 @@ jobs:
 
       - name: test:import-list
         run: npm run test:import-list
+
+      - name: test:assistant
+        run: npm run test:assistant
+
+      - name: test:ask-quality
+        run: npm run test:ask-quality
+
+      - name: test:evidence
+        run: npm run test:evidence
+
+      - name: test:mobile
+        run: npm run test:mobile
+
+      - name: smoke:deployment
+        run: npm run smoke:deployment
 
   backend:
     runs-on: ubuntu-latest
