@@ -44,9 +44,9 @@ async function visibleMoreButton(page: Page) {
 
 async function checkWidth(browser: Browser, width: number, height: number): Promise<void> {
   const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: width <= 414 ? 2 : 1, isMobile: width <= 414, hasTouch: width <= 414 });
-  await page.goto(`${BASE_URL}/intelligence/industry-updates`, { waitUntil: "networkidle" });
-  await page.locator("[data-surface-component='surface-route-industry_updates'], [data-surface-component='surface-industry-updates']").waitFor({ timeout: 15_000 });
+  await page.goto(`${BASE_URL}/intelligence/industry-updates`, { waitUntil: "domcontentloaded" });
   const more = await visibleMoreButton(page);
+  await more.waitFor({ timeout: 15_000 });
   assert(await more.isVisible(), `More navigation is not visible at ${width}px`);
   await more.focus();
   assert(await more.evaluate((node) => node === document.activeElement), `More navigation cannot receive focus at ${width}px`);
