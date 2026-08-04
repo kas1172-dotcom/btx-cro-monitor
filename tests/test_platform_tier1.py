@@ -72,7 +72,7 @@ def test_production_rejects_clerk_development_credentials():
     with pytest.raises(ValidationError, match="rejects Clerk development"):
         Settings(
             deployment_mode="production",
-            clerk_secret_key="sk_test_not-a-real-secret",
+            clerk_secret_key="sk_test_placeholder",
             clerk_issuer="https://example.clerk.accounts.dev",
         )
 

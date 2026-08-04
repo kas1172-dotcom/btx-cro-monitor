@@ -55,7 +55,7 @@ export function stripBasePath(pathname: string): string {
 
 const routeListeners = new Set<() => void>();
 let routeSnapshot: AppRoute | null = null;
-const SERVER_ROUTE_SNAPSHOT = parseAppRoute("/today");
+const SERVER_ROUTE_SNAPSHOT = parseAppRoute("/briefing");
 
 const ROUTE_TO_TAB: Record<Exclude<RouteId, "not_found">, TabId> = {
   today: "brief",
@@ -74,7 +74,7 @@ const ROUTE_TO_TAB: Record<Exclude<RouteId, "not_found">, TabId> = {
 };
 
 export const TAB_TO_ROUTE: Record<TabId, string> = {
-  brief: "/today",
+  brief: "/briefing",
   work_queue: "/work",
   accounts: "/accounts",
   ask: "/ask",
@@ -106,7 +106,7 @@ export function parseAppRoute(pathname: string, search = ""): AppRoute {
   const [root, child] = parts;
 
   if (clean === "/") {
-    return { id: "today", tab: "brief", path: "/today", accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
+    return { id: "today", tab: "brief", path: "/briefing", accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   }
   if (root === "today" || root === "briefing") return { id: "today", tab: "brief", path: clean, accountId: null, workItemId: null, programId: null, conversationId: null, deliverableId: null, query };
   if (root === "work") return { id: "work", tab: "work_queue", path: clean, accountId: null, workItemId: decodeSegment(child), programId: null, conversationId: null, deliverableId: null, query };
@@ -157,14 +157,14 @@ export function useAppRoute(): AppRoute {
   useEffect(() => {
     const onPopState = () => emitRoute();
     window.addEventListener("popstate", onPopState);
-    if (stripBasePath(window.location.pathname).replace(/\/+$/, "") === "") navigateTo("/today", { replace: true });
+    if (stripBasePath(window.location.pathname).replace(/\/+$/, "") === "") navigateTo("/briefing", { replace: true });
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
   return useSyncExternalStore(subscribeRoute, currentRoute, () => SERVER_ROUTE_SNAPSHOT);
 }
 
 export function pathForTab(tab: TabId): string {
-  return TAB_TO_ROUTE[tab] ?? "/today";
+  return TAB_TO_ROUTE[tab] ?? "/briefing";
 }
 
 export function accountPath(accountId: string): string {

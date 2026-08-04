@@ -126,8 +126,17 @@ assert(supplier?.radius === 5, `non-prospect radius should stay fixed at 5, got 
 
 const prospectMapSource = readFileSync(new URL("../src/ui/map/ProspectMap.tsx", import.meta.url), "utf8");
 const documentViewerSource = readFileSync(new URL("../src/ui/deliverables/DocumentViewer.tsx", import.meta.url), "utf8");
+const demoDefinitions = readFileSync(new URL("../../btx_platform/demo/definitions.py", import.meta.url), "utf8");
 assert(!/basemaps\.cartocdn|openstreetmap|TileLayer/.test(prospectMapSource), "Prospect map must not depend on external raster tiles");
 assert(!/basemaps\.cartocdn|TileLayer/.test(documentViewerSource), "Document maps must not depend on external raster tiles");
 assert(prospectMapSource.includes("DarkMapTiles"), "Prospect map must mount the bundled dark basemap");
+assert(prospectMapSource.includes("FitMapBounds"), "Prospect map must fit bounds to plotted markers.");
+assert(prospectMapSource.includes("relationship === \"target\""), "Prospects-only map must exclude customer accounts.");
+for (const city of ["Fort Worth", "Camas", "Bellevue"]) {
+  const index = demoDefinitions.indexOf(`"city": "${city}"`);
+  assert(index > -1, `Demo account for ${city} is missing.`);
+  const slice = demoDefinitions.slice(index, index + 220);
+  assert(/"lat":\s*-?\d+\.\d+/.test(slice) && /"lon":\s*-?\d+\.\d+/.test(slice), `Demo account for ${city} must include real coordinates.`);
+}
 
-console.log("map ok: bundled dark tiles, mixed coordinates filtered, canonical fallback used, customers excluded from prospect styling");
+console.log("map ok: bundled dark tiles, demo account coordinates present, bounds fit markers, customers excluded from prospect map");

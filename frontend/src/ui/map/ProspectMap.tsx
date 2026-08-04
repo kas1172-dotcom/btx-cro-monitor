@@ -54,7 +54,9 @@ function FitMapBounds({ points, watchKey }: { points: Array<[number, number]>; w
 }
 
 export function ProspectMap({ world, selectedAccountId, onSelectAccount, prospectsOnly = false }: { world: World; selectedAccountId?: string | null; onSelectAccount?: (accountId: string) => void; prospectsOnly?: boolean }) {
-  const prospectCompanies = world.prospects.map((prospect) => prospect.company);
+  const prospectCompanies = world.prospects
+    .map((prospect) => prospect.company)
+    .filter((company) => company.relationship === "target" || String(company.relationship) === "prospect");
   const mapCompanies = prospectsOnly ? prospectCompanies : world.companies;
   const markers = buildMapMarkers(mapCompanies, world.analysis.byId, world.scoreResults);
   const center = mapCenter(mappableCompanies(mapCompanies));
@@ -127,7 +129,10 @@ export function ProspectMap({ world, selectedAccountId, onSelectAccount, prospec
           </details>
         )}
         <div className="map-prospect-list">
-          {world.prospects.filter((p) => !prospectsOnly || markers.some((marker) => marker.company.id === p.company.id)).slice(0, 12).map((p, i) => {
+          {world.prospects
+            .filter((p) => !prospectsOnly || prospectCompanies.some((company) => company.id === p.company.id))
+            .filter((p) => !prospectsOnly || markers.some((marker) => marker.company.id === p.company.id))
+            .slice(0, 12).map((p, i) => {
             const qualification = prospectQualificationLabel({
               company: p.company,
               contact: p.contact,

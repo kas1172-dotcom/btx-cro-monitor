@@ -267,7 +267,7 @@ export function TodayBrief({ world }: { world: World }) {
             key={item.id}
             type="button"
             className={item.id === horizon.id ? "active" : ""}
-            onClick={() => navigateTo(`/today?horizon=${item.id}`)}
+            onClick={() => navigateTo(`/briefing?horizon=${item.id}`)}
           >
             {item.label}
           </button>

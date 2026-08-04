@@ -56,7 +56,7 @@ export function ContextRibbon({ world }: { world: World | null }) {
     <div className="context-ribbon" aria-label="Relevant system status">
       {notice ? <span className="context-ribbon-notice">{notice}</span> : null}
       {items.map((item) => item.href ? (
-        <button key={item.id} type="button" className={`context-ribbon-item ${item.tone}`} onClick={() => navigateTo(item.href ?? "/today")}>{item.label}</button>
+        <button key={item.id} type="button" className={`context-ribbon-item ${item.tone}`} onClick={() => navigateTo(item.href ?? "/briefing")}>{item.label}</button>
       ) : (
         <span key={item.id} className={`context-ribbon-item ${item.tone}`}>{item.label}</span>
       ))}

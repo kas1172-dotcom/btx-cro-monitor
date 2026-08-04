@@ -486,7 +486,7 @@ function RouteDataFallback({ route, world }: { route: AppRoute; world: ReturnTyp
         </p>
         <div className="route-data-actions">
           <button type="button" onClick={() => world?.refresh()}>Retry</button>
-          <button type="button" onClick={() => navigateTo("/today")}>Open Briefing</button>
+          <button type="button" onClick={() => navigateTo("/briefing")}>Open Briefing</button>
           <button type="button" onClick={() => navigateTo("/work")}>Open Work</button>
         </div>
       </div>
@@ -539,7 +539,7 @@ function RouteNotFound({ path: _path }: { path: string }) {
         <p className="eyebrow">Not found</p>
         <h1>That page is not available.</h1>
         <p>That address does not match a cockpit workspace. Use the navigation rail to choose a supported page.</p>
-        <button type="button" onClick={() => navigateTo("/today", { replace: true })}>Open Today</button>
+        <button type="button" onClick={() => navigateTo("/briefing", { replace: true })}>Open Briefing</button>
       </div>
     </section>
   );

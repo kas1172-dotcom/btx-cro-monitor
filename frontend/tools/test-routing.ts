@@ -5,7 +5,7 @@ function assert(condition: unknown, message: string): void {
 }
 
 const today = parseAppRoute("/");
-assert(today.id === "today" && today.tab === "brief" && today.path === "/today", "root should normalize to Today");
+assert(today.id === "today" && today.tab === "brief" && today.path === "/briefing", "root should normalize to Briefing");
 const briefing = parseAppRoute("/briefing");
 assert(briefing.id === "today" && briefing.tab === "brief", "labelled briefing URL should resolve");
 
@@ -50,12 +50,12 @@ assert(accountPath("acct 1") === "/accounts/acct%201", "account path encodes ids
 assert(workItemPath("work 1") === "/work/work%201", "work path encodes ids");
 assert(deliverablePath("deliverable 1") === "/deliverables/deliverable%201", "deliverable path encodes ids");
 assert(figureInsertPath().startsWith("/deliverables/figures/new?"), "figure insert helper preserves Deliverables navigation ownership");
-assert(pathForTab("brief") === "/today", "brief tab path");
+assert(pathForTab("brief") === "/briefing", "brief tab path");
 assert(pathForTab("work_queue") === "/work", "work tab path");
 assert(pathForTab("hubspot") === "/integrations", "integrations path replaces HubSpot top-level");
 assert(pathForTab("industry_updates") === "/intelligence/industry-updates", "industry updates nested route");
 
-const expectedPrimary = ["/today", "/work", "/accounts", "/ask"];
+const expectedPrimary = ["/briefing", "/work", "/accounts", "/ask"];
 assert(expectedPrimary.every((path) => Object.values(TAB_TO_ROUTE).includes(path)), "primary routes should be registered");
 
 // Model browser history for insert/cancel/insert and cross-navigation through Work.

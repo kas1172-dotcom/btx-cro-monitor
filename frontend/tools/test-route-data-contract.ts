@@ -38,6 +38,21 @@ async function waitForPreview(): Promise<ReturnType<typeof spawn>> {
   throw new Error("Timed out waiting for Vite preview.");
 }
 
+async function stopChild(child: ReturnType<typeof spawn>): Promise<void> {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(() => {
+      if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
+      resolve();
+    }, 5_000);
+    child.once("exit", () => {
+      clearTimeout(timer);
+      resolve();
+    });
+    child.kill("SIGTERM");
+  });
+}
+
 const snapshot: WorldSnapshot = {
   tenant: { id: "tenant-route-test", displayName: "Route Data Test", isDemonstration: true, demoNotice: "Demonstration — internal records are illustrative" },
   accounts: [
@@ -164,5 +179,5 @@ try {
   console.log("route data contract ok: cold, slow, rejected, offline, auth, retry, and cache paths verified");
 } finally {
   if (browser) await browser.close();
-  preview.kill("SIGTERM");
+  await stopChild(preview);
 }
