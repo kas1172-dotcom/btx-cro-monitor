@@ -19,7 +19,7 @@ for (const token of [
   "deliverable_draft",
   "AssistantSourceMode",
   "workspace_web",
-  "Cancel research",
+  "Stop research",
   "actual_source_mode",
   "as-of unavailable",
   "SanitizedMarkdown",

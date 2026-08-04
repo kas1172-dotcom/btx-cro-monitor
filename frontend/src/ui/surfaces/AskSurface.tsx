@@ -553,7 +553,7 @@ export function AskSurface({ world }: { world: World }) {
                     <div role="status" aria-live="polite">
                       {streamingText ? <SanitizedMarkdown text={streamingText} /> : <p>Preparing an evidence-backed answer.</p>}
                     </div>
-                    <button type="button" onClick={() => requestController.current?.abort()}>Stop</button>
+                    <button type="button" onClick={() => requestController.current?.abort()}>Stop research</button>
                   </article>
                 )}
               </div>
