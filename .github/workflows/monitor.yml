@@ -34,6 +34,7 @@ jobs:
   # for the selected client(s), then a single Pages publish.
   setup:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       matrix: ${{ steps.pick.outputs.matrix }}
     steps:
@@ -54,6 +55,7 @@ jobs:
   # rather than a silent skip.
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -88,6 +90,7 @@ jobs:
       matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
 
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -110,6 +113,7 @@ jobs:
       # GitHub Actions treats non-zero exit codes as step failures, so this
       # step will fail loudly without any extra shell error-trapping needed.
       - name: Run pipeline - ${{ matrix.client }}
+        timeout-minutes: 18
         run: |
           python -m monitor_engine \
             --config "clients/${{ matrix.client }}/config.json" \
@@ -216,6 +220,7 @@ jobs:
     # monitor run with an unrelated deploy/test failure.
     if: ${{ !cancelled() && github.ref_name == 'main' && needs.run.result == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deploy-pages.outputs.page_url }}

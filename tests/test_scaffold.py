@@ -141,7 +141,8 @@ class TestRoundTrip:
 
     def test_cost_caps_default(self, result):
         assert result["config"]["cost_caps"] == {
-            "max_items_per_run": 120, "max_output_tokens_per_run": 90000,
+            "max_items_per_run": 120,
+            "max_output_tokens_per_run": 90000,
         }
 
 

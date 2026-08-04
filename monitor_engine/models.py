@@ -150,6 +150,7 @@ class Cadence(BaseModel):
 class CostCaps(BaseModel):
     max_items_per_run: int = 50
     max_output_tokens_per_run: int = 8000
+    max_runtime_seconds: float | None = None
 
 
 class DeepAnalysisSection(BaseModel):

@@ -394,7 +394,8 @@
   },
   "cost_caps": {
     "max_items_per_run": 50,
-    "max_output_tokens_per_run": 40000
+    "max_output_tokens_per_run": 40000,
+    "max_runtime_seconds": 900
   },
   "profile": {
     "capabilities": [

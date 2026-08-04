@@ -156,6 +156,35 @@ def _editorial_payload() -> dict:
     }
 
 
+class TestScorerBounds:
+    def test_anthropic_client_constructed_with_request_bounds(self, config: ClientConfig):
+        with patch("monitor_engine.analysis.scorer.anthropic.Anthropic") as anthropic_cls:
+            Scorer(config, api_key="test-key")
+
+        kwargs = anthropic_cls.call_args.kwargs
+        assert kwargs["timeout"] == pytest.approx(180.0)
+        assert kwargs["max_retries"] <= 1
+
+    def test_runtime_budget_returns_partial_results(self, config: ClientConfig):
+        config.cost_caps.max_runtime_seconds = 10
+        times = iter([0.0, 0.0, 11.0])
+
+        scorer = Scorer(
+            config,
+            client=MagicMock(),
+            min_call_interval=0,
+            clock=lambda: next(times),
+        )
+        results = scorer._run_capped(
+            ["first", "second", "third"],
+            lambda batch: f"done-{batch}",
+            _RunCost(),
+            config.cost_caps,
+        )
+
+        assert results == ["done-first"]
+
+
 # ─── Title normalization ──────────────────────────────────────────────────
 
 class TestNormalizeTitle:

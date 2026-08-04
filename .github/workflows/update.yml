@@ -20,6 +20,7 @@ permissions:
 jobs:
   bake:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/bake-llm-artifacts
@@ -29,6 +30,7 @@ jobs:
   deploy:
     needs: bake
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deploy-pages.outputs.page_url }}

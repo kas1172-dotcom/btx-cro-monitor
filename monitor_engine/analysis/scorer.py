@@ -245,13 +245,22 @@ class Scorer:
         batch_size: int = DEFAULT_BATCH_SIZE,
         min_call_interval: float = DEFAULT_MIN_INTERVAL,
         max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._config = config
-        self._client = client or anthropic.Anthropic(api_key=api_key)
+        # Bound SDK requests because streamed responses can stall between chunks
+        # and bypass the single-read timeout trap. App-level retries still apply.
+        self._client = client or anthropic.Anthropic(
+            api_key=api_key,
+            timeout=180.0,
+            max_retries=1,
+        )
         self._batch_size = batch_size
         self._min_interval = min_call_interval
         self._max_concurrency = max(1, max_concurrency)
         self._last_call: float = 0.0
+        self._clock = clock
+        self._started_at = self._clock()
         self._session: Any = None   # lazily created for the agentic research pass
 
     # ── internal helpers ───────────────────────────────────────────────────
@@ -262,7 +271,7 @@ class Scorer:
         # re-serialize the calls).
         if self._max_concurrency > 1:
             return
-        elapsed = time.monotonic() - self._last_call
+        elapsed = self._clock() - self._last_call
         if elapsed < self._min_interval:
             time.sleep(self._min_interval - elapsed)
 
@@ -283,17 +292,31 @@ class Scorer:
         def _capped() -> bool:
             return cost.total_output_tokens() >= caps.max_output_tokens_per_run
 
+        def _runtime_exhausted() -> bool:
+            budget = getattr(caps, "max_runtime_seconds", None)
+            if budget is None:
+                return False
+            elapsed = self._clock() - self._started_at
+            if elapsed < budget:
+                return False
+            logger.warning(
+                "Runtime budget reached after %.1f seconds, budget %.1f seconds",
+                elapsed,
+                budget,
+            )
+            return True
+
         results: list[_T] = []
         if self._max_concurrency <= 1:
             for batch in batches:
-                if _capped():
+                if _capped() or _runtime_exhausted():
                     break
                 results.append(fn(batch))
             return results
 
         with ThreadPoolExecutor(max_workers=self._max_concurrency) as pool:
             for start in range(0, len(batches), self._max_concurrency):
-                if _capped():
+                if _capped() or _runtime_exhausted():
                     break
                 wave = batches[start : start + self._max_concurrency]
                 results.extend(pool.map(fn, wave))
@@ -340,7 +363,7 @@ class Scorer:
                 message = s.get_final_message()
         else:
             message = self._client.messages.create(**params)
-        self._last_call = time.monotonic()
+        self._last_call = self._clock()
         return message.content[0].text, message.usage
 
     def _call_json(
