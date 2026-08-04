@@ -61,7 +61,7 @@ runs:
           exit 1
         fi
         npm ci
-        npm run test:release-critical
+        env -u VITE_CLERK_PUBLISHABLE_KEY npm run test:release-critical
         npm run validate:production-env
         npm run build
         npm run smoke:deployment
