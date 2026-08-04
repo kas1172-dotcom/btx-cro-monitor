@@ -64,8 +64,8 @@ runs:
         npm ci
         env -u VITE_CLERK_PUBLISHABLE_KEY npm run test:release-critical
         npm run validate:production-env
-        npm run build
         npm run smoke:deployment
+        npm run build
 
     - name: Assemble site
       shell: bash
