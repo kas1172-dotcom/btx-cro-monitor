@@ -10,6 +10,7 @@ import type { Company, Contact, Opportunity } from "../../engine/brain/entities.
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
 import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "../../app/sourceRegistry.ts";
 import { displayLabel } from "../../app/displayLabels.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 import { plural } from "../../app/format.ts";
 
 type ListType = "company" | "contact";
@@ -149,7 +150,7 @@ export function HubSpotViewer({ world }: { world: World }) {
       setLookupResults(response.records);
       setLookupStatus(response.records.length ? `Found ${response.records.length} companies.` : "No HubSpot companies matched that search.");
     } catch (error) {
-      setLookupStatus(error instanceof Error ? error.message : "HubSpot lookup failed.");
+      setLookupStatus(userFacingError(error, "The CRM lookup could not be completed."));
     }
   }
 
@@ -173,7 +174,7 @@ export function HubSpotViewer({ world }: { world: World }) {
       });
       setListStatus(`Verified HubSpot list ${created.list.id} with ${added.list.record_ids.length} ${listType} records. ${created.duplicate ? "Reused idempotent create result." : ""}`);
     } catch (error) {
-      setListStatus(error instanceof Error ? error.message : "HubSpot list creation failed.");
+      setListStatus(userFacingError(error, "The CRM list could not be created."));
     } finally {
       setCreating(false);
     }

@@ -7,6 +7,7 @@ import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { applyScoringConfig } from "../../app/config.ts";
 import { displayLabel } from "../../app/displayLabels.ts";
 import { formatDateTime } from "../../app/format.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 import { clearMemory } from "../../memory/localMemory.ts";
 import { resetUiState, setState, useStore, type SettingsSection } from "../../store/store.ts";
 import type { WeightsConfig } from "../../engine/decision/weights.ts";
@@ -219,7 +220,7 @@ function EngineTuningPanel() {
         setStatus("Loaded from backend.");
       })
       .catch((error) => {
-        if (alive) setStatus(error instanceof Error ? error.message : "Could not load backend scoring weights.");
+        if (alive) setStatus(userFacingError(error, "Could not load scoring weights."));
       });
     return () => {
       alive = false;
@@ -263,7 +264,7 @@ function EngineTuningPanel() {
       setSaved(response);
       setStatus("Saved to backend.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Save failed.");
+      setStatus(userFacingError(error, "Scoring weights could not be saved."));
     } finally {
       setSaving(false);
     }
@@ -362,7 +363,7 @@ function SourcesPanel() {
         loadRuns();
       })
       .catch((error) => {
-        if (alive) setStatus(error instanceof Error ? error.message : "Could not load backend sources.");
+        if (alive) setStatus(userFacingError(error, "Could not load data sources."));
       });
     const timer = window.setInterval(loadRuns, 8000);
     return () => {
@@ -410,7 +411,7 @@ function SourcesPanel() {
       setSaved(response);
       setStatus("Saved to backend.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Save failed.");
+      setStatus(userFacingError(error, "Source settings could not be saved."));
     } finally {
       setBusyAction(null);
     }
@@ -429,7 +430,7 @@ function SourcesPanel() {
       setStatus(`Pipeline ${run.status}: ${run.id}`);
       loadRuns();
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Pipeline trigger failed.");
+      setStatus(userFacingError(error, "The pipeline could not be started."));
     } finally {
       setBusyAction(null);
     }

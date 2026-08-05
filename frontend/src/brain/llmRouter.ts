@@ -36,7 +36,7 @@ export interface RoutedClassification extends Classification {
 function routerSystem(world: World): string {
   const names = world.companies.map((c) => c.name).join(", ");
   const cities = [...new Set(world.companies.map((c) => c.location.city))].join(", ");
-  return `Route a CRO question for the BTX Revenue Brain. Return strict JSON only.
+  return `Route a CRO question for the BTX Enterprise Brain. Return strict JSON only.
 Allowed intents: ${INTENTS.join(", ")}.
 Allowed tabs: ${TAB_IDS.join(", ")}.
 Known account names: ${names}.

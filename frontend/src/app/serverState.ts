@@ -149,7 +149,6 @@ export function useQuery<T>(key: string, loader: (signal: AbortSignal) => Promis
     });
     return () => {
       alive = false;
-      getState<T>(key).abortController?.abort();
     };
   }, [key, refreshNonce, ...dependencies]);
 

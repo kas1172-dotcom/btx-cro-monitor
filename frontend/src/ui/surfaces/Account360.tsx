@@ -381,7 +381,7 @@ export function Account360({ world, accountId, onSelectAccount }: { world: World
             </section>
             <section className="surface-panel">
               <div className="panel-head"><h2>Work items</h2></div>
-              <WorkItemList items={workItems} empty="No account-specific work items." world={world} />
+              <WorkItemList items={workItems} empty="No account-specific work items." world={world} compact />
             </section>
           </div>
           <MeaningfulTimeline

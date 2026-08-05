@@ -58,6 +58,7 @@ from btx_platform.intelligence import (
     validate_weight_config,
 )
 from btx_platform.ingest import IngestError, ingest
+from btx_platform.integrations.registry import AdapterRegistry, build_adapter_registry
 from btx_platform.industry_monitor import load_artifact, monitor_snapshot, sanitize_external_text
 from btx_platform.llm import LlmProviderError, call_anthropic
 from btx_platform.pipeline import PipelineConfigError, PipelineRateLimit, list_runs, trigger_pipeline
@@ -852,6 +853,7 @@ def create_app(
     queue: JobQueue | None = None,
     clerk_verifier: ClerkVerifier | None = None,
     rate_limiter: RateLimiter | None = None,
+    adapter_registry: AdapterRegistry | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
     configure_observability(settings)
@@ -871,6 +873,7 @@ def create_app(
     app.state.settings = settings
     app.state.session_factory = session_factory
     app.state.queue = queue if queue is not None else _default_queue(settings)
+    app.state.adapter_registry = adapter_registry or build_adapter_registry(settings)
     app.state.crm_cache = {}
     app.state.crm_list_idempotency = {}
     app.state.clerk_verifier = clerk_verifier or (

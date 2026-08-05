@@ -92,7 +92,7 @@ async function composeOnce(input: {
   rubric: string;
   validate: (deliverable: Deliverable, ctx: AgentContext) => ValidationResult;
 }, retry: boolean): Promise<{ ok: true; deliverable: Deliverable } | { ok: false; reason: string; parseFailure?: boolean }> {
-  const system = `You compose CRO deliverable prose for the Revenue Brain.
+  const system = `You compose CRO deliverable prose for Enterprise Brain.
 Use only the provided context facts, output schema, and rubric.
 Reproduce every numeric value exactly as provided. Do not invent, recompute, round, or alter numbers.
 Do not invent names, accounts, contacts, programs, dates, sources, or metrics.
@@ -248,7 +248,7 @@ function checkGrounding(deliverable: Deliverable, ctx: AgentContext): GroundingR
     groundingText.flatMap((value) => candidateNames(value)),
   );
   for (const name of candidateNames(text)) {
-    if (!allowedNames.has(name) && !["Revenue Brain", "Executive Summary"].includes(name)) violations.push(`"${name}" has no source`);
+    if (!allowedNames.has(name) && !["Enterprise Brain", "Executive Summary"].includes(name)) violations.push(`"${name}" has no source`);
   }
   return { ok: violations.length === 0, violations: [...new Set(violations)].slice(0, 8) };
 }

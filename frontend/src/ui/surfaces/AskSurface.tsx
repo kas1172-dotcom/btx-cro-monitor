@@ -642,7 +642,7 @@ export function AskSurface({ world }: { world: World }) {
           <section>
             <h2>Work context</h2>
             <WorkItemSourceNote source={attention.source} error={attention.error} />
-            <WorkItemList items={attention.items.slice(0, 3)} empty="No urgent work items to anchor the conversation." world={world} />
+            <WorkItemList items={attention.items.slice(0, 3)} empty="No urgent work items to anchor the conversation." world={world} compact />
           </section>
         </aside>
       </div>

@@ -15,6 +15,15 @@
   --warning: #E0A93B;
   --danger: #D96A57;
   --info: #4C86C4;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --touch-target: 44px;
+  --type-caption: 11px;
+  --type-body: 14px;
+  --type-title: 20px;
   --page-rgb: 12, 22, 33;
   --rail-rgb: 10, 19, 30;
   --panel-rgb: 16, 30, 44;
@@ -108,7 +117,7 @@ button, input, select, textarea { font: inherit; }
 .access-panel button:disabled { opacity: .65; cursor: wait; }
 .access-panel small { color: var(--bad); }
 
-/* Quiet Revenue Brain cockpit */
+/* Quiet Revenue Cockpit */
 .quiet-cockpit {
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr) var(--right-w, 0px);
@@ -3780,7 +3789,7 @@ input[type="checkbox"]:checked::after {
   width: min(720px, 100%); background: transparent; color: var(--text); border: 1px solid transparent;
   border-radius: 8px; padding: 4px 0; font: inherit; font-size: 28px; font-weight: var(--font-semibold); line-height: 1.08;
 }
-.document-title-input:focus { outline: none; border-color: var(--line); padding-left: 8px; background: var(--panel-2); }
+.document-title-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); padding-left: 8px; background: var(--panel-2); }
 .document-source-trace {
   display: inline-flex;
   width: fit-content;
@@ -4618,7 +4627,8 @@ input[type="checkbox"]:checked::after {
     justify-content: flex-start;
     gap: 8px;
     overflow-x: auto;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scroll-snap-type: x proximity;
   }
   .quiet-topbar::-webkit-scrollbar { display: none; }
   .quiet-brand {
@@ -4733,9 +4743,10 @@ input[type="checkbox"]:checked::after {
     padding-bottom: 4px;
     scrollbar-width: none;
   }
-  .account360-list::-webkit-scrollbar { display: none; }
+  .account360-list::-webkit-scrollbar { height: 4px; }
   .account360-list button {
     min-width: 230px;
+    scroll-snap-align: start;
   }
   .ask-brain {
     position: static;
@@ -5742,7 +5753,7 @@ input[type="checkbox"]:checked::after {
   cursor: pointer;
 }
 
-/* Revenue cockpit theme */
+/* Revenue Cockpit theme */
 :root {
   --canvas: #09121d;
   --sidebar: #0b1622;
@@ -5885,6 +5896,31 @@ button, a, input, select, textarea { outline-offset: 3px; }
   border-radius: 8px;
   background: var(--surface-1);
 }
+.work-item-list:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.work-item-list.compact .work-item-table-head { display: none; }
+.work-item-list.compact .work-item-row {
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+.work-item-list.compact .work-action-cell { grid-column: 1 / -1; }
+.work-item-list.compact .work-item-row > span::before {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--type-caption);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.work-item-list.compact .work-item-row > span:nth-child(2)::before { content: "Account"; }
+.work-item-list.compact .work-item-row > span:nth-child(3)::before { content: "Status"; }
+.work-item-list.compact .work-item-row > span:nth-child(4)::before { content: "Owner"; }
+.work-item-list.compact .work-item-row > span:nth-child(5)::before { content: "Due"; }
+.work-item-list.compact .work-item-row > span:nth-child(6)::before { content: "Priority"; }
+.work-item-list.compact .work-item-row > span:nth-child(7)::before { content: "External effect"; }
 .work-item-table-head, .work-item-row {
   min-width: 1040px;
   display: grid;
@@ -5926,6 +5962,12 @@ button, a, input, select, textarea { outline-offset: 3px; }
   .brain-rail-btn { grid-template-columns: 1fr; justify-items: center; }
   .brain-rail-btn em { position: absolute; top: 2px; right: 2px; }
   .intelligence-navigation { padding-left: 0; border-left: 0; }
+  .brain-rail-btn { min-width: var(--touch-target); min-height: var(--touch-target); }
+  .account-decision-strip { grid-template-columns: minmax(0, 1fr); }
+  .account-decision-strip button { width: 100%; }
+  .industry-update-card, .prospecting-page, .prospecting-layout { min-width: 0; max-width: 100%; }
+  .current-account-row, .current-pipeline-row, .current-signal-row, .rec-row, .outreach-row { grid-template-columns: minmax(0, 1fr); }
+  .current-signal-row > *, .rec-row > *, .outreach-row > * { min-width: 0; max-width: 100%; }
 }
 
 @media (max-width: 767px) {
@@ -5976,6 +6018,8 @@ button, a, input, select, textarea { outline-offset: 3px; }
     margin: 0;
     border: 0;
   }
+  .brain-rail-primary { display: contents; }
+  .brain-rail-utility { display: none; }
   .rail-brand,
   .brain-rail-group-label,
   .rail-user-chip,
@@ -5985,7 +6029,8 @@ button, a, input, select, textarea { outline-offset: 3px; }
     display: none;
   }
   .brain-rail-btn {
-    min-width: 68px;
+    flex: 1 1 0;
+    min-width: var(--touch-target);
     min-height: 56px;
     grid-template-columns: 1fr;
     grid-template-rows: 20px 1fr;
@@ -6016,7 +6061,8 @@ button, a, input, select, textarea { outline-offset: 3px; }
     box-shadow: 0 20px 50px var(--shadow);
     padding: 10px;
   }
-  .mobile-more-menu a {
+  .mobile-more-menu a,
+  .mobile-more-menu button {
     min-height: 44px;
     display: grid;
     grid-template-columns: 24px minmax(0, 1fr);
@@ -6027,6 +6073,10 @@ button, a, input, select, textarea { outline-offset: 3px; }
     color: var(--text-primary);
     padding: 10px;
     text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
   }
   .mobile-more-menu a.active {
     border-color: var(--accent);
@@ -6131,4 +6181,28 @@ button, a, input, select, textarea { outline-offset: 3px; }
   .hubspot-mini-list article {
     overflow-wrap: anywhere;
   }
+  button,
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  .horizon-control button,
+  .industry-filter-bar button,
+  .account-decision-strip button,
+  .map-full-bounds {
+    min-height: var(--touch-target);
+  }
+  .industry-filter-bar button,
+  .leaflet-control-zoom a { min-width: var(--touch-target); }
+  .map-rail { left: 10px; right: 10px; width: auto; max-width: none; }
+  .work-item-list:not(.compact) .work-item-table-head { display: none; }
+  .work-item-list:not(.compact) .work-item-row,
+  .work-item-list.compact .work-item-row {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .work-item-list .work-item-row > span { min-width: 0; overflow-wrap: anywhere; }
+  .ask-workspace-grid em,
+  .ask-thread-panel em { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+  .editor-overlay { padding: var(--space-2); }
+  .editor-window { width: 100%; max-width: 100%; }
 }

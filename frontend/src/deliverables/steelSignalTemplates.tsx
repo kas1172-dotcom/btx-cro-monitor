@@ -5,6 +5,7 @@ import type { Deliverable } from "./types.ts";
 import type { World } from "../app/useWorld.ts";
 import type { Company } from "../engine/brain/entities.ts";
 import type { Signal, SignalRelationship, SignalScope } from "../engine/signals/contract.ts";
+import { ASSISTANT_BRAND_NAME } from "../app/branding.ts";
 import {
   BrandMark,
   CapacityTable,
@@ -160,7 +161,7 @@ export function RetentionEarningsHeatmap({ world }: { world: World }) {
 function GenericSteelSignalTemplate({ deliverable, world }: { deliverable: Deliverable; world: World }) {
   return (
     <main className="ss-page">
-      <header className="ss-doc-header compact"><div><BrandMark /><div><p>BTX Revenue Brain</p><span>{deliverable.audience ?? "Internal"} deliverable</span></div></div><h1>{stripEmDashes(deliverable.title)}</h1></header>
+      <header className="ss-doc-header compact"><div><BrandMark /><div><p>{ASSISTANT_BRAND_NAME}</p><span>{deliverable.audience ?? "Internal"} deliverable</span></div></div><h1>{stripEmDashes(deliverable.title)}</h1></header>
       {deliverable.sections.map((section) => <section key={section.id} className="ss-card"><h2>{stripEmDashes(section.heading)}</h2>{section.blocks.map((block, index) => <p key={index}>{stripEmDashes(block.kind === "text" ? block.text : block.kind === "table" ? block.rows.map((row) => row.join(" · ")).join("\n") : block.title)}</p>)}</section>)}
       {deliverable.entityIds.map((id) => companyForId(world, id)).filter(Boolean).map((company) => {
         const relationship = relationshipForCompany(world, company as Company);

@@ -222,7 +222,7 @@ try {
   assert(stylesXml.includes("BTXTitle"), "docx export should include BTX title style");
   assert(stylesXml.includes("BTXHeading2"), "docx export should include BTX section-heading style");
   assert(!stylesXml.includes("Times New Roman"), "docx export should not depend on Word's Times New Roman default");
-  assert(documentXml.includes("BTX Revenue Brain"), "docx export should include the BTX brand line");
+  assert(documentXml.includes("BTX Enterprise Brain"), "docx export should include the BTX assistant brand line");
 } finally {
   rmSync(docxPath, { force: true });
 }

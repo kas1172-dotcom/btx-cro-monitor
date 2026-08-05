@@ -10,7 +10,7 @@ export function processBrainQuestion(question: string, world?: World): BrainResp
   if (!world) {
     return {
       question,
-      directAnswer: "The Revenue Brain is still preparing its local operating context.",
+      directAnswer: "Enterprise Brain is still preparing its local operating context.",
       whyThisMatters: "The brain only answers from rules-based account, signal, opportunity, and capacity context, so it waits for those records before answering.",
       activatedTabs: ["analysis"],
       contextUsed: [{ source: "local operating context", reason: "Required before rules-based scoring can run." }],

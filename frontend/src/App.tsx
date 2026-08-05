@@ -23,6 +23,7 @@ import { accountPath, deliverablePath, figureInsertPath, figureSpecFromRoute, na
 import { sourceFreshness, sourceModeLabel, sourcePermissionLabel } from "./app/sourceRegistry.ts";
 import { BUILD_ENVIRONMENT, loadEnvironmentContract, type EnvironmentContract } from "./app/environmentContract.ts";
 import type { AppRoute } from "./app/router.ts";
+import { userFacingError } from "./app/userFacingError.ts";
 
 const ALL_MARKETS_VALUE = "__all_markets__";
 const AnalysisView = lazy(() => import("./ui/analysis/AnalysisView.tsx").then((module) => ({ default: module.AnalysisView })));
@@ -274,7 +275,7 @@ export function App() {
         }
         setWorkItemStatus("Created work item.");
       } catch (error) {
-        setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
+        setWorkItemStatus(userFacingError(error, "The work item could not be created."));
         if (request.afterSave.openDeliverable) {
           closeDeliverableWizard();
           navigateTo(deliverablePath(deliverable.backendRecordId ?? deliverable.id));
@@ -292,7 +293,7 @@ export function App() {
           {environment.demoNotice ?? "Demonstration — internal records are illustrative"}
         </div>
       ) : null}
-      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : routeTab} counts={counts} metrics={surfaceMetrics} />}
+      rail={<BrainSidebar activeTab={settingsActive ? "settings" : homeActive ? "brief" : routeTab} counts={counts} metrics={surfaceMetrics} onOpenCommands={() => setCommandOpen(true)} />}
       topbar={(
         <header className="quiet-topbar">
           <div className="surface-title">
@@ -412,7 +413,7 @@ export function App() {
                           navigateTo("/work");
                         }, 800);
                       }).catch((error) => {
-                        setWorkItemStatus(error instanceof Error ? error.message : "Could not create work item.");
+                        setWorkItemStatus(userFacingError(error, "The work item could not be created."));
                       });
                     }}
                   >
@@ -463,7 +464,7 @@ function RouteDataFallback({ route, world }: { route: AppRoute; world: ReturnTyp
   const status = offline
     ? "Browser appears offline."
     : auth
-      ? "Your session may have expired."
+      ? "Sign in again to continue."
       : isError
         ? "The data service rejected the request."
         : delayed
@@ -481,7 +482,7 @@ function RouteDataFallback({ route, world }: { route: AppRoute; world: ReturnTyp
         <strong>{status}</strong>
         <p>
           {delayed && !isError ? `Still waiting after ${Math.max(elapsedSeconds, 1)} seconds. You can navigate elsewhere while this keeps trying.` : null}
-          {isError && error ? error : null}
+          {isError && error ? (auth ? "Authentication is unavailable. If signing in again does not help, contact your workspace administrator." : "The requested data could not be loaded. Retry now or continue in another workspace area.") : null}
           {!delayed && !isError ? "The cockpit shell stays available while this route loads." : null}
         </p>
         <div className="route-data-actions">

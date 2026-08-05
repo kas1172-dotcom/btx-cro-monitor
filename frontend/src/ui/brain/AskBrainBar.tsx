@@ -5,6 +5,7 @@ import type { MetricId } from "../../metrics/types.ts";
 import { dispatchBrainQuestion } from "../../app/brainActions.ts";
 import { defaultDateAnchor, defaultTripWindow, quarterOptions } from "../../app/dateDefaults.ts";
 import type { BrainChatMessage } from "../../brain/types.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 
 const ACTIONS = [
   "Plan a trip",
@@ -125,7 +126,7 @@ export function AskBrainBar({ world, large = false, seedPrompt, initialMessages 
     } catch (error) {
       setMessages((current) => [
         ...current,
-        { role: "assistant", content: error instanceof Error ? `Could not answer: ${error.message}` : "Could not answer the question.", source: "offline" },
+        { role: "assistant", content: userFacingError(error, "The question could not be answered. Try again."), source: "offline" },
       ]);
     } finally {
       if (showTimer) window.clearTimeout(showTimer);

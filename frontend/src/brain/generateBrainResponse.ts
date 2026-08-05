@@ -63,7 +63,7 @@ export function generateBrainResponse(ctx: RetrievedContext, world: World): Brai
   let relatedOpportunities: OpportunityCard[] = [];
   let focusView: BrainResponse["focusView"] = "accounts";
   let noteArea: SavedBrainNote["brainArea"] = ctx.activatedTabs[0] ?? "analysis";
-  let noteTitle = "Revenue Brain note";
+  let noteTitle = "Enterprise Brain note";
 
   if (ctx.intent === "market_signals") {
     const names = ctx.topSignals.slice(0, 3).map((s) => `${world.companies.find((c) => c.id === s.subject_id)?.name ?? s.subject_id}: ${s.value ? money(s.value) : displayLabel(s.event_type)}`).join(", ");

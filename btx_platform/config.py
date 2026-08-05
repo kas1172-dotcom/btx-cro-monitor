@@ -60,6 +60,27 @@ class Settings(BaseSettings):
     hubspot_access_token: str | None = None
     hubspot_environment: str = "none"
     hubspot_allow_production_writes: bool = False
+    # Optional integration seams. Disabled systems resolve to safe stub adapters.
+    contact_registry_enabled: bool = False
+    contact_registry_base_url: str | None = None
+    contact_registry_auth_secret: str | None = None
+    contact_registry_auth_scopes: str | None = None
+    contact_registry_timeout_seconds: float = 10.0
+    prism_enabled: bool = False
+    prism_base_url: str | None = None
+    prism_auth_secret: str | None = None
+    prism_auth_scopes: str | None = None
+    prism_timeout_seconds: float = 10.0
+    paperless_parts_enabled: bool = False
+    paperless_parts_base_url: str | None = None
+    paperless_parts_auth_secret: str | None = None
+    paperless_parts_auth_scopes: str | None = None
+    paperless_parts_timeout_seconds: float = 10.0
+    erp_mes_enabled: bool = False
+    erp_mes_base_url: str | None = None
+    erp_mes_auth_secret: str | None = None
+    erp_mes_auth_scopes: str | None = None
+    erp_mes_timeout_seconds: float = 10.0
     gmail_allowlist: str = ""
     pipeline_mechanism: str = "subprocess"
     pipeline_output_dir: str = "clients/btx/artifacts"

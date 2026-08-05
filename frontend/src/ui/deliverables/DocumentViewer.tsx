@@ -9,6 +9,7 @@ import { openDemoAction } from "../../store/store.ts";
 import { saveDeliverable } from "../../memory/localMemory.ts";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
 import { hasDeliverablesBackend, recordToDeliverable, saveStoredDeliverable } from "../../app/deliverablesApi.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 import { requestSectionRevision } from "../../deliverables/editorAssistant.ts";
 import {
   DELIVERABLE_DOWNLOAD_FORMATS,
@@ -34,7 +35,7 @@ import { assessDeliverableQuality, invalidateLegacyDeliverable } from "../../del
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const processEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const copilotEndpoint = env?.VITE_COPILOT_ENDPOINT ?? processEnv?.VITE_COPILOT_ENDPOINT;
-const EDITOR_BANNED_VOCABULARY = ["demo", "snapshot", "simulated", "deterministic", "Revenue Brain"];
+const EDITOR_BANNED_VOCABULARY = ["demo", "snapshot", "simulated", "deterministic", "Enterprise Brain"];
 
 interface TaskTarget {
   company?: Company;
@@ -169,7 +170,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       }
       setDirty(false);
     } catch (error) {
-      setSaveStatus(error instanceof Error ? `Saved locally; backend save failed: ${error.message}` : "Saved locally; backend save failed.");
+      setSaveStatus(userFacingError(error, "Saved locally, but the workspace copy could not be updated."));
     } finally {
       setBusyAction(null);
     }
@@ -198,7 +199,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       if (format === "ics") downloadIcs(current);
       setSaveStatus(`${format.toUpperCase()} ready.`);
     } catch (error) {
-      setSaveStatus(error instanceof Error ? error.message : `${format.toUpperCase()} export failed.`);
+      setSaveStatus(userFacingError(error, `${format.toUpperCase()} export could not be created.`));
     } finally {
       setBusyAction(null);
     }
@@ -245,7 +246,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
         sectionId: target.id,
         originalText: firstText.text,
         text: "No suggestion generated.",
-        warning: error instanceof Error ? error.message : "Assistant revision failed.",
+        warning: userFacingError(error, "The assistant revision could not be completed."),
       }]);
     } finally {
       setAssistantInput("");
@@ -307,7 +308,7 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       });
       setTaskDialog({ ...draft, status: "created", id: result.id, recordUrl: result.record_url });
     } catch (error) {
-      setTaskDialog({ ...draft, status: "error", error: error instanceof Error ? error.message : "CRM task creation failed." });
+      setTaskDialog({ ...draft, status: "error", error: userFacingError(error, "The CRM task could not be created.") });
     }
   }
 
@@ -357,7 +358,8 @@ export function DocumentViewer({ deliverable, world, openedFrom = "generation" }
       <header className="document-head">
         <div>
           <p className="eyebrow">Deliverable</p>
-          <input className="document-title-input" value={title} onChange={(event) => { setTitle(event.target.value); setDirty(true); }} />
+          <label className="visually-hidden" htmlFor="deliverable-title">Deliverable title</label>
+          <input id="deliverable-title" className="document-title-input" value={title} onChange={(event) => { setTitle(event.target.value); setDirty(true); }} />
           <span title={deliverable.confidenceReason}>{deliverableMetaLabel(deliverable)}{dirty ? " - edited" : ""}</span>
           <span className={deliverable.compositionPath?.startsWith("Composed: LLM") ? "composition-status live" : "composition-status"}>
             {deliverable.compositionPath ?? "Template fallback (LLM unavailable: composition status unavailable)"}

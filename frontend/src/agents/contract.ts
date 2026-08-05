@@ -46,8 +46,8 @@ const PROSPECT_BANNED = [
   "competitivePressure",
 ];
 
-const INTERNAL_BANNED = ["demo", "snapshot", "simulated", "deterministic", "Revenue Brain"];
-const HYBRID_INTERNAL_BANNED = ["simulated", "deterministic", "Revenue Brain"];
+const INTERNAL_BANNED = ["demo", "snapshot", "simulated", "deterministic", "Enterprise Brain"];
+const HYBRID_INTERNAL_BANNED = ["simulated", "deterministic", "Enterprise Brain"];
 
 function blockText(section: DeliverableSection): string {
   return section.blocks.map((block) => {

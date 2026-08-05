@@ -12,6 +12,7 @@ import { deliverablePath, navigateTo } from "../../app/router.ts";
 import { AnalysisFigure } from "./ChartFigure.tsx";
 import { FigureTypePicker } from "./FigureTypePicker.tsx";
 import { humanSourceLabel, humanSourceReason } from "../../app/sourceLabels.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 
 const METRIC_IDS = Object.keys(METRICS) as MetricId[];
 
@@ -130,7 +131,7 @@ export function AnalysisView({ world, initialSpec, onCancel, onSpecChange }: { w
       setSaveStatus("Saved figure.");
       navigateTo(deliverablePath(saved.backendRecordId ?? saved.id), { replace: true });
     } catch (error) {
-      setSaveStatus(error instanceof Error ? error.message : "Could not save the figure.");
+      setSaveStatus(userFacingError(error, "The figure could not be saved."));
     } finally {
       setSaving(false);
     }

@@ -93,7 +93,7 @@ function contextPack(world: World): string {
   });
 
   return [
-    "BTX Revenue Brain context pack",
+    "BTX Enterprise Brain context pack",
     `Monitor run: ${world.snapshot?.publicSignals.run_at ?? "not provided"}`,
     `Data source: ${world.dataSource ?? "not provided"}`,
     "",
@@ -113,7 +113,7 @@ function contextPack(world: World): string {
 
 function systemPrompt(context: string): string {
   return [
-    "You are the BTX Revenue Brain assistant inside a sales demo cockpit.",
+    "You are the BTX Enterprise Brain assistant inside the Revenue Cockpit.",
     "Answer only from the context pack below. Do not use outside knowledge about specific companies.",
     "Do not invent accounts, contacts, scores, dollar values, dates, programs, capacity, CAGE, UEI, CRM fields, or pipeline.",
     "When a value is missing, say it is not in the data.",
@@ -144,7 +144,7 @@ function groundingProblems(answer: string, context: string, world: World): strin
   }
   const allowedNames = new Set([
     "BTX",
-    "Revenue Brain",
+    "Enterprise Brain",
     ...world.companies.map((company) => company.name),
     ...world.companies.flatMap((company) => company.aliases ?? []),
     ...world.contacts.map((contact) => contact.name),

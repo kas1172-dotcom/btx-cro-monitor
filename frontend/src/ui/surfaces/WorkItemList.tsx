@@ -34,7 +34,7 @@ export function WorkItemSourceNote({ source, error }: { source: "backend" | "una
   );
 }
 
-export function WorkItemList({ items, empty = "No work items yet.", world }: { items: WorkItem[]; empty?: string; world?: World }) {
+export function WorkItemList({ items, empty = "No work items yet.", world, compact = false }: { items: WorkItem[]; empty?: string; world?: World; compact?: boolean }) {
   if (items.length === 0) {
     return (
       <div className="work-item-list" aria-label="Controlled work queue">
@@ -43,7 +43,14 @@ export function WorkItemList({ items, empty = "No work items yet.", world }: { i
     );
   }
   return (
-    <div className="work-item-list" role="table" aria-label="Controlled work queue">
+    <div
+      className={compact ? "work-item-list compact" : "work-item-list"}
+      role="table"
+      aria-label="Controlled work queue"
+      // A scrollable ARIA table must be keyboard-focusable so its off-screen columns are reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
+    >
       <div role="rowgroup">
         <div className="work-item-table-head" role="row">
           <span role="columnheader">Decision / action</span>

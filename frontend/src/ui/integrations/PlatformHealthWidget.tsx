@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BACKEND_ENDPOINT, backendJson } from "../../app/backendApi.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 
 interface IntegrationHealth {
   name: string;
@@ -60,7 +61,7 @@ export function PlatformHealthWidget() {
         if (!cancelled) setState({ kind: "ready", health });
       })
       .catch((error: unknown) => {
-        if (!cancelled) setState({ kind: "error", message: error instanceof Error ? error.message : String(error) });
+        if (!cancelled) setState({ kind: "error", message: userFacingError(error, "Platform health is temporarily unavailable.") });
       });
     return () => {
       cancelled = true;

@@ -12,6 +12,7 @@ import {
   type FigureMeta,
 } from "../steelSignalPrimitives.tsx";
 import { assertSteelSignalExportable, relationshipForCompany } from "../steelSignalTemplates.tsx";
+import { ASSISTANT_BRAND_NAME } from "../../app/branding.ts";
 
 const W = steelSignal.spacing.slideWidth;
 const H = steelSignal.spacing.slideHeight;
@@ -21,7 +22,7 @@ const FONT = steelSignal.font.pptxFace;
 
 export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen {
   assertSteelSignalExportable(deliverable, world);
-  const pptx = createSteelDeck("BTX Revenue Brain");
+  const pptx = createSteelDeck(ASSISTANT_BRAND_NAME);
   const focus = focusCompany(deliverable, world);
   const relationship = relationshipForCompany(world, focus) ?? sampleRelationship(focus?.name ?? "HubSpot CRM + monitor evidence");
 
@@ -32,7 +33,7 @@ export function buildBoardDeck(deliverable: Deliverable, world: World): pptxgen 
   text(slide, "Quarterly Revenue & Account Board Review", M, 2.95, 11.5, 1.5, 40, C.whiteHex, true);
   text(slide, "Signal-to-action intelligence for precision machining & defense supply", M, 4.35, 11, 0.5, 16, C.iceHex);
   rich(slide, [{ text: "FY26 · Q3 Board Packet", options: { bold: true, color: C.whiteHex } }, { text: "        Confidential", options: { color: C.iceHex } }], M, 6.4, 11, 0.35, 12);
-  slide.addNotes("Cover. BTX Revenue Brain quarterly board review. All figures use illustrative planning context.");
+  slide.addNotes(`Cover. ${ASSISTANT_BRAND_NAME} quarterly board review. All figures use illustrative planning context.`);
 
   slide = pptx.addSlide();
   bg(slide);
@@ -213,7 +214,7 @@ function createSteelDeck(subject: string): pptxgen {
   const pptx = new PptxGen();
   pptx.defineLayout({ name: "SS_WIDE", width: W, height: H });
   pptx.layout = "SS_WIDE";
-  pptx.author = "BTX Revenue Brain";
+  pptx.author = ASSISTANT_BRAND_NAME;
   pptx.company = "BTX";
   pptx.subject = subject;
   pptx.theme = { headFontFace: FONT, bodyFontFace: FONT };

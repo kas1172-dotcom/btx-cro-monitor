@@ -35,10 +35,12 @@ export function BrainSidebar({
   activeTab,
   counts,
   metrics,
+  onOpenCommands,
 }: {
   activeTab: TabId;
   counts: Partial<Record<TabId, number>>;
   metrics?: Partial<Record<TabId, DisplayMetric>>;
+  onOpenCommands?: () => void;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const routeIsSecondary = SECONDARY_IDS.includes(activeTab);
@@ -74,7 +76,7 @@ export function BrainSidebar({
     <nav className="brain-rail" aria-label="Cockpit navigation">
       <div className="rail-brand" aria-label="BTX">
         <span>BTX</span>
-        <strong>Revenue cockpit</strong>
+        <strong>Revenue Cockpit</strong>
       </div>
       <div className="brain-rail-group brain-rail-primary">
         <div className="brain-rail-group-label">Operate</div>
@@ -110,6 +112,10 @@ export function BrainSidebar({
       </button>
       {moreOpen && (
         <div id="mobile-more-menu" className="mobile-more-menu">
+          <button type="button" onClick={() => { setMoreOpen(false); onOpenCommands?.(); }}>
+            <UiIcon name="ask" />
+            <span>Commands</span>
+          </button>
           {[...primary, ...(ask ? [ask] : []), ...intelligence, ...utilities].map((surface) => (
             <a
               key={surface.id}

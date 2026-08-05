@@ -6,6 +6,7 @@ const BASE_URL = "http://127.0.0.1:4174";
 const SCREENSHOT_DIR = "/tmp/btx-mobile-smoke";
 const VIEWPORTS = [
   [320, 568],
+  [375, 812],
   [390, 844],
   [414, 896],
   [768, 1024],

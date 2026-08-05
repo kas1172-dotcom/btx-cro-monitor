@@ -10,6 +10,7 @@ import {
 import type { World } from "../../app/useWorld.ts";
 import { navigateTo } from "../../app/router.ts";
 import { signalHeadline, signalSourceName } from "../../app/signalProvenance.ts";
+import { userFacingError } from "../../app/userFacingError.ts";
 import { displayLabel } from "../../app/displayLabels.ts";
 import { ExternalLink } from "../common/ExternalLink.tsx";
 import { EmptyState, SurfaceHeader } from "../primitives.tsx";
@@ -179,7 +180,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       setUndoReview({ id: update.id, previous, label: `Undo ${action === "dismiss" ? "dismiss" : action === "mark_reviewed" ? "review" : "queue change"}` });
       setStatus(action === "needs_account_match" ? "Queued for account-evidence assessment. Undo will restore the prior backend review status." : "Review saved. Undo will restore the prior backend review status.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "The review could not be saved.");
+      setStatus(userFacingError(error, "The review could not be saved."));
     } finally {
       setBusyAction(null);
     }
@@ -208,7 +209,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       setStatus("Previous review status restored.");
       setUndoReview(null);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "The review change could not be restored.");
+      setStatus(userFacingError(error, "The review change could not be restored."));
     } finally {
       setBusyAction(null);
     }
@@ -228,7 +229,7 @@ export function IndustryUpdates({ world }: { world: World }) {
       setStatus("Internal draft created. No CRM action occurred.");
       navigateTo(`/work/${encodeURIComponent(item.id)}`);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "The work-item draft could not be created.");
+      setStatus(userFacingError(error, "The work-item draft could not be created."));
     } finally {
       setBusyAction(null);
     }

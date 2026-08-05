@@ -1,4 +1,5 @@
 import { brandCore, hex } from "../app/brandCore.ts";
+import { ASSISTANT_BRAND_NAME } from "../app/branding.ts";
 
 export const steelSignal = {
   colors: {
@@ -72,7 +73,7 @@ export const steelSignal = {
     confidential: "Confidential",
     illustrative: "Illustrative sample",
     document: "BTX Precision Machining  ·  Confidential  ·  Illustrative sample",
-    board: "BTX Revenue Brain   ·   Confidential · Illustrative planning context",
+    board: `${ASSISTANT_BRAND_NAME}   ·   Confidential · Illustrative planning context`,
     pitch: "BTX Precision Machining   ·   Sales pitch · Illustrative sample",
   },
 } as const;
